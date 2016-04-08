@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/global_padding"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/img_destiny_symbol_white"
+        android:layout_margin="@dimen/image_margin"
+        android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/login_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tx_login"
+            android:layout_marginLeft="@dimen/text_margin"
+            android:layout_toEndOf="@+id/logo"
+            android:layout_toRightOf="@+id/logo"
+            android:layout_alignTop="@+id/logo"
+            />
+
+            <Button
+                android:id="@+id/btn_psn"
+                android:layout_width="260dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="@dimen/button_margin"
+                android:text="@string/psn"
+                android:gravity="left|center"
+                android:layout_alignLeft="@+id/login_text"
+                android:layout_below="@id/login_text"
+                android:drawableLeft="@drawable/ic_psn"
+                android:backgroundTint="@android:color/holo_blue_dark"
+                android:onClick="callWebView"/>
+
+            <Button
+                android:id="@+id/btn_live"
+                android:layout_width="260dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="@dimen/button_margin"
+                android:text="@string/live"
+                android:gravity="left|center"
+                android:layout_below="@id/btn_psn"
+                android:layout_alignLeft="@id/btn_psn"
+                android:drawableLeft="@drawable/ic_live"
+                android:backgroundTint="@android:color/holo_green_dark"
+                android:onClick="callWebView"/>
+
+</RelativeLayout>

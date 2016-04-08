@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="DestinyApp" parent="Theme.AppCompat.NoActionBar" >
+        <item name="android:colorBackground">@android:color/background_dark</item>
+        <item name="colorAccent">@color/lineColor</item>
+        <item name="colorButtonNormal">@color/colorButtonNormal</item>
+    </style>
+
+</resources>

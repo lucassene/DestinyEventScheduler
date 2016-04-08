@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:gravity="center_vertical"
+    android:layout_marginBottom="6dp"
+    android:elevation="7dp"
+    android:focusable="true"
+    android:clickable="true"
+    android:background="?android:attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/clan_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/default_clan_banner"
+        android:adjustViewBounds="false"
+        android:scaleType="centerCrop"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/global_padding"
+        android:paddingStart="@dimen/global_padding"
+        android:paddingBottom="12dp">
+
+        <ImageView
+            android:id="@+id/clan_logo"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/img_default_clan"
+            android:adjustViewBounds="true"
+            android:layout_gravity="bottom" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:gravity="bottom"
+            android:layout_marginLeft="@dimen/global_padding">
+
+            <TextView
+                android:id="@+id/clan_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/def_clan_header"
+                android:textStyle="bold"
+                android:textColor="@color/primary_text_material_light"/>
+
+            <TextView
+                android:id="@+id/clan_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/def_clan_desc"
+                android:textColor="@color/primary_text_material_light"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</FrameLayout>

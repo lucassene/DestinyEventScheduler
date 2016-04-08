@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/new_event_fragment">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheaderHeight"
+            android:id="@+id/section_game"
+            android:textColor="@color/psnColor"
+            android:textSize="@dimen/secondaryTextSize"
+            android:text="@string/game_info"
+            android:gravity="center_vertical"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/type" />
+
+            <RelativeLayout
+                android:id="@+id/type_list"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/listItemHeight"
+                android:focusable="true"
+                android:clickable="true"
+                android:background="?android:attr/selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/type_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"/>
+
+                <TextView
+                    android:id="@+id/type_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="@dimen/primaryTextLeftPadding"
+                    android:paddingStart="@dimen/primaryTextLeftPadding"
+                    android:textSize="18sp"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/game_label"
+                android:layout_marginTop="8dp" />
+
+            <RelativeLayout
+                android:id="@+id/game_list"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/listItemHeight"
+                android:focusable="true"
+                android:clickable="true"
+                android:background="?android:attr/selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/game_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"/>
+
+                <TextView
+                    android:id="@+id/game_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="@dimen/primaryTextLeftPadding"
+                    android:paddingStart="@dimen/primaryTextLeftPadding"
+                    android:textSize="18sp"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheaderHeight"
+            android:id="@+id/section_wait_list"
+            android:textColor="@color/psnColor"
+            android:textSize="@dimen/secondaryTextSize"
+            android:text="@string/date_time_section"
+            android:gravity="center_vertical"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3">
+
+                <EditText
+                    android:id="@+id/date_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="date"
+                    android:singleLine="true"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:hint="@string/date" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2">
+
+                <EditText
+                    android:id="@+id/time_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:hint="@string/time"
+                    android:inputType="time"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheaderHeight"
+            android:textColor="@color/psnColor"
+            android:textSize="@dimen/secondaryTextSize"
+            android:text="@string/specs"
+            android:gravity="center_vertical"/>
+
+       <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/global_padding"
+            android:paddingTop="@dimen/global_padding">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/guardian_text"
+                android:text="@string/max_guardians_label"
+                android:layout_marginBottom="@dimen/paddingBottomLabelText"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/guardian_layout"
+                android:layout_below="@id/guardian_text">
+
+                <SeekBar
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:id="@+id/guardian_bar"
+                    android:layout_gravity="center_vertical"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/listItemHeight"
+                    android:layout_weight="1"
+                    android:text="1"
+                    android:gravity="center"
+                    android:id="@+id/guardian_total_text"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="?android:attr/selectableItemBackground" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/light_text"
+                android:text="@string/min_light_label"
+                android:layout_below="@id/guardian_layout"
+                android:layout_marginTop="@dimen/paddingTopLabelText"
+                android:layout_marginBottom="@dimen/paddingBottomLabelText"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/light_layout"
+                android:layout_below="@id/light_text">
+
+                <SeekBar
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:id="@+id/light_bar"
+                    android:layout_gravity="center_vertical"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/listItemHeight"
+                    android:layout_weight="1"
+                    android:text="200"
+                    android:gravity="center"
+                    android:id="@+id/light_min_text"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="?android:attr/selectableItemBackground"/>
+
+            </LinearLayout>
+
+       </RelativeLayout>
+
+            <Button
+                android:layout_width="260dp"
+                android:layout_height="50dp"
+                android:id="@+id/btn_gravar"
+                android:text="@string/new_event_button"
+                android:background="@color/colorButtonNormal"
+                android:layout_gravity="center_horizontal"
+                android:onClick="createNewEvent"
+                />
+
+    </LinearLayout>
+
+</ScrollView>

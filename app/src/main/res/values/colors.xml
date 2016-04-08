@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#424242</color>
+    <color name="colorPrimaryDark">#151515</color>
+    <color name="colorAccent">#E0E0E0</color>
+    <color name="textColorPrimary">#F5F5F5</color>
+    <color name="lineColor">#ff9800</color>
+    <color name="psnColor">#0288D1</color>
+    <color name="liveColor">#388E3C</color>
+    <color name="navigationBarColor">#212121</color>
+    <color name="primary_material_dark">#212121</color>
+    <color name="tabIndicatorColor">#9E9E9E</color>
+    <color name="background_dark">#ffffff</color>
+    <color name="primary_text_default_material_dark">#00000000</color>
+    <color name="primary_text_material_dark">#000000</color>
+    <color name="primary_material_light">#4527a0</color>
+    <color name="background_material_light">#fafafa</color>
+    <color name="accent_material_light">#fb8c00</color>
+    <color name="primary_dark_material_light">#311b92</color>
+    <color name="colorButtonNormal">#1976D2</color>
+    <color name="colorToolbarTitle">#FFFFFF</color>
+    <color name="colorTextButton">#FFFFFF</color>
+    <color name="primary_text_default_material_light">#ffffff</color>
+    <color name="primary_text_material_light">#ffffff</color>
+</resources>

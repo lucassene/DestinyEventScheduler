@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/global_padding"
+    android:paddingRight="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/drawer_header_layout"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/order_by"
+                android:paddingBottom="@dimen/paddingBottomLabelText"/>
+
+            <Spinner
+                android:id="@+id/order_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheaderHeight">
+
+            <TextView
+                android:id="@+id/section_members"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/subheaderHeight"
+                android:textColor="@color/psnColor"
+                android:gravity="center_vertical"
+                android:textSize="@dimen/secondaryTextSize"
+                android:text="@string/members" />
+
+            <ImageView
+                android:id="@+id/members_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_clan"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"/>
+
+            <TextView
+                android:id="@+id/total_members"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="46"
+                android:layout_toLeftOf="@id/members_icon"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+
+
+        <FrameLayout
+            android:id="@+id/myclan_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </FrameLayout>
+
+    </LinearLayout>
+
+</ScrollView>

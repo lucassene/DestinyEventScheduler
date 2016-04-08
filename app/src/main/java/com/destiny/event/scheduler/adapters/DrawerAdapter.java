@@ -1,0 +1,137 @@
+package com.destiny.event.scheduler.adapters;
+
+
+import android.content.res.TypedArray;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.destiny.event.scheduler.R;
+
+public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder> {
+
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
+    private static final int TYPE_SECTION = 2;
+
+    private String items[];
+    private TypedArray icons;
+    private String sections[];
+    private String header;
+
+    public static class ViewHolder extends RecyclerView.ViewHolder{
+
+        int holderId;
+        TextView itemView;
+        ImageView iconView;
+        TextView sectionView;
+        TextView headerView;
+        TextView descView;
+        ImageView bannerView;
+        ImageView logoView;
+
+        public ViewHolder(View itemView, int ViewType){
+            super(itemView);
+
+            switch (ViewType){
+                case TYPE_ITEM:
+                    this.itemView = (TextView) itemView.findViewById(R.id.drawer_text);
+                    iconView = (ImageView ) itemView.findViewById(R.id.drawer_icon);
+                    holderId = 1;
+                    break;
+                case TYPE_HEADER:
+                    bannerView = (ImageView) itemView.findViewById(R.id.clan_banner);
+                    headerView = (TextView) itemView.findViewById(R.id.clan_header);
+                    descView = (TextView) itemView.findViewById(R.id.clan_desc);
+                    logoView = (ImageView) itemView.findViewById(R.id.clan_logo);
+                    holderId = 0;
+                    break;
+                case TYPE_SECTION:
+                    sectionView = (TextView) itemView.findViewById(R.id.drawer_section_text);
+                    holderId = 2;
+                    break;
+            }
+
+        }
+    }
+
+    public DrawerAdapter(String header, String[] sections, TypedArray icons, String[] items) {
+        this.sections = sections;
+        this.header = header;
+        this.icons = icons;
+        this.items = items;
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType){
+            case TYPE_ITEM:
+                View vItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_item_layout, parent, false);
+                ViewHolder vhItem = new ViewHolder(vItem, viewType);
+                return vhItem;
+            case TYPE_HEADER:
+                View vHeader = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_header_layout, parent, false);
+                ViewHolder vhHeader = new ViewHolder(vHeader, viewType);
+                return vhHeader;
+            case TYPE_SECTION:
+                View vSection = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_section_layout, parent, false);
+                ViewHolder vhSection = new ViewHolder(vSection, viewType);
+                return vhSection;
+        }
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        switch (holder.holderId){
+            case 1:
+                if (position <=4){
+                    holder.itemView.setText(items[position -1]);
+                    holder.iconView.setImageResource(icons.getResourceId(position-1,0));
+                } else if(position <=7){
+                    holder.itemView.setText(items[position -2]);
+                    holder.iconView.setImageResource(icons.getResourceId(position-2,0));
+                } else {
+                    holder.itemView.setText(items[position -3]);
+                    holder.iconView.setImageResource(icons.getResourceId(position-3,0));
+                }
+                break;
+            case 0:
+                holder.headerView.setText(header);
+                break;
+            case 2:
+                if (position == 5) {
+                    holder.sectionView.setText(sections[position -5]);
+                } else {
+                    holder.sectionView.setText(sections[position -7]);
+                }
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return items.length+sections.length+1;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (isPositionHeader(position)){
+            return TYPE_HEADER;
+        } else if (isPositionSection(position)){
+            return TYPE_SECTION;
+        } else {
+            return TYPE_ITEM;
+        }
+    }
+
+    private boolean isPositionHeader(int position){
+        return position == 0;
+    }
+
+    private boolean isPositionSection(int position){
+        return position == 5 || position == 8;
+    }
+}

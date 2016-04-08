@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="psn" translatable="false">PSN</string>
+    <string name="live" translatable="false">LIVE</string>
+    <string name="app_name" translatable="false">Destiny Event Scheduler</string>
+    <string name="default_url" translatable="false">http://wwww.url.com.br</string>
+    <string name="default_username">username</string>
+    <string name="default_img_desc">Icon</string>
+    <string name="back_desc">Back</string>
+    <string name="menu_new_event">New Event</string>
+    <string name="open_menu">Open menu</string>
+    <string name="close_menu">Close menu</string>
+    <string name="new_tab_header">NEW</string>
+    <string name="scheduled_tab_header">SCHEDULED</string>
+    <string name="validate_tab_header">VALIDAR</string>
+    <string name="new_event_title">New Event</string>
+
+    <string name="tx_login">Welcome Guardian! What is the secret code?</string>
+
+    <string-array name="tab_titles">
+        <item>NEW</item>
+        <item>SCHEDULED</item>
+        <item>EVALUATE</item>
+    </string-array>
+
+    <string-array name="menu_item">
+        <item>New Event</item>
+        <item>Search Events</item>
+        <item>Validate Event</item>
+        <item>History</item>
+        <item>My Clan</item>
+        <item>My Stats</item>
+        <item>Settings</item>
+        <item>Logout</item>
+    </string-array>
+
+    <array name="menu_icons">
+        <item>@drawable/ic_event_new</item>
+        <item>@drawable/ic_event_search</item>
+        <item>@drawable/ic_event_validate</item>
+        <item>@drawable/ic_event_history</item>
+        <item>@drawable/ic_clan</item>
+        <item>@drawable/ic_person</item>
+        <item>@drawable/ic_settings</item>
+        <item>@drawable/ic_exit</item>
+    </array>
+
+    <string-array name="menu_section">
+        <item>Data</item>
+        <item>Other</item>
+    </string-array>
+
+    <string name="def_clan_desc">"Here goes Clan\'s description"</string>
+    <string name="def_clan_header">Clan\'s Name</string>
+    <string name="empty_new_events">It seems that nobody is playing huh?</string>
+    <string name="empty_validate_event">First you play, then you evaluate, got it?</string>
+    <string name="empty_scheduled_list">You don\'t have any scheduled event.</string>
+    <string name="menu">Menu</string>
+    <string name="refresh_lists">Refresh Lists</string>
+    <string name="game_type_label">Game Type</string>
+    <string name="game_label">Game</string>
+    <string name="date_label">Date</string>
+    <string name="time_label">Time</string>
+    <string name="max_guardians_label">Max Guardians</string>
+    <string name="min_light_label">Min Light</string>
+    <string name="new_event_button">Create Event</string>
+    <string name="home_title">Main</string>
+    <string name="validate_event_title">Validate Event</string>
+    <string name="event_confirmation">This event happened?</string>
+    <string name="validate_button">Validate</string>
+    <string name="search_title">Search Event</string>
+    <string name="date_time_section">Date and Time</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="specs">Specs</string>
+    <string name="min_light">Min light</string>
+    <string name="guardians">Guardians</string>
+    <string name="guardians_participating">Guardians Participating</string>
+    <string name="join">Join</string>
+    <string name="participants_guardians">Participants Guardians</string>
+    <string name="created_by">Created by</string>
+
+    <string-array name="new_event_section">
+        <item>What</item>
+        <item>When</item>
+        <item>Who</item>
+    </string-array>
+
+    <string name="wait_list">Queue</string>
+    <string name="games_available">Games Available</string>
+    <string name="members">Members</string>
+    <string name="order_by">Order by</string>
+    <string name="my_clan">My Clan</string>
+    <string name="history">History</string>
+    <string name="games_played">Games Played</string>
+    <string name="sort_by">Sort by</string>
+    <string name="system">System</string>
+    <string name="my_profile">My Profile</string>
+    <string name="joined_events">Joined Events:</string>
+    <string name="events_created">Events created:</string>
+    <string name="member_since">Member since:</string>
+
+    <string name="court">Court of Oryx</string>
+    <string name="crucible">Crucible</string>
+    <string name="patrol">Patrol</string>
+    <string name="prison">Prison of Elders</string>
+    <string name="raid">Raid</string>
+    <string name="story">Story</string>
+    <string name="strike">Strike</string>
+    <string name="strike_list">Strike List</string>
+
+    <string name="tier1">Reciprocate Rune</string>
+    <string name="tier2">Stolen Rune</string>
+    <string name="tier3">Antiquated Rune</string>
+
+    <string name="clash">Clash</string>
+    <string name="classic3">Classic 3v3</string>
+    <string name="classic6">Classic 6v6</string>
+    <string name="classic1">Classic Rumble</string>
+    <string name="control">Control</string>
+    <string name="doubles">Doubles</string>
+    <string name="elimination">Elimination</string>
+    <string name="inferno3">Inferno 3v3</string>
+    <string name="inferno6">Inferno 6v6</string>
+    <string name="iron_banner">Iron Banner</string>
+    <string name="mayhem_clash">Mayhem Clash</string>
+    <string name="mayhem_rumble">Mayhem Rumble</string>
+    <string name="rift">Rift</string>
+    <string name="rumble">Rumble</string>
+    <string name="salvage">Salvage</string>
+    <string name="skirmish">Skirmish</string>
+    <string name="trials">Trials of Osiris</string>
+    <string name="zone_control">Zone Control</string>
+    
+    <string name="valus">Cerberus Vae III</string>
+    <string name="dust">Dust Palace</string>
+    <string name="echo">Echo Chamber</string>
+    <string name="saber">Fallen S.A.B.E.R.</string>
+    <string name="shield">Shield Brothers</string>
+    <string name="devils">The Devil\'s Lair</string>
+    <string name="nexus">The Nexus</string>
+    <string name="shadow">The Shadow Thief</string>
+    <string name="pits">The Summoning Pits</string>
+    <string name="sunless">The Sunless Cell</string>
+    <string name="mind">The Undying Mind</string>
+    <string name="will">The Will of Crota</string>
+    <string name="winter">Winter\'s Run</string>
+
+    <string name="nightfall">Nightfall</string>
+    <string name="weekly">Weekly Heroic Strike</string>
+    <string name="heroic">Heroic Strike</string>
+    <string name="vanguard">Vanguard Strike</string>
+    <string name="legacy">Legacy Strike</string>
+    
+    <string name="crota_normal">Crota\'s End - NORMAL</string>
+    <string name="crota_hard">Crota\'s End - HARD</string>
+    <string name="king_normal">King\'s Fall - NORMAL</string>
+    <string name="king_hard">King\'s Fall - HARD</string>
+    <string name="vault_normal">Vault of Glass - NORMAL</string>
+    <string name="vault_hard">Vault of Glass - HARD</string>
+
+    <string name="cosmodrome">Patrol the Cosmodrome</string>
+    <string name="dreadnaught">Patrol the Dreadnaught</string>
+    <string name="mars">Patrol Mars</string>
+    <string name="moon">Patro the Moon</string>
+    <string name="venus">Patrol Venus</string>
+    
+    <string name="prison28">Prison of Elders - 28</string>
+    <string name="prison32">Prison of Elders - 32</string>
+    <string name="prison34">Prison of Elders - 34</string>
+    <string name="prison35">Skola\'s Revenge</string>
+
+    <string name="story_normal">Regular Story</string>
+    <string name="story_heroic">Daily Heroic Story</string>
+
+    <string name="choose_type">Choose the game type:</string>
+    <string name="choose_game">Choose the game mode:</string>
+    <string name="event_type_title">Event Type List</string>
+    <string name="type">Type</string>
+    <string name="game_info">Game Info</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="values_between1">"Value between 1 and "</string>
+    <string name="value_between2">"Value between "</string>
+    <string name="and320">" and 320"</string>
+
+
+</resources>

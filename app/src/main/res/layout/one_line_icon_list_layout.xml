@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/listItemHeight">
+
+    <ImageView
+        android:id="@+id/icon_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_nightfall"
+        android:layout_centerVertical="true"/>
+
+        <TextView
+            android:id="@+id/primary_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Primary Text"
+            android:textSize="@dimen/primaryTextSize"
+            android:layout_centerVertical="true"
+            android:paddingLeft="@dimen/primaryTextLeftPadding"
+            android:paddingStart="@dimen/primaryTextLeftPadding"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorPrimary"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

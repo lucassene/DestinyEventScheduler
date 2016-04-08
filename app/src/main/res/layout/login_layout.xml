@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/global_padding"
+    android:gravity="center"
+    android:background="@drawable/gradient_background">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/img_destiny_symbol_white"
+        android:gravity="center_horizontal"
+        android:layout_margin="@dimen/image_margin"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/tx_login"
+        android:layout_marginBottom="@dimen/text_margin"
+        android:layout_marginTop="42dp"/>
+
+    <Button
+        android:id="@+id/btn_psn"
+        android:layout_width="260dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="@dimen/button_margin"
+        android:layout_marginTop="@dimen/button_margin"
+        android:text="@string/psn"
+        android:gravity="left|center"
+        android:drawableLeft="@drawable/ic_psn"
+        android:background="@color/psnColor"
+        android:onClick="callWebView"/>
+
+    <Button
+        android:id="@+id/btn_live"
+        android:layout_width="260dp"
+        android:layout_height="50dp"
+        android:text="@string/live"
+        android:gravity="left|center"
+        android:drawableLeft="@drawable/ic_live"
+        android:background="@color/liveColor"
+        android:onClick="goHome"/>
+
+</LinearLayout>

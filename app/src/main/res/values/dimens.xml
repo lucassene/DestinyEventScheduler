@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="global_padding">16dp</dimen>
+    <dimen name="image_margin">12dp</dimen>
+    <dimen name="button_margin">12dp</dimen>
+    <dimen name="text_margin">18dp</dimen>
+    <dimen name="bottomTopDrawerItemPadding">8dp</dimen>
+
+    <dimen name="paddingTopLabelText">16dp</dimen>
+    <dimen name="paddingBottomLabelText">8dp</dimen>
+    
+
+    <dimen name="toolbar_height">55dp</dimen>
+
+    <dimen name="tab_label">14sp</dimen>
+    <dimen name="tab_max_width">264dp</dimen>
+    <dimen name="tab_layout_height">48dp</dimen>
+    <dimen name="tab_side_padding">12dp</dimen>
+    <dimen name="tab_line_bottom_padding">20dp</dimen>
+
+    <dimen name="settingsMargin">24dp</dimen>
+
+    <dimen name="paddingLeftList">16dp</dimen>
+    <dimen name="paddingBottomTopListItem">20dp</dimen>
+    <dimen name="paddingList">8dp</dimen>
+    <dimen name="listItemHeight">72dp</dimen>
+
+    <dimen name="primaryTextSize">16sp</dimen>
+    <dimen name="primaryTextLeftPadding">56dp</dimen>
+    <dimen name="secondaryTextSize">14sp</dimen>
+
+
+    <dimen name="subheaderHeight">48dp</dimen>
+
+</resources>
