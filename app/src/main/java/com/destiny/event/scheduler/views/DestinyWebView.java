@@ -13,7 +13,6 @@ import android.webkit.WebViewClient;
 
 import com.destiny.event.scheduler.utils.CookiesUtils;
 
-
 public class DestinyWebView extends WebView {
     protected static final String TAG = DestinyWebView.class.getSimpleName();
     public static final String REDIRECT_FINISH = "https://www.bungie.net/";
@@ -59,6 +58,7 @@ public class DestinyWebView extends WebView {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String loadingUrl) {
                 Log.e(TAG, loadingUrl);
+                mListener.onPageChanged(loadingUrl);
                 if (REDIRECT_FINISH.equals(loadingUrl)) {
                     serverToken = CookiesUtils.getCookies(loadingUrl);
                     Log.e("SERVER_TOKEN", serverToken);
@@ -89,6 +89,8 @@ public class DestinyWebView extends WebView {
         });
     }
 
+
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_UP) {
@@ -103,9 +105,8 @@ public class DestinyWebView extends WebView {
         mListener = listener;
     }
 
-    public void loadLoginUrl(String url) {
-        String loginUrl = url;
-        super.loadUrl(loginUrl);
+    public void loadLoginUrl(String url, String locale) {
+        super.loadUrl(url+locale);
     }
 
     public void clearUserCookies() {
@@ -122,6 +123,8 @@ public class DestinyWebView extends WebView {
         void onUserLoggedIn(String cookies, String crossRefToken);
 
         void onLoginFailed();
+
+        void onPageChanged(String url);
 
     }
 

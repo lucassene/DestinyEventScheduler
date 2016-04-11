@@ -20,6 +20,7 @@ public class DBHelper extends SQLiteOpenHelper{
         EventTypeTable.onCreate(db);
         EventTable.onCreate(db);
         LoggedUserTable.onCreate(db);
+        ClanTable.onCreate(db);
     }
 
     @Override
@@ -27,6 +28,7 @@ public class DBHelper extends SQLiteOpenHelper{
         EventTypeTable.onUpdate(db, oldVersion, newVersion);
         EventTable.onUpdate(db, oldVersion, newVersion);
         LoggedUserTable.onUpdate(db, oldVersion, newVersion);
+        ClanTable.onUpdate(db, oldVersion, newVersion);
     }
 
     @Override

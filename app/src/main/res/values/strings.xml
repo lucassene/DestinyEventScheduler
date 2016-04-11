@@ -3,7 +3,7 @@
     <string name="psn" translatable="false">PSN</string>
     <string name="live" translatable="false">LIVE</string>
     <string name="app_name" translatable="false">Destiny Event Scheduler</string>
-    <string name="default_url" translatable="false">http://wwww.url.com.br</string>
+    <string name="default_url" translatable="false">https://www.bungie.net</string>
     <string name="default_username">username</string>
     <string name="default_img_desc">Icon</string>
     <string name="back_desc">Back</string>

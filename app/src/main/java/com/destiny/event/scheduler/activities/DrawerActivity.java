@@ -1,13 +1,18 @@
 package com.destiny.event.scheduler.activities;
 
+import android.content.Intent;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -23,10 +28,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
+import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.DrawerAdapter;
 import com.destiny.event.scheduler.adapters.ViewPageAdapter;
+import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.fragments.HistoryFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
 import com.destiny.event.scheduler.fragments.MyProfileFragment;
@@ -35,11 +42,15 @@ import com.destiny.event.scheduler.fragments.SearchFragment;
 import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
+import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
 import java.util.ArrayList;
 
-public class DrawerActivity extends AppCompatActivity implements ToActivityListener, FragmentManager.OnBackStackChangedListener {
+public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>{
+
+    private static final int URL_LOADER_USER = 30;
+    private static final int NO_USER = 0;
 
     private Toolbar toolbar;
     private FloatingActionButton newEventButton;
@@ -68,6 +79,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         setContentView(R.layout.drawer_layout);
 
+        if (savedInstanceState == null){
+            Toast.makeText(this, "Verificando usuário logado...", Toast.LENGTH_SHORT).show();
+            getLoggedUser();
+        }
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
@@ -95,7 +111,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         rView.setLayoutManager(rLayoutManager);
 
         fm = getSupportFragmentManager();
-        fm.addOnBackStackChangedListener(this);
+        //fm.addOnBackStackChangedListener(this);
 
         final GestureDetector gestureDetector = new GestureDetector(DrawerActivity.this, new GestureDetector.SimpleOnGestureListener(){
             @Override
@@ -219,6 +235,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     }
 
+    private void getLoggedUser() {
+        getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -246,8 +266,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            Toast.makeText(this, "Back Count: " + fm.getBackStackEntryCount(), Toast.LENGTH_SHORT).show();
+            if (fm.getBackStackEntryCount() == 1) {
+                super.onBackPressed();
+                openMainActivity(null);
+            } else {
+                super.onBackPressed();
+            }
         }
+
     }
 
     @Override
@@ -267,7 +294,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void updateViewPager() {
-        if (getFragmentManager().getBackStackEntryCount() == 0){
             openFragment = null;
             viewPager.setAdapter(viewPageAdapter);
             tabLayout.setViewPager(viewPager);
@@ -277,7 +303,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 getSupportActionBar().setTitle(R.string.home_title);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             }
-        }
     }
 
     @Override
@@ -308,15 +333,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void onEventTypeSelected(String id) {
-        getSupportFragmentManager().popBackStack();
-        newEventListener = (FromActivityListener) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        fm.popBackStack();
+        newEventListener = (FromActivityListener) getSupportFragmentManager().findFragmentByTag("new");
         newEventListener.onEventTypeSent(id);
     }
 
     @Override
     public void onEventGameSelected(String id) {
-        getSupportFragmentManager().popBackStack();
-        newEventListener = (NewEventFragment) getSupportFragmentManager().findFragmentByTag("new");
+        fm.popBackStack();
+        newEventListener = (FromActivityListener) getSupportFragmentManager().findFragmentByTag("new");
         newEventListener.onEventGameSent(id);
     }
 
@@ -382,14 +407,14 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openMainActivity(View child){
-        if(openFragment !=null){
+        if(openFragment != null){
             ft = fm.beginTransaction();
             ft.remove(openFragment);
             ft.commit();
             fragmentTag = null;
             updateViewPager();
             drawerLayout.closeDrawers();
-            child.playSoundEffect(SoundEffectConstants.CLICK);
+            if (child != null) child.playSoundEffect(SoundEffectConstants.CLICK);
             return true;
         }
         drawerLayout.closeDrawers();
@@ -401,12 +426,53 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         openNewEventFragment(view);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        String[] projection;
+        CursorLoader cursorLoader;
+
+        Toast.makeText(this, "Loader criado!", Toast.LENGTH_SHORT).show();
+
+        switch (id) {
+            case URL_LOADER_USER:
+                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_NAME, LoggedUserTable.COLUMN_ICON};
+                cursorLoader = new CursorLoader(
+                        this,
+                        DataProvider.LOGGED_USER_URI,
+                        projection,
+                        null,
+                        null,
+                        null);
+                break;
+            default:
+                cursorLoader = null;
+                break;
+        }
+
+        return cursorLoader;
+
+    }
 
     @Override
-    public void onBackStackChanged() {
-        //if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-            //updateViewPager();
-        //}
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        Toast.makeText(this, "Loader concluido.", Toast.LENGTH_SHORT).show();
+
+        switch (loader.getId()){
+            case URL_LOADER_USER:
+                if (data.getCount() == 0){
+                    Toast.makeText(this, "Nenhum usuário logado!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivityForResult(intent, NO_USER);
+                }
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
 

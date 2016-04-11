@@ -41,6 +41,6 @@
         android:gravity="left|center"
         android:drawableLeft="@drawable/ic_live"
         android:background="@color/liveColor"
-        android:onClick="goHome"/>
+        android:onClick="callWebView"/>
 
 </LinearLayout>

@@ -3,9 +3,6 @@ package com.destiny.event.scheduler.utils;
 import android.support.annotation.Nullable;
 import android.webkit.CookieManager;
 
-/**
- * Created by Escritorio on 18/01/2016.
- */
 public final class CookiesUtils {
 
     public static final String DESTINY_CSRF = "bungled";

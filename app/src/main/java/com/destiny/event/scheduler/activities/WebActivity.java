@@ -1,16 +1,24 @@
 package com.destiny.event.scheduler.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.views.DestinyWebView;
 
+import java.util.Locale;
+
 public class WebActivity extends Activity implements DestinyWebView.DestinyListener {
+
+    String url;
+    DestinyWebView destinyWebView;
+    EditText urlText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,26 +36,57 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
         webview.getSettings().setBuiltInZoomControls(true);
         webview.getSettings().setDisplayZoomControls(false);
 
-        WebSettings webSettings = webview.getSettings();
+/*        WebSettings webSettings = webview.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        webview.loadUrl("http://www.bungie.net");
         webview.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
                 return false;
             }
-        });
+        });*/
+
+        Intent intent = getIntent();
+        url = intent.getStringExtra("url");
+
+        urlText = (EditText) findViewById(R.id.webview_text);
+
+        String locale = Locale.getDefault().getLanguage();
+
+        destinyWebView = (DestinyWebView) findViewById(R.id.webview);
+        destinyWebView.setListener(this);
+        destinyWebView.loadLoginUrl(url, locale);
+
+        destinyWebView = new DestinyWebView(getApplicationContext());
 
     }
 
     @Override
     public void onUserLoggedIn(String cookies, String crossRefToken) {
-
+        Toast.makeText(this, "User logged in: " + crossRefToken, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        intent.putExtra("cookies",crossRefToken);
+        setResult(Activity.RESULT_OK, intent);
+        finish();
     }
 
     @Override
     public void onLoginFailed() {
+        Toast.makeText(this, "Login failed!", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        setResult(Activity.RESULT_CANCELED, intent);
+        finish();
+    }
 
+    @Override
+    public void onPageChanged(String url) {
+        urlText.setText(url);
+    }
+
+    public void onWebViewCancel(View view) {
+        Toast.makeText(this, "Login failed! User input.", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        setResult(Activity.RESULT_CANCELED, intent);
+        finish();
     }
 }
