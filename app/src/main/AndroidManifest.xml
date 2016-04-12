@@ -25,12 +25,20 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
         </activity>
+        <activity
+            android:name="com.destiny.event.scheduler.activities.PrepareActivity"
+            android:noHistory="true">
+        </activity>
         
         <provider
             android:authorities="com.destiny.event.scheduler.provider"
             android:name=".provider.DataProvider"
             android:exported="false">
         </provider>
+
+        <service android:name=".services.DestinyService"
+            android:exported="false">
+        </service>
 
     </application>
 

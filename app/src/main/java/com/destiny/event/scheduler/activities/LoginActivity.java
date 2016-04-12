@@ -45,8 +45,13 @@ public class LoginActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOGIN){
             if (resultCode == Activity.RESULT_OK){
-                String result = data.getStringExtra("cookies");
-                Toast.makeText(this, "Dados do result: " + result, Toast.LENGTH_SHORT).show();
+                String cookies = data.getStringExtra("cookies");
+                String xcsrf = data.getStringExtra("x-csrf");
+                Intent intent = new Intent(this, PrepareActivity.class);
+                intent.putExtra("cookies",cookies);
+                intent.putExtra("x-csrf",xcsrf);
+                startActivity(intent);
+                //Toast.makeText(this, "Dados do result: " + result, Toast.LENGTH_SHORT).show();
             }
             if (resultCode == Activity.RESULT_CANCELED){
                 Toast.makeText(this, "Result falhou ou vazio.", Toast.LENGTH_SHORT).show();

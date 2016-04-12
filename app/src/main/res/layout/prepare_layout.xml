@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/global_padding">
+
+    <LinearLayout
+        android:id="@+id/linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheaderHeight"
+            android:textColor="@color/psnColor"
+            android:textSize="@dimen/secondaryTextSize"
+            android:text="Preparing your arrival"
+            android:gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Can you wait just a little please? Turns out there is too many Guardians in this universe..."/>
+
+        <TextView
+            android:id="@+id/label_guardian"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_done"
+            android:text="     Looking for your documents"
+            android:gravity="center_vertical"
+            android:layout_marginTop="32dp"/>
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="260dp"
+        android:layout_height="50dp"
+        android:id="@+id/btn_ok"
+        android:text="Begin, yes?"
+        android:background="@color/colorButtonNormal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_marginRight="12dp"
+        android:layout_marginBottom="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/btn_ok"/>
+
+</RelativeLayout>

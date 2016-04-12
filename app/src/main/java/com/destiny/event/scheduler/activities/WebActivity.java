@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
@@ -18,7 +18,7 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
 
     String url;
     DestinyWebView destinyWebView;
-    EditText urlText;
+    TextView urlText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +49,13 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
         Intent intent = getIntent();
         url = intent.getStringExtra("url");
 
-        urlText = (EditText) findViewById(R.id.webview_text);
+        urlText = (TextView) findViewById(R.id.webview_text);
 
         String locale = Locale.getDefault().getLanguage();
 
         destinyWebView = (DestinyWebView) findViewById(R.id.webview);
         destinyWebView.setListener(this);
-        destinyWebView.loadLoginUrl(url, locale);
+        destinyWebView.loadLoginUrl(url);
 
         destinyWebView = new DestinyWebView(getApplicationContext());
 
@@ -65,7 +65,8 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
     public void onUserLoggedIn(String cookies, String crossRefToken) {
         Toast.makeText(this, "User logged in: " + crossRefToken, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
-        intent.putExtra("cookies",crossRefToken);
+        intent.putExtra("cookies",cookies);
+        intent.putExtra("x-csrf", crossRefToken);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }

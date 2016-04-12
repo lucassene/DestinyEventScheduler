@@ -105,8 +105,8 @@ public class DestinyWebView extends WebView {
         mListener = listener;
     }
 
-    public void loadLoginUrl(String url, String locale) {
-        super.loadUrl(url+locale);
+    public void loadLoginUrl(String url) {
+        super.loadUrl(url);
     }
 
     public void clearUserCookies() {

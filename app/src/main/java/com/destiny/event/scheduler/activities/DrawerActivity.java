@@ -80,7 +80,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         setContentView(R.layout.drawer_layout);
 
         if (savedInstanceState == null){
-            Toast.makeText(this, "Verificando usuário logado...", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Verificando usuário logado...", Toast.LENGTH_SHORT).show();
             getLoggedUser();
         }
 
@@ -432,7 +432,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         String[] projection;
         CursorLoader cursorLoader;
 
-        Toast.makeText(this, "Loader criado!", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Loader criado!", Toast.LENGTH_SHORT).show();
 
         switch (id) {
             case URL_LOADER_USER:
@@ -457,12 +457,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        Toast.makeText(this, "Loader concluido.", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Loader concluido.", Toast.LENGTH_SHORT).show();
 
         switch (loader.getId()){
             case URL_LOADER_USER:
                 if (data.getCount() == 0){
-                    Toast.makeText(this, "Nenhum usuário logado!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this, "Nenhum usuário logado!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(this, LoginActivity.class);
                     startActivityForResult(intent, NO_USER);
                 }
