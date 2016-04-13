@@ -142,7 +142,7 @@
     <string name="choose_game">Escolha o modo de jogo:</string>
     <string name="inferno3">Inferno 3v3</string>
     <string name="inferno6">Inferno 3v3</string>
-    <string name="and320">" e 320"</string>
+    <string name="and320">" e 335"</string>
     <string name="cancel">Cancelar</string>
     <string name="save">Salvar</string>
     <string name="value_between2">"Valor entre "</string>
@@ -151,5 +151,15 @@
     <string name="story_normal">História Regular</string>
     <string name="cosmodrome">Patrulhe o Cosmódromo</string>
     <string name="king_hard">A Queda do Rei - DIFÍCIL</string>
+    <string name="malok">Cálice Maculado</string>
+    <string name="prison41">Prisão dos Anciões - 41</string>
+    <string name="prison42">Desafio dos Anciões</string>
+    <string name="begin_yes">Começar, sim?</string>
+    <string name="prepare_label1">Procurando a papelada</string>
+    <string name="prepare_label2">Você vêm sempre aqui?</string>
+    <string name="prepare_label3">Tirando uma foto 3x4</string>
+    <string name="prepare_label4">Procurando pelos seus amigos</string>
+    <string name="prepare_label5">Convidando todos para a festa</string>
+    <string name="prepare_label6">Feito! </string>
 
 </resources>

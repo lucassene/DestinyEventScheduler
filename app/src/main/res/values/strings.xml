@@ -132,6 +132,7 @@
     <string name="trials">Trials of Osiris</string>
     <string name="zone_control">Zone Control</string>
     
+    <string name="malok">Blighted Chalice</string>
     <string name="valus">Cerberus Vae III</string>
     <string name="dust">Dust Palace</string>
     <string name="echo">Echo Chamber</string>
@@ -169,6 +170,8 @@
     <string name="prison32">Prison of Elders - 32</string>
     <string name="prison34">Prison of Elders - 34</string>
     <string name="prison35">Skola\'s Revenge</string>
+    <string name="prison41">Prison of Elders - 41</string>
+    <string name="prison42">Challenge of Elders</string>
 
     <string name="story_normal">Regular Story</string>
     <string name="story_heroic">Daily Heroic Story</string>
@@ -182,7 +185,14 @@
     <string name="cancel">Cancel</string>
     <string name="values_between1">"Value between 1 and "</string>
     <string name="value_between2">"Value between "</string>
-    <string name="and320">" and 320"</string>
+    <string name="and320">" and 335"</string>
+    <string name="prepare_label1">Looking for your documents</string>
+    <string name="prepare_label2">Have you been here?</string>
+    <string name="prepare_label3">Taking a picture</string>
+    <string name="prepare_label4">Searching for your friends</string>
+    <string name="prepare_label5">Inviting them to the welcome party</string>
+    <string name="prepare_label6">Done! </string>
+    <string name="begin_yes">Begin, yes?</string>
 
 
 </resources>

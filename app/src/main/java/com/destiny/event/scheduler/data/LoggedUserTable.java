@@ -9,6 +9,7 @@ public class LoggedUserTable {
     public static final String TABLE_NAME = "logged_user";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_BUNGIE = "bungie";
     public static final String COLUMN_MEMBERSHIP = "membership";
     public static final String COLUMN_KEY = "key";
     public static final String COLUMN_CLAN = "clan";
@@ -20,7 +21,7 @@ public class LoggedUserTable {
     public static final String COLUMN_PLAYED = "games_played";
     public static final String COLUMN_SINCE = "member_since";
 
-    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_NAME, COLUMN_MEMBERSHIP, COLUMN_KEY, COLUMN_CLAN, COLUMN_ICON, COLUMN_PLATFORM, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED, COLUMN_SINCE};
+    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_NAME, COLUMN_BUNGIE, COLUMN_MEMBERSHIP, COLUMN_KEY, COLUMN_CLAN, COLUMN_ICON, COLUMN_PLATFORM, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED, COLUMN_SINCE};
     public static final String[] VIEW_COLUMNS = {COLUMN_NAME, COLUMN_ICON, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED, COLUMN_SINCE};
 
     public static final String CREATE_TABLE = "CREATE TABLE "
@@ -30,16 +31,18 @@ public class LoggedUserTable {
             + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_NAME
             + " TEXT NOT NULL, "
+            + COLUMN_BUNGIE
+            + " TEXT NOT NULL, "
             + COLUMN_MEMBERSHIP
-            + " INTEGER NOT NULL, "
+            + " TEXT NOT NULL, "
             + COLUMN_KEY
-            + " INTEGER NOT NULL, "
+            + " TEXT NOT NULL, "
             + COLUMN_CLAN
-            + " INTEGER NOT NULL, "
+            + " TEXT NOT NULL, "
             + COLUMN_ICON
             + " TEXT NOT NULL, "
             + COLUMN_PLATFORM
-            + " INTEGER NOT NULL, "
+            + " TEXT NOT NULL, "
             + COLUMN_LIKES
             + " INTEGER NOT NULL, "
             + COLUMN_DISLIKES

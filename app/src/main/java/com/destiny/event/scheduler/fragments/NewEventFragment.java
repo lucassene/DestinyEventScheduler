@@ -100,16 +100,16 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 selectedGame = "25";
                 break;
             case "5":
-                selectedGame = "29";
+                selectedGame = "31";
                 break;
             case "6":
-                selectedGame = "35";
-                break;
-            case "7":
                 selectedGame = "37";
                 break;
+            case "7":
+                selectedGame = "39";
+                break;
             case "8":
-                selectedGame = "50";
+                selectedGame = "53";
                 break;
         }
     }
@@ -234,7 +234,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 bundle.putString("title", getResources().getString(R.string.min_light_label));
                 bundle.putString("yes", getResources().getString(R.string.save));
                 bundle.putString("no", getResources().getString(R.string.cancel));
-                bundle.putInt("max", 320);
+                bundle.putInt("max", 335);
                 bundle.putInt("min", minLight);
                 bundle.putInt("type", FromDialogListener.LIGHT_TYPE);
                 String hint = getResources().getString(R.string.value_between2) + minLight + getResources().getString(R.string.and320);
