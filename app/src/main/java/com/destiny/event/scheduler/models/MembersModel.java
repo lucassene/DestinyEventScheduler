@@ -4,7 +4,6 @@ public class MembersModel {
 
     private String id;
     private String name;
-    private String bungieId;
     private String membershipId;
     private String clanId;
     private String iconPath;
@@ -14,14 +13,6 @@ public class MembersModel {
     private String gamesCreated;
     private String gamesPlayed;
     private String memberSince;
-
-    public String getBungieId() {
-        return bungieId;
-    }
-
-    public void setBungieId(String bungieId) {
-        this.bungieId = bungieId;
-    }
 
     public String getClanId() {
         return clanId;

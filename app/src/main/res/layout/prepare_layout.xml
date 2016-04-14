@@ -17,18 +17,18 @@
             android:layout_height="@dimen/subheaderHeight"
             android:textColor="@color/psnColor"
             android:textSize="@dimen/secondaryTextSize"
-            android:text="Preparing your arrival"
+            android:text="@string/prepare_title"
             android:gravity="center_vertical"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Can you wait just a little please? Turns out there is too many Guardians in this universe..."/>
+            android:text="@string/prepare_msg1"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Don't worry, it's just in the first time!"
+            android:text="@string/prepare_msg2"
             android:layout_marginTop="8dp"/>
 
         <LinearLayout

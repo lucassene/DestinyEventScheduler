@@ -86,6 +86,14 @@
         <item>Who</item>
     </string-array>
 
+    <string-array name="clan_order_by">
+        <item>Name</item>
+        <item>Games created</item>
+        <item>Games played</item>
+        <item>Likes</item>
+        <item>Dislikes</item>
+    </string-array>
+
     <string name="wait_list">Queue</string>
     <string name="games_available">Games Available</string>
     <string name="members">Members</string>
@@ -193,6 +201,10 @@
     <string name="prepare_label5">Inviting them to the welcome party</string>
     <string name="prepare_label6">Done! </string>
     <string name="begin_yes">Begin, yes?</string>
+    <string name="connection_needed_login">Internet connection needed for log in.</string>
+    <string name="prepare_title">Preparing your arrival</string>
+    <string name="prepare_msg1">Can you wait just a little please? Turns out there is too many Guardians in this universe...</string>
+    <string name="prepare_msg2">Don\'t worry, it\'s just in the first time!</string>
 
 
 </resources>

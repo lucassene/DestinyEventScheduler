@@ -50,6 +50,7 @@ import java.util.ArrayList;
 public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final int URL_LOADER_USER = 30;
+    private static final int URL_LOADER_CLAN = 40;
     private static final int NO_USER = 0;
 
     private Toolbar toolbar;

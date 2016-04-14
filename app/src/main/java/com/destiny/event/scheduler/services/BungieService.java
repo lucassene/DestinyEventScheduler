@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
+import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.models.MembersModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 
@@ -115,6 +117,7 @@ public class BungieService extends IntentService {
                 getBungieAccount(receiver);
                 insertLoggedUser();
                 insertClan();
+                insertClanMembers();
                 break;
         }
 
@@ -122,18 +125,46 @@ public class BungieService extends IntentService {
 
     }
 
+    private void insertClanMembers() {
+
+        for (int i=0; i<membersModelList.size();i++){
+            ContentValues values = new ContentValues();
+            values.put(MemberTable.COLUMN_NAME, membersModelList.get(i).getName());
+            values.put(MemberTable.COLUMN_MEMBERSHIP, membersModelList.get(i).getMembershipId());
+            values.put(MemberTable.COLUMN_CLAN, clanId);
+            values.put(MemberTable.COLUMN_ICON, membersModelList.get(i).getIconPath());
+            values.put(MemberTable.COLUMN_PLATFORM, platformId);
+            values.put(MemberTable.COLUMN_LIKES, 0);
+            values.put(MemberTable.COLUMN_DISLIKES, 0);
+            values.put(MemberTable.COLUMN_CREATED, 0);
+            values.put(MemberTable.COLUMN_PLAYED, 0);
+            values.put(MemberTable.COLUMN_SINCE, membersModelList.get(i).getMemberSince());
+            getContentResolver().insert(DataProvider.MEMBER_URI, values);
+
+            Log.w(TAG, "Clan members criados com sucesso!");
+        }
+
+    }
+
     private void insertClan() {
 
         ContentValues values = new ContentValues();
+        values.put(ClanTable.COLUMN_BUNGIE_ID, clanId);
+        values.put(ClanTable.COLUMN_NAME, clanName);
+        values.put(ClanTable.COLUMN_ICON, clanIcon);
+        values.put(ClanTable.COLUMN_BACKGROUND, clanBanner);
+        values.put(ClanTable.COLUMN_DESC, motto);
+
+        getContentResolver().insert(DataProvider.CLAN_URI, values);
+
+        Log.w(TAG, "Clan table criado com sucesso!");
     }
 
     private void insertLoggedUser() {
 
         ContentValues values = new ContentValues();
         values.put(LoggedUserTable.COLUMN_NAME, displayName);
-        values.put(LoggedUserTable.COLUMN_BUNGIE, bungieId);
         values.put(LoggedUserTable.COLUMN_MEMBERSHIP, membershipId);
-        values.put(LoggedUserTable.COLUMN_KEY, "123");
         values.put(LoggedUserTable.COLUMN_CLAN, clanId);
         values.put(LoggedUserTable.COLUMN_ICON, iconPath);
         values.put(LoggedUserTable.COLUMN_PLATFORM, platformId);
@@ -227,12 +258,12 @@ public class BungieService extends IntentService {
                         JSONObject userInfo = obj.getJSONObject("userInfo");
                         JSONObject bungieInfo = jResponse.getJSONObject("bungieNetUser");
 
-                        bungieId = bungieInfo.getString("membershipId");
+                        membershipId = bungieInfo.getString("membershipId");
                         membershipType = userInfo.getString("membershipType");
-                        membershipId = userInfo.getString("membershipId");
+                        //membershipId = userInfo.getString("membershipId");
                         displayName = userInfo.getString("displayName");
 
-                        Log.w(TAG,"Results: " + displayName + " " + bungieId + " / " + membershipId );
+                        Log.w(TAG,"Results: " + displayName + " " + membershipId );
 
                        /* bundle.clear();
                         bundle.putString(PLATFORM, membershipType);
@@ -288,7 +319,7 @@ public class BungieService extends IntentService {
                         getMembersOfClan(receiver, 1);
 
                         for (int i = 0; i< membersModelList.size(); i++){
-                            getClanMemberAccount(receiver, membersModelList.get(i).getBungieId(), BUNGIE_TYPE, i);
+                            getClanMemberAccount(receiver, membersModelList.get(i).getMembershipId(), BUNGIE_TYPE, i);
                         }
 
                         /*Log.w(TAG,"Name: " + membersModelList.get(1).getName());
@@ -356,12 +387,12 @@ public class BungieService extends IntentService {
 
             for (int i=0;i<jResults.length();i++){
                 JSONObject memberJSON = jResults.getJSONObject(i);
-                JSONObject userInfo = memberJSON.getJSONObject("bungieNetUserInfo");
+                JSONObject bungieInfo = memberJSON.getJSONObject("bungieNetUserInfo");
 
-                if (!userInfo.getString("membershipId").equals(bungieId)){
+                if (!bungieInfo.getString("membershipId").equals(membershipId)){
                     MembersModel member = new MembersModel();
-                    member.setBungieId(userInfo.getString("membershipId"));
                     member.setMemberSince(memberJSON.getString("approvalDate"));
+                    member.setMembershipId(bungieInfo.getString("membershipId"));
                     membersModelList.add(i, member);
                     //Log.w(TAG, "Clan member: " + membersModelList.get(i));
                     //Log.w(TAG, "Approval Date: " + member.getMemberSince());
@@ -409,10 +440,9 @@ public class BungieService extends IntentService {
                 if (response != null){
                     Bundle bundle = parseClanMember(response);
                     if (bundle != Bundle.EMPTY){
-                        membersModelList.get(position).setMembershipId(bundle.getString(MEMBER_ID));
                         membersModelList.get(position).setName(bundle.getString(NAME));
                         membersModelList.get(position).setIconPath(bundle.getString(ICON));
-                        membersModelList.get(position).setPlatformId(bundle.getString(PLATFORM));
+                        membersModelList.get(position).setPlatformId(platformId);
                         membersModelList.get(position).setClanId(clanId);
                         Log.w(TAG, "Clan member: " + membersModelList.get(position).getMembershipId() + ": " + membersModelList.get(position).getName());
                     }
@@ -440,25 +470,22 @@ public class BungieService extends IntentService {
 
             JSONObject jResponse = jObject.getJSONObject("Response");
             JSONArray jDestinyAccounts = jResponse.getJSONArray("destinyAccounts");
+            JSONObject jBungieNetUser = jResponse.getJSONObject("bungieNetUser");
 
-            if (jDestinyAccounts.length()>0){
+            if (jDestinyAccounts.length()!=0){
+                JSONObject jO = jDestinyAccounts.getJSONObject(0);
+                JSONObject jUserInfo = jO.getJSONObject("userInfo");
+                memberDisplayName = jUserInfo.getString("displayName");
+            } else {
+                memberDisplayName = jBungieNetUser.getString("displayName");
+            }
 
-                JSONObject obj = jDestinyAccounts.getJSONObject(0);
-                JSONObject userInfo = obj.getJSONObject("userInfo");
+            memberIconPath = jBungieNetUser.getString("profilePicturePath");
+            memberMembershipId = jBungieNetUser.getString("membershipId");
 
-                memberMembershipType = userInfo.getString("membershipType");
-                memberMembershipId = userInfo.getString("membershipId");
-                memberDisplayName = userInfo.getString("displayName");
-
-                JSONObject jBungieNetUser = jResponse.getJSONObject("bungieNetUser");
-                memberIconPath = jBungieNetUser.getString("profilePicturePath");
-
-                bundle.putString(PLATFORM, memberMembershipType);
-                bundle.putString(MEMBER_ID, memberMembershipId);
-                bundle.putString(NAME, memberDisplayName);
-                bundle.putString(ICON, memberIconPath);
-
-            } else return Bundle.EMPTY;
+            bundle.putString(MEMBER_ID, memberMembershipId);
+            bundle.putString(NAME, memberDisplayName);
+            bundle.putString(ICON, memberIconPath);
 
         } catch (JSONException e) {
             e.printStackTrace();

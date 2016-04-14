@@ -7,6 +7,7 @@
     <color name="lineColor">#ff9800</color>
     <color name="psnColor">#0288D1</color>
     <color name="liveColor">#388E3C</color>
+    <color name="redFilter">#E53935</color>
     <color name="navigationBarColor">#212121</color>
     <color name="primary_material_dark">#212121</color>
     <color name="tabIndicatorColor">#9E9E9E</color>

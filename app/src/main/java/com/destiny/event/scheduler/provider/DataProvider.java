@@ -11,10 +11,12 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
+import com.destiny.event.scheduler.data.MemberTable;
 
 public class DataProvider extends ContentProvider {
 
@@ -26,6 +28,10 @@ public class DataProvider extends ContentProvider {
     private static final int EVENT_ID = 21;
     private static final int LOGGED_USER = 30;
     private static final int LOGGED_USER_ID = 31;
+    private static final int CLAN = 40;
+    private static final int CLAN_ID = 41;
+    private static final int MEMBER = 50;
+    private static final int MEMBER_ID = 51;
 
     private static final String AUTHORITY = "com.destiny.event.scheduler.provider";
 
@@ -35,6 +41,10 @@ public class DataProvider extends ContentProvider {
     public static final Uri EVENT_URI = Uri.parse("content://" + AUTHORITY + "/" + EVENT_PATH);
     private static final String LOGGED_USER_PATH = "loggeduser";
     public static final Uri LOGGED_USER_URI = Uri.parse("content://" + AUTHORITY + "/" + LOGGED_USER_PATH);
+    private static final String CLAN_PATH = "clan";
+    public static final Uri CLAN_URI = Uri.parse("content://" + AUTHORITY + "/" + CLAN_PATH);
+    private static final String MEMBER_PATH = "members";
+    public static final Uri MEMBER_URI = Uri.parse("content://" + AUTHORITY + "/" + MEMBER_PATH);
 
     public static final String EVENT_TYPE_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/alleventtype";
     public static final String EVENT_TYPE_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleeventtype";
@@ -42,6 +52,10 @@ public class DataProvider extends ContentProvider {
     public static final String EVENT_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleevent";
     public static final String LOGGED_USER_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allloggeduser";
     public static final String LOGGED_USER_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleloggeduser";
+    public static final String CLAN_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allclan";
+    public static final String CLAN_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleclan";
+    public static final String MEMBER_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allmember";
+    public static final String MEMBER_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singlemember";
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
@@ -51,6 +65,10 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, EVENT_PATH + "/#", EVENT_ID);
         uriMatcher.addURI(AUTHORITY, LOGGED_USER_PATH, LOGGED_USER);
         uriMatcher.addURI(AUTHORITY, LOGGED_USER_PATH + "/#", LOGGED_USER_ID);
+        uriMatcher.addURI(AUTHORITY, CLAN_PATH, CLAN);
+        uriMatcher.addURI(AUTHORITY, CLAN_PATH + "/#", CLAN_ID);
+        uriMatcher.addURI(AUTHORITY, MEMBER_PATH, MEMBER);
+        uriMatcher.addURI(AUTHORITY, MEMBER_PATH + "/#", MEMBER_ID);
     }
 
     @Override
@@ -93,6 +111,21 @@ public class DataProvider extends ContentProvider {
             case LOGGED_USER_ID:
                 queryBuilder.setTables(LoggedUserTable.TABLE_NAME);
                 queryBuilder.appendWhere(LoggedUserTable.COLUMN_ID + "=" + uri.getLastPathSegment());
+                break;
+            case CLAN:
+                queryBuilder.setTables(ClanTable.TABLE_NAME);
+                break;
+            case CLAN_ID:
+                queryBuilder.setTables(ClanTable.TABLE_NAME);
+                queryBuilder.appendWhere(ClanTable.COLUMN_ID + "=" + uri.getLastPathSegment());
+                break;
+            case MEMBER:
+                queryBuilder.setTables(MemberTable.TABLE_NAME);
+                break;
+            case MEMBER_ID:
+                queryBuilder.setTables(MemberTable.TABLE_NAME);
+                queryBuilder.appendWhere(MemberTable.COLUMN_ID + "=" + uri.getLastPathSegment());
+                break;
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }
@@ -104,6 +137,7 @@ public class DataProvider extends ContentProvider {
         return cursor;
     }
 
+
     @Override
     public String getType(Uri uri) {
         return null;
@@ -114,6 +148,7 @@ public class DataProvider extends ContentProvider {
         int uriType = uriMatcher.match(uri);
         SQLiteDatabase sqlDB = database.getWritableDatabase();
         long id = 0;
+
         switch (uriType){
             case EVENT_TYPE:
                 id = sqlDB.insert(EventTypeTable.TABLE_NAME, null, values);
@@ -127,6 +162,14 @@ public class DataProvider extends ContentProvider {
                 id = sqlDB.insert(LoggedUserTable.TABLE_NAME, null, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return Uri.parse(LOGGED_USER_PATH + "/" + id);
+            case CLAN:
+                id = sqlDB.insert(ClanTable.TABLE_NAME, null, values);
+                getContext().getContentResolver().notifyChange(uri, null);
+                return Uri.parse(CLAN_PATH + "/" + id);
+            case MEMBER:
+                id = sqlDB.insert(MemberTable.TABLE_NAME, null, values);
+                getContext().getContentResolver().notifyChange(uri, null);
+                return Uri.parse(MEMBER_PATH + "/" + id);
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }
@@ -172,6 +215,28 @@ public class DataProvider extends ContentProvider {
                     rowsDeleted = sqlDB.delete(LoggedUserTable.TABLE_NAME, LoggedUserTable.COLUMN_ID + "=" + id, null);
                 } else {
                     rowsDeleted = sqlDB.delete(LoggedUserTable.TABLE_NAME, LoggedUserTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
+                }
+                break;
+            case CLAN:
+                rowsDeleted = sqlDB.delete(ClanTable.TABLE_NAME, selection, selectionArgs);
+                break;
+            case CLAN_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)){
+                    rowsDeleted = sqlDB.delete(ClanTable.TABLE_NAME, ClanTable.COLUMN_ID + "=" + id, null);
+                } else {
+                    rowsDeleted = sqlDB.delete(ClanTable.TABLE_NAME, ClanTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
+                }
+                break;
+            case MEMBER:
+                rowsDeleted = sqlDB.delete(MemberTable.TABLE_NAME, selection, selectionArgs);
+                break;
+            case MEMBER_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)){
+                    rowsDeleted = sqlDB.delete(MemberTable.TABLE_NAME, MemberTable.COLUMN_ID + "=" + id, null);
+                } else {
+                    rowsDeleted = sqlDB.delete(MemberTable.TABLE_NAME, MemberTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
                 }
                 break;
             default:
@@ -221,6 +286,28 @@ public class DataProvider extends ContentProvider {
                     rowUpdated = sqlDB.update(LoggedUserTable.TABLE_NAME, values, LoggedUserTable.COLUMN_ID + "=" + id, null);
                 } else {
                     rowUpdated = sqlDB.update(LoggedUserTable.TABLE_NAME, values, LoggedUserTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
+                }
+                break;
+            case CLAN:
+                rowUpdated = sqlDB.update(ClanTable.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case CLAN_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)){
+                    rowUpdated = sqlDB.update(ClanTable.TABLE_NAME, values, ClanTable.COLUMN_ID + "=" + id, null);
+                } else {
+                    rowUpdated = sqlDB.update(ClanTable.TABLE_NAME, values, ClanTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
+                }
+                break;
+            case MEMBER:
+                rowUpdated = sqlDB.update(MemberTable.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case MEMBER_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)){
+                    rowUpdated = sqlDB.update(MemberTable.TABLE_NAME, values, MemberTable.COLUMN_ID + "=" + id, null);
+                } else {
+                    rowUpdated = sqlDB.update(MemberTable.TABLE_NAME, values, MemberTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
                 }
                 break;
             default:

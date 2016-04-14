@@ -1,7 +1,10 @@
 package com.destiny.event.scheduler.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -34,17 +37,30 @@ public class LoginActivity extends Activity {
     }
 
     public void callWebView(View v) {
-        if (v.getId() == R.id.btn_psn) {
-            selectedPlatform = PSN;
-            Intent intent = new Intent(this, WebActivity.class);
-            intent.putExtra("url",PSN_URL);
-            startActivityForResult(intent,LOGIN);
-        } else if (v.getId() == R.id.btn_live){
-            selectedPlatform = LIVE;
-            Intent intent = new Intent(this, WebActivity.class);
-            intent.putExtra("url",LIVE_URL);
-            startActivityForResult(intent,LOGIN);
+        if (checkConnection()){
+            if (v.getId() == R.id.btn_psn) {
+                selectedPlatform = PSN;
+                Intent intent = new Intent(this, WebActivity.class);
+                intent.putExtra("url",PSN_URL);
+                startActivityForResult(intent,LOGIN);
+            } else if (v.getId() == R.id.btn_live){
+                selectedPlatform = LIVE;
+                Intent intent = new Intent(this, WebActivity.class);
+                intent.putExtra("url",LIVE_URL);
+                startActivityForResult(intent,LOGIN);
+            }
+        } else {
+            Toast.makeText(this, R.string.connection_needed_login, Toast.LENGTH_SHORT).show();
         }
+
+    }
+
+    private boolean checkConnection() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null){
+            return netInfo.isConnected();
+        } else return false;
     }
 
     @Override

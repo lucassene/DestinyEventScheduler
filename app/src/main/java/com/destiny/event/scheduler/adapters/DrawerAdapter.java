@@ -44,7 +44,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                     break;
                 case TYPE_HEADER:
                     bannerView = (ImageView) itemView.findViewById(R.id.clan_banner);
-                    headerView = (TextView) itemView.findViewById(R.id.clan_header);
+                    headerView = (TextView) itemView.findViewById(R.id.clan_name);
                     descView = (TextView) itemView.findViewById(R.id.clan_desc);
                     logoView = (ImageView) itemView.findViewById(R.id.clan_logo);
                     holderId = 0;

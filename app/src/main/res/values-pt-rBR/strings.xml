@@ -161,5 +161,9 @@
     <string name="prepare_label4">Procurando pelos seus amigos</string>
     <string name="prepare_label5">Convidando todos para a festa</string>
     <string name="prepare_label6">Feito! </string>
+    <string name="connection_needed_login">Conexão com a internet necessária para o login.</string>
+    <string name="prepare_msg1">Você se importa de esperar um pouco? Acontece que temos muitos guardiões nesse universo...</string>
+    <string name="prepare_msg2">Não se preocupe, é só na primeira vez!</string>
+    <string name="prepare_title">Preparando sua chegada</string>
 
 </resources>

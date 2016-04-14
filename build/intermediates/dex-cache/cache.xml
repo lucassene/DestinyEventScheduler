@@ -5,7 +5,7 @@
         jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
         jumboMode="true"
         revision="23.0.2"
-        sha1="bc33f8129f2632ca8058c2c5388655475b8fc245">
+        sha1="a843ea8cc4620dd26d0700bd72302e991e976a5b">
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_528c79f81cd48a8de8f9cfb90d233d6ed022fc30\classes.dex" />
     </item>
     <item
@@ -30,18 +30,18 @@
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-recyclerview-v7-23.0.1_7d62a628bb3ae8c6b8fd7cde4cc23926f79e3ff6\classes.dex" />
     </item>
     <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-appindexing\8.1.0\jars\classes.jar"
-        jumboMode="true"
-        revision="23.0.2"
-        sha1="4477ea44f5ec5ad064022a22691732d7638ff197">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-appindexing-8.1.0_5e174667ef48c30d130b666f3b5a0a443bdd0fe1\classes.dex" />
-    </item>
-    <item
         jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.2.1\jars\classes.jar"
         jumboMode="true"
         revision="23.0.2"
         sha1="3be474b1b21b31cf2fa93fe6bd641ae108d96452">
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-23.2.1_90fd87bfbdf088e5e0f518a10f9a6b21468946ad\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-appindexing\8.1.0\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="4477ea44f5ec5ad064022a22691732d7638ff197">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-appindexing-8.1.0_5e174667ef48c30d130b666f3b5a0a443bdd0fe1\classes.dex" />
     </item>
     <item
         jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\design\23.0.1\jars\classes.jar"
@@ -54,7 +54,7 @@
         jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
         jumboMode="true"
         revision="23.0.2"
-        sha1="f206f7e5bdecd0feb70590e2332bd2ebfff09641">
+        sha1="7fcc34bc865a883c132eae96781779fb9d6dd178">
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_8f8e3140ffa0a537a42df9e9b51e1ba83edc6257\classes.dex" />
     </item>
     <item
