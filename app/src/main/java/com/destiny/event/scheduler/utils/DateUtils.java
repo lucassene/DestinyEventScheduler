@@ -1,5 +1,7 @@
 package com.destiny.event.scheduler.utils;
 
+import android.util.Log;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -65,6 +67,12 @@ public class DateUtils {
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    public static String onBungieDate(String text){
+        String date = text.substring(0,text.indexOf("T"));
+        Log.w("DateUtils", "Data no DB: " + date);
+        return date;
     }
 
 }

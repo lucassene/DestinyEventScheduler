@@ -437,7 +437,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         switch (id) {
             case URL_LOADER_USER:
-                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_NAME, LoggedUserTable.COLUMN_ICON};
+                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_NAME};
                 cursorLoader = new CursorLoader(
                         this,
                         DataProvider.LOGGED_USER_URI,

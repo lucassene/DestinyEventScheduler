@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,17 +22,23 @@ import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.utils.ImageUtils;
+
+import java.io.IOException;
 
 public class MyClanFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final String TAG = "MyClanFragment";
 
     private static final int LOADER_CLAN = 40;
     private static final int LOADER_MEMBERS = 50;
 
-    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_SINCE, MemberTable.COLUMN_LIKES, MemberTable.COLUMN_DISLIKES};
-    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.secondary_text, R.id.like_text, R.id.dislike_text};
+    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_SINCE, MemberTable.COLUMN_CREATED, MemberTable.COLUMN_PLAYED, MemberTable.COLUMN_LIKES, MemberTable.COLUMN_DISLIKES};
+    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points};
 
     TextView clanName;
     TextView clanDesc;
+    ImageView clanLogo;
 
     TextView totalMembers;
     ListView memberList;
@@ -53,6 +60,7 @@ public class MyClanFragment extends Fragment implements LoaderManager.LoaderCall
 
         clanName = (TextView) myClanLayout.findViewById(R.id.clan_name);
         clanDesc = (TextView) myClanLayout.findViewById(R.id.clan_desc);
+        clanLogo = (ImageView) myClanLayout.findViewById(R.id.clan_logo);
 
         totalMembers = (TextView) v.findViewById(R.id.total_members);
         memberList = (ListView) v.findViewById(R.id.clan_list);
@@ -128,6 +136,13 @@ public class MyClanFragment extends Fragment implements LoaderManager.LoaderCall
             case LOADER_CLAN:
                 clanName.setText(data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_NAME)));
                 clanDesc.setText(data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_DESC)));
+                try {
+                    clanLogo.setImageBitmap(ImageUtils.loadImage(getContext(),data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_ICON))));
+                } catch (IOException e){
+                    Log.w(TAG, "Clan Logo not found");
+                    e.printStackTrace();
+                }
+
                 break;
             case LOADER_MEMBERS:
                 adapter.swapCursor(data);

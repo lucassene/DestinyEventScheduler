@@ -6,11 +6,11 @@
 
     <ImageView
         android:id="@+id/profile_pic"
-        android:layout_width="62dp"
+        android:layout_width="59dp"
         android:layout_height="match_parent"
         android:src="@drawable/default_profile_img"
         android:scaleType="fitStart"
-        android:layout_margin="5dp"/>
+        android:layout_margin="8dp"/>
 
     <LinearLayout
         android:id="@+id/text_layout"
@@ -42,51 +42,24 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:orientation="vertical"
-        android:layout_centerVertical="true">
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical">
 
-        <LinearLayout
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_vertical">
+            android:text="P T S"
+            android:textStyle="bold"
+            android:textColor="@color/lineColor"
+            android:layout_gravity="center_horizontal"/>
 
-            <TextView
-                android:id="@+id/like_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="99"
-                android:layout_marginRight="8dp"/>
-
-            <ImageView
-                android:id="@+id/like_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_like"/>
-
-        </LinearLayout>
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/text_points"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/dislike_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="99"
-                android:layout_marginRight="8dp"/>
-
-            <ImageView
-                android:id="@+id/dislike_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_dislike"/>
-
-        </LinearLayout>
+            android:text="99"
+            android:textSize="32sp"
+            android:layout_gravity="center_horizontal" />
 
 
     </LinearLayout>

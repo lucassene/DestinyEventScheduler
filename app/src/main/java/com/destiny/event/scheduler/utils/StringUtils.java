@@ -11,4 +11,5 @@ public class StringUtils {
     public static boolean isEmptyOrWhiteSpaces(CharSequence s) {
         return isEmpty(s) || s.toString().trim().isEmpty();
     }
+
 }

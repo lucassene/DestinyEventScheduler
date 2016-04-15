@@ -5,7 +5,9 @@
     android:layout_height="match_parent"
     android:paddingTop="@dimen/global_padding"
     android:paddingRight="@dimen/global_padding"
-    android:paddingEnd="@dimen/global_padding">
+    android:paddingEnd="@dimen/global_padding"
+    android:fillViewport="true"
+    android:scrollbars="vertical">
 
     <LinearLayout
         android:orientation="vertical"
@@ -76,7 +78,8 @@
             <ListView
                 android:id="@+id/clan_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:scrollbars="none" />
 
     </LinearLayout>
 

@@ -13,6 +13,7 @@ import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.models.MembersModel;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.utils.ImageUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +32,7 @@ public class BungieService extends IntentService {
 
     private static final String API_KEY = "4788fecc8fc04393984ff76619b7501f";
     private static final String BASE_URL = "https://www.bungie.net/Platform/";
+    private static final String BASE_IMAGE_URL = "http://www.bungie.net";
 
     private static final String USER_PREFIX = "User/";
     private static final String GROUP_PREFIX = "Group/";
@@ -71,7 +73,6 @@ public class BungieService extends IntentService {
     private String displayName;
     private String membershipType;
     private String membershipId;
-    private String bungieId;
     private String platformId;
     private String approvalDate;
 
@@ -82,6 +83,7 @@ public class BungieService extends IntentService {
     private String clanBanner;
 
     private ArrayList<MembersModel> membersModelList;
+    private ArrayList<String> iconsList;
 
     public static final String ICON = "icon";
     public static final String NAME = "name";
@@ -109,6 +111,7 @@ public class BungieService extends IntentService {
         platformId = intent.getStringExtra(PLATFORM_EXTRA);
 
         membersModelList = new ArrayList<>();
+        iconsList = new ArrayList<>();
 
         final ResultReceiver receiver = intent.getParcelableExtra(RECEIVER_EXTRA);
 
@@ -132,7 +135,16 @@ public class BungieService extends IntentService {
             values.put(MemberTable.COLUMN_NAME, membersModelList.get(i).getName());
             values.put(MemberTable.COLUMN_MEMBERSHIP, membersModelList.get(i).getMembershipId());
             values.put(MemberTable.COLUMN_CLAN, clanId);
-            values.put(MemberTable.COLUMN_ICON, membersModelList.get(i).getIconPath());
+
+            String imageSubURL = membersModelList.get(i).getIconPath();
+            Log.w(TAG, "Total of icons: " + iconsList.size());
+
+            //ImageUtils.downloadImage(getApplicationContext(), imagePath);
+
+            String imageName = imageSubURL.substring(imageSubURL.lastIndexOf("/")+1, imageSubURL.length());
+            Log.w(TAG, "Image Name: " + imageName);
+
+            values.put(MemberTable.COLUMN_ICON, imageName);
             values.put(MemberTable.COLUMN_PLATFORM, platformId);
             values.put(MemberTable.COLUMN_LIKES, 0);
             values.put(MemberTable.COLUMN_DISLIKES, 0);
@@ -142,7 +154,14 @@ public class BungieService extends IntentService {
             getContentResolver().insert(DataProvider.MEMBER_URI, values);
 
             Log.w(TAG, "Clan members criados com sucesso!");
+
         }
+
+        for (int x=0;x<iconsList.size();x++){
+            ImageUtils.downloadImage(getApplicationContext(), BASE_IMAGE_URL + iconsList.get(x));
+        }
+
+        Log.w(TAG, "Icon images downloaded succesfully");
 
     }
 
@@ -151,7 +170,13 @@ public class BungieService extends IntentService {
         ContentValues values = new ContentValues();
         values.put(ClanTable.COLUMN_BUNGIE_ID, clanId);
         values.put(ClanTable.COLUMN_NAME, clanName);
-        values.put(ClanTable.COLUMN_ICON, clanIcon);
+
+        String iconURL = BASE_IMAGE_URL + clanIcon;
+        ImageUtils.downloadImage(getApplicationContext(), iconURL);
+
+        String iconName = clanIcon.substring(clanIcon.lastIndexOf("/")+1, clanIcon.length());
+
+        values.put(ClanTable.COLUMN_ICON, iconName);
         values.put(ClanTable.COLUMN_BACKGROUND, clanBanner);
         values.put(ClanTable.COLUMN_DESC, motto);
 
@@ -166,13 +191,7 @@ public class BungieService extends IntentService {
         values.put(LoggedUserTable.COLUMN_NAME, displayName);
         values.put(LoggedUserTable.COLUMN_MEMBERSHIP, membershipId);
         values.put(LoggedUserTable.COLUMN_CLAN, clanId);
-        values.put(LoggedUserTable.COLUMN_ICON, iconPath);
         values.put(LoggedUserTable.COLUMN_PLATFORM, platformId);
-        values.put(LoggedUserTable.COLUMN_LIKES, 0);
-        values.put(LoggedUserTable.COLUMN_DISLIKES, 0);
-        values.put(LoggedUserTable.COLUMN_CREATED, 0);
-        values.put(LoggedUserTable.COLUMN_PLAYED, 0);
-        values.put(LoggedUserTable.COLUMN_SINCE, approvalDate);
 
         getContentResolver().insert(DataProvider.LOGGED_USER_URI, values);
 
@@ -282,7 +301,7 @@ public class BungieService extends IntentService {
                         JSONObject jBungieNetUser = jResponse.getJSONObject("bungieNetUser");
                         iconPath = jBungieNetUser.getString("profilePicturePath");
 
-                        Log.w(TAG,"IconPath: " + iconPath);
+                        //Log.w(TAG,"IconPath: " + iconPath);
 
                         /*bundle.clear();
                         bundle.putString(ICON, iconPath);*/
@@ -389,16 +408,10 @@ public class BungieService extends IntentService {
                 JSONObject memberJSON = jResults.getJSONObject(i);
                 JSONObject bungieInfo = memberJSON.getJSONObject("bungieNetUserInfo");
 
-                if (!bungieInfo.getString("membershipId").equals(membershipId)){
-                    MembersModel member = new MembersModel();
-                    member.setMemberSince(memberJSON.getString("approvalDate"));
-                    member.setMembershipId(bungieInfo.getString("membershipId"));
-                    membersModelList.add(i, member);
-                    //Log.w(TAG, "Clan member: " + membersModelList.get(i));
-                    //Log.w(TAG, "Approval Date: " + member.getMemberSince());
-                } else {
-                    approvalDate = memberJSON.getString("approvalDate");
-                }
+                MembersModel member = new MembersModel();
+                member.setMemberSince(memberJSON.getString("approvalDate"));
+                member.setMembershipId(bungieInfo.getString("membershipId"));
+                membersModelList.add(i, member);
             }
 
             String hasMore = jResponse.getString("hasMore");
@@ -423,6 +436,7 @@ public class BungieService extends IntentService {
 
         String myURL = BASE_URL + USER_PREFIX + GET_BUNGIE_ACCOUNT + clanMember + memberType;
         Log.w(TAG, myURL);
+        int notAdd = 0;
 
         try {
             URL url = new URL(myURL);
@@ -445,6 +459,23 @@ public class BungieService extends IntentService {
                         membersModelList.get(position).setPlatformId(platformId);
                         membersModelList.get(position).setClanId(clanId);
                         Log.w(TAG, "Clan member: " + membersModelList.get(position).getMembershipId() + ": " + membersModelList.get(position).getName());
+
+                        if (iconsList.size()==0){
+                            iconsList.add(membersModelList.get(position).getIconPath());
+                        } else {
+                            for (int i=0; i<iconsList.size();i++){
+                                if (iconsList.get(i).equals(membersModelList.get(position).getIconPath())){
+                                    notAdd = 1;
+                                    //Log.w(TAG, "Number of Images: " + i);
+                                    break;
+                                }
+                        }
+                            if (notAdd != 1){
+                                iconsList.add(membersModelList.get(position).getIconPath());
+                            }
+
+                        }
+
                     }
                 }
             }
@@ -460,7 +491,6 @@ public class BungieService extends IntentService {
 
         Bundle bundle = new Bundle();
 
-        String memberMembershipType;
         String memberMembershipId;
         String memberDisplayName;
         String memberIconPath;
