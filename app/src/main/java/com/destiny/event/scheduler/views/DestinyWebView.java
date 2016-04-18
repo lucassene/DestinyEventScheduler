@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
@@ -57,18 +56,18 @@ public class DestinyWebView extends WebView {
         setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String loadingUrl) {
-                Log.e(TAG, loadingUrl);
+                //Log.e(TAG, loadingUrl);
                 mListener.onPageChanged(loadingUrl);
                 if (REDIRECT_FINISH.equals(loadingUrl)) {
                     serverToken = CookiesUtils.getCookies(loadingUrl);
-                    Log.e("SERVER_TOKEN", serverToken);
+                    //Log.e("SERVER_TOKEN", serverToken);
                     if (mListener != null) {
                         if (serverToken != null) {
                             xRefToken = CookiesUtils.getCrossReferenceToken(serverToken);
                             mListener.onUserLoggedIn(serverToken, xRefToken);
-                            Log.e("CROSS_REF", xRefToken);
+                            //Log.e("CROSS_REF", xRefToken);
                         } else {
-                            Log.e("STATUS_LOGIN", "Login falhou!");
+                            //Log.e("STATUS_LOGIN", "Login falhou!");
                             mListener.onLoginFailed();
                         }
                     }

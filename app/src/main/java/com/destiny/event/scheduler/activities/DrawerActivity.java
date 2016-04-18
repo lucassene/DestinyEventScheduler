@@ -465,7 +465,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 if (data.getCount() == 0){
                     //Toast.makeText(this, "Nenhum usuário logado!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivityForResult(intent, NO_USER);
+                    finish();
                 }
         }
 

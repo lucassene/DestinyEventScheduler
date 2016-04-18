@@ -1,86 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/global_padding"
     android:paddingRight="@dimen/global_padding"
     android:paddingEnd="@dimen/global_padding"
-    android:fillViewport="true"
-    android:scrollbars="vertical">
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ListView
+        android:id="@id/android:list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal" />
 
-        <include layout="@layout/drawer_header_layout" android:id="@id/myclan_layout"/>
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/my_clan_empty"
+        android:layout_gravity="center"
+        android:gravity="center"/>
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/listItemHeight"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/order_by"
-                android:paddingBottom="@dimen/paddingBottomLabelText"/>
-
-            <Spinner
-                android:id="@+id/order_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorPrimary"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/subheaderHeight">
-
-            <TextView
-                android:id="@+id/section_members"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/subheaderHeight"
-                android:textColor="@color/psnColor"
-                android:gravity="center_vertical"
-                android:textSize="@dimen/secondaryTextSize"
-                android:text="@string/members" />
-
-            <ImageView
-                android:id="@+id/members_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_clan"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"/>
-
-            <TextView
-                android:id="@+id/total_members"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="99"
-                android:layout_toLeftOf="@id/members_icon"
-                android:layout_toStartOf="@id/members_icon"
-                android:layout_centerVertical="true"/>
-
-        </RelativeLayout>
-
-            <ListView
-                android:id="@+id/clan_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none" />
-
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

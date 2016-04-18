@@ -69,16 +69,19 @@ public class PrepareActivity extends Activity implements RequestResultReceiver.R
         String xcsrf = getIntent().getStringExtra("x-csrf");
         String platform = getIntent().getStringExtra("platform");
 
-        RequestResultReceiver mReceiver = new RequestResultReceiver(new Handler());
-        mReceiver.setReceiver(this);
-        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
-        intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.GET_CURRENT_ACCOUNT);
-        intent.putExtra(BungieService.COOKIE_EXTRA, cookies);
-        intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
-        intent.putExtra(BungieService.XCSRF_EXTRA, xcsrf);
-        intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
-        startService(intent);
+        if (savedInstanceState == null){
 
+            RequestResultReceiver mReceiver = new RequestResultReceiver(new Handler());
+            mReceiver.setReceiver(this);
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
+            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.GET_CURRENT_ACCOUNT);
+            intent.putExtra(BungieService.COOKIE_EXTRA, cookies);
+            intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
+            intent.putExtra(BungieService.XCSRF_EXTRA, xcsrf);
+            intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
+            startService(intent);
+
+        }
     }
 
     @Override
@@ -126,6 +129,9 @@ public class PrepareActivity extends Activity implements RequestResultReceiver.R
 
     public void onBegin(View view) {
         Intent intent = new Intent(this, DrawerActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+        finish();
+
     }
 }

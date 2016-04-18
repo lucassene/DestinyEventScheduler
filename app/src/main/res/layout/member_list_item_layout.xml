@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:src="@drawable/default_profile_img"
         android:scaleType="fitStart"
-        android:layout_margin="8dp"/>
+        android:layout_margin="5dp"/>
 
     <LinearLayout
         android:id="@+id/text_layout"
@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/profile_pic"
-        android:layout_margin="5dp">
+        android:layout_alignTop="@id/profile_pic">
 
         <TextView
             android:id="@+id/primary_text"
@@ -29,11 +29,17 @@
             android:textAppearance="?android:textAppearanceMedium"/>
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/member_since"
+            android:textSize="@dimen/secondaryTextSize" />
+
+        <TextView
             android:id="@+id/secondary_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Secondary Text"
-            android:textSize="@dimen/secondaryTextSize" />
+            android:text="99/99/9999"
+            android:textSize="@dimen/secondaryTextSize"/>
 
     </LinearLayout>
 

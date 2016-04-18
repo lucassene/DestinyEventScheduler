@@ -70,10 +70,12 @@ public class LoginActivity extends Activity {
                 String cookies = data.getStringExtra("cookies");
                 String xcsrf = data.getStringExtra("x-csrf");
                 Intent intent = new Intent(this, PrepareActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("cookies",cookies);
                 intent.putExtra("x-csrf",xcsrf);
                 intent.putExtra("platform",selectedPlatform);
                 startActivity(intent);
+                finish();
                 //Toast.makeText(this, "Dados do result: " + result, Toast.LENGTH_SHORT).show();
             }
             if (resultCode == Activity.RESULT_CANCELED){

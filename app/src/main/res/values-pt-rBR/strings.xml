@@ -41,6 +41,12 @@
         <item>Outros</item>
     </string-array>
 
+    <string-array name="clan_order_by">
+        <item>Nome</item>
+        <item>Data de admissão</item>
+        <item>Pontos de participação</item>
+    </string-array>
+
     <string name="refresh_lists">Atualizar Listas</string>
     <string name="game_type_label">Tipo de Jogo</string>
     <string name="max_guardians_label">Max de Guardiões</string>
@@ -165,6 +171,5 @@
     <string name="prepare_msg1">Você se importa de esperar um pouco? Acontece que temos muitos guardiões nesse universo...</string>
     <string name="prepare_msg2">Não se preocupe, é só na primeira vez!</string>
     <string name="prepare_title">Preparando sua chegada</string>
-    <string name="member_since_label">" Membro desde: "</string>
 
 </resources>

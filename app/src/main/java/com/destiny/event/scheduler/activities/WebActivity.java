@@ -63,7 +63,7 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
 
     @Override
     public void onUserLoggedIn(String cookies, String crossRefToken) {
-        Toast.makeText(this, "User logged in: " + crossRefToken, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "User logged in: " + crossRefToken, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         intent.putExtra("cookies",cookies);
         intent.putExtra("x-csrf", crossRefToken);
@@ -85,7 +85,7 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
     }
 
     public void onWebViewCancel(View view) {
-        Toast.makeText(this, "Login failed! User input.", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Login failed! User input.", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         setResult(Activity.RESULT_CANCELED, intent);
         finish();

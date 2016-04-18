@@ -82,20 +82,26 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
                     e.printStackTrace();
                 }
 
-                float likes = (float) cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES));
+                /*float likes = (float) cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES));
                 float dislikes = (float) cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES));
                 float created = (float) cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED));
                 float played = (float) cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED));
 
-                double totalPoints = (likes/played)*100;
+                double totalPoints = (likes/(created+played))*100;
                 totalPoints = totalPoints + (created*0.5);
-                totalPoints = totalPoints - dislikes;
+                totalPoints = totalPoints - dislikes;*/
 
-                if (Math.round(totalPoints) >= 100){
+                int totalPoints = cursor.getInt(6);
+                Log.w(TAG, "Total Points: " + totalPoints);
+
+                if (Math.round(totalPoints) >= 100) {
                     points.setText("99");
+                } else if (Math.round(totalPoints) <= 0){
+                    points.setText("00");
                 } else if (Math.round(totalPoints) < 10){
-                    points.setText("0" + Math.round(totalPoints));
-                }
+                    String finalPoint = "0" + Math.round(totalPoints);
+                    points.setText(finalPoint);
+                } else points.setText(String.valueOf(totalPoints));
 
                 name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
                 
@@ -106,8 +112,7 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
                     Date sinceDate = df.parse(sinceString);
                     df = new SimpleDateFormat("dd/MM/yyyy");
                     String finalDate = df.format(sinceDate);
-                    String since = context.getString(R.string.member_since_label) + finalDate;
-                    memberSince.setText(since);
+                    memberSince.setText(finalDate);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

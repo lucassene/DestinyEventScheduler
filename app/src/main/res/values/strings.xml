@@ -88,10 +88,8 @@
 
     <string-array name="clan_order_by">
         <item>Name</item>
-        <item>Games created</item>
-        <item>Games played</item>
-        <item>Likes</item>
-        <item>Dislikes</item>
+        <item>Join date</item>
+        <item>Participation points</item>
     </string-array>
 
     <string name="wait_list">Queue</string>
@@ -205,7 +203,7 @@
     <string name="prepare_title">Preparing your arrival</string>
     <string name="prepare_msg1">Can you wait just a little please? Turns out there is too many Guardians in this universe...</string>
     <string name="prepare_msg2">Don\'t worry, it\'s just in the first time!</string>
-    <string name="member_since_label">"Member since: "</string>
+    <string name="my_clan_empty">Oops! Did we forget to invite those guardians?</string>
 
 
 </resources>

@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class BungieService extends IntentService {
 
@@ -130,6 +131,8 @@ public class BungieService extends IntentService {
 
     private void insertClanMembers() {
 
+        Random random = new Random();
+
         for (int i=0; i<membersModelList.size();i++){
             ContentValues values = new ContentValues();
             values.put(MemberTable.COLUMN_NAME, membersModelList.get(i).getName());
@@ -146,14 +149,20 @@ public class BungieService extends IntentService {
 
             values.put(MemberTable.COLUMN_ICON, imageName);
             values.put(MemberTable.COLUMN_PLATFORM, platformId);
-            values.put(MemberTable.COLUMN_LIKES, 0);
-            values.put(MemberTable.COLUMN_DISLIKES, 0);
-            values.put(MemberTable.COLUMN_CREATED, 0);
-            values.put(MemberTable.COLUMN_PLAYED, 0);
-            values.put(MemberTable.COLUMN_SINCE, membersModelList.get(i).getMemberSince());
+            int created = (random.nextInt(5));
+            int played = (random.nextInt(10)+1);
+            int likes = (random.nextInt(created+played));
+            int dislikes = (created+played)-likes;
+            values.put(MemberTable.COLUMN_LIKES, likes);
+            values.put(MemberTable.COLUMN_DISLIKES, dislikes);
+            values.put(MemberTable.COLUMN_CREATED, created);
+            values.put(MemberTable.COLUMN_PLAYED, played);
+            String dateBefore = membersModelList.get(i).getMemberSince();
+            String dateAfter = dateBefore.substring(0,dateBefore.length()-1);
+            values.put(MemberTable.COLUMN_SINCE, dateAfter);
             getContentResolver().insert(DataProvider.MEMBER_URI, values);
 
-            Log.w(TAG, "Clan members criados com sucesso!");
+            Log.w(TAG, membersModelList.get(i).getName() + ": Likes: " + likes + ", Dislikes: " + dislikes + ", Created: " + created + ", Played: " + played);
 
         }
 
@@ -174,10 +183,14 @@ public class BungieService extends IntentService {
         String iconURL = BASE_IMAGE_URL + clanIcon;
         ImageUtils.downloadImage(getApplicationContext(), iconURL);
 
+        String bannerURL = BASE_IMAGE_URL + clanBanner;
+        ImageUtils.downloadImage(getApplicationContext(), bannerURL);
+
         String iconName = clanIcon.substring(clanIcon.lastIndexOf("/")+1, clanIcon.length());
+        String bannerName = clanBanner.substring(clanBanner.lastIndexOf("/")+1, clanBanner.length());
 
         values.put(ClanTable.COLUMN_ICON, iconName);
-        values.put(ClanTable.COLUMN_BACKGROUND, clanBanner);
+        values.put(ClanTable.COLUMN_BACKGROUND, bannerName);
         values.put(ClanTable.COLUMN_DESC, motto);
 
         getContentResolver().insert(DataProvider.CLAN_URI, values);

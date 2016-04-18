@@ -3,7 +3,7 @@ package com.destiny.event.scheduler.fragments;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -13,8 +13,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
@@ -26,22 +28,31 @@ import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
 
-public class MyClanFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MyClanFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "MyClanFragment";
 
     private static final int LOADER_CLAN = 40;
     private static final int LOADER_MEMBERS = 50;
 
-    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_SINCE, MemberTable.COLUMN_CREATED, MemberTable.COLUMN_PLAYED, MemberTable.COLUMN_LIKES, MemberTable.COLUMN_DISLIKES};
+    private static final String POINTS_ORDER_BY = "((" + MemberTable.COLUMN_LIKES + "*1.0)/(" + MemberTable.COLUMN_CREATED + "+" + MemberTable.COLUMN_PLAYED + "))*100+(" + MemberTable.COLUMN_CREATED + "*0.5)-" + MemberTable.COLUMN_DISLIKES;
+    private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE;
+    private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME;
+    private String orderBy;
+
+    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_SINCE};
     private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points};
 
     TextView clanName;
     TextView clanDesc;
     ImageView clanLogo;
+    ImageView clanBanner;
+
+    Spinner orderSpinner;
+
+    View headerView;
 
     TextView totalMembers;
-    ListView memberList;
 
     CustomCursorAdapter adapter;
 
@@ -56,25 +67,47 @@ public class MyClanFragment extends Fragment implements LoaderManager.LoaderCall
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.my_clan);
 
         View v = inflater.inflate(R.layout.my_clan_layout, container, false);
-        View myClanLayout = v.findViewById(R.id.myclan_layout);
+
+        headerView = inflater.inflate(R.layout.my_clan_header_layout, null);
+
+        return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        View myClanLayout = headerView.findViewById(R.id.myclan_layout);
 
         clanName = (TextView) myClanLayout.findViewById(R.id.clan_name);
         clanDesc = (TextView) myClanLayout.findViewById(R.id.clan_desc);
         clanLogo = (ImageView) myClanLayout.findViewById(R.id.clan_logo);
+        clanBanner = (ImageView) myClanLayout.findViewById(R.id.clan_banner);
 
-        totalMembers = (TextView) v.findViewById(R.id.total_members);
-        memberList = (ListView) v.findViewById(R.id.clan_list);
+        totalMembers = (TextView) headerView.findViewById(R.id.total_members);
+        orderSpinner = (Spinner) headerView.findViewById(R.id.order_spinner);
 
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getContext().getResources().getStringArray(R.array.clan_order_by));
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        orderSpinner.setOnItemSelectedListener(this);
+        orderSpinner.setAdapter(spinnerAdapter);
+        orderSpinner.setSelection(0);
+
+        orderBy = NAME_ORDER_BY + " ASC";
         getClanData();
-
-        return v;
     }
 
     private void getClanData() {
         getLoaderManager().initLoader(LOADER_CLAN, null, this);
         getLoaderManager().initLoader(LOADER_MEMBERS, null, this);
         adapter = new CustomCursorAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, LOADER_MEMBERS);
-        memberList.setAdapter(adapter);
+
+        if (headerView != null){
+            this.getListView().addHeaderView(headerView);
+        }
+
+        setListAdapter(adapter);
     }
 
     @Override
@@ -99,7 +132,7 @@ public class MyClanFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection;
-        String[] selectionArgs;
+        Log.w(TAG, "SQL: " + orderBy);
 
         switch (id){
             case LOADER_CLAN:
@@ -113,14 +146,14 @@ public class MyClanFragment extends Fragment implements LoaderManager.LoaderCall
                         null
                 );
             case LOADER_MEMBERS:
-                projection = MemberTable.ALL_COLUMNS;
+                projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, POINTS_ORDER_BY, MemberTable.COLUMN_SINCE};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.MEMBER_URI,
                         projection,
                         null,
                         null,
-                        null
+                        orderBy
                 );
             default:
                 return null;
@@ -138,6 +171,7 @@ public class MyClanFragment extends Fragment implements LoaderManager.LoaderCall
                 clanDesc.setText(data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_DESC)));
                 try {
                     clanLogo.setImageBitmap(ImageUtils.loadImage(getContext(),data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_ICON))));
+                    clanBanner.setImageBitmap(ImageUtils.loadImage(getContext(), data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BACKGROUND))));
                 } catch (IOException e){
                     Log.w(TAG, "Clan Logo not found");
                     e.printStackTrace();
@@ -156,6 +190,30 @@ public class MyClanFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
         Log.w("MyClan Loader: ", "O Loader entrou no método onLoaderReset");
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        switch (position){
+            case 0:
+                orderBy = NAME_ORDER_BY + " ASC";
+                getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
+                break;
+            case 1:
+                orderBy = DATE_ORDER_BY + " ASC";
+                getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
+                break;
+            case 2:
+                orderBy = POINTS_ORDER_BY + " DESC";
+                getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
+                break;
+        }
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
     }
 }
