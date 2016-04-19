@@ -7,7 +7,7 @@ public class ClanTable {
 
     public static final String TABLE_NAME = "clan";
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_BUNGIE_ID = "bungie_id";
+    public static final String COLUMN_BUNGIE_ID = "bungie";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_ICON = "icon";
     public static final String COLUMN_BACKGROUND = "background";

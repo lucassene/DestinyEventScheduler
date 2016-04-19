@@ -13,8 +13,10 @@ import android.util.Log;
 
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.DBHelper;
+import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
+import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 
@@ -32,6 +34,11 @@ public class DataProvider extends ContentProvider {
     private static final int CLAN_ID = 41;
     private static final int MEMBER = 50;
     private static final int MEMBER_ID = 51;
+    private static final int GAME = 60;
+    private static final int GAME_ID = 61;
+    private static final int ENTRY = 70;
+    private static final int ENTRY_ID = 71;
+    private static final int GAME_WITH_EVENT = 65;
 
     private static final String AUTHORITY = "com.destiny.event.scheduler.provider";
 
@@ -45,6 +52,12 @@ public class DataProvider extends ContentProvider {
     public static final Uri CLAN_URI = Uri.parse("content://" + AUTHORITY + "/" + CLAN_PATH);
     private static final String MEMBER_PATH = "members";
     public static final Uri MEMBER_URI = Uri.parse("content://" + AUTHORITY + "/" + MEMBER_PATH);
+    private static final String GAME_PATH = "game";
+    public static final Uri GAME_URI = Uri.parse("content://" + AUTHORITY + "/" + GAME_PATH);
+    private static final String ENTRY_PATH = "entry";
+    public static final Uri ENTRY_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_PATH);
+    private static final String GAME_WITH_EVENT_PATH = "gamewithevent";
+    public static final Uri GAME_EVENT_URI = Uri.parse("content://" + AUTHORITY + "/" + GAME_WITH_EVENT_PATH);
 
     public static final String EVENT_TYPE_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/alleventtype";
     public static final String EVENT_TYPE_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleeventtype";
@@ -56,6 +69,10 @@ public class DataProvider extends ContentProvider {
     public static final String CLAN_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleclan";
     public static final String MEMBER_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allmember";
     public static final String MEMBER_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singlemember";
+    public static final String GAME_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allgame";
+    public static final String GAME_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singlegame";
+    public static final String ENTRY_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allentry";
+    public static final String ENTRY_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleentry";
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
@@ -69,6 +86,12 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, CLAN_PATH + "/#", CLAN_ID);
         uriMatcher.addURI(AUTHORITY, MEMBER_PATH, MEMBER);
         uriMatcher.addURI(AUTHORITY, MEMBER_PATH + "/#", MEMBER_ID);
+        uriMatcher.addURI(AUTHORITY, GAME_PATH, GAME);
+        uriMatcher.addURI(AUTHORITY, GAME_PATH + "/#", GAME_ID);
+        uriMatcher.addURI(AUTHORITY, ENTRY_PATH, ENTRY);
+        uriMatcher.addURI(AUTHORITY, ENTRY_PATH + "/#", ENTRY_ID);
+        uriMatcher.addURI(AUTHORITY, GAME_WITH_EVENT_PATH, GAME_WITH_EVENT);
+        uriMatcher.addURI(AUTHORITY, GAME_WITH_EVENT_PATH + "/#", GAME_WITH_EVENT);
     }
 
     @Override
@@ -126,6 +149,32 @@ public class DataProvider extends ContentProvider {
                 queryBuilder.setTables(MemberTable.TABLE_NAME);
                 queryBuilder.appendWhere(MemberTable.COLUMN_ID + "=" + uri.getLastPathSegment());
                 break;
+            case GAME:
+                queryBuilder.setTables(GameTable.TABLE_NAME);
+                break;
+            case GAME_ID:
+                queryBuilder.setTables(GameTable.TABLE_NAME);
+                queryBuilder.appendWhere(GameTable.COLUMN_ID + "=" + uri.getLastPathSegment());
+                break;
+            case ENTRY:
+                queryBuilder.setTables(EntryTable.TABLE_NAME);
+                break;
+            case ENTRY_ID:
+                queryBuilder.setTables(EntryTable.TABLE_NAME);
+                queryBuilder.appendWhere(EntryTable.COLUMN_ID + "=" + uri.getLastPathSegment());
+                break;
+            case GAME_WITH_EVENT:
+                StringBuilder sb = new StringBuilder();
+                sb.append(GameTable.TABLE_NAME);
+                sb.append(" JOIN ");
+                sb.append(EventTable.TABLE_NAME);
+                sb.append(" ON ");
+                sb.append(GameTable.TABLE_NAME + "." + GameTable.COLUMN_EVENT_ID);
+                sb.append(" = ");
+                sb.append(EventTable.TABLE_NAME + "." + EventTable.COLUMN_ID);
+                sb.append(";");
+                queryBuilder.setTables(sb.toString());
+                break;
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }
@@ -170,6 +219,14 @@ public class DataProvider extends ContentProvider {
                 id = sqlDB.insert(MemberTable.TABLE_NAME, null, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return Uri.parse(MEMBER_PATH + "/" + id);
+            case GAME:
+                id = sqlDB.insert(GameTable.TABLE_NAME, null, values);
+                getContext().getContentResolver().notifyChange(uri, null);
+                return Uri.parse(GAME_PATH + "/" + id);
+            case ENTRY:
+                id = sqlDB.insert(EntryTable.TABLE_NAME, null, values);
+                getContext().getContentResolver().notifyChange(uri, null);
+                return Uri.parse(ENTRY_PATH + "/" + id);
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }
@@ -237,6 +294,28 @@ public class DataProvider extends ContentProvider {
                     rowsDeleted = sqlDB.delete(MemberTable.TABLE_NAME, MemberTable.COLUMN_ID + "=" + id, null);
                 } else {
                     rowsDeleted = sqlDB.delete(MemberTable.TABLE_NAME, MemberTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
+                }
+                break;
+            case GAME:
+                rowsDeleted = sqlDB.delete(GameTable.TABLE_NAME, selection, selectionArgs);
+                break;
+            case GAME_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)){
+                    rowsDeleted = sqlDB.delete(GameTable.TABLE_NAME, GameTable.COLUMN_ID + "=" + id, null);
+                } else {
+                    rowsDeleted = sqlDB.delete(GameTable.TABLE_NAME, GameTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
+                }
+                break;
+            case ENTRY:
+                rowsDeleted = sqlDB.delete(EntryTable.TABLE_NAME, selection, selectionArgs);
+                break;
+            case ENTRY_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)){
+                    rowsDeleted = sqlDB.delete(EntryTable.TABLE_NAME, EntryTable.COLUMN_ID + "=" + id, null);
+                } else {
+                    rowsDeleted = sqlDB.delete(EntryTable.TABLE_NAME, EntryTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
                 }
                 break;
             default:
@@ -308,6 +387,28 @@ public class DataProvider extends ContentProvider {
                     rowUpdated = sqlDB.update(MemberTable.TABLE_NAME, values, MemberTable.COLUMN_ID + "=" + id, null);
                 } else {
                     rowUpdated = sqlDB.update(MemberTable.TABLE_NAME, values, MemberTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
+                }
+                break;
+            case GAME:
+                rowUpdated = sqlDB.update(GameTable.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case GAME_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)){
+                    rowUpdated = sqlDB.update(GameTable.TABLE_NAME, values, GameTable.COLUMN_ID + "=" + id, null);
+                } else {
+                    rowUpdated = sqlDB.update(GameTable.TABLE_NAME, values, GameTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
+                }
+                break;
+            case ENTRY:
+                rowUpdated = sqlDB.update(EntryTable.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case ENTRY_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)){
+                    rowUpdated = sqlDB.update(EntryTable.TABLE_NAME, values, EntryTable.COLUMN_ID + "=" + id, null);
+                } else {
+                    rowUpdated = sqlDB.update(EntryTable.TABLE_NAME, values, EntryTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
                 }
                 break;
             default:

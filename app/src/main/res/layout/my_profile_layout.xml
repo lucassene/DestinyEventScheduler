@@ -55,6 +55,7 @@
             android:textColor="@color/psnColor"/>
 
         <TextView
+            android:id="@+id/profile_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -66,9 +67,10 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/join_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="That's the date you joined"
+        android:text="@string/date_you_join"
         android:textSize="13sp"
         android:alpha="0.5"/>
 
@@ -82,10 +84,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="Games created:"
+            android:text="@string/games_created"
             android:textColor="@color/psnColor"/>
 
         <TextView
+            android:id="@+id/profile_created"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -97,9 +100,10 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/created_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Number of games created by you"
+        android:text="@string/games_created_by_you"
         android:textSize="13sp"
         android:alpha="0.5"/>
 
@@ -113,10 +117,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="Games played:"
+            android:text="@string/games_played2"
             android:textColor="@color/psnColor"/>
 
         <TextView
+            android:id="@+id/profile_played"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -128,9 +133,10 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/played_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Number of games played by you, not incluind yours."
+        android:text="@string/games_played_you"
         android:textSize="13sp"
         android:alpha="0.5"/>
 
@@ -144,10 +150,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="Likes:"
+            android:text="@string/likes"
             android:textColor="@color/psnColor"/>
 
         <TextView
+            android:id="@+id/profile_likes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -161,7 +168,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Guardians likes helpful and good friends."
+        android:text="@string/good_and_helpful_friends"
         android:textSize="13sp"
         android:alpha="0.5"/>
 
@@ -175,10 +182,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="Dislikes:"
+            android:text="@string/dislikes"
             android:textColor="@color/psnColor"/>
 
         <TextView
+            android:id="@+id/profile_dislikes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -192,7 +200,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="And they don't like guardians with bad aim."
+        android:text="@string/guardians_with_bad_aim"
         android:textSize="13sp"
         android:alpha="0.5"/>
 
@@ -213,10 +221,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="Participation Points:"
+            android:text="@string/participation_points"
             android:textColor="@color/lineColor"/>
 
         <TextView
+            android:id="@+id/profile_points"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -230,7 +239,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="The final equation that involves all this previous stats"
+        android:text="@string/final_equation"
         android:textSize="13sp"
         android:alpha="0.5"/>
 

@@ -1,6 +1,7 @@
 package com.destiny.event.scheduler.utils;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -69,6 +70,17 @@ public class DateUtils {
 
     public static String onBungieDate(String text){
         String date = text.substring(0,text.indexOf("T"));
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date sinceDate = df.parse(date);
+            df = new SimpleDateFormat("dd/MM/yyyy");
+            String finalDate = df.format(sinceDate);
+            return finalDate;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         //Log.w("DateUtils", "Data no DB: " + date);
         return date;
     }

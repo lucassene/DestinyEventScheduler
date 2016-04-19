@@ -13,14 +13,12 @@ import android.widget.TextView;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
+import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class CustomCursorAdapter extends SimpleCursorAdapter {
 
@@ -82,15 +80,6 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
                     e.printStackTrace();
                 }
 
-                /*float likes = (float) cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES));
-                float dislikes = (float) cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES));
-                float created = (float) cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED));
-                float played = (float) cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED));
-
-                double totalPoints = (likes/(created+played))*100;
-                totalPoints = totalPoints + (created*0.5);
-                totalPoints = totalPoints - dislikes;*/
-
                 int totalPoints = cursor.getInt(6);
                 Log.w(TAG, "Total Points: " + totalPoints);
 
@@ -106,17 +95,23 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
                 name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
                 
                 String sinceString = DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
+                memberSince.setText(sinceString);
+                break;
+            case R.layout.game_list_item_layout:
+                ImageView gameIcon = (ImageView) view.findViewById(R.id.game_image);
+                TextView gameTitle = (TextView) view.findViewById(R.id.primary_text);
+                TextView gameCreator = (TextView) view.findViewById(R.id.secondary_text);
+                TextView gameDate = (TextView) view.findViewById(R.id.game_date);
+                TextView gameTime = (TextView) view.findViewById(R.id.game_time);
+                TextView gameMax = (TextView) view.findViewById(R.id.game_max);
 
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                try {
-                    Date sinceDate = df.parse(sinceString);
-                    df = new SimpleDateFormat("dd/MM/yyyy");
-                    String finalDate = df.format(sinceDate);
-                    memberSince.setText(finalDate);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
+                gameIcon.setImageResource(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",context.getPackageName()));
+                gameTitle.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_NAME)));
+                gameCreator.setText(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_CREATOR)));
+                gameDate.setText(DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
+                gameTime.setText(DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
+                gameMax.setText("/" + cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_GUARDIANS)));
+                break;
         }
 
     }

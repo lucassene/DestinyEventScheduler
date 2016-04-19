@@ -28,11 +28,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
-import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.DrawerAdapter;
 import com.destiny.event.scheduler.adapters.ViewPageAdapter;
+import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.fragments.HistoryFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
@@ -53,6 +53,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private static final int URL_LOADER_CLAN = 40;
     private static final int NO_USER = 0;
 
+    private static final int TYPE_USER = 1;
+    private static final int TYPE_MEMBER = 2;
+
     private Toolbar toolbar;
     private FloatingActionButton newEventButton;
 
@@ -69,6 +72,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private Fragment openFragment;
     private String fragmentTag;
     private ArrayList<String> backStackList;
+
+    private String clanName;
+    private String clanId;
+    private String clanIcon;
+    private String clanBanner;
+    private String clanDesc;
+
+    private String bungieId;
+    private String userName;
 
     ViewPager viewPager;
     ViewPageAdapter viewPageAdapter;
@@ -236,6 +248,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     }
 
+    private void getClanData() {
+        getSupportLoaderManager().initLoader(URL_LOADER_CLAN, null, this);
+    }
+
     private void getLoggedUser() {
         getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
     }
@@ -267,7 +283,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            Toast.makeText(this, "Back Count: " + fm.getBackStackEntryCount(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Back Count: " + fm.getBackStackEntryCount(), Toast.LENGTH_SHORT).show();
             if (fm.getBackStackEntryCount() == 1) {
                 super.onBackPressed();
                 openMainActivity(null);
@@ -284,13 +300,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         outState.putString("fragment", fragmentTag);
     }
 
-    private void createFragmentView(Fragment fragment, View child, String tag){
+    private void prepareFragmentHolder(Fragment fragment, View child, Bundle bundle, String tag){
         drawerLayout.closeDrawers();
         tabLayout.setViewPager(null);
         viewPager.setAdapter(null);
         child.playSoundEffect(SoundEffectConstants.CLICK);
         newEventButton.setVisibility(View.GONE);
-        loadNewFragment(fragment, null, tag);
+        loadNewFragment(fragment, bundle, tag);
     }
 
     @Override
@@ -353,7 +369,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             return false;
         }
         NewEventFragment fragment = new NewEventFragment();
-        createFragmentView(fragment, child, "new");
+        prepareFragmentHolder(fragment, child, null, "new");
         return true;
     }
 
@@ -363,7 +379,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             return false;
         }
         ValidateFragment fragment = new ValidateFragment();
-        createFragmentView(fragment, child, "validate");
+        prepareFragmentHolder(fragment, child, null, "validate");
         return true;
     }
 
@@ -373,7 +389,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             return false;
         }
         SearchFragment fragment = new SearchFragment();
-        createFragmentView(fragment, child,"search");
+        prepareFragmentHolder(fragment, child, null, "search");
         return true;
     }
 
@@ -383,7 +399,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             return false;
         }
         HistoryFragment fragment = new HistoryFragment();
-        createFragmentView(fragment, child,"history");
+        prepareFragmentHolder(fragment, child, null, "history");
         return true;
     }
 
@@ -393,7 +409,14 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             return false;
         }
         MyClanFragment fragment = new MyClanFragment();
-        createFragmentView(fragment, child,"clan");
+
+        Bundle bundle = new Bundle();
+        bundle.putString("clanName", clanName);
+        bundle.putString("clanDesc", clanDesc);
+        bundle.putString("clanBanner", clanBanner);
+        bundle.putString("clanIcon", clanIcon);
+
+        prepareFragmentHolder(fragment, child, bundle, "clan");
         return true;
     }
 
@@ -403,7 +426,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             return false;
         }
         MyProfileFragment fragment = new MyProfileFragment();
-        createFragmentView(fragment, child,"profile");
+
+        Bundle bundle = new Bundle();
+        bundle.putString("bungieId", bungieId);
+        bundle.putString("clanName", clanName);
+        bundle.putInt("type", TYPE_USER);
+
+        prepareFragmentHolder(fragment, child, bundle, "profile");
         return true;
     }
 
@@ -433,11 +462,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         String[] projection;
         CursorLoader cursorLoader;
 
-        //Toast.makeText(this, "Loader criado!", Toast.LENGTH_SHORT).show();
-
         switch (id) {
             case URL_LOADER_USER:
-                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_NAME};
+                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_MEMBERSHIP, LoggedUserTable.COLUMN_NAME};
                 cursorLoader = new CursorLoader(
                         this,
                         DataProvider.LOGGED_USER_URI,
@@ -446,6 +473,16 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         null,
                         null);
                 break;
+            case URL_LOADER_CLAN:
+                projection = ClanTable.ALL_COLUMNS;
+                return new CursorLoader(
+                        this,
+                        DataProvider.CLAN_URI,
+                        projection,
+                        null,
+                        null,
+                        null
+                );
             default:
                 cursorLoader = null;
                 break;
@@ -458,7 +495,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        //Toast.makeText(this, "Loader concluido.", Toast.LENGTH_SHORT).show();
+        data.moveToFirst();
 
         switch (loader.getId()){
             case URL_LOADER_USER:
@@ -468,7 +505,19 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivityForResult(intent, NO_USER);
                     finish();
+                } else {
+                    bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
+                    userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
+                    getClanData();
                 }
+                break;
+            case URL_LOADER_CLAN:
+                clanId = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BUNGIE_ID));
+                clanName = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_NAME));
+                clanDesc = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_DESC));
+                clanIcon = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_ICON));
+                clanBanner = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BACKGROUND));
+                break;
         }
 
     }

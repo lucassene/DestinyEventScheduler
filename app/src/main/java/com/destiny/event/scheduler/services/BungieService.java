@@ -9,6 +9,7 @@ import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.destiny.event.scheduler.data.ClanTable;
+import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.models.MembersModel;
@@ -122,11 +123,31 @@ public class BungieService extends IntentService {
                 insertLoggedUser();
                 insertClan();
                 insertClanMembers();
+                insertFakeEvents();
                 break;
         }
 
         this.stopSelf();
 
+    }
+
+    private void insertFakeEvents() {
+
+        Random random = new Random();
+
+        for (int i=0; i<10; i++){
+            int member = random.nextInt(membersModelList.size()-1);
+            String id = membersModelList.get(member).getMembershipId();
+            int event = random.nextInt(57);
+            ContentValues values = new ContentValues();
+            values.put(GameTable.COLUMN_CREATOR, id);
+            values.put(GameTable.COLUMN_EVENT_ID, event);
+            values.put(GameTable.COLUMN_TIME,"2016-04-20T14:38:00");
+            values.put(GameTable.COLUMN_LIGHT, 320);
+            values.put(GameTable.COLUMN_GUARDIANS, 3);
+            getContentResolver().insert(DataProvider.GAME_URI, values);
+            Log.w(TAG, "Game created: " + id + " / " + event );
+        }
     }
 
     private void insertClanMembers() {
@@ -140,12 +161,12 @@ public class BungieService extends IntentService {
             values.put(MemberTable.COLUMN_CLAN, clanId);
 
             String imageSubURL = membersModelList.get(i).getIconPath();
-            Log.w(TAG, "Total of icons: " + iconsList.size());
+            //Log.w(TAG, "Total of icons: " + iconsList.size());
 
             //ImageUtils.downloadImage(getApplicationContext(), imagePath);
 
             String imageName = imageSubURL.substring(imageSubURL.lastIndexOf("/")+1, imageSubURL.length());
-            Log.w(TAG, "Image Name: " + imageName);
+            //Log.w(TAG, "Image Name: " + imageName);
 
             values.put(MemberTable.COLUMN_ICON, imageName);
             values.put(MemberTable.COLUMN_PLATFORM, platformId);
@@ -162,7 +183,7 @@ public class BungieService extends IntentService {
             values.put(MemberTable.COLUMN_SINCE, dateAfter);
             getContentResolver().insert(DataProvider.MEMBER_URI, values);
 
-            Log.w(TAG, membersModelList.get(i).getName() + ": Likes: " + likes + ", Dislikes: " + dislikes + ", Created: " + created + ", Played: " + played);
+            //Log.w(TAG, membersModelList.get(i).getName() + ": Likes: " + likes + ", Dislikes: " + dislikes + ", Created: " + created + ", Played: " + played);
 
         }
 
@@ -170,7 +191,7 @@ public class BungieService extends IntentService {
             ImageUtils.downloadImage(getApplicationContext(), BASE_IMAGE_URL + iconsList.get(x));
         }
 
-        Log.w(TAG, "Icon images downloaded succesfully");
+        //Log.w(TAG, "Icon images downloaded succesfully");
 
     }
 
@@ -195,7 +216,7 @@ public class BungieService extends IntentService {
 
         getContentResolver().insert(DataProvider.CLAN_URI, values);
 
-        Log.w(TAG, "Clan table criado com sucesso!");
+        //Log.w(TAG, "Clan table criado com sucesso!");
     }
 
     private void insertLoggedUser() {
@@ -208,7 +229,7 @@ public class BungieService extends IntentService {
 
         getContentResolver().insert(DataProvider.LOGGED_USER_URI, values);
 
-        Log.w(TAG, "Logged User criado com sucesso!");
+        //Log.w(TAG, "Logged User criado com sucesso!");
 
     }
 
@@ -295,7 +316,7 @@ public class BungieService extends IntentService {
                         //membershipId = userInfo.getString("membershipId");
                         displayName = userInfo.getString("displayName");
 
-                        Log.w(TAG,"Results: " + displayName + " " + membershipId );
+                        //Log.w(TAG,"Results: " + displayName + " " + membershipId );
 
                        /* bundle.clear();
                         bundle.putString(PLATFORM, membershipType);
@@ -326,7 +347,7 @@ public class BungieService extends IntentService {
                         JSONArray jClans = jResponse.getJSONArray("clans");
                         JSONObject clanObj = jClans.getJSONObject(0);
                         clanId = clanObj.getString("groupId");
-                        Log.w(TAG,"Clan ID: " + clanId);
+                        //Log.w(TAG,"Clan ID: " + clanId);
 
                         JSONObject jRelatedGroups = jResponse.getJSONObject("relatedGroups");
                         JSONObject jGroup = jRelatedGroups.getJSONObject(clanId);
@@ -336,7 +357,7 @@ public class BungieService extends IntentService {
                         clanBanner = jGroup.getString("bannerPath");
                         clanIcon = jGroup.getString("avatarPath");
 
-                        Log.w(TAG, "Clan Info: " + clanName + " - " + motto);
+                        //Log.w(TAG, "Clan Info: " + clanName + " - " + motto);
 
                         /*bundle.clear();
                         bundle.putString(CLAN_ID, clanId);
@@ -448,7 +469,7 @@ public class BungieService extends IntentService {
     private void getClanMemberAccount(ResultReceiver receiver, String clanMember, String memberType, int position){
 
         String myURL = BASE_URL + USER_PREFIX + GET_BUNGIE_ACCOUNT + clanMember + memberType;
-        Log.w(TAG, myURL);
+        //Log.w(TAG, myURL);
         int notAdd = 0;
 
         try {
@@ -471,7 +492,7 @@ public class BungieService extends IntentService {
                         membersModelList.get(position).setIconPath(bundle.getString(ICON));
                         membersModelList.get(position).setPlatformId(platformId);
                         membersModelList.get(position).setClanId(clanId);
-                        Log.w(TAG, "Clan member: " + membersModelList.get(position).getMembershipId() + ": " + membersModelList.get(position).getName());
+                        //Log.w(TAG, "Clan member: " + membersModelList.get(position).getMembershipId() + ": " + membersModelList.get(position).getName());
 
                         if (iconsList.size()==0){
                             iconsList.add(membersModelList.get(position).getIconPath());

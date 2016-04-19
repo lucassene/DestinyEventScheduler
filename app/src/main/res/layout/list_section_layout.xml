@@ -11,6 +11,6 @@
         android:id="@+id/section_title"
         android:textColor="@color/psnColor"
         android:gravity="center_vertical"
-        android:textSize="@dimen/secondaryTextSize"/>
+        android:textSize="@dimen/secondaryTextSize" />
 
 </LinearLayout>

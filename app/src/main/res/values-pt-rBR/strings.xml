@@ -171,5 +171,22 @@
     <string name="prepare_msg1">Você se importa de esperar um pouco? Acontece que temos muitos guardiões nesse universo...</string>
     <string name="prepare_msg2">Não se preocupe, é só na primeira vez!</string>
     <string name="prepare_title">Preparando sua chegada</string>
+    <string name="date_you_join">O dia em que você entrou no</string>
+    <string name="dislikes">Dislikes:</string>
+    <string name="final_equation">A equação final que envolve todos esses stats.</string>
+    <string name="games_created">Partidas criadas:</string>
+    <string name="games_created_by_you">Número de partidas criadas por você.</string>
+    <string name="games_played2">Partidas jogadas:</string>
+    <string name="games_played_you">Número de partidas jogadas por você.</string>
+    <string name="good_and_helpful_friends">Guardiões gostam de amigos bons e prestativos.</string>
+    <string name="guardians_with_bad_aim">Mas eles não gostam daqueles com mira ruim.</string>
+    <string name="likes">Likes:</string>
+    <string name="participation_points">Pontos de Participação:</string>
+    <string name="games_created_by_member">Número de partidas criadas por </string>
+    <string name="games_played_by_member">Número de partidas jogadas por</string>
+    <string name="my_clan_empty">Oops! Será que esquecemos de convidar os guardiões?</string>
+    <string name="date_member_join1">O dia em que</string>
+    <string name="date_member_join2">entrou no</string>
+    <string name="games_played_by_member2">, não incluindo os próprios</string>
 
 </resources>

@@ -44,10 +44,13 @@ public class LoginActivity extends Activity {
                 intent.putExtra("url",PSN_URL);
                 startActivityForResult(intent,LOGIN);
             } else if (v.getId() == R.id.btn_live){
-                selectedPlatform = LIVE;
+                /*selectedPlatform = LIVE;
                 Intent intent = new Intent(this, WebActivity.class);
                 intent.putExtra("url",LIVE_URL);
-                startActivityForResult(intent,LOGIN);
+                startActivityForResult(intent,LOGIN);*/
+                Intent intent = new Intent(this, DrawerActivity.class);
+                startActivity(intent);
+                finish();
             }
         } else {
             Toast.makeText(this, R.string.connection_needed_login, Toast.LENGTH_SHORT).show();

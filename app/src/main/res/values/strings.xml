@@ -201,9 +201,25 @@
     <string name="begin_yes">Begin, yes?</string>
     <string name="connection_needed_login">Internet connection needed for log in.</string>
     <string name="prepare_title">Preparing your arrival</string>
-    <string name="prepare_msg1">Can you wait just a little please? Turns out there is too many Guardians in this universe...</string>
+    <string name="prepare_msg1">Can you wait just a little please? Turns out there is too many Guardians in this universe…</string>
     <string name="prepare_msg2">Don\'t worry, it\'s just in the first time!</string>
-    <string name="my_clan_empty">Oops! Did we forget to invite those guardians?</string>
+    <string name="my_clan_empty">Oops! Did we forget to invite some guardians?</string>
+    <string name="date_you_join">The day you joined</string>
+    <string name="date_member_join1">The day</string>
+    <string name="date_member_join2">joined</string>
+    <string name="games_created">Games created:</string>
+    <string name="games_created_by_you">Number of games created by you.</string>
+    <string name="games_created_by_member">Number of games created by</string>
+    <string name="games_played2">Games played:</string>
+    <string name="games_played_you">Number of games played by you.</string>
+    <string name="games_played_by_member">Number of games played by</string>
+    <string name="games_played_by_member2">, not including his own.</string>
+    <string name="likes">Likes:</string>
+    <string name="good_and_helpful_friends">Guardians likes good and helpful friends.</string>
+    <string name="dislikes">Dislikes:</string>
+    <string name="guardians_with_bad_aim">But they don\'t like those with bad aim.</string>
+    <string name="participation_points">Participation Points:</string>
+    <string name="final_equation">The final equation that involves all this previous stats.</string>
 
 
 </resources>

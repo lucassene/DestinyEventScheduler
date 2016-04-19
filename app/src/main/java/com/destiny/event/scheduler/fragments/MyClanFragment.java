@@ -3,6 +3,7 @@ package com.destiny.event.scheduler.fragments;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -16,24 +17,27 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
-import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MyClanFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "MyClanFragment";
 
-    private static final int LOADER_CLAN = 40;
     private static final int LOADER_MEMBERS = 50;
+
+    private static final int TYPE_MEMBER = 2;
 
     private static final String POINTS_ORDER_BY = "((" + MemberTable.COLUMN_LIKES + "*1.0)/(" + MemberTable.COLUMN_CREATED + "+" + MemberTable.COLUMN_PLAYED + "))*100+(" + MemberTable.COLUMN_CREATED + "*0.5)-" + MemberTable.COLUMN_DISLIKES;
     private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE;
@@ -43,10 +47,15 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_SINCE};
     private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points};
 
-    TextView clanName;
+    private ArrayList<String> bungieIdList;
+    private String bungieId;
+
+    TextView clanNameTxt;
     TextView clanDesc;
     ImageView clanLogo;
     ImageView clanBanner;
+
+    private String clanName;
 
     Spinner orderSpinner;
 
@@ -55,6 +64,8 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     TextView totalMembers;
 
     CustomCursorAdapter adapter;
+
+    private ToActivityListener callback;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +81,8 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         headerView = inflater.inflate(R.layout.my_clan_header_layout, null);
 
+        bungieIdList = new ArrayList<>();
+
         return v;
     }
 
@@ -79,7 +92,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         View myClanLayout = headerView.findViewById(R.id.myclan_layout);
 
-        clanName = (TextView) myClanLayout.findViewById(R.id.clan_name);
+        clanNameTxt = (TextView) myClanLayout.findViewById(R.id.clan_name);
         clanDesc = (TextView) myClanLayout.findViewById(R.id.clan_desc);
         clanLogo = (ImageView) myClanLayout.findViewById(R.id.clan_logo);
         clanBanner = (ImageView) myClanLayout.findViewById(R.id.clan_banner);
@@ -95,11 +108,24 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         orderSpinner.setSelection(0);
 
         orderBy = NAME_ORDER_BY + " ASC";
-        getClanData();
+        setClanData();
     }
 
-    private void getClanData() {
-        getLoaderManager().initLoader(LOADER_CLAN, null, this);
+    private void setClanData() {
+
+        Bundle bundle = getArguments();
+
+        clanNameTxt.setText(bundle.getString("clanName"));
+        clanName = bundle.getString("clanName");
+        clanDesc.setText(bundle.getString("clanDesc"));
+        try {
+            clanLogo.setImageBitmap(ImageUtils.loadImage(getContext(),bundle.getString("clanIcon")));
+            clanBanner.setImageBitmap(ImageUtils.loadImage(getContext(), bundle.getString("clanBanner")));
+        } catch (IOException e){
+            Log.w(TAG, "Clan Logo not found");
+            e.printStackTrace();
+        }
+
         getLoaderManager().initLoader(LOADER_MEMBERS, null, this);
         adapter = new CustomCursorAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, LOADER_MEMBERS);
 
@@ -113,6 +139,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        callback = (ToActivityListener) getActivity();
         setHasOptionsMenu(true);
     }
 
@@ -128,23 +155,28 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     }
 
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+
+        bungieId = bungieIdList.get(position-1);
+
+        Fragment fragment = new MyProfileFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("bungieId", bungieId);
+        bundle.putInt("type", TYPE_MEMBER);
+        bundle.putString("clanName", clanName);
+
+        callback.loadNewFragment(fragment, bundle, "profile");
+
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection;
-        Log.w(TAG, "SQL: " + orderBy);
+        //Log.w(TAG, "SQL: " + orderBy);
 
         switch (id){
-            case LOADER_CLAN:
-                projection = ClanTable.ALL_COLUMNS;
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.CLAN_URI,
-                        projection,
-                        null,
-                        null,
-                        null
-                );
             case LOADER_MEMBERS:
                 projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, POINTS_ORDER_BY, MemberTable.COLUMN_SINCE};
                 return new CursorLoader(
@@ -166,21 +198,13 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         data.moveToFirst();
 
         switch (loader.getId()){
-            case LOADER_CLAN:
-                clanName.setText(data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_NAME)));
-                clanDesc.setText(data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_DESC)));
-                try {
-                    clanLogo.setImageBitmap(ImageUtils.loadImage(getContext(),data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_ICON))));
-                    clanBanner.setImageBitmap(ImageUtils.loadImage(getContext(), data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BACKGROUND))));
-                } catch (IOException e){
-                    Log.w(TAG, "Clan Logo not found");
-                    e.printStackTrace();
-                }
-
-                break;
             case LOADER_MEMBERS:
                 adapter.swapCursor(data);
                 totalMembers.setText(String.valueOf(data.getCount()));
+                for (int i=0; i<data.getCount(); i++){
+                    bungieIdList.add(i,data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP)));
+                    data.moveToNext();
+                }
                 break;
         }
 
