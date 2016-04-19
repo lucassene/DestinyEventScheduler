@@ -106,10 +106,10 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
                 TextView gameMax = (TextView) view.findViewById(R.id.game_max);
 
                 gameIcon.setImageResource(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",context.getPackageName()));
-                gameTitle.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_NAME)));
+                gameTitle.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",context.getPackageName()));
                 gameCreator.setText(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_CREATOR)));
                 gameDate.setText(DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-                gameTime.setText(DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
+                gameTime.setText(DateUtils.getTime(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
                 gameMax.setText("/" + cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_GUARDIANS)));
                 break;
         }

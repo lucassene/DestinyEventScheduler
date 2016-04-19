@@ -85,4 +85,11 @@ public class DateUtils {
         return date;
     }
 
+    public static String getTime(String text){
+        String t = text.substring(text.indexOf("T")+1,text.length());
+        String time = t.substring(0,5);
+
+        return time;
+    }
+
 }

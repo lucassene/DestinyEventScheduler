@@ -51,7 +51,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private static final int URL_LOADER_USER = 30;
     private static final int URL_LOADER_CLAN = 40;
-    private static final int NO_USER = 0;
 
     private static final int TYPE_USER = 1;
     private static final int TYPE_MEMBER = 2;
@@ -94,7 +93,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         if (savedInstanceState == null){
             //Toast.makeText(this, "Verificando usuário logado...", Toast.LENGTH_SHORT).show();
-            getLoggedUser();
+            getClanData();
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -103,6 +102,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             getSupportActionBar().setTitle(R.string.home_title);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        bungieId = getIntent().getStringExtra("bungieId");
+        userName = getIntent().getStringExtra("userName");
 
         newEventButton = (FloatingActionButton) findViewById(R.id.floating_button);
 
@@ -185,7 +187,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         case 4:
                             return openHistoryFragment(child);
                         case 5:
-                           return false;
+                            return false;
                         case 6:
                             return openMyClanFragment(child);
                         case 7:
@@ -232,11 +234,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         tabLayout.setDistributeEvenly(true);
         tabLayout.setViewPager(viewPager);
         tabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-                @Override
-                public int getIndicatorColor(int position) {
-                    return getResources().getColor(R.color.tabIndicatorColor);
-                }
-            });
+            @Override
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.tabIndicatorColor);
+            }
+        });
         viewPager.setCurrentItem(1);
 
         if (getSupportFragmentManager().getBackStackEntryCount()>0){
@@ -252,9 +254,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         getSupportLoaderManager().initLoader(URL_LOADER_CLAN, null, this);
     }
 
-    private void getLoggedUser() {
-        getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -311,15 +310,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void updateViewPager() {
-            openFragment = null;
-            viewPager.setAdapter(viewPageAdapter);
-            tabLayout.setViewPager(viewPager);
-            viewPager.setCurrentItem(1);
-            newEventButton.setVisibility(View.VISIBLE);
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(R.string.home_title);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            }
+        openFragment = null;
+        viewPager.setAdapter(viewPageAdapter);
+        tabLayout.setViewPager(viewPager);
+        viewPager.setCurrentItem(1);
+        newEventButton.setVisibility(View.VISIBLE);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(R.string.home_title);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -463,16 +462,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         CursorLoader cursorLoader;
 
         switch (id) {
-            case URL_LOADER_USER:
-                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_MEMBERSHIP, LoggedUserTable.COLUMN_NAME};
-                cursorLoader = new CursorLoader(
-                        this,
-                        DataProvider.LOGGED_USER_URI,
-                        projection,
-                        null,
-                        null,
-                        null);
-                break;
             case URL_LOADER_CLAN:
                 projection = ClanTable.ALL_COLUMNS;
                 return new CursorLoader(
@@ -498,19 +487,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         data.moveToFirst();
 
         switch (loader.getId()){
-            case URL_LOADER_USER:
-                if (data.getCount() == 0){
-                    //Toast.makeText(this, "Nenhum usuário logado!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(this, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivityForResult(intent, NO_USER);
-                    finish();
-                } else {
-                    bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
-                    userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
-                    getClanData();
-                }
-                break;
             case URL_LOADER_CLAN:
                 clanId = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BUNGIE_ID));
                 clanName = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_NAME));

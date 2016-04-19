@@ -3,16 +3,24 @@ package com.destiny.event.scheduler.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.data.LoggedUserTable;
+import com.destiny.event.scheduler.provider.DataProvider;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int URL_LOADER_USER = 30;
 
     private static final String PSN_URL = "http://www.bungie.net/en/User/SignIn/Psnid";
     private static final String LIVE_URL = "http://www.bungie.net/en/User/SignIn/Xuid";
@@ -22,6 +30,9 @@ public class LoginActivity extends Activity {
 
     Button psnButton;
     Button liveButton;
+
+    private String bungieId;
+    private String userName;
 
     private String selectedPlatform;
 
@@ -85,5 +96,52 @@ public class LoginActivity extends Activity {
                 Toast.makeText(this, "Result falhou ou vazio.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection;
+        CursorLoader cursorLoader;
+
+        switch (id) {
+            case URL_LOADER_USER:
+                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_MEMBERSHIP, LoggedUserTable.COLUMN_NAME};
+                return new CursorLoader(
+                        this,
+                        DataProvider.LOGGED_USER_URI,
+                        projection,
+                        null,
+                        null,
+                        null);
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        data.moveToFirst();
+
+        switch (loader.getId()) {
+            case URL_LOADER_USER:
+                if (data.getCount() > 0) {
+                    bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
+                    userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
+                    Intent intent = new Intent(this, DrawerActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("bungieId",bungieId);
+                    intent.putExtra("userName",userName);
+                    startActivity(intent);
+                    finish();
+                }
+                break;
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
