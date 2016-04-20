@@ -2,6 +2,7 @@ package com.destiny.event.scheduler.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -104,13 +105,22 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
                 TextView gameDate = (TextView) view.findViewById(R.id.game_date);
                 TextView gameTime = (TextView) view.findViewById(R.id.game_time);
                 TextView gameMax = (TextView) view.findViewById(R.id.game_max);
+                TextView gameInsc = (TextView) view.findViewById(R.id.game_actual);
 
-                gameIcon.setImageResource(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",context.getPackageName()));
-                gameTitle.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",context.getPackageName()));
-                gameCreator.setText(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_CREATOR)));
+                gameIcon.setImageResource(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_ICON)),"drawable",context.getPackageName()));
+                gameTitle.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.getAliasColumn(EventTable.COLUMN_NAME))),"string",context.getPackageName()));
+                gameCreator.setText(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.getAliasColumn(GameTable.COLUMN_CREATOR_NAME))));
                 gameDate.setText(DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
                 gameTime.setText(DateUtils.getTime(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-                gameMax.setText("/" + cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_GUARDIANS)));
+                int max = cursor.getInt(cursor.getColumnIndexOrThrow(GameTable.COLUMN_GUARDIANS));
+                String maxS = " / " + max;
+                gameMax.setText(maxS);
+                int insc = cursor.getInt(cursor.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
+                gameInsc.setText(String.valueOf(insc));
+
+                if (insc > max){
+                    gameInsc.setTextColor(ContextCompat.getColor(context, R.color.redFilter));
+                }
                 break;
         }
 

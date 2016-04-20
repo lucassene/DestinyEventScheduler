@@ -7,9 +7,9 @@ public class EventTable {
 
     public static final String TABLE_NAME = "event";
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_ICON = "icon";
-    public static final String COLUMN_TYPE = "type";
+    public static final String COLUMN_NAME = "event_name";
+    public static final String COLUMN_ICON = "event_icon";
+    public static final String COLUMN_TYPE = "type_of_event";
     public static final String COLUMN_LIGHT = "min_light";
     public static final String COLUMN_GUARDIANS = "max_guardians";
 
@@ -43,7 +43,6 @@ public class EventTable {
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'clash', 'ic_clash', '2', '5', '6');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'classic3', 'ic_classic', '2', '5', '3');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'classic6', 'ic_classic', '2', '5', '6');");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'classic1', 'ic_rumble', '2', '5', '3');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'control', 'ic_control', '2', '5', '6');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'doubles', 'ic_doubles', '2', '5', '2');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'elimination', 'ic_elimination', '2', '5', '6');");
@@ -100,14 +99,6 @@ public class EventTable {
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'heroic', 'ic_strike_heroic', '8', '260', '3');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'vanguard', 'ic_strike', '8', '200', '3');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'legacy', 'ic_strike', '8', '5', '3');");
-
-
-
-
-
-
-
-
     }
 
     public static void onUpdate(SQLiteDatabase db, int oldVersion, int newVersion){
@@ -115,4 +106,17 @@ public class EventTable {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
+
+    public static String getQualifiedColumn(String column){
+        return TABLE_NAME + "." + column;
+    }
+
+    public static String getAliasColumn(String column){
+        return TABLE_NAME + "_" + column;
+    }
+
+    public static String getAliasExpression(String column){
+        return getQualifiedColumn(column) + " AS " + getAliasColumn(column);
+    }
+
 }

@@ -38,7 +38,6 @@ public class DataProvider extends ContentProvider {
     private static final int GAME_ID = 61;
     private static final int ENTRY = 70;
     private static final int ENTRY_ID = 71;
-    private static final int GAME_WITH_EVENT = 65;
 
     private static final String AUTHORITY = "com.destiny.event.scheduler.provider";
 
@@ -56,8 +55,6 @@ public class DataProvider extends ContentProvider {
     public static final Uri GAME_URI = Uri.parse("content://" + AUTHORITY + "/" + GAME_PATH);
     private static final String ENTRY_PATH = "entry";
     public static final Uri ENTRY_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_PATH);
-    private static final String GAME_WITH_EVENT_PATH = "gamewithevent";
-    public static final Uri GAME_EVENT_URI = Uri.parse("content://" + AUTHORITY + "/" + GAME_WITH_EVENT_PATH);
 
     public static final String EVENT_TYPE_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/alleventtype";
     public static final String EVENT_TYPE_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleeventtype";
@@ -90,8 +87,6 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, GAME_PATH + "/#", GAME_ID);
         uriMatcher.addURI(AUTHORITY, ENTRY_PATH, ENTRY);
         uriMatcher.addURI(AUTHORITY, ENTRY_PATH + "/#", ENTRY_ID);
-        uriMatcher.addURI(AUTHORITY, GAME_WITH_EVENT_PATH, GAME_WITH_EVENT);
-        uriMatcher.addURI(AUTHORITY, GAME_WITH_EVENT_PATH + "/#", GAME_WITH_EVENT);
     }
 
     @Override
@@ -150,31 +145,65 @@ public class DataProvider extends ContentProvider {
                 queryBuilder.appendWhere(MemberTable.COLUMN_ID + "=" + uri.getLastPathSegment());
                 break;
             case GAME:
-                queryBuilder.setTables(GameTable.TABLE_NAME);
+                StringBuilder sbGame = new StringBuilder();
+                sbGame.append(GameTable.TABLE_NAME);
+                sbGame.append(" JOIN ");
+                sbGame.append(MemberTable.TABLE_NAME);
+                sbGame.append(" ON ");
+                sbGame.append(GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR));
+                sbGame.append(" = ");
+                sbGame.append(MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP));
+                sbGame.append(" JOIN ");
+                sbGame.append(EventTable.TABLE_NAME);
+                sbGame.append(" ON ");
+                sbGame.append(GameTable.getQualifiedColumn(GameTable.COLUMN_EVENT_ID));
+                sbGame.append(" = ");
+                sbGame.append(EventTable.getQualifiedColumn(EventTable.COLUMN_ID));
+                queryBuilder.setTables(sbGame.toString());
                 break;
             case GAME_ID:
                 queryBuilder.setTables(GameTable.TABLE_NAME);
                 queryBuilder.appendWhere(GameTable.COLUMN_ID + "=" + uri.getLastPathSegment());
                 break;
             case ENTRY:
-                queryBuilder.setTables(EntryTable.TABLE_NAME);
+                StringBuilder sbEntry = new StringBuilder();
+                sbEntry.append(EntryTable.TABLE_NAME);
+                sbEntry.append(" JOIN ");
+                sbEntry.append(GameTable.TABLE_NAME);
+                sbEntry.append(" ON ");
+                sbEntry.append(EntryTable.getQualifiedColumn(EntryTable.COLUMN_GAME));
+                sbEntry.append(" = ");
+                sbEntry.append(GameTable.getQualifiedColumn(GameTable.COLUMN_ID));
+                sbEntry.append(" JOIN ");
+                sbEntry.append(EventTable.TABLE_NAME);
+                sbEntry.append(" ON ");
+                sbEntry.append(GameTable.getQualifiedColumn(GameTable.COLUMN_EVENT_ID));
+                sbEntry.append(" = ");
+                sbEntry.append(EventTable.getQualifiedColumn(EventTable.COLUMN_ID));
+                sbEntry.append(" JOIN ");
+                sbEntry.append(MemberTable.TABLE_NAME);
+                sbEntry.append(" ON ");
+                sbEntry.append(EntryTable.getQualifiedColumn(EntryTable.COLUMN_MEMBERSHIP));
+                sbEntry.append(" = ");
+                sbEntry.append(MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP));
+                queryBuilder.setTables(sbEntry.toString());
                 break;
             case ENTRY_ID:
                 queryBuilder.setTables(EntryTable.TABLE_NAME);
                 queryBuilder.appendWhere(EntryTable.COLUMN_ID + "=" + uri.getLastPathSegment());
                 break;
-            case GAME_WITH_EVENT:
-                StringBuilder sb = new StringBuilder();
-                sb.append(GameTable.TABLE_NAME);
-                sb.append(" JOIN ");
-                sb.append(EventTable.TABLE_NAME);
-                sb.append(" ON ");
-                sb.append(GameTable.TABLE_NAME + "." + GameTable.COLUMN_EVENT_ID);
-                sb.append(" = ");
-                sb.append(EventTable.TABLE_NAME + "." + EventTable.COLUMN_ID);
-                sb.append(";");
-                queryBuilder.setTables(sb.toString());
-                break;
+/*            case GAME_WITH_EVENT:
+                StringBuilder sb1 = new StringBuilder();
+                sb1.append(GameTable.TABLE_NAME);
+                sb1.append(" JOIN ");
+                sb1.append(EventTable.TABLE_NAME);
+                sb1.append(" ON ");
+                sb1.append(GameTable.TABLE_NAME + "." + GameTable.COLUMN_EVENT_ID);
+                sb1.append(" = ");
+                sb1.append(EventTable.TABLE_NAME + "." + EventTable.COLUMN_ID);
+                sb1.append(";");
+                queryBuilder.setTables(sb1.toString());
+                break;*/
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }

@@ -1,6 +1,5 @@
 package com.destiny.event.scheduler.activities;
 
-import android.content.Intent;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -33,7 +32,6 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.DrawerAdapter;
 import com.destiny.event.scheduler.adapters.ViewPageAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
-import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.fragments.HistoryFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
 import com.destiny.event.scheduler.fragments.MyProfileFragment;
@@ -41,15 +39,15 @@ import com.destiny.event.scheduler.fragments.NewEventFragment;
 import com.destiny.event.scheduler.fragments.SearchFragment;
 import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
+import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
 import java.util.ArrayList;
 
-public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>{
+public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>, OnEventCreatedListener{
 
-    private static final int URL_LOADER_USER = 30;
     private static final int URL_LOADER_CLAN = 40;
 
     private static final int TYPE_USER = 1;
@@ -65,6 +63,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     ActionBarDrawerToggle drawerToggle;
 
     private FromActivityListener newEventListener;
+    private OnEventCreatedListener createdEventListener;
 
     private FragmentTransaction ft;
     private FragmentManager fm;
@@ -359,6 +358,31 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         fm.popBackStack();
         newEventListener = (FromActivityListener) getSupportFragmentManager().findFragmentByTag("new");
         newEventListener.onEventGameSent(id);
+    }
+
+    @Override
+    public String getBungieId() {
+        return bungieId;
+    }
+
+    @Override
+    public String getUserName() {
+        return userName;
+    }
+
+    @Override
+    public void closeFragment() {
+        ft = fm.beginTransaction();
+        ft.remove(openFragment);
+        ft.commit();
+        fm.popBackStack();
+        fragmentTag = null;
+        updateViewPager();
+    }
+
+    @Override
+    public void onEventCreated() {
+        closeFragment();
     }
 
 

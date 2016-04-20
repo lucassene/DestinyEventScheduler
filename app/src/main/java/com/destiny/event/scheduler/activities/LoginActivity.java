@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -18,7 +19,7 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.provider.DataProvider;
 
-public class LoginActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class LoginActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int URL_LOADER_USER = 30;
 
@@ -38,12 +39,15 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.login_layout);
 
         psnButton = (Button) findViewById(R.id.btn_psn);
         liveButton = (Button) findViewById(R.id.btn_live);
+
+        getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
 
     }
 
@@ -55,13 +59,10 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
                 intent.putExtra("url",PSN_URL);
                 startActivityForResult(intent,LOGIN);
             } else if (v.getId() == R.id.btn_live){
-                /*selectedPlatform = LIVE;
+                selectedPlatform = LIVE;
                 Intent intent = new Intent(this, WebActivity.class);
                 intent.putExtra("url",LIVE_URL);
-                startActivityForResult(intent,LOGIN);*/
-                Intent intent = new Intent(this, DrawerActivity.class);
-                startActivity(intent);
-                finish();
+                startActivityForResult(intent,LOGIN);
             }
         } else {
             Toast.makeText(this, R.string.connection_needed_login, Toast.LENGTH_SHORT).show();

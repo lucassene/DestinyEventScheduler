@@ -5,15 +5,21 @@ import android.util.Log;
 
 public class GameTable {
 
-    public static final String TABLE_NAME = "game_table";
+    public static final String TABLE_NAME = "game";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_CREATOR = "creator";
+    public static final String COLUMN_CREATOR_NAME = "creator_name";
     public static final String COLUMN_EVENT_ID = "event_id";
     public static final String COLUMN_TIME = "time";
     public static final String COLUMN_LIGHT = "light";
     public static final String COLUMN_GUARDIANS = "guardians";
+    public static final String COLUMN_INSCRIPTIONS = "inscriptions";
+    public static final String COLUMN_STATUS = "status";
 
-    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_CREATOR, COLUMN_EVENT_ID, COLUMN_TIME, COLUMN_LIGHT, COLUMN_GUARDIANS};
+    public static final String GAME_NEW = "0";
+    public static final String GAME_HAPPENED = "1";
+
+    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_CREATOR, COLUMN_CREATOR_NAME, COLUMN_EVENT_ID, COLUMN_TIME, COLUMN_LIGHT, COLUMN_GUARDIANS, COLUMN_INSCRIPTIONS, COLUMN_STATUS};
 
     public static final String CREATE_TABLE = "CREATE TABLE "
             + TABLE_NAME
@@ -22,6 +28,8 @@ public class GameTable {
             + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_CREATOR
             + " TEXT NOT NULL, "
+            + COLUMN_CREATOR_NAME
+            + " TEXT NOT NULL, "
             + COLUMN_EVENT_ID
             + " TEXT NOT NULL, "
             + COLUMN_TIME
@@ -29,6 +37,10 @@ public class GameTable {
             + COLUMN_LIGHT
             + " INTEGER NOT NULL, "
             + COLUMN_GUARDIANS
+            + " INTEGER NOT NULL, "
+            + COLUMN_INSCRIPTIONS
+            + " INTEGER NOT NULL, "
+            + COLUMN_STATUS
             + " INTEGER NOT NULL"
             + ");";
 
@@ -41,5 +53,18 @@ public class GameTable {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
+
+    public static String getQualifiedColumn(String column){
+        return TABLE_NAME + "." + column;
+    }
+
+    public static String getAliasColumn(String column){
+        return TABLE_NAME + "_" + column;
+    }
+
+    public static String getAliasExpression(String column){
+        return getQualifiedColumn(column) + " AS " + getAliasColumn(column);
+    }
+
 
 }

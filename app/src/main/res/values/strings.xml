@@ -61,7 +61,7 @@
     <string name="game_label">Game</string>
     <string name="date_label">Date</string>
     <string name="time_label">Time</string>
-    <string name="max_guardians_label">Max Guardians</string>
+    <string name="max_guardians_label">Min Guardians</string>
     <string name="min_light_label">Min Light</string>
     <string name="new_event_button">Create Event</string>
     <string name="home_title">Main</string>
@@ -79,6 +79,7 @@
     <string name="join">Join</string>
     <string name="participants_guardians">Participants Guardians</string>
     <string name="created_by">Created by</string>
+    <string name="scheduled_games">Scheduled Games</string>
 
     <string-array name="new_event_section">
         <item>What</item>
@@ -189,7 +190,7 @@
     <string name="game_info">Game Info</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
-    <string name="values_between1">"Value between 1 and "</string>
+    <string name="values_between1">"Value between 2 and "</string>
     <string name="value_between2">"Value between "</string>
     <string name="and320">" and 335"</string>
     <string name="prepare_label1">Looking for your documents</string>

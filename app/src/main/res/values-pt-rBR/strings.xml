@@ -49,7 +49,7 @@
 
     <string name="refresh_lists">Atualizar Listas</string>
     <string name="game_type_label">Tipo de Jogo</string>
-    <string name="max_guardians_label">Max de Guardiões</string>
+    <string name="max_guardians_label">Mínimo de Guardiões</string>
     <string name="min_light_label">Luz Mínima</string>
     <string name="new_event_button">Criar Evento</string>
     <string name="new_event_title">Novo Evento</string>
@@ -152,7 +152,7 @@
     <string name="cancel">Cancelar</string>
     <string name="save">Salvar</string>
     <string name="value_between2">"Valor entre "</string>
-    <string name="values_between1">"Valor entre 1 e "</string>
+    <string name="values_between1">"Valor entre 2 e "</string>
     <string name="story_heroic">História Diária Heróica</string>
     <string name="story_normal">História Regular</string>
     <string name="cosmodrome">Patrulhe o Cosmódromo</string>
@@ -188,5 +188,6 @@
     <string name="date_member_join1">O dia em que</string>
     <string name="date_member_join2">entrou no</string>
     <string name="games_played_by_member2">, não incluindo os próprios</string>
+    <string name="scheduled_games">Jogos Agendados</string>
 
 </resources>

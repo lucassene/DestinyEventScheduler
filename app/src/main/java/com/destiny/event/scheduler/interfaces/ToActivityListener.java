@@ -9,4 +9,7 @@ public interface ToActivityListener {
     public void loadWithoutBackStack(Fragment fragment, Bundle bundle, String tag);
     public void onEventTypeSelected(String id);
     public void onEventGameSelected(String id);
+    public String getBungieId();
+    public String getUserName();
+    public void closeFragment();
 }

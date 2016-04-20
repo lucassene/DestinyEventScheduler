@@ -138,13 +138,17 @@ public class BungieService extends IntentService {
         for (int i=0; i<10; i++){
             int member = random.nextInt(membersModelList.size()-1);
             String id = membersModelList.get(member).getMembershipId();
-            int event = random.nextInt(57);
+            int event = random.nextInt(56);
+            int insc = random.nextInt(5)+1;
             ContentValues values = new ContentValues();
             values.put(GameTable.COLUMN_CREATOR, id);
+            values.put(GameTable.COLUMN_CREATOR_NAME, membersModelList.get(member).getName());
             values.put(GameTable.COLUMN_EVENT_ID, event);
             values.put(GameTable.COLUMN_TIME,"2016-04-20T14:38:00");
             values.put(GameTable.COLUMN_LIGHT, 320);
             values.put(GameTable.COLUMN_GUARDIANS, 3);
+            values.put(GameTable.COLUMN_INSCRIPTIONS, insc);
+            values.put(GameTable.COLUMN_STATUS, random.nextInt(2));
             getContentResolver().insert(DataProvider.GAME_URI, values);
             Log.w(TAG, "Game created: " + id + " / " + event );
         }

@@ -1,7 +1,9 @@
 package com.destiny.event.scheduler.fragments;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -14,25 +16,37 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
+import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.dialogs.MyDatePickerDialog;
 import com.destiny.event.scheduler.dialogs.MyTimePickerDialog;
 import com.destiny.event.scheduler.dialogs.SimpleInputDialog;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
+import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 
 public class NewEventFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener, FromActivityListener {
+
+    private static final String TAG = "NewEventFragment";
 
     private static final int URL_LOADER_TYPE = 10;
     private static final int URL_LOADER_GAME = 20;
@@ -41,6 +55,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private String selectedGame;
 
     private ToActivityListener callback;
+    private OnEventCreatedListener eventCallback;
 
     private ImageView iconType;
     private TextView textType;
@@ -50,7 +65,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private TextView textGame;
     private RelativeLayout gameLayout;
 
-    private TextView guardianMaxText;
+    private TextView guardianMinText;
     private SeekBar guardianBar;
     private int maxGuardian;
 
@@ -60,6 +75,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     private EditText dateText;
     private EditText timeText;
+
+    private Button createButton;
 
     private SimpleInputDialog dialog;
 
@@ -94,22 +111,22 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 selectedGame = "4";
                 break;
             case "3":
-                selectedGame = "20";
+                selectedGame = "19";
                 break;
             case "4":
-                selectedGame = "25";
+                selectedGame = "24";
                 break;
             case "5":
-                selectedGame = "31";
+                selectedGame = "30";
                 break;
             case "6":
-                selectedGame = "37";
+                selectedGame = "36";
                 break;
             case "7":
-                selectedGame = "39";
+                selectedGame = "38";
                 break;
             case "8":
-                selectedGame = "53";
+                selectedGame = "52";
                 break;
         }
     }
@@ -119,6 +136,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         super.onAttach(context);
         setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
+        eventCallback = (OnEventCreatedListener) getActivity();
     }
 
     @Override
@@ -141,7 +159,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         textGame = (TextView) v.findViewById(R.id.game_text);
         gameLayout = (RelativeLayout) v.findViewById(R.id.game_list);
 
-        guardianMaxText = (TextView) v.findViewById(R.id.guardian_total_text);
+        guardianMinText = (TextView) v.findViewById(R.id.guardian_total_text);
         guardianBar = (SeekBar) v.findViewById(R.id.guardian_bar);
 
         lightText = (TextView) v.findViewById(R.id.light_min_text);
@@ -150,11 +168,21 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         dateText = (EditText) v.findViewById(R.id.date_text);
         timeText = (EditText) v.findViewById(R.id.time_text);
 
+        createButton = (Button) v.findViewById(R.id.btn_gravar);
+
+        createButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createNewEvent();
+            }
+        });
+
+
         guardianBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                guardianMaxText.setText(String.valueOf(guardianBar.getProgress()+1));
+                guardianMinText.setText(String.valueOf(guardianBar.getProgress()+2));
             }
 
             @Override
@@ -207,7 +235,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
 
-        guardianMaxText.setOnClickListener(new View.OnClickListener() {
+        guardianMinText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
@@ -216,7 +244,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 bundle.putString("yes", getResources().getString(R.string.save));
                 bundle.putString("no", getResources().getString(R.string.cancel));
                 bundle.putInt("max", maxGuardian);
-                bundle.putInt("min", 1);
+                bundle.putInt("min", 2);
                 bundle.putInt("type", FromDialogListener.GUARDIAN_TYPE);
                 String hint = getResources().getString(R.string.values_between1) + maxGuardian;
                 bundle.putString("hint", hint);
@@ -343,10 +371,10 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 break;
             case URL_LOADER_GAME:
                 maxGuardian = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS));
-                guardianBar.setMax(maxGuardian - 1);
-                guardianMaxText.setText("1");
+                guardianBar.setMax(maxGuardian - 2);
+                guardianMinText.setText("2");
                 minLight = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT));
-                lightBar.setMax(320 - minLight);
+                lightBar.setMax(335 - minLight);
                 lightText.setText(String.valueOf(minLight));
                 iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
                 iconGame.setImageResource(getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
@@ -367,7 +395,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
         switch (type){
             case FromDialogListener.GUARDIAN_TYPE:
-                guardianMaxText.setText(input);
+                guardianMinText.setText(input);
                 guardianBar.setProgress(value-1);
                 break;
             case FromDialogListener.LIGHT_TYPE:
@@ -405,11 +433,98 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().restartLoader(URL_LOADER_GAME, null, this);
     }
 
-    public void createNewEvent(View view) {
+
+    public void createNewEvent() {
         String date = dateText.getText().toString();
         String time = timeText.getText().toString();
-        int minGuardian = Integer.parseInt(guardianMaxText.getText().toString());
-        int minLight = Integer.parseInt(lightText.getText().toString());
+
+        if(!date.isEmpty() || !time.isEmpty()){
+
+            String fullTime = getBungieTime(date, time);
+
+            int maxGuardian = Integer.parseInt(guardianMinText.getText().toString());
+            int minLight = Integer.parseInt(lightText.getText().toString());
+            int insc = 1;
+            String bungieId = callback.getBungieId();
+            String userName = callback.getUserName();
+
+            ContentValues gameValues = new ContentValues();
+            gameValues.put(GameTable.COLUMN_CREATOR, bungieId);
+            gameValues.put(GameTable.COLUMN_CREATOR_NAME,userName);
+            gameValues.put(GameTable.COLUMN_EVENT_ID, selectedGame);
+            gameValues.put(GameTable.COLUMN_TIME,fullTime);
+            gameValues.put(GameTable.COLUMN_LIGHT, minLight);
+            gameValues.put(GameTable.COLUMN_GUARDIANS, maxGuardian);
+            gameValues.put(GameTable.COLUMN_INSCRIPTIONS, insc);
+            gameValues.put(GameTable.COLUMN_STATUS, 0);
+
+            Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
+            String id = "";
+            if (result != null) {
+                id = result.getLastPathSegment();
+            }
+
+            String now = getCurrentTime();
+
+            ContentValues entryValues = new ContentValues();
+            entryValues.put(EntryTable.COLUMN_MEMBERSHIP, bungieId);
+            entryValues.put(EntryTable.COLUMN_GAME, id);
+            entryValues.put(EntryTable.COLUMN_TIME, now);
+            getContext().getContentResolver().insert(DataProvider.ENTRY_URI, entryValues);
+
+            Toast.makeText(getContext(), "Success! You've created one brand new event!", Toast.LENGTH_SHORT).show();
+            eventCallback.onEventCreated();
+
+        } else{
+            Toast.makeText(getContext(), "Hmmm, when do you wanna play?", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private String getCurrentTime() {
+        Calendar c = GregorianCalendar.getInstance();
+        String minute = String.valueOf(c.get(Calendar.MINUTE));
+        String hour = String.valueOf(c.get(Calendar.HOUR));
+        String day = String.valueOf(c.get(Calendar.DAY_OF_MONTH));
+        String month = String.valueOf(c.get(Calendar.MONTH)+1);
+        String year = String.valueOf(c.get(Calendar.YEAR));
+
+        // SimpleDateFormat Class
+        SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd");
+        String newdate =  sdfDateTime.format(new Date(System.currentTimeMillis()));
+
+        SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
+        String newtime = sdfTime.format(new Date(System.currentTimeMillis()));
+
+        String finalString = newdate + "T" + newtime;
+
+        /*if (minute.length() == 1)minute = "0" + minute;
+        if (hour.length() == 1) hour = "0" + hour;
+        if (day.length() == 1) day = "0" + day;
+        if (month.length() == 1) month = "0" + month;
+        if (year.length() == 1) year = "0" + year;
+
+        String time = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00";*/
+
+        Log.w(TAG, "Time: " + finalString);
+
+        return finalString ;
+    }
+
+    private String getBungieTime(String date, String time) {
+
+        String year = date.substring(date.lastIndexOf("/")+1,date.length());
+        String month = date.substring(date.indexOf("/")+1,date.lastIndexOf("/")-1);
+        String day = date.substring(0,date.indexOf("/")-1);
+
+        if (time.length() == 4){
+            time = "0" + time + ":00";
+        } else {
+            time = time + ":00";
+        }
+
+        Log.w(TAG, "Bungie Time: " + year + "-" + month + "-" + day + "T" + time);
+        return year + "-" + month + "-" + day + "T" + time;
 
     }
 }
