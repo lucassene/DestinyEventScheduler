@@ -46,13 +46,6 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginRight="16dp">
 
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/floating_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_add"
-                    android:onClick="showNewEvent"/>
-
                 <ProgressBar
                     android:id="@+id/progress_bar"
                     android:layout_width="wrap_content"

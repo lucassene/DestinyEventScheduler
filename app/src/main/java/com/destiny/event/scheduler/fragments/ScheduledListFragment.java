@@ -20,7 +20,7 @@ import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
-import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
+import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 
 public class ScheduledListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -37,7 +37,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
     TextView sectionTitle;
 
-    private OnEventCreatedListener callback;
+    private ToActivityListener callback;
 
     private String[] projection;
     private String[] from;
@@ -45,6 +45,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        callback = (ToActivityListener) getActivity();
     }
 
     @Override
@@ -117,8 +118,10 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] selectionArgs = {GameTable.GAME_NEW};
+        String[] selectionArgs = {GameTable.GAME_SCHEDULED};
         String orderBy = GameTable.getQualifiedColumn(GameTable.COLUMN_TIME);
+
+        callback.onLoadingData();
 
         switch (id){
             case LOADER_ENTRY:
@@ -128,7 +131,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
                         projection,
                         GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS) + "=?",
                         selectionArgs,
-                        orderBy + " ASC "
+                        null
                 );
             default:
                 return null;
@@ -138,14 +141,18 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        data.moveToFirst();
 
         Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
 
-        switch (loader.getId()){
-            case LOADER_ENTRY:
-                adapter.swapCursor(data);
+        if (data !=null && data.moveToFirst()){
+            switch (loader.getId()){
+                case LOADER_ENTRY:
+                    adapter.swapCursor(data);
+            }
+            callback.onDataLoaded();
         }
+
+
 
 
     }

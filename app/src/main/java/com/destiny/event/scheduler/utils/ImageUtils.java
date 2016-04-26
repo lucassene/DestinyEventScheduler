@@ -89,7 +89,7 @@ public class ImageUtils {
             Log.w(TAG, "Image not found");
             e.printStackTrace();
         } finally {
-            fis.close();
+            if (fis != null) fis.close();
         }
 
         return image;

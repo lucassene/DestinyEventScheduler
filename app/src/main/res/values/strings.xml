@@ -27,6 +27,7 @@
         <item>New Event</item>
         <item>Search Events</item>
         <item>Validate Event</item>
+        <item>My Events</item>
         <item>History</item>
         <item>My Clan</item>
         <item>My Stats</item>
@@ -38,6 +39,7 @@
         <item>@drawable/ic_event_new</item>
         <item>@drawable/ic_event_search</item>
         <item>@drawable/ic_event_validate</item>
+        <item>@drawable/ic_my_events</item>
         <item>@drawable/ic_event_history</item>
         <item>@drawable/ic_clan</item>
         <item>@drawable/ic_person</item>
@@ -221,6 +223,10 @@
     <string name="guardians_with_bad_aim">But they don\'t like those with bad aim.</string>
     <string name="participation_points">Participation Points:</string>
     <string name="final_equation">The final equation that involves all this previous stats.</string>
+    <string name="leaving">Are you leaving guardian?</string>
+    <string name="oblivion">Be aware that all your data will be deleted, and you\'ll be forgot in the oblivion.</string>
+    <string name="leave">Leave</string>
+    <string name="nevermind">Nevermind</string>
 
 
 </resources>

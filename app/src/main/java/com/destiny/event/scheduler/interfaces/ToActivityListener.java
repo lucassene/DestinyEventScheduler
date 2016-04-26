@@ -12,4 +12,6 @@ public interface ToActivityListener {
     public String getBungieId();
     public String getUserName();
     public void closeFragment();
+    public void onLoadingData();
+    public void onDataLoaded();
 }

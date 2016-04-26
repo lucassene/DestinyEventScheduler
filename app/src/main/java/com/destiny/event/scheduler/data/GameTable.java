@@ -18,6 +18,8 @@ public class GameTable {
 
     public static final String GAME_NEW = "0";
     public static final String GAME_HAPPENED = "1";
+    public static final String GAME_VALIDATED = "2";
+    public static final String GAME_SCHEDULED = "9";
 
     public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_CREATOR, COLUMN_CREATOR_NAME, COLUMN_EVENT_ID, COLUMN_TIME, COLUMN_LIGHT, COLUMN_GUARDIANS, COLUMN_INSCRIPTIONS, COLUMN_STATUS};
 

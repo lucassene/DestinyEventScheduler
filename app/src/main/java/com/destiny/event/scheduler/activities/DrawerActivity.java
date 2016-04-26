@@ -1,15 +1,16 @@
 package com.destiny.event.scheduler.activities;
 
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
+import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
@@ -27,11 +28,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.DrawerAdapter;
 import com.destiny.event.scheduler.adapters.ViewPageAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
+import com.destiny.event.scheduler.data.DBHelper;
+import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.fragments.HistoryFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
 import com.destiny.event.scheduler.fragments.MyProfileFragment;
@@ -39,14 +43,15 @@ import com.destiny.event.scheduler.fragments.NewEventFragment;
 import com.destiny.event.scheduler.fragments.SearchFragment;
 import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
+import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
-import java.util.ArrayList;
+public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>, OnEventCreatedListener, FromDialogListener{
 
-public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>, OnEventCreatedListener{
+    private static final String TAG = "DrawerActivity";
 
     private static final int URL_LOADER_CLAN = 40;
 
@@ -54,22 +59,22 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private static final int TYPE_MEMBER = 2;
 
     private Toolbar toolbar;
-    private FloatingActionButton newEventButton;
 
     RecyclerView rView;
     RecyclerView.Adapter rAdapter;
     RecyclerView.LayoutManager rLayoutManager;
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle drawerToggle;
+    ProgressBar progress;
 
     private FromActivityListener newEventListener;
-    private OnEventCreatedListener createdEventListener;
+    //private OnEventCreatedListener createdEventListener;
 
     private FragmentTransaction ft;
     private FragmentManager fm;
     private Fragment openFragment;
     private String fragmentTag;
-    private ArrayList<String> backStackList;
+    //private ArrayList<String> backStackList;
 
     private String clanName;
     private String clanId;
@@ -90,6 +95,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         setContentView(R.layout.drawer_layout);
 
+        progress = (ProgressBar) findViewById(R.id.progress_bar);
+
         if (savedInstanceState == null){
             //Toast.makeText(this, "Verificando usuário logado...", Toast.LENGTH_SHORT).show();
             getClanData();
@@ -105,124 +112,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         bungieId = getIntent().getStringExtra("bungieId");
         userName = getIntent().getStringExtra("userName");
 
-        newEventButton = (FloatingActionButton) findViewById(R.id.floating_button);
 
-        String[] items = getResources().getStringArray(R.array.menu_item);
-        TypedArray icons = getResources().obtainTypedArray(R.array.menu_icons);
-
-        String header = getResources().getString(R.string.def_clan_header);
-        Drawable clanImg = ContextCompat.getDrawable(this, R.drawable.default_clan_banner);
-        String clanDesc = getResources().getString(R.string.def_clan_desc);
-
-        String[] sections = getResources().getStringArray(R.array.menu_section);
         String titles[] = getResources().getStringArray(R.array.tab_titles);
         int numOfTabs = titles.length;
-
-        rView = (RecyclerView) findViewById(R.id.drawer_view);
-        rAdapter = new DrawerAdapter(header, sections, icons, items);
-        rView.setAdapter(rAdapter);
-        rLayoutManager = new LinearLayoutManager(this);
-        rView.setLayoutManager(rLayoutManager);
-
-        fm = getSupportFragmentManager();
-        //fm.addOnBackStackChangedListener(this);
-
-        final GestureDetector gestureDetector = new GestureDetector(DrawerActivity.this, new GestureDetector.SimpleOnGestureListener(){
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                return true;
-            }
-
-            @Override
-            public void onLongPress(MotionEvent e) {
-                View child = rView.findChildViewUnder(e.getX(), e.getY());
-
-                if (child!=null){
-                    switch (rView.getChildAdapterPosition(child)){
-                        case 0:
-                            openMainActivity(child);
-                            break;
-                        case 1:
-                            openNewEventFragment(child);
-                            break;
-                        case 2:
-                            openSearchEventFragment(child);
-                            break;
-                        case 3:
-                            openValidateEventFragment(child);
-                            break;
-                        case 4:
-                            openHistoryFragment(child);
-                            break;
-                        case 5:
-                            break;
-                        case 6:
-                            openMyClanFragment(child);
-                            break;
-                        case 7:
-                            openMyProfileFragment(child);
-                            break;
-                    }
-                }
-            }
-        });
-
-        rView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener(){
-
-            @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                View child = rView.findChildViewUnder(e.getX(), e.getY());
-
-                if (child!=null && gestureDetector.onTouchEvent(e)){
-                    switch (rView.getChildAdapterPosition(child)){
-                        case 0:
-                            return openMainActivity(child);
-                        case 1:
-                            return openNewEventFragment(child);
-                        case 2:
-                            return openSearchEventFragment(child);
-                        case 3:
-                            return openValidateEventFragment(child);
-                        case 4:
-                            return openHistoryFragment(child);
-                        case 5:
-                            return false;
-                        case 6:
-                            return openMyClanFragment(child);
-                        case 7:
-                            return openMyProfileFragment(child);
-                    }
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        });
-
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_menu, R.string.close_menu) {
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-            }
-        };
-        drawerLayout.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
 
         tabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tab);
         viewPager = (ViewPager) findViewById(R.id.content_view);
@@ -242,7 +134,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         if (getSupportFragmentManager().getBackStackEntryCount()>0){
             Log.w("DrawerActivity", "Fragment BackStack Count: " + String.valueOf(getSupportFragmentManager().getBackStackEntryCount()));
-            newEventButton.setVisibility(View.GONE);
             tabLayout.setViewPager(null);
             viewPager.setAdapter(null);
         }
@@ -273,7 +164,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
+        //drawerToggle.syncState();
     }
 
     @Override
@@ -303,7 +194,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         tabLayout.setViewPager(null);
         viewPager.setAdapter(null);
         child.playSoundEffect(SoundEffectConstants.CLICK);
-        newEventButton.setVisibility(View.GONE);
         loadNewFragment(fragment, bundle, tag);
     }
 
@@ -313,7 +203,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         viewPager.setAdapter(viewPageAdapter);
         tabLayout.setViewPager(viewPager);
         viewPager.setCurrentItem(1);
-        newEventButton.setVisibility(View.VISIBLE);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.home_title);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -377,7 +266,22 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         ft.commit();
         fm.popBackStack();
         fragmentTag = null;
-        updateViewPager();
+        if (fm.getBackStackEntryCount() == 1){
+            updateViewPager();
+        } else {
+            openFragment = fm.findFragmentById(R.id.content_frame);
+            fragmentTag = openFragment.getTag();
+        }
+    }
+
+    @Override
+    public void onLoadingData() {
+        progress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDataLoaded() {
+        progress.setVisibility(View.GONE);
     }
 
     @Override
@@ -483,7 +387,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         String[] projection;
-        CursorLoader cursorLoader;
+
+        progress.setVisibility(View.VISIBLE);
 
         switch (id) {
             case URL_LOADER_CLAN:
@@ -497,34 +402,201 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         null
                 );
             default:
-                cursorLoader = null;
-                break;
+                return null;
         }
-
-        return cursorLoader;
 
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        data.moveToFirst();
+        Log.w(TAG, "Clan Cursor: " + DatabaseUtils.dumpCursorToString(data));
 
-        switch (loader.getId()){
-            case URL_LOADER_CLAN:
-                clanId = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BUNGIE_ID));
-                clanName = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_NAME));
-                clanDesc = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_DESC));
-                clanIcon = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_ICON));
-                clanBanner = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BACKGROUND));
-                break;
+        if (data.moveToFirst() && data != null){
+            switch (loader.getId()){
+                case URL_LOADER_CLAN:
+                    clanId = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BUNGIE_ID));
+                    clanName = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_NAME));
+                    clanDesc = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_DESC));
+                    clanIcon = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_ICON));
+                    clanBanner = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BACKGROUND));
+                    prepareDrawerMenu();
+                    break;
+            }
+            progress.setVisibility(View.GONE);
         }
-
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    public void prepareDrawerMenu(){
+
+        String[] items = getResources().getStringArray(R.array.menu_item);
+        TypedArray icons = getResources().obtainTypedArray(R.array.menu_icons);
+
+        String header = getResources().getString(R.string.def_clan_header);
+        String[] sections = getResources().getStringArray(R.array.menu_section);
+
+        rView = (RecyclerView) findViewById(R.id.drawer_view);
+        rAdapter = new DrawerAdapter(getApplicationContext(), header, sections, icons, items, clanIcon, clanName, clanDesc, clanBanner);
+        rView.setAdapter(rAdapter);
+        rLayoutManager = new LinearLayoutManager(this);
+        rView.setLayoutManager(rLayoutManager);
+
+        fm = getSupportFragmentManager();
+        //fm.addOnBackStackChangedListener(this);
+
+        final GestureDetector gestureDetector = new GestureDetector(DrawerActivity.this, new GestureDetector.SimpleOnGestureListener(){
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                View child = rView.findChildViewUnder(e.getX(), e.getY());
+
+                if (child!=null){
+                    switch (rView.getChildAdapterPosition(child)){
+                        case 0:
+                            openMainActivity(child);
+                            break;
+                        case 1:
+                            openNewEventFragment(child);
+                            break;
+                        case 2:
+                            openSearchEventFragment(child);
+                            break;
+                        case 3:
+                            openValidateEventFragment(child);
+                            break;
+                        case 4:
+                            break;
+                        case 5:
+                            openHistoryFragment(child);
+                            break;
+                        case 6:
+                            break;
+                        case 7:
+                            openMyClanFragment(child);
+                            break;
+                        case 8:
+                            openMyProfileFragment(child);
+                            break;
+                        case 9:
+                            break;
+                        case 10:
+                            break;
+                        case 11:
+                            showLogOffDialog(child);
+                            break;
+                    }
+                }
+            }
+        });
+
+        rView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener(){
+
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                View child = rView.findChildViewUnder(e.getX(), e.getY());
+
+                if (child!=null && gestureDetector.onTouchEvent(e)){
+                    switch (rView.getChildAdapterPosition(child)){
+                        case 0:
+                            return openMainActivity(child);
+                        case 1:
+                            return openNewEventFragment(child);
+                        case 2:
+                            return openSearchEventFragment(child);
+                        case 3:
+                            return openValidateEventFragment(child);
+                        case 4:
+                            return false;
+                        case 5:
+                            return openHistoryFragment(child);
+                        case 6:
+                            return false;
+                        case 7:
+                            return openMyClanFragment(child);
+                        case 8:
+                            return openMyProfileFragment(child);
+                        case 9:
+                            return false;
+                        case 10:
+                            return false;
+                        case 11:
+                            return showLogOffDialog(child);
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_menu, R.string.close_menu) {
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+        };
+        drawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+
+    }
+
+    private boolean showLogOffDialog(View child) {
+
+        DialogFragment logOffDialog = new MyAlertDialog();
+        logOffDialog.show(getSupportFragmentManager(),"Logoff");
+        child.playSoundEffect(SoundEffectConstants.CLICK);
+        return true;
+
+    }
+
+    @Override
+    public void onPositiveClick(String input, int type) {
+
+    }
+
+    @Override
+    public void onDateSent(String date) {
+
+    }
+
+    @Override
+    public void onTimeSent(String time) {
+
+    }
+
+    @Override
+    public void onLogoff() {
+        DBHelper database = new DBHelper(getApplicationContext());
+        SQLiteDatabase db = database.getWritableDatabase();
+        database.onUpgrade(db, 0, 0);
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
 

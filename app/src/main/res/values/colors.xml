@@ -14,7 +14,6 @@
     <color name="background_dark">#ffffff</color>
     <color name="primary_text_default_material_dark">#00000000</color>
     <color name="primary_text_material_dark">#000000</color>
-    <color name="primary_material_light">#4527a0</color>
     <color name="background_material_light">#fafafa</color>
     <color name="accent_material_light">#fb8c00</color>
     <color name="primary_dark_material_light">#311b92</color>

@@ -123,7 +123,7 @@ public class BungieService extends IntentService {
                 insertLoggedUser();
                 insertClan();
                 insertClanMembers();
-                insertFakeEvents();
+                insertFakeEvents(receiver);
                 break;
         }
 
@@ -131,7 +131,7 @@ public class BungieService extends IntentService {
 
     }
 
-    private void insertFakeEvents() {
+    private void insertFakeEvents(ResultReceiver receiver) {
 
         Random random = new Random();
 
@@ -152,6 +152,9 @@ public class BungieService extends IntentService {
             getContentResolver().insert(DataProvider.GAME_URI, values);
             Log.w(TAG, "Game created: " + id + " / " + event );
         }
+
+        receiver.send(STATUS_FINISHED, Bundle.EMPTY);
+
     }
 
     private void insertClanMembers() {
@@ -284,7 +287,7 @@ public class BungieService extends IntentService {
                     bundle = parseBungieAccount(receiver,response,STATUS_PARTY);
                     receiver.send(STATUS_PARTY, Bundle.EMPTY);
 
-                    receiver.send(STATUS_FINISHED, Bundle.EMPTY);
+                    //receiver.send(STATUS_FINISHED, Bundle.EMPTY);
 
                 }
             }

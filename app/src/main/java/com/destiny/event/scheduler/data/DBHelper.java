@@ -28,6 +28,7 @@ public class DBHelper extends SQLiteOpenHelper{
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.w("Database", "DBHelper is updating...");
         EventTypeTable.onUpdate(db, oldVersion, newVersion);
         EventTable.onUpdate(db, oldVersion, newVersion);
         LoggedUserTable.onUpdate(db, oldVersion, newVersion);

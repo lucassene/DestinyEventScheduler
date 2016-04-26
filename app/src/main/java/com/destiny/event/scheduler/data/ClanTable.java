@@ -35,10 +35,11 @@ public class ClanTable {
 
     public static void onCreate(SQLiteDatabase db){
         db.execSQL(CREATE_TABLE);
+        Log.w("Clan Table","Clan table created sucessfully");
     }
 
     public static void onUpdate(SQLiteDatabase db, int oldVersion, int newVersion){
-        Log.e(LoggedUserTable.class.getName(), "Upgrading database from version " + oldVersion + " to " + newVersion);
+        Log.w(LoggedUserTable.class.getName(), "Upgrading database from version " + oldVersion + " to " + newVersion);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }

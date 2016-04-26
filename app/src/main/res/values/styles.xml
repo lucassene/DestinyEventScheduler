@@ -14,5 +14,5 @@
         <item name="colorAccent">@color/lineColor</item>
         <item name="colorButtonNormal">@color/colorButtonNormal</item>
     </style>
-
+    
 </resources>

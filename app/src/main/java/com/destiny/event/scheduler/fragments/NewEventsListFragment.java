@@ -43,6 +43,7 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        callback = (ToActivityListener) getActivity();
     }
 
     @Override
@@ -111,6 +112,8 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
 
         String[] selectionArgs = {GameTable.GAME_NEW};
 
+        callback.onLoadingData();
+
         switch (id){
             case URL_LOADER_GAME:
                 return new CursorLoader(
@@ -129,14 +132,17 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        data.moveToFirst();
-
         Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
 
-        switch (loader.getId()){
-            case URL_LOADER_GAME:
-                adapter.swapCursor(data);
+        if (data != null && data.moveToFirst()){
+            switch (loader.getId()){
+                case URL_LOADER_GAME:
+                    adapter.swapCursor(data);
+            }
+            callback.onDataLoaded();
         }
+
+
 
     }
 

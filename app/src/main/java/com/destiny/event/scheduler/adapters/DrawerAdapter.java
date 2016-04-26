@@ -1,8 +1,10 @@
 package com.destiny.event.scheduler.adapters;
 
 
+import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +12,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.utils.ImageUtils;
+
+import java.io.IOException;
 
 public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder> {
+
+    private static final String TAG = "DrawerAdapter";
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
@@ -21,6 +28,12 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
     private TypedArray icons;
     private String sections[];
     private String header;
+    private String clanIcon;
+    private String clanName;
+    private String clanDesc;
+    private String clanBanner;
+
+    private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
@@ -58,11 +71,16 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
         }
     }
 
-    public DrawerAdapter(String header, String[] sections, TypedArray icons, String[] items) {
+    public DrawerAdapter(Context context, String header, String[] sections, TypedArray icons, String[] items, String clanIcon, String clanName, String clanDesc, String clanBanner) {
+        this.context = context;
         this.sections = sections;
         this.header = header;
         this.icons = icons;
         this.items = items;
+        this.clanDesc = clanDesc;
+        this.clanIcon = clanIcon;
+        this.clanName = clanName;
+        this.clanBanner = clanBanner;
     }
 
     @Override
@@ -88,10 +106,10 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         switch (holder.holderId){
             case 1:
-                if (position <=4){
-                    holder.itemView.setText(items[position -1]);
+                if (position <=5){
                     holder.iconView.setImageResource(icons.getResourceId(position-1,0));
-                } else if(position <=7){
+                    holder.itemView.setText(items[position-1]);
+                } else if(position <=8){
                     holder.itemView.setText(items[position -2]);
                     holder.iconView.setImageResource(icons.getResourceId(position-2,0));
                 } else {
@@ -100,13 +118,24 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                 }
                 break;
             case 0:
-                holder.headerView.setText(header);
+                Log.w(TAG, "Clan Name: " + clanName);
+                holder.headerView.setText(clanName);
+                try {
+                    Log.w(TAG, "Clan Icon: " + clanIcon);
+                    Log.w(TAG, "Clan Banner: " + clanBanner);
+                    holder.logoView.setImageBitmap(ImageUtils.loadImage(context,clanIcon));
+                    holder.bannerView.setImageBitmap(ImageUtils.loadImage(context,clanBanner));
+                } catch (IOException e) {
+                    Log.w(TAG, "Image Bitmap not found.");
+                    e.printStackTrace();
+                }
+                holder.descView.setText(clanDesc);
                 break;
             case 2:
-                if (position == 5) {
-                    holder.sectionView.setText(sections[position -5]);
+                if (position == 6) {
+                    holder.sectionView.setText(sections[position -6]);
                 } else {
-                    holder.sectionView.setText(sections[position -7]);
+                    holder.sectionView.setText(sections[position -8]);
                 }
         }
     }
@@ -132,6 +161,6 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
     }
 
     private boolean isPositionSection(int position){
-        return position == 5 || position == 8;
+        return position == 6 || position == 9;
     }
 }

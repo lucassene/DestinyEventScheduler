@@ -418,6 +418,11 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         timeText.setText(time);
     }
 
+    @Override
+    public void onLogoff() {
+
+    }
+
 
     @Override
     public void onEventTypeSent(String id) {
@@ -456,7 +461,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             gameValues.put(GameTable.COLUMN_LIGHT, minLight);
             gameValues.put(GameTable.COLUMN_GUARDIANS, maxGuardian);
             gameValues.put(GameTable.COLUMN_INSCRIPTIONS, insc);
-            gameValues.put(GameTable.COLUMN_STATUS, 0);
+            gameValues.put(GameTable.COLUMN_STATUS, GameTable.GAME_SCHEDULED);
 
             Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
             String id = "";
@@ -465,6 +470,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             }
 
             String now = getCurrentTime();
+            //Toast.makeText(getContext(), "Time: " + now, Toast.LENGTH_SHORT).show();
 
             ContentValues entryValues = new ContentValues();
             entryValues.put(EntryTable.COLUMN_MEMBERSHIP, bungieId);
@@ -498,14 +504,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
         String finalString = newdate + "T" + newtime;
 
-        /*if (minute.length() == 1)minute = "0" + minute;
-        if (hour.length() == 1) hour = "0" + hour;
-        if (day.length() == 1) day = "0" + day;
-        if (month.length() == 1) month = "0" + month;
-        if (year.length() == 1) year = "0" + year;
-
-        String time = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00";*/
-
         Log.w(TAG, "Time: " + finalString);
 
         return finalString ;
@@ -514,17 +512,13 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private String getBungieTime(String date, String time) {
 
         String year = date.substring(date.lastIndexOf("/")+1,date.length());
-        String month = date.substring(date.indexOf("/")+1,date.lastIndexOf("/")-1);
-        String day = date.substring(0,date.indexOf("/")-1);
+        String month = date.substring(date.indexOf("/")+1,date.lastIndexOf("/"));
+        String day = date.substring(0,date.indexOf("/"));
+        String hour = time.substring(0,time.indexOf(" "));
+        String minute = time.substring(time.lastIndexOf(" ")+1, time.length());
 
-        if (time.length() == 4){
-            time = "0" + time + ":00";
-        } else {
-            time = time + ":00";
-        }
-
-        Log.w(TAG, "Bungie Time: " + year + "-" + month + "-" + day + "T" + time);
-        return year + "-" + month + "-" + day + "T" + time;
+        //Log.w(TAG, "Bungie Time: " + year + "-" + month + "-" + day + "T" + time);
+        return year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00";
 
     }
 }

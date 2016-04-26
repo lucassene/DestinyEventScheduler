@@ -94,7 +94,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 //Toast.makeText(this, "Dados do result: " + result, Toast.LENGTH_SHORT).show();
             }
             if (resultCode == Activity.RESULT_CANCELED){
-                Toast.makeText(this, "Result falhou ou vazio.", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Result falhou ou vazio.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -102,7 +102,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection;
-        CursorLoader cursorLoader;
 
         switch (id) {
             case URL_LOADER_USER:

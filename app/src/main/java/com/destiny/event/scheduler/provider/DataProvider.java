@@ -251,6 +251,7 @@ public class DataProvider extends ContentProvider {
             case GAME:
                 id = sqlDB.insert(GameTable.TABLE_NAME, null, values);
                 getContext().getContentResolver().notifyChange(uri, null);
+                Log.w("Insert", "Game created sucessfully!");
                 return Uri.parse(GAME_PATH + "/" + id);
             case ENTRY:
                 id = sqlDB.insert(EntryTable.TABLE_NAME, null, values);
