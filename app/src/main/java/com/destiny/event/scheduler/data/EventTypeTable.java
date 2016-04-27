@@ -8,8 +8,8 @@ public class EventTypeTable {
 
     public static final String TABLE_NAME = "event_type";
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_ICON = "icon";
+    public static final String COLUMN_NAME = "type_name";
+    public static final String COLUMN_ICON = "type_icon";
 
     public static final String[] ALL_COLUMNS = {COLUMN_NAME, COLUMN_ICON, COLUMN_ID};
     public static final String[] VIEW_COLUMNS = {COLUMN_NAME, COLUMN_ICON};
@@ -43,5 +43,18 @@ public class EventTypeTable {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
+
+    public static String getQualifiedColumn(String column){
+        return TABLE_NAME + "." + column;
+    }
+
+    public static String getAliasColumn(String column){
+        return TABLE_NAME + "_" + column;
+    }
+
+    public static String getAliasExpression(String column){
+        return getQualifiedColumn(column) + " AS " + getAliasColumn(column);
+    }
+
 
 }

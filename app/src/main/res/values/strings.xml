@@ -227,6 +227,9 @@
     <string name="oblivion">Be aware that all your data will be deleted, and you\'ll be forgot in the oblivion.</string>
     <string name="leave">Leave</string>
     <string name="nevermind">Nevermind</string>
+    <string name="event_details">Event Details</string>
+    <string name="of">of</string>
+    <string name="empty_game">Oops! Is this game empty?</string>
 
 
 </resources>

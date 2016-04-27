@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/event_header_layout" android:id="@+id/header" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/subheaderHeight"
+        android:id="@+id/section_date"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/secondaryTextSize"
+        android:text="@string/date_time_section"
+        android:layout_below="@id/header"
+        android:textColor="@color/psnColor"/>
+
+    <LinearLayout
+        android:id="@+id/linear_date"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/section_date">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="@string/date"
+            android:paddingBottom="@dimen/paddingBottomLabelText" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:layout_height="wrap_content"
+            android:text="24/03/2016"
+            android:textSize="@dimen/secondaryTextSize"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear_time"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linear_date">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="@string/time"
+            android:paddingBottom="@dimen/paddingBottomLabelText" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="11:38"
+            android:textSize="@dimen/secondaryTextSize"/>
+
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/subheaderHeight"
+        android:id="@+id/section_specs"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/secondaryTextSize"
+        android:text="@string/specs"
+        android:layout_below="@id/linear_time"
+        android:textColor="@color/psnColor"
+        android:layout_marginTop="8dp"/>
+
+    <LinearLayout
+        android:id="@+id/linear_light"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/section_specs">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="@string/min_light"
+            android:paddingBottom="@dimen/paddingBottomLabelText" />
+
+        <TextView
+            android:id="@+id/light"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="240"
+            android:textSize="@dimen/secondaryTextSize"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear_guardians"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linear_light">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="@string/guardians"
+            android:paddingBottom="@dimen/paddingBottomLabelText" />
+
+        <TextView
+            android:id="@+id/guardians"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="3 of 6"
+            android:textSize="@dimen/secondaryTextSize"/>
+
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/subheaderHeight"
+        android:id="@+id/section_guardians"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/secondaryTextSize"
+        android:text="@string/guardians_participating"
+        android:layout_below="@id/linear_guardians"
+        android:textColor="@color/psnColor"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>

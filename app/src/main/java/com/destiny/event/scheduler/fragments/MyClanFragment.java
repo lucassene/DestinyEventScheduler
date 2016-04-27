@@ -39,7 +39,6 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     private static final int TYPE_MEMBER = 2;
 
-    private static final String POINTS_ORDER_BY = "((" + MemberTable.COLUMN_LIKES + "*1.0)/(" + MemberTable.COLUMN_CREATED + "+" + MemberTable.COLUMN_PLAYED + "))*100+(" + MemberTable.COLUMN_CREATED + "*0.5)-" + MemberTable.COLUMN_DISLIKES;
     private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE;
     private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME;
     private String orderBy;
@@ -178,7 +177,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         switch (id){
             case LOADER_MEMBERS:
-                projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, POINTS_ORDER_BY, MemberTable.COLUMN_SINCE};
+                projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, MemberTable.POINTS_COLUMNS, MemberTable.COLUMN_SINCE};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.MEMBER_URI,
@@ -229,7 +228,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
                 getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
                 break;
             case 2:
-                orderBy = POINTS_ORDER_BY + " DESC";
+                orderBy = MemberTable.POINTS_COLUMNS + " DESC";
                 getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
                 break;
         }

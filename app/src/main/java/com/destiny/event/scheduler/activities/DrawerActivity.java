@@ -36,6 +36,7 @@ import com.destiny.event.scheduler.adapters.ViewPageAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
+import com.destiny.event.scheduler.fragments.DetailEventFragment;
 import com.destiny.event.scheduler.fragments.HistoryFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
 import com.destiny.event.scheduler.fragments.MyProfileFragment;
@@ -141,6 +142,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     private void getClanData() {
+        onLoadingData();
         getSupportLoaderManager().initLoader(URL_LOADER_CLAN, null, this);
     }
 
@@ -178,6 +180,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 openMainActivity(null);
             } else {
                 super.onBackPressed();
+                openFragment = fm.findFragmentById(R.id.content_frame);
+                fragmentTag = openFragment.getTag();
             }
         }
 
@@ -285,6 +289,23 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
+    public void onGameSelected(String id) {
+
+        Bundle bundle = new Bundle();
+        bundle.putString("gameId",id);
+        tabLayout.setViewPager(null);
+        viewPager.setAdapter(null);
+        loadNewFragment(new DetailEventFragment(), bundle, id);
+
+    }
+
+    @Override
+    public void onNoScheduledGames() {
+        onDataLoaded();
+        viewPager.setCurrentItem(0);
+    }
+
+    @Override
     public void onEventCreated() {
         closeFragment();
     }
@@ -388,8 +409,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         String[] projection;
 
-        progress.setVisibility(View.VISIBLE);
-
         switch (id) {
             case URL_LOADER_CLAN:
                 projection = ClanTable.ALL_COLUMNS;
@@ -423,7 +442,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     prepareDrawerMenu();
                     break;
             }
-            progress.setVisibility(View.GONE);
+            onDataLoaded();
         }
     }
 

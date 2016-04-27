@@ -10,7 +10,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_nightfall"
         android:layout_centerVertical="true"/>
 
     <LinearLayout
@@ -25,53 +24,31 @@
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3">
+            android:layout_weight="3"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:paddingLeft="8dp">
 
             <TextView
                 android:id="@+id/primary_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Primary Text"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textStyle="bold"/>
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/lineColor"/>
 
             <TextView
                 android:id="@+id/secondary_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Secondary Text"
-                android:textSize="@dimen/primaryTextSize" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/global_padding"
-            android:layout_weight="2"
-            android:layout_gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/primary_right_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/created_by"
-                android:textStyle="bold"
-                android:gravity="end"/>
-
-            <TextView
-                android:id="@+id/secondary_right_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="username"
-                android:gravity="end"/>
-
-        </LinearLayout>
 
     </LinearLayout>
 
     <View
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/colorPrimary"

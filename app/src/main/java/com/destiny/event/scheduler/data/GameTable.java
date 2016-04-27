@@ -12,7 +12,6 @@ public class GameTable {
     public static final String COLUMN_EVENT_ID = "event_id";
     public static final String COLUMN_TIME = "time";
     public static final String COLUMN_LIGHT = "light";
-    public static final String COLUMN_GUARDIANS = "guardians";
     public static final String COLUMN_INSCRIPTIONS = "inscriptions";
     public static final String COLUMN_STATUS = "status";
 
@@ -21,7 +20,7 @@ public class GameTable {
     public static final String GAME_VALIDATED = "2";
     public static final String GAME_SCHEDULED = "9";
 
-    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_CREATOR, COLUMN_CREATOR_NAME, COLUMN_EVENT_ID, COLUMN_TIME, COLUMN_LIGHT, COLUMN_GUARDIANS, COLUMN_INSCRIPTIONS, COLUMN_STATUS};
+    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_CREATOR, COLUMN_CREATOR_NAME, COLUMN_EVENT_ID, COLUMN_TIME, COLUMN_LIGHT, COLUMN_INSCRIPTIONS, COLUMN_STATUS};
 
     public static final String CREATE_TABLE = "CREATE TABLE "
             + TABLE_NAME
@@ -37,8 +36,6 @@ public class GameTable {
             + COLUMN_TIME
             + " TEXT NOT NULL, "
             + COLUMN_LIGHT
-            + " INTEGER NOT NULL, "
-            + COLUMN_GUARDIANS
             + " INTEGER NOT NULL, "
             + COLUMN_INSCRIPTIONS
             + " INTEGER NOT NULL, "

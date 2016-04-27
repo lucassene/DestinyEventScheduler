@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
@@ -37,6 +38,8 @@ public class PrepareActivity extends Activity implements RequestResultReceiver.R
     ImageView img5;
     ImageView img6;
 
+    TextView txt6;
+
     private GoogleApiClient client;
 
     @Override
@@ -61,6 +64,8 @@ public class PrepareActivity extends Activity implements RequestResultReceiver.R
         img4 = (ImageView) findViewById(R.id.img4);
         img5 = (ImageView) findViewById(R.id.img5);
         img6 = (ImageView) findViewById(R.id.img6);
+
+        txt6 = (TextView) findViewById(R.id.txt6);
 
 
         img1.setColorFilter(ContextCompat.getColor(this, android.R.color.black), PorterDuff.Mode.MULTIPLY);
@@ -115,6 +120,7 @@ public class PrepareActivity extends Activity implements RequestResultReceiver.R
                 break;
             case BungieService.STATUS_PARTY:
                 img5.setColorFilter(ContextCompat.getColor(this, R.color.accent_material_light), PorterDuff.Mode.MULTIPLY);
+                txt6.setText("Criando banco de dados de teste...");
                 lay6.setVisibility(View.VISIBLE);
                 img6.setColorFilter(ContextCompat.getColor(this, android.R.color.black), PorterDuff.Mode.MULTIPLY);
                 break;

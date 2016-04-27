@@ -1,204 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/global_padding">
+    android:paddingRight="16dp"
+    android:paddingEnd="@dimen/global_padding"
+    android:orientation="vertical">
 
-    <RelativeLayout
+    <ListView
+        android:id="@id/android:list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal" />
 
-        <include layout="@layout/event_header_layout" android:id="@+id/header"/>
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/empty_game"
+        android:layout_gravity="center"
+        android:gravity="center"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/subheaderHeight"
-            android:id="@+id/section_date"
-            android:textColor="@color/psnColor"
-            android:gravity="center_vertical"
-            android:textSize="@dimen/secondaryTextSize"
-            android:text="@string/date_time_section"
-            android:layout_below="@id/header"/>
 
-        <LinearLayout
-            android:id="@+id/linear_date"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/listItemHeight"
-            android:layout_below="@id/section_date"
-            android:paddingBottom="@dimen/global_padding"
-            android:paddingTop="@dimen/global_padding">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/date"
-                android:paddingBottom="@dimen/paddingBottomLabelText"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="24/03/2016"
-                android:textSize="@dimen/secondaryTextSize"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linear_time"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/listItemHeight"
-            android:layout_below="@id/linear_date"
-            android:paddingBottom="@dimen/global_padding"
-            android:paddingTop="@dimen/global_padding">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/time"
-                android:paddingBottom="@dimen/paddingBottomLabelText"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="11:38"
-                android:textSize="@dimen/secondaryTextSize"/>
-
-        </LinearLayout>
-
-        <View
-            android:id="@+id/date_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorPrimary"
-            android:layout_below="@id/linear_time"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/subheaderHeight"
-            android:id="@+id/section_specs"
-            android:textColor="@color/psnColor"
-            android:gravity="center_vertical"
-            android:textSize="@dimen/secondaryTextSize"
-            android:text="@string/specs"
-            android:layout_below="@id/date_divider"/>
-
-        <LinearLayout
-            android:id="@+id/linear_light"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/listItemHeight"
-            android:layout_below="@id/section_specs"
-            android:paddingBottom="@dimen/global_padding"
-            android:paddingTop="@dimen/global_padding">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/min_light"
-                android:paddingBottom="@dimen/paddingBottomLabelText"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/light"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="240"
-                android:textSize="@dimen/secondaryTextSize"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linear_guardians"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/listItemHeight"
-            android:layout_below="@id/linear_light"
-            android:paddingBottom="@dimen/global_padding"
-            android:paddingTop="@dimen/global_padding">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/guardians"
-                android:paddingBottom="@dimen/paddingBottomLabelText"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="3 of 6"
-                android:textSize="@dimen/secondaryTextSize"/>
-
-        </LinearLayout>
-
-        <View
-            android:id="@+id/specs_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorPrimary"
-            android:layout_below="@id/linear_guardians"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/subheaderHeight"
-            android:id="@+id/section_guardians"
-            android:textColor="@color/psnColor"
-            android:gravity="center_vertical"
-            android:textSize="@dimen/secondaryTextSize"
-            android:text="@string/guardians_participating"
-            android:layout_below="@id/specs_divider"/>
-
-        <FrameLayout
-            android:id="@+id/guardians_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/section_guardians"/>
-
-        <View
-            android:id="@+id/guardians_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorPrimary"
-            android:layout_below="@id/guardians_container"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/subheaderHeight"
-            android:id="@+id/section_wait_list"
-            android:textColor="@color/psnColor"
-            android:gravity="center_vertical"
-            android:textSize="@dimen/secondaryTextSize"
-            android:text="@string/wait_list"
-            android:layout_below="@id/guardians_container"/>
-
-        <FrameLayout
-            android:id="@+id/wait_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/section_wait_list"/>
-
-        <View
-            android:id="@+id/wait_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorPrimary"
-            android:layout_below="@id/wait_container"/>
-
-        <Button
-            android:layout_width="260dp"
-            android:layout_height="50dp"
-            android:id="@+id/btn_join"
-            android:layout_marginTop="@dimen/settingsMargin"
-            android:text="@string/join"
-            android:background="@color/colorButtonNormal"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/wait_divider"/>
-
-    </RelativeLayout>
-
-</ScrollView>
+</LinearLayout>

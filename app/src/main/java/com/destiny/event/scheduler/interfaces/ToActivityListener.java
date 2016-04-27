@@ -14,4 +14,6 @@ public interface ToActivityListener {
     public void closeFragment();
     public void onLoadingData();
     public void onDataLoaded();
+    public void onGameSelected(String id);
+    public void onNoScheduledGames();
 }

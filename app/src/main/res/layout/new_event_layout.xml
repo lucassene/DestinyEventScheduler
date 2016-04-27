@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheaderHeight"
             android:id="@+id/section_game"
-            android:textColor="@color/psnColor"
+            android:textColor="@color/lineColor"
             android:textSize="@dimen/secondaryTextSize"
             android:text="@string/game_info"
             android:gravity="center_vertical"/>
@@ -105,7 +105,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheaderHeight"
             android:id="@+id/section_wait_list"
-            android:textColor="@color/psnColor"
+            android:textColor="@color/lineColor"
             android:textSize="@dimen/secondaryTextSize"
             android:text="@string/date_time_section"
             android:gravity="center_vertical"/>
@@ -154,7 +154,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheaderHeight"
-            android:textColor="@color/psnColor"
+            android:textColor="@color/lineColor"
             android:textSize="@dimen/secondaryTextSize"
             android:text="@string/specs"
             android:gravity="center_vertical"/>
@@ -162,49 +162,13 @@
        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/global_padding"
-            android:paddingTop="@dimen/global_padding">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/guardian_text"
-                android:text="@string/max_guardians_label"
-                android:layout_marginBottom="@dimen/paddingBottomLabelText"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:id="@+id/guardian_layout"
-                android:layout_below="@id/guardian_text">
-
-                <SeekBar
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:id="@+id/guardian_bar"
-                    android:layout_gravity="center_vertical"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/listItemHeight"
-                    android:layout_weight="1"
-                    android:text="1"
-                    android:gravity="center"
-                    android:id="@+id/guardian_total_text"
-                    android:focusable="true"
-                    android:clickable="true"
-                    android:background="?android:attr/selectableItemBackground" />
-
-            </LinearLayout>
+            android:paddingBottom="@dimen/global_padding">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/light_text"
                 android:text="@string/min_light_label"
-                android:layout_below="@id/guardian_layout"
                 android:layout_marginTop="@dimen/paddingTopLabelText"
                 android:layout_marginBottom="@dimen/paddingBottomLabelText"/>
 

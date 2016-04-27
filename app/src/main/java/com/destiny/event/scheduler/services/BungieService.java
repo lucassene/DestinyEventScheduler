@@ -9,6 +9,7 @@ import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.destiny.event.scheduler.data.ClanTable;
+import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
@@ -146,11 +147,29 @@ public class BungieService extends IntentService {
             values.put(GameTable.COLUMN_EVENT_ID, event);
             values.put(GameTable.COLUMN_TIME,"2016-04-20T14:38:00");
             values.put(GameTable.COLUMN_LIGHT, 320);
-            values.put(GameTable.COLUMN_GUARDIANS, 3);
             values.put(GameTable.COLUMN_INSCRIPTIONS, insc);
-            values.put(GameTable.COLUMN_STATUS, random.nextInt(2));
+            values.put(GameTable.COLUMN_STATUS, 0);
             getContentResolver().insert(DataProvider.GAME_URI, values);
-            Log.w(TAG, "Game created: " + id + " / " + event );
+            Log.w(TAG, "Game created: " + id + " / Inscriptions: " + insc );
+
+            ContentValues first = new ContentValues();
+            first.put(EntryTable.COLUMN_GAME,i+1);
+            first.put(EntryTable.COLUMN_MEMBERSHIP, id);
+            first.put(EntryTable.COLUMN_TIME,"2016-04-20T14:00:00");
+            getContentResolver().insert(DataProvider.ENTRY_URI, first);
+            Log.w(TAG, "Entry created! GameID: " + i + " | Creator: " + id + " | Time: 2016-04-20T14:00:00");
+
+            for (int x=0; x<insc-1; x++){
+                ContentValues entries = new ContentValues();
+                entries.put(EntryTable.COLUMN_GAME, i+1);
+                String mid = membersModelList.get(random.nextInt(membersModelList.size()-1)).getMembershipId();
+                entries.put(EntryTable.COLUMN_MEMBERSHIP, mid);
+                String t = "2016-04-20T14:" + String.valueOf(random.nextInt(48)+10) + ":00";
+                entries.put(EntryTable.COLUMN_TIME, t);
+                getContentResolver().insert(DataProvider.ENTRY_URI, entries);
+                Log.w(TAG, "Entry created! Entry ID: " + x + "| GameID: " + i + " | Membership: " + mid + " | Time: " + t);
+            }
+
         }
 
         receiver.send(STATUS_FINISHED, Bundle.EMPTY);

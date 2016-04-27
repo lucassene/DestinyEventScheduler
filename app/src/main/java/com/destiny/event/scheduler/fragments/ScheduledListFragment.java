@@ -12,16 +12,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
+import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
+
+import java.util.ArrayList;
 
 public class ScheduledListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -29,7 +33,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
     private static final int LOADER_ENTRY = 70;
 
-    private static final int[] to = {R.id.primary_text, R.id.game_image, R.id.secondary_text, R.id.game_date, R.id.game_time, R.id.game_actual, R.id.game_max};
+    private static final int[] to = {R.id.primary_text, R.id.game_image, R.id.secondary_text, R.id.game_date, R.id.game_time, R.id.game_actual, R.id.game_max, R.id.type_text};
 
     CustomCursorAdapter adapter;
 
@@ -41,6 +45,8 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
     private String[] projection;
     private String[] from;
+
+    private ArrayList<String> gameIdList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,6 +62,8 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
         sectionTitle = (TextView) headerView.findViewById(R.id.section_title);
 
+        gameIdList = new ArrayList<>();
+
         return v;
     }
 
@@ -69,11 +77,18 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     }
 
     @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        callback.onGameSelected(gameIdList.get(position-1));
+    }
+
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }
 
     private void getScheduledEvents() {
+        callback.onLoadingData();
         prepareStrings();
         getLoaderManager().initLoader(LOADER_ENTRY, null, this);
         adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_ENTRY);
@@ -96,22 +111,23 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
         String c7 = GameTable.getAliasExpression(GameTable.COLUMN_CREATOR_NAME);
         String c8 = GameTable.getQualifiedColumn(GameTable.COLUMN_TIME);
         String c9 = GameTable.getQualifiedColumn(GameTable.COLUMN_LIGHT);
-        String c10 = GameTable.getQualifiedColumn(GameTable.COLUMN_GUARDIANS);
-        String c11 = GameTable.getQualifiedColumn(GameTable.COLUMN_INSCRIPTIONS);
-        String c12 = GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS);
-        String c13 = EventTable.getAliasExpression(EventTable.COLUMN_ID);
-        String c14 = EventTable.getQualifiedColumn(EventTable.COLUMN_ICON);
-        String c15 = EventTable.getAliasExpression(EventTable.COLUMN_NAME);
-        String c16 = EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS);
-        String c17 = MemberTable.getAliasExpression(MemberTable.COLUMN_ID);
-        String c18 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP);
+        String c10 = GameTable.getQualifiedColumn(GameTable.COLUMN_INSCRIPTIONS);
+        String c11 = GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS);
+        String c12 = EventTable.getAliasExpression(EventTable.COLUMN_ID);
+        String c13 = EventTable.getQualifiedColumn(EventTable.COLUMN_ICON);
+        String c14 = EventTable.getAliasExpression(EventTable.COLUMN_NAME);
+        String c15 = EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS);
+        String c16 = MemberTable.getAliasExpression(MemberTable.COLUMN_ID);
+        String c17 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP);
+        String c18 = EventTypeTable.getAliasExpression(EventTypeTable.COLUMN_ID); // event_type._ID AS event_type__ID;
+        String c19 = EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_NAME); // event_type.type_name;
 
-        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18};
+        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19};
 
         String f1 = EventTable.getAliasColumn(EventTable.COLUMN_NAME);
         String f2 = GameTable.getAliasColumn(GameTable.COLUMN_CREATOR_NAME);
 
-        from = new String[] {f1, c14, f2, c8, c8, c11, c16};
+        from = new String[] {f1, c13, f2, c8, c8, c10, c15, c19};
 
     }
 
@@ -121,8 +137,6 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
         String[] selectionArgs = {GameTable.GAME_SCHEDULED};
         String orderBy = GameTable.getQualifiedColumn(GameTable.COLUMN_TIME);
 
-        callback.onLoadingData();
-
         switch (id){
             case LOADER_ENTRY:
                 return new CursorLoader(
@@ -131,7 +145,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
                         projection,
                         GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS) + "=?",
                         selectionArgs,
-                        null
+                        "datetime(" + EntryTable.getQualifiedColumn(EntryTable.COLUMN_TIME) + ") DESC"
                 );
             default:
                 return null;
@@ -148,8 +162,14 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
             switch (loader.getId()){
                 case LOADER_ENTRY:
                     adapter.swapCursor(data);
+                    data.moveToFirst();
+                    for (int i=0; i < data.getCount();i++){
+                        gameIdList.add(i, data.getString(data.getColumnIndexOrThrow(EntryTable.getQualifiedColumn(EntryTable.COLUMN_GAME))));
+                    }
             }
             callback.onDataLoaded();
+        } else {
+            callback.onNoScheduledGames();
         }
 
 

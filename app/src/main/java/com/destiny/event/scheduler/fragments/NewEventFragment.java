@@ -65,10 +65,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private TextView textGame;
     private RelativeLayout gameLayout;
 
-    private TextView guardianMinText;
-    private SeekBar guardianBar;
-    private int maxGuardian;
-
     private TextView lightText;
     private SeekBar lightBar;
     private int minLight;
@@ -159,9 +155,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         textGame = (TextView) v.findViewById(R.id.game_text);
         gameLayout = (RelativeLayout) v.findViewById(R.id.game_list);
 
-        guardianMinText = (TextView) v.findViewById(R.id.guardian_total_text);
-        guardianBar = (SeekBar) v.findViewById(R.id.guardian_bar);
-
         lightText = (TextView) v.findViewById(R.id.light_min_text);
         lightBar = (SeekBar) v.findViewById(R.id.light_bar);
 
@@ -177,20 +170,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
 
-
-        guardianBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                guardianMinText.setText(String.valueOf(guardianBar.getProgress()+2));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
 
         lightBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
@@ -232,25 +211,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 bundle.putString("type", selectedType);
                 bundle.putString("tag", getTag());
                 callback.loadNewFragment(fragment, bundle, "game");
-            }
-        });
-
-        guardianMinText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString("tag", "new");
-                bundle.putString("title", getResources().getString(R.string.max_guardians_label));
-                bundle.putString("yes", getResources().getString(R.string.save));
-                bundle.putString("no", getResources().getString(R.string.cancel));
-                bundle.putInt("max", maxGuardian);
-                bundle.putInt("min", 2);
-                bundle.putInt("type", FromDialogListener.GUARDIAN_TYPE);
-                String hint = getResources().getString(R.string.values_between1) + maxGuardian;
-                bundle.putString("hint", hint);
-                dialog = new SimpleInputDialog();
-                dialog.setArguments(bundle);
-                dialog.show(getFragmentManager(), "dialog");
             }
         });
 
@@ -370,9 +330,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 textType.setText(getContext().getResources().getIdentifier(textId,"string",getContext().getPackageName()));
                 break;
             case URL_LOADER_GAME:
-                maxGuardian = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS));
-                guardianBar.setMax(maxGuardian - 2);
-                guardianMinText.setText("2");
                 minLight = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT));
                 lightBar.setMax(335 - minLight);
                 lightText.setText(String.valueOf(minLight));
@@ -394,10 +351,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         int value = Integer.parseInt(input);
 
         switch (type){
-            case FromDialogListener.GUARDIAN_TYPE:
-                guardianMinText.setText(input);
-                guardianBar.setProgress(value-1);
-                break;
             case FromDialogListener.LIGHT_TYPE:
                 lightText.setText(input);
                 int min = Integer.parseInt(input) - minLight;
@@ -447,7 +400,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
             String fullTime = getBungieTime(date, time);
 
-            int maxGuardian = Integer.parseInt(guardianMinText.getText().toString());
             int minLight = Integer.parseInt(lightText.getText().toString());
             int insc = 1;
             String bungieId = callback.getBungieId();
@@ -459,7 +411,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             gameValues.put(GameTable.COLUMN_EVENT_ID, selectedGame);
             gameValues.put(GameTable.COLUMN_TIME,fullTime);
             gameValues.put(GameTable.COLUMN_LIGHT, minLight);
-            gameValues.put(GameTable.COLUMN_GUARDIANS, maxGuardian);
             gameValues.put(GameTable.COLUMN_INSCRIPTIONS, insc);
             gameValues.put(GameTable.COLUMN_STATUS, GameTable.GAME_SCHEDULED);
 

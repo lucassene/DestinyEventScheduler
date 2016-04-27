@@ -100,23 +100,12 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        //Toast.makeText(getContext(),"Você clicou no item: " + id,Toast.LENGTH_SHORT).show();
 
-        //Bundle bundle = new Bundle();
-        //bundle.putLong("id",id);
-        //String tag = "";
         switch (tableName){
             case EventTypeTable.TABLE_NAME:
-                //bundle.putString("Table", EventTypeTable.TABLE_NAME);
-                //bundle.putLong("id", id);
-                //tag = "new";
                 callback.onEventTypeSelected(String.valueOf(id));
                 break;
             case EventTable.TABLE_NAME:
-                //bundle.putString("Table", EventTable.TABLE_NAME);
-                //bundle.putLong("id", id);
-                //bundle.putString("Type", gameType);
-                //tag = "new";
                 callback.onEventGameSelected(String.valueOf(id));
                 break;
         }
