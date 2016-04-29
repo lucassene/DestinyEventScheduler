@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
@@ -26,7 +25,7 @@ import com.destiny.event.scheduler.provider.DataProvider;
 
 public class NewEventsListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String TAG = "NewEventsListFragment";
+    public static final String TAG = "NewEventsListFragment";
 
     private static final int URL_LOADER_GAME = 60;
 
@@ -72,8 +71,8 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        Toast.makeText(getContext(), "GameID Selected: " + id, Toast.LENGTH_SHORT).show();
-        callback.onGameSelected(String.valueOf(id));
+        //Toast.makeText(getContext(), "GameID Selected: " + id, Toast.LENGTH_SHORT).show();
+        callback.onGameSelected(String.valueOf(id), TAG, null, null);
     }
 
     private void getNewEvents() {

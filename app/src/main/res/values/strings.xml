@@ -7,13 +7,13 @@
     <string name="default_username">username</string>
     <string name="default_img_desc">Icon</string>
     <string name="back_desc">Back</string>
-    <string name="menu_new_event">New Event</string>
+    <string name="menu_new_event">New Match</string>
     <string name="open_menu">Open menu</string>
     <string name="close_menu">Close menu</string>
     <string name="new_tab_header">NEW</string>
     <string name="scheduled_tab_header">SCHEDULED</string>
     <string name="validate_tab_header">VALIDAR</string>
-    <string name="new_event_title">New Event</string>
+    <string name="new_event_title">New Match</string>
 
     <string name="tx_login">Welcome Guardian! What is the secret code?</string>
 
@@ -24,10 +24,10 @@
     </string-array>
 
     <string-array name="menu_item">
-        <item>New Event</item>
-        <item>Search Events</item>
-        <item>Validate Event</item>
-        <item>My Events</item>
+        <item>New Match</item>
+        <item>Search Matches</item>
+        <item>Evaluate Match</item>
+        <item>My Matches</item>
         <item>History</item>
         <item>My Clan</item>
         <item>My Stats</item>
@@ -56,7 +56,7 @@
     <string name="def_clan_header">Clan\'s Name</string>
     <string name="empty_new_events">It seems that nobody is playing huh?</string>
     <string name="empty_validate_event">First you play, then you evaluate, got it?</string>
-    <string name="empty_scheduled_list">You don\'t have any scheduled event.</string>
+    <string name="empty_scheduled_list">You don\'t have any scheduled match.</string>
     <string name="menu">Menu</string>
     <string name="refresh_lists">Refresh Lists</string>
     <string name="game_type_label">Game Type</string>
@@ -65,12 +65,12 @@
     <string name="time_label">Time</string>
     <string name="max_guardians_label">Min Guardians</string>
     <string name="min_light_label">Min Light</string>
-    <string name="new_event_button">Create Event</string>
+    <string name="new_event_button">Create Match</string>
     <string name="home_title">Main</string>
-    <string name="validate_event_title">Validate Event</string>
-    <string name="event_confirmation">This event happened?</string>
-    <string name="validate_button">Validate</string>
-    <string name="search_title">Search Event</string>
+    <string name="validate_event_title">Evaluate Match</string>
+    <string name="event_confirmation">This match happened?</string>
+    <string name="validate_button">Evaluate</string>
+    <string name="search_title">Search Match</string>
     <string name="date_time_section">Date and Time</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
@@ -81,7 +81,7 @@
     <string name="join">Join</string>
     <string name="participants_guardians">Participants Guardians</string>
     <string name="created_by">Created by</string>
-    <string name="scheduled_games">Scheduled Games</string>
+    <string name="scheduled_games">Scheduled Matches</string>
 
     <string-array name="new_event_section">
         <item>What</item>
@@ -106,7 +106,7 @@
     <string name="system">System</string>
     <string name="my_profile">My Profile</string>
     <string name="joined_events">Joined Events:</string>
-    <string name="events_created">Events created:</string>
+    <string name="events_created">Matches created:</string>
     <string name="member_since">Member since:</string>
 
     <string name="court">Court of Oryx</string>
@@ -117,6 +117,35 @@
     <string name="story">Story</string>
     <string name="strike">Strike</string>
     <string name="strike_list">Strike List</string>
+
+    <string-array name="event_types">
+        <item>Court of Oryx</item>
+        <item>Crucible</item>
+        <item>Patrol</item>
+        <item>Prison of Elders</item>
+        <item>Raid</item>
+        <item>Story</item>
+        <item>Strike</item>
+        <item>Strike List</item>
+    </string-array>
+
+    <integer-array name="event_type_ids">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </integer-array>
+
+    <string-array name="game_status">
+        <item>Scheduled</item>
+        <item>Waiting for Validation</item>
+        <item>Validated</item>
+        <item>Evaluated</item>
+    </string-array>
 
     <string name="tier1">Reciprocate Rune</string>
     <string name="tier2">Stolen Rune</string>
@@ -187,7 +216,7 @@
 
     <string name="choose_type">Choose the game type:</string>
     <string name="choose_game">Choose the game mode:</string>
-    <string name="event_type_title">Event Type List</string>
+    <string name="event_type_title">Game Type List</string>
     <string name="type">Type</string>
     <string name="game_info">Game Info</string>
     <string name="save">Save</string>
@@ -227,9 +256,15 @@
     <string name="oblivion">Be aware that all your data will be deleted, and you\'ll be forgot in the oblivion.</string>
     <string name="leave">Leave</string>
     <string name="nevermind">Nevermind</string>
-    <string name="event_details">Event Details</string>
+    <string name="event_details">Match Details</string>
     <string name="of">of</string>
     <string name="empty_game">Oops! Is this game empty?</string>
+    <string name="search_empty_list">Looks like no one wants to play this kind of game...</string>
+    <string name="no_match_type">Have you created one match of this type?</string>
+    <string name="delete">Delete</string>
+    <string name="validate">Validate</string>
+    <string name="waiting_validation">Waiting for Validation</string>
+    <string name="evaluate">Evaluate</string>
 
 
 </resources>

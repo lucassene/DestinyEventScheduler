@@ -16,7 +16,6 @@ import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
-import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
@@ -31,7 +30,6 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
     private Cursor c;
     private final LayoutInflater inflater;
     private int code;
-
 
     public CustomCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags, int code) {
         super(context, layout, c, from, to, flags);
@@ -117,10 +115,6 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
     }
 
     private void getMembers(View view, Context context, Cursor cursor) {
-
-        if (cursor.getPosition() == 0 && code == DataProvider.ENTRY_MEMBERS){
-            view.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
-        }
 
         TextView name = (TextView) view.findViewById(R.id.primary_text);
         ImageView profile = (ImageView) view.findViewById(R.id.profile_pic);

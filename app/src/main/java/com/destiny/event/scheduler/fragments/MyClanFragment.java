@@ -37,8 +37,6 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     private static final int LOADER_MEMBERS = 50;
 
-    private static final int TYPE_MEMBER = 2;
-
     private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE;
     private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME;
     private String orderBy;
@@ -163,7 +161,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
-        bundle.putInt("type", TYPE_MEMBER);
+        bundle.putInt("type", MyProfileFragment.TYPE_MEMBER);
         bundle.putString("clanName", clanName);
 
         callback.loadNewFragment(fragment, bundle, "profile");

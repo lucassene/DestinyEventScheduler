@@ -37,11 +37,7 @@ import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import com.destiny.event.scheduler.utils.DateUtils;
 
 
 public class NewEventFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener, FromActivityListener {
@@ -420,7 +416,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 id = result.getLastPathSegment();
             }
 
-            String now = getCurrentTime();
+            String now = DateUtils.getCurrentTime();
             //Toast.makeText(getContext(), "Time: " + now, Toast.LENGTH_SHORT).show();
 
             ContentValues entryValues = new ContentValues();
@@ -438,27 +434,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
-    private String getCurrentTime() {
-        Calendar c = GregorianCalendar.getInstance();
-        String minute = String.valueOf(c.get(Calendar.MINUTE));
-        String hour = String.valueOf(c.get(Calendar.HOUR));
-        String day = String.valueOf(c.get(Calendar.DAY_OF_MONTH));
-        String month = String.valueOf(c.get(Calendar.MONTH)+1);
-        String year = String.valueOf(c.get(Calendar.YEAR));
 
-        // SimpleDateFormat Class
-        SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd");
-        String newdate =  sdfDateTime.format(new Date(System.currentTimeMillis()));
-
-        SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
-        String newtime = sdfTime.format(new Date(System.currentTimeMillis()));
-
-        String finalString = newdate + "T" + newtime;
-
-        Log.w(TAG, "Time: " + finalString);
-
-        return finalString ;
-    }
 
     private String getBungieTime(String date, String time) {
 

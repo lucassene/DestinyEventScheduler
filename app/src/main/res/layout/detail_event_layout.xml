@@ -13,13 +13,5 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal" />
 
-    <TextView
-        android:id="@android:id/empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/empty_game"
-        android:layout_gravity="center"
-        android:gravity="center"/>
-
 
 </LinearLayout>

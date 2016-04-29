@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 public class DateUtils {
@@ -90,6 +91,26 @@ public class DateUtils {
         String time = t.substring(0,5);
 
         return time;
+    }
+
+    public static String getCurrentTime() {
+        Calendar c = GregorianCalendar.getInstance();
+        String minute = String.valueOf(c.get(Calendar.MINUTE));
+        String hour = String.valueOf(c.get(Calendar.HOUR));
+        String day = String.valueOf(c.get(Calendar.DAY_OF_MONTH));
+        String month = String.valueOf(c.get(Calendar.MONTH)+1);
+        String year = String.valueOf(c.get(Calendar.YEAR));
+
+        // SimpleDateFormat Class
+        SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd");
+        String newdate =  sdfDateTime.format(new Date(System.currentTimeMillis()));
+
+        SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
+        String newtime = sdfTime.format(new Date(System.currentTimeMillis()));
+
+        String finalString = newdate + "T" + newtime;
+
+        return finalString ;
     }
 
 }

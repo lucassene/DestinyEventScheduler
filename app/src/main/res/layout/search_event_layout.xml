@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:paddingTop="@dimen/global_padding"
     android:paddingRight="16dp">
 
@@ -24,7 +24,7 @@
                 android:paddingBottom="@dimen/paddingBottomLabelText"/>
 
             <Spinner
-                android:id="@+id/order_spinner"
+                android:id="@+id/filter_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -35,20 +35,16 @@
             android:layout_height="1dp"
             android:background="@color/colorPrimary"/>
 
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheaderHeight"
             android:textColor="@color/psnColor"
             android:gravity="center_vertical"
             android:textSize="@dimen/secondaryTextSize"
-            android:text="@string/games_available" />
-
-        <FrameLayout
-            android:id="@+id/myclan_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </FrameLayout>
+            android:text="@string/games_available"
+           />
 
     </LinearLayout>
 
-</ScrollView>
+</RelativeLayout>

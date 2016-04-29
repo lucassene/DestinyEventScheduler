@@ -1,9 +1,12 @@
 package com.destiny.event.scheduler.fragments;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -16,10 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
+import com.destiny.event.scheduler.adapters.MembersAdapter;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
@@ -29,6 +33,8 @@ import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 
+import java.util.ArrayList;
+
 public class DetailEventFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String TAG = "DetailEventFragment";
@@ -37,6 +43,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private static final int URL_LOADER_ENTRY_MEMBERS = 72;
 
     private String gameId;
+    private String origin;
+    private String gameStatus;
+    private int userCreated = 0;
+    private int inscriptions;
+
+    private ArrayList<String> bungieIdList;
 
     View headerView;
     View includedView;
@@ -61,7 +73,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_SINCE};
     private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points};
 
-    CustomCursorAdapter adapter;
+    MembersAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +83,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         Bundle bundle = getArguments();
         if (bundle != null){
             gameId = bundle.getString("gameId");
+            origin = bundle.getString("origin");
+            userCreated = bundle.getInt("userCreated");
+            gameStatus = bundle.getString("status");
         }
 
         callback = (ToActivityListener) getActivity();
@@ -97,8 +112,97 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         guardians = (TextView) headerView.findViewById(R.id.guardians);
 
         joinButton = (Button) footerView.findViewById(R.id.btn_join);
+        switch (origin){
+            case ScheduledListFragment.TAG:
+                joinButton.setText(getContext().getResources().getString(R.string.leave));
+                break;
+            case MyEventsFragment.TAG:
+                switch (gameStatus){
+                    case GameTable.GAME_SCHEDULED:
+                        if (userCreated == 1){
+                            joinButton.setText(R.string.delete);
+                        } else joinButton.setText(getContext().getResources().getString(R.string.leave));
+                        break;
+                    case GameTable.GAME_WAITING:
+                        if (userCreated == 1){
+                            joinButton.setText(R.string.validate);
+                        } else {
+                            joinButton.setText(R.string.waiting_validation);
+                            joinButton.setEnabled(false);
+                        }
+                        break;
+                    case GameTable.GAME_VALIDATED:
+                        joinButton.setText(R.string.evaluate);
+                        break;
+                };
+                break;
+        };
+
+        joinButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String[] selectionArgs = {gameId};
+                ContentValues values = new ContentValues();
+                String uriString = DataProvider.GAME_URI + "/" + gameId;
+                Uri uri = Uri.parse(uriString);
+
+                switch (origin){
+                    case NewEventsListFragment.TAG:
+                        joinGame(values, uri);
+                        callback.closeFragment();
+                        break;
+                    case ScheduledListFragment.TAG:
+                        leaveGame(values, uri);
+                        callback.closeFragment();
+                        break;
+                    case SearchFragment.TAG:
+                        joinGame(values, uri);
+                        callback.closeFragment();
+                        break;
+                    case MyEventsFragment.TAG:
+                        leaveGame(values, uri);
+                        callback.closeFragment();
+                        break;
+                }
+            }
+        });
+
+        bungieIdList = new ArrayList<>();
 
         return v;
+    }
+
+    private void leaveGame(ContentValues values, Uri uri) {
+
+        if (userCreated == 1){
+            getContext().getContentResolver().delete(uri,null,null);
+        } else {
+            values.put(GameTable.COLUMN_STATUS, GameTable.GAME_NEW);
+            values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions-1);
+            getContext().getContentResolver().update(uri, values,null, null);
+            values.clear();
+        }
+
+        String selection = EntryTable.COLUMN_GAME + "=" + gameId + " AND " + EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
+        getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
+
+
+    }
+
+    private void joinGame(ContentValues values, Uri uri) {
+
+        values.put(GameTable.COLUMN_STATUS, GameTable.GAME_SCHEDULED);
+        values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions+1);
+        getContext().getContentResolver().update(uri, values,null, null);
+        values.clear();
+
+        values.put(EntryTable.COLUMN_GAME,gameId);
+        values.put(EntryTable.COLUMN_MEMBERSHIP, callback.getBungieId());
+        values.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
+        getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
+        values.clear();
+
     }
 
     @Override
@@ -110,24 +214,30 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     }
 
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        String bungieId = bungieIdList.get(position-1);
+
+        Fragment fragment = new MyProfileFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("bungieId", bungieId);
+        if (bungieId.equals(callback.getBungieId())){
+            bundle.putInt("type", MyProfileFragment.TYPE_USER);
+        } else{
+            bundle.putInt("type", MyProfileFragment.TYPE_MEMBER);
+        }
+        bundle.putString("clanName", callback.getClanName());
+
+        callback.loadNewFragment(fragment, bundle, "profile");
+    }
+
     private void getGameData() {
 
         callback.onLoadingData();
 
         prepareGameStrings();
         getLoaderManager().initLoader(URL_LOADER_GAME, null, this);
-
-        prepareMemberStrings();
-        getLoaderManager().initLoader(URL_LOADER_ENTRY_MEMBERS, null, this);
-        adapter = new CustomCursorAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, URL_LOADER_ENTRY_MEMBERS);
-
-        if (headerView != null && footerView != null){
-            this.getListView().addHeaderView(headerView);
-            this.getListView().addFooterView(footerView);
-        }
-
-        setListAdapter(adapter);
-
     }
 
     private void prepareGameStrings() {
@@ -169,8 +279,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         String c11 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_PLAYED);
         String c12 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_SINCE);
         String c13 = GameTable.getAliasExpression(GameTable.COLUMN_ID);
+        String c14 = MemberTable.POINTS_COLUMNS;
 
-        membersProjection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13};
+        membersProjection = new String[] {c1, c2, c3, c4, c5, c6, c14, c7, c8, c9, c10, c11, c12, c13};
 
     }
 
@@ -236,13 +347,23 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     light.setText(data.getString(data.getColumnIndexOrThrow(GameTable.getQualifiedColumn(GameTable.COLUMN_LIGHT))));
 
                     int max = data.getInt(data.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS)));
-                    int insc = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
-                    String sg = insc + " " + getContext().getResources().getString(R.string.of) + " " + max;
+                    inscriptions = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
+                    String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + max;
                     guardians.setText(sg);
                     Log.w(TAG, "Game Cursor: " + DatabaseUtils.dumpCursorToString(data));
+                    setAdapter(max);
+                    prepareMemberStrings();
+                    getLoaderManager().initLoader(URL_LOADER_ENTRY_MEMBERS, null, this);
                     break;
                 case URL_LOADER_ENTRY_MEMBERS:
                     adapter.swapCursor(data);
+
+                    data.moveToFirst();
+                    for (int i=0; i < data.getCount();i++){
+                        bungieIdList.add(i, data.getString(data.getColumnIndexOrThrow(EntryTable.getQualifiedColumn(EntryTable.COLUMN_MEMBERSHIP))));
+                        data.moveToNext();
+                    }
+
                     Log.w(TAG, "Entry Cursor: " + DatabaseUtils.dumpCursorToString(data));
                     break;
 
@@ -251,6 +372,17 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
         callback.onDataLoaded();
 
+    }
+
+    private void setAdapter(int max) {
+        adapter = new MembersAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, max);
+
+        if (headerView != null && footerView != null){
+            this.getListView().addHeaderView(headerView, null, false);
+            this.getListView().addFooterView(footerView);
+        }
+
+        setListAdapter(adapter);
     }
 
     @Override

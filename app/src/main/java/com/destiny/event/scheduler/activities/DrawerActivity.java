@@ -39,8 +39,11 @@ import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.fragments.DetailEventFragment;
 import com.destiny.event.scheduler.fragments.HistoryFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
+import com.destiny.event.scheduler.fragments.MyEventsFragment;
 import com.destiny.event.scheduler.fragments.MyProfileFragment;
 import com.destiny.event.scheduler.fragments.NewEventFragment;
+import com.destiny.event.scheduler.fragments.NewEventsListFragment;
+import com.destiny.event.scheduler.fragments.ScheduledListFragment;
 import com.destiny.event.scheduler.fragments.SearchFragment;
 import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
@@ -56,8 +59,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private static final int URL_LOADER_CLAN = 40;
 
-    private static final int TYPE_USER = 1;
-    private static final int TYPE_MEMBER = 2;
 
     private Toolbar toolbar;
 
@@ -85,6 +86,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private String bungieId;
     private String userName;
+
+    private String gameOrigin;
 
     ViewPager viewPager;
     ViewPageAdapter viewPageAdapter;
@@ -181,7 +184,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             } else {
                 super.onBackPressed();
                 openFragment = fm.findFragmentById(R.id.content_frame);
-                fragmentTag = openFragment.getTag();
+                if (openFragment != null) fragmentTag = openFragment.getTag();
             }
         }
 
@@ -264,6 +267,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
+    public String getClanName() {
+        return clanName;
+    }
+
+    @Override
     public void closeFragment() {
         ft = fm.beginTransaction();
         ft.remove(openFragment);
@@ -289,10 +297,19 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void onGameSelected(String id) {
+    public void onGameSelected(String id, String tag, String creator, String status) {
+
+        gameOrigin = tag;
+
+        int userCreated = 0;
+
+        if (creator != null && creator.equals(getBungieId())) userCreated = 1;
 
         Bundle bundle = new Bundle();
         bundle.putString("gameId",id);
+        bundle.putString("origin",gameOrigin);
+        bundle.putInt("userCreated", userCreated);
+        bundle.putString("status", status);
         tabLayout.setViewPager(null);
         viewPager.setAdapter(null);
         loadNewFragment(new DetailEventFragment(), bundle, id);
@@ -341,6 +358,17 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         return true;
     }
 
+    private boolean openMyEventsFragment(View child) {
+        if (openFragment instanceof MyEventsFragment){
+            drawerLayout.closeDrawers();
+            return false;
+        }
+        MyEventsFragment fragment = new MyEventsFragment();
+        prepareFragmentHolder(fragment, child, null, "myevents");
+        return true;
+
+    }
+
     public boolean openHistoryFragment(View child){
         if (openFragment instanceof HistoryFragment){
             drawerLayout.closeDrawers();
@@ -378,7 +406,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
         bundle.putString("clanName", clanName);
-        bundle.putInt("type", TYPE_USER);
+        bundle.putInt("type", MyProfileFragment.TYPE_USER);
 
         prepareFragmentHolder(fragment, child, bundle, "profile");
         return true;
@@ -393,6 +421,24 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             updateViewPager();
             drawerLayout.closeDrawers();
             if (child != null) child.playSoundEffect(SoundEffectConstants.CLICK);
+
+
+            if (gameOrigin != null){
+                switch (gameOrigin){
+                    case NewEventsListFragment.TAG:
+                        viewPager.setCurrentItem(0);
+                        break;
+                    case ScheduledListFragment.TAG:
+                        viewPager.setCurrentItem(1);
+                        break;
+                    default:
+                        viewPager.setCurrentItem(1);
+                        break;
+                }
+            }
+
+
+
             return true;
         }
         drawerLayout.closeDrawers();
@@ -493,6 +539,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             openValidateEventFragment(child);
                             break;
                         case 4:
+                            openMyEventsFragment(child);
                             break;
                         case 5:
                             openHistoryFragment(child);
@@ -534,7 +581,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         case 3:
                             return openValidateEventFragment(child);
                         case 4:
-                            return false;
+                            return openMyEventsFragment(child);
                         case 5:
                             return openHistoryFragment(child);
                         case 6:

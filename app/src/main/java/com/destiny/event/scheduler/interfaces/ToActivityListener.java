@@ -11,9 +11,10 @@ public interface ToActivityListener {
     public void onEventGameSelected(String id);
     public String getBungieId();
     public String getUserName();
+    public String getClanName();
     public void closeFragment();
     public void onLoadingData();
     public void onDataLoaded();
-    public void onGameSelected(String id);
+    public void onGameSelected(String id, String tag, String creator, String status);
     public void onNoScheduledGames();
 }

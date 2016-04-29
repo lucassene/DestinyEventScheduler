@@ -29,8 +29,8 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
     private static final int LOADER_MEMBER = 50;
     private static final String TAG = "MyProfileFragment";
 
-    private static final int TYPE_USER = 1;
-    private static final int TYPE_MEMBER = 2;
+    public static final int TYPE_USER = 1;
+    public static final int TYPE_MEMBER = 2;
 
     //private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_SINCE, MemberTable.COLUMN_CREATED, MemberTable.COLUMN_PLAYED, MemberTable.COLUMN_LIKES, MemberTable.COLUMN_DISLIKES};
     //private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.profile_date, R.id.profile_created, R.id.profile_played, R.id.profile_likes, R.id.profile_dislikes, R.id.profile_points};

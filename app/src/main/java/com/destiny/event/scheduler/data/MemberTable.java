@@ -23,6 +23,7 @@ public class MemberTable {
     public static final String[] VIEW_COLUMNS = {COLUMN_NAME, COLUMN_ICON, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED, COLUMN_SINCE};
 
     public static final String POINTS_COLUMNS = "((" + COLUMN_LIKES + "*1.0)/(" + COLUMN_CREATED + "+" + COLUMN_PLAYED + "))*100+(" + COLUMN_CREATED + "*0.5)-" + COLUMN_DISLIKES;
+    public static final String QUALIFIED_POINTS_COLUMNS = "((" + getQualifiedColumn(COLUMN_LIKES) + "*1.0)/(" + getQualifiedColumn(COLUMN_CREATED) + "+" + getQualifiedColumn(COLUMN_PLAYED) + "))*100+(" + getQualifiedColumn(COLUMN_CREATED) + "*0.5)-" + getQualifiedColumn(COLUMN_DISLIKES);
 
     public static final String CREATE_TABLE = "CREATE TABLE "
             + TABLE_NAME

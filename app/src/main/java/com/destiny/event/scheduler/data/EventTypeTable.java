@@ -28,14 +28,14 @@ public class EventTypeTable {
     public static void onCreate(SQLiteDatabase db){
         db.execSQL(TABLE_CREATE);
         Log.e("EventType Table", "EventType table created");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'court', 'ic_court');");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'crucible', 'ic_crucible');");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'patrol', 'ic_patrol');");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'prison', 'ic_prison');");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'raid', 'ic_raid');");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'story', 'ic_story');");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'strike', 'ic_strike');");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'strike_list', 'ic_strike');");
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'court', 'ic_court');"); //1
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'crucible', 'ic_crucible');"); //2
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'patrol', 'ic_patrol');"); //3
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'prison', 'ic_prison');"); //4
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'raid', 'ic_raid');"); //5
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'story', 'ic_story');"); //6
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'strike', 'ic_strike');"); //7
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'strike_list', 'ic_strike');"); //8
     }
 
     public static void onUpdate(SQLiteDatabase db, int oldVersion, int newVersion){

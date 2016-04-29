@@ -11,6 +11,89 @@
         android:textSize="@dimen/secondaryTextSize"
         android:text="@string/wait_list"
         android:textColor="@color/psnColor"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp"
+        android:clickable="false"/>
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/listItemHeight">
+
+        <ImageView
+            android:id="@+id/profile_pic"
+            android:layout_width="59dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/default_profile_img"
+            android:scaleType="fitStart"
+            android:layout_margin="5dp"
+            android:layout_marginLeft="8dp"/>
+
+        <LinearLayout
+            android:id="@+id/text_layout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/profile_pic"
+            android:layout_alignTop="@id/profile_pic"
+            android:paddingLeft="5dp">
+
+            <TextView
+                android:id="@+id/primary_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Primary Text"
+                android:textStyle="bold"
+                android:textAppearance="?android:textAppearanceMedium"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/member_since"
+                android:textSize="@dimen/secondaryTextSize" />
+
+            <TextView
+                android:id="@+id/secondary_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="99/99/9999"
+                android:textSize="@dimen/secondaryTextSize"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:paddingRight="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="P T S"
+                android:textStyle="bold"
+                android:textColor="@color/lineColor"
+                android:layout_gravity="center_horizontal"/>
+
+            <TextView
+                android:id="@+id/text_points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="99"
+                android:textSize="32sp"
+                android:layout_gravity="center_horizontal" />
+
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
 
 </LinearLayout>
