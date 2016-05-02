@@ -20,6 +20,13 @@
             android:text="Here comes the title!"
             android:textColor="@color/psnColor"/>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/white"
+            android:alpha="0.25"
+            android:layout_marginTop="8dp"/>
+
     </LinearLayout>
 
     <LinearLayout
@@ -36,12 +43,6 @@
             android:alpha="0.75"/>
 
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/white"
-        android:alpha="0.25"/>
 
     <LinearLayout
         android:layout_width="match_parent"

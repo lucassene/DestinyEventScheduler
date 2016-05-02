@@ -12,9 +12,12 @@ public interface ToActivityListener {
     public String getBungieId();
     public String getUserName();
     public String getClanName();
+    public String getOrderBy();
     public void closeFragment();
     public void onLoadingData();
     public void onDataLoaded();
     public void onGameSelected(String id, String tag, String creator, String status);
     public void onNoScheduledGames();
+    public void setClanOrderBy(String orderBy);
+    public void registerRefreshListener(Fragment fragment);
 }

@@ -3,7 +3,7 @@ package com.destiny.event.scheduler.fragments;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
@@ -28,13 +29,13 @@ import com.destiny.event.scheduler.provider.DataProvider;
 
 import java.util.ArrayList;
 
-public class MyEventsFragment extends ListFragment implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class MyEventsFragment extends Fragment implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final String TAG = "MyEventsFragments";
+    public static final String TAG = "MyEventsFragment";
 
-    View headerView;
     Spinner filterSpinner;
-    Spinner emptySpinner;
+    ListView gameList;
+    TextView emptyView;
 
     CustomCursorAdapter adapter;
 
@@ -58,18 +59,27 @@ public class MyEventsFragment extends ListFragment implements AdapterView.OnItem
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.search_title);
-        View v = inflater.inflate(R.layout.search_list_layout, container, false);
-        emptySpinner = (Spinner) v.findViewById(R.id.empty_spinner);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.my_events);
+        View v = inflater.inflate(R.layout.my_events_layout, container, false);
 
-        headerView = inflater.inflate(R.layout.search_event_layout, null);
-        filterSpinner = (Spinner) headerView.findViewById(R.id.filter_spinner);
+        filterSpinner = (Spinner) v.findViewById(R.id.my_events_spinner);
+        gameList = (ListView) v.findViewById(R.id.my_events_list);
+        emptyView = (TextView) v.findViewById(R.id.empty_label);
 
         gameStatusList = new String[] {"1","2","3","4"};
 
         gameCreatorList = new ArrayList<>();
 
+        if (savedInstanceState != null) gameCreatorList = savedInstanceState.getStringArrayList("gameCreatorList");
+
         callback = (ToActivityListener) getActivity();
+
+        gameList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                callback.onGameSelected(String.valueOf(id), TAG, gameCreatorList.get(position), gameStatus);
+            }
+        });
 
         return v;
     }
@@ -82,9 +92,6 @@ public class MyEventsFragment extends ListFragment implements AdapterView.OnItem
         filterSpinner.setOnItemSelectedListener(this);
         filterSpinner.setAdapter(spinnerAdapter);
         filterSpinner.setSelection(0);
-        emptySpinner.setOnItemSelectedListener(this);
-        emptySpinner.setAdapter(spinnerAdapter);
-        emptySpinner.setSelection(0);
 
         gameStatus = gameStatusList[0];
         getGamesData();
@@ -98,19 +105,8 @@ public class MyEventsFragment extends ListFragment implements AdapterView.OnItem
         getLoaderManager().initLoader(LOADER_GAME, null, this);
 
         adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_GAME);
+        gameList.setAdapter(adapter);
 
-        if (headerView != null){
-            this.getListView().addHeaderView(headerView);
-            //this.getListView().addFooterView(footerView);
-        }
-
-        setListAdapter(adapter);
-
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        callback.onGameSelected(String.valueOf(id), TAG, gameCreatorList.get(position), gameStatus);
     }
 
     private void prepareStrings() {
@@ -160,7 +156,6 @@ public class MyEventsFragment extends ListFragment implements AdapterView.OnItem
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
         gameStatus = gameStatusList[position];
-        emptySpinner.setSelection(position);
         filterSpinner.setSelection(position);
         getLoaderManager().restartLoader(LOADER_GAME, null, this);
 
@@ -209,9 +204,11 @@ public class MyEventsFragment extends ListFragment implements AdapterView.OnItem
                     }
             }
             callback.onDataLoaded();
+            emptyView.setVisibility(View.GONE);
         } else {
             callback.onDataLoaded();
             adapter.swapCursor(null);
+            emptyView.setVisibility(View.VISIBLE);
         }
 
     }
@@ -219,5 +216,11 @@ public class MyEventsFragment extends ListFragment implements AdapterView.OnItem
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putStringArrayList("gameCreatorList", gameCreatorList);
+        super.onSaveInstanceState(outState);
     }
 }

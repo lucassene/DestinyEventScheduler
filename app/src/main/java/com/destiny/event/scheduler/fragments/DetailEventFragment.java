@@ -29,24 +29,31 @@ import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.dialogs.MyAlertDialog;
+import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 
 import java.util.ArrayList;
 
-public class DetailEventFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class DetailEventFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener{
 
     private static final String TAG = "DetailEventFragment";
 
     private static final int URL_LOADER_GAME = 60;
     private static final int URL_LOADER_ENTRY_MEMBERS = 72;
 
+    public static final int LEAVE_DIALOG = 10;
+    public static final int DELETE_DIALOG = 11;
+    public static final int JOIN_DIALOG = 12;
+
     private String gameId;
     private String origin;
     private String gameStatus;
-    private int userCreated = 0;
+    private String creator;
     private int inscriptions;
+    private int maxGuardians;
 
     private ArrayList<String> bungieIdList;
 
@@ -75,18 +82,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     MembersAdapter adapter;
 
+    MyAlertDialog dialog;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-        Bundle bundle = getArguments();
-        if (bundle != null){
-            gameId = bundle.getString("gameId");
-            origin = bundle.getString("origin");
-            userCreated = bundle.getInt("userCreated");
-            gameStatus = bundle.getString("status");
-        }
 
         callback = (ToActivityListener) getActivity();
 
@@ -112,19 +113,32 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         guardians = (TextView) headerView.findViewById(R.id.guardians);
 
         joinButton = (Button) footerView.findViewById(R.id.btn_join);
+
+        Bundle bundle = getArguments();
+        if (bundle != null){
+            gameId = bundle.getString("gameId");
+            origin = bundle.getString("origin");
+            creator = bundle.getString("creator");
+            gameStatus = bundle.getString("status");
+        }
+
+        Log.w(TAG, "Creator: " + creator + ", BungieID: " + callback.getBungieId());
+
         switch (origin){
             case ScheduledListFragment.TAG:
-                joinButton.setText(getContext().getResources().getString(R.string.leave));
+                if (creator.equals(callback.getBungieId())){
+                    joinButton.setText(R.string.delete);
+                } else joinButton.setText(R.string.leave);
                 break;
             case MyEventsFragment.TAG:
                 switch (gameStatus){
                     case GameTable.GAME_SCHEDULED:
-                        if (userCreated == 1){
+                        if (creator.equals(callback.getBungieId())){
                             joinButton.setText(R.string.delete);
                         } else joinButton.setText(getContext().getResources().getString(R.string.leave));
                         break;
                     case GameTable.GAME_WAITING:
-                        if (userCreated == 1){
+                        if (creator.equals(callback.getBungieId())){
                             joinButton.setText(R.string.validate);
                         } else {
                             joinButton.setText(R.string.waiting_validation);
@@ -142,27 +156,20 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             @Override
             public void onClick(View v) {
 
-                String[] selectionArgs = {gameId};
-                ContentValues values = new ContentValues();
-                String uriString = DataProvider.GAME_URI + "/" + gameId;
-                Uri uri = Uri.parse(uriString);
-
                 switch (origin){
                     case NewEventsListFragment.TAG:
-                        joinGame(values, uri);
-                        callback.closeFragment();
+                        showAlertDialog(JOIN_DIALOG);
                         break;
                     case ScheduledListFragment.TAG:
-                        leaveGame(values, uri);
-                        callback.closeFragment();
+                        if (creator.equals(callback.getBungieId())){
+                            showAlertDialog(DELETE_DIALOG);
+                        } else showAlertDialog(LEAVE_DIALOG);
                         break;
                     case SearchFragment.TAG:
-                        joinGame(values, uri);
-                        callback.closeFragment();
+                        showAlertDialog(JOIN_DIALOG);
                         break;
                     case MyEventsFragment.TAG:
-                        leaveGame(values, uri);
-                        callback.closeFragment();
+                        showAlertDialog(LEAVE_DIALOG);
                         break;
                 }
             }
@@ -173,20 +180,56 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         return v;
     }
 
-    private void leaveGame(ContentValues values, Uri uri) {
+    private void showAlertDialog(int dialogType) {
 
-        if (userCreated == 1){
-            getContext().getContentResolver().delete(uri,null,null);
-        } else {
-            values.put(GameTable.COLUMN_STATUS, GameTable.GAME_NEW);
-            values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions-1);
-            getContext().getContentResolver().update(uri, values,null, null);
-            values.clear();
+        final String title = "title";
+        final String msg = "msg";
+        final String posButton = "posButton";
+
+        Bundle bundle = new Bundle();
+        switch (dialogType){
+            case LEAVE_DIALOG:
+                bundle.putString(title, getContext().getResources().getString(R.string.leave_game_title));
+                bundle.putString(msg, getContext().getResources().getString(R.string.leave_dialog_msg));
+                bundle.putString(posButton, getContext().getResources().getString(R.string.leave));
+                break;
+            case DELETE_DIALOG:
+                bundle.putString(title, getContext().getResources().getString(R.string.delete_dialog_title));
+                bundle.putString(msg, getContext().getResources().getString(R.string.delete_dialog_msg));
+                bundle.putString(posButton, getContext().getResources().getString(R.string.delete));
+                break;
+            case JOIN_DIALOG:
+                bundle.putString(title, getContext().getResources().getString(R.string.join_dialog_title));
+                bundle.putString(posButton, getContext().getResources().getString(R.string.join));
+                if (inscriptions > maxGuardians){
+                    bundle.putString(msg, getContext().getResources().getString(R.string.join_full_dialog_msg));
+                } else bundle.putString(msg, getContext().getResources().getString(R.string.join_dialog_msg));
+                break;
         }
 
+        bundle.putInt("type", dialogType);
+
+        dialog = new MyAlertDialog();
+        dialog.setArguments(bundle);
+        dialog.show(getFragmentManager(),"dialog");
+
+    }
+
+    private void deleteGame(Uri uri) {
+        getContext().getContentResolver().delete(uri,null,null);
+        callback.closeFragment();
+    }
+
+    private void leaveGame(ContentValues values, Uri uri) {
+
+        values.put(GameTable.COLUMN_STATUS, GameTable.GAME_NEW);
+        values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions-1);
+        getContext().getContentResolver().update(uri, values,null, null);
+        values.clear();
         String selection = EntryTable.COLUMN_GAME + "=" + gameId + " AND " + EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
         getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
 
+        callback.closeFragment();
 
     }
 
@@ -202,6 +245,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         values.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
         values.clear();
+
+        callback.closeFragment();
 
     }
 
@@ -346,12 +391,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     time.setText(DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
                     light.setText(data.getString(data.getColumnIndexOrThrow(GameTable.getQualifiedColumn(GameTable.COLUMN_LIGHT))));
 
-                    int max = data.getInt(data.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS)));
+                    maxGuardians = data.getInt(data.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS)));
                     inscriptions = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
-                    String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + max;
+                    String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
                     guardians.setText(sg);
                     Log.w(TAG, "Game Cursor: " + DatabaseUtils.dumpCursorToString(data));
-                    setAdapter(max);
+                    setAdapter(maxGuardians);
                     prepareMemberStrings();
                     getLoaderManager().initLoader(URL_LOADER_ENTRY_MEMBERS, null, this);
                     break;
@@ -393,6 +438,42 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                 adapter.swapCursor(null);
                 break;
         }
+
+    }
+
+    @Override
+    public void onPositiveClick(String input, int type) {
+
+        ContentValues values = new ContentValues();
+        String uriString = DataProvider.GAME_URI + "/" + gameId;
+        Uri uri = Uri.parse(uriString);
+
+        switch (type){
+            case JOIN_DIALOG:
+                joinGame(values, uri);
+                break;
+            case LEAVE_DIALOG:
+                leaveGame(values, uri);
+                break;
+            case DELETE_DIALOG:
+                deleteGame(uri);
+                break;
+        }
+
+    }
+
+    @Override
+    public void onDateSent(String date) {
+
+    }
+
+    @Override
+    public void onTimeSent(String time) {
+
+    }
+
+    @Override
+    public void onLogoff() {
 
     }
 }

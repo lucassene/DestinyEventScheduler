@@ -2,30 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center">
-
-    <ListView
-        android:id="@id/android:list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal" />
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@android:id/empty"
-        android:gravity="center"
-        android:layout_gravity="center">
+    android:layout_gravity="center"
+    android:paddingRight="@dimen/global_padding">
 
         <RelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/global_padding"
-            android:paddingRight="16dp">
+            android:layout_height="match_parent">
 
             <LinearLayout
+                android:id="@+id/header_layout"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -39,11 +25,11 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/game_type_label"
+                        android:text="@string/game_status"
                         android:paddingBottom="@dimen/paddingBottomLabelText"/>
 
                     <Spinner
-                        android:id="@+id/empty_spinner"
+                        android:id="@+id/my_events_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
@@ -52,19 +38,41 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/colorPrimary"/>
+                    android:background="@color/colorPrimary" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/subheaderHeight"
+                    android:id="@+id/section_title"
+                    android:textColor="@color/psnColor"
+                    android:gravity="center_vertical"
+                    android:text="@string/games_available"
+                    android:textSize="@dimen/secondaryTextSize" />
 
             </LinearLayout>
 
+            <FrameLayout
+                android:id="@+id/list_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/header_layout">
+
+                <ListView
+                    android:id="@+id/my_events_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/empty_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/no_games_status"
+                    android:visibility="gone"/>
+
+            </FrameLayout>
+
         </RelativeLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/no_match_type"/>
-
-    </LinearLayout>
-
 
 </LinearLayout>

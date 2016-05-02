@@ -3,7 +3,7 @@ package com.destiny.event.scheduler.fragments;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
@@ -26,13 +27,13 @@ import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 
-public class SearchFragment extends ListFragment implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String TAG = "SearchFragment";
 
-    View headerView;
     Spinner filterSpinner;
-    Spinner emptySpinner;
+    ListView gamesList;
+    TextView emptyView;
 
     CustomCursorAdapter adapter;
 
@@ -56,15 +57,22 @@ public class SearchFragment extends ListFragment implements AdapterView.OnItemSe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.search_title);
-        View v = inflater.inflate(R.layout.search_list_layout, container, false);
-        emptySpinner = (Spinner) v.findViewById(R.id.empty_spinner);
+        View v = inflater.inflate(R.layout.search_event_layout, container, false);
 
-        headerView = inflater.inflate(R.layout.search_event_layout, null);
-        filterSpinner = (Spinner) headerView.findViewById(R.id.filter_spinner);
+        filterSpinner = (Spinner) v.findViewById(R.id.search_spinner);
+        gamesList = (ListView) v.findViewById(R.id.search_list);
+        emptyView = (TextView) v.findViewById(R.id.empty_label);
 
         eventIdList = getContext().getResources().getIntArray(R.array.event_type_ids);
 
         callback = (ToActivityListener) getActivity();
+
+        gamesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                callback.onGameSelected(String.valueOf(id), TAG, null, null);
+            }
+        });
 
         return v;
     }
@@ -76,10 +84,7 @@ public class SearchFragment extends ListFragment implements AdapterView.OnItemSe
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterSpinner.setOnItemSelectedListener(this);
         filterSpinner.setAdapter(spinnerAdapter);
-        filterSpinner.setSelection(0);
-        emptySpinner.setOnItemSelectedListener(this);
-        emptySpinner.setAdapter(spinnerAdapter);
-        emptySpinner.setSelection(0);
+        //filterSpinner.setSelection(0);
 
         eventId = eventIdList[0];
         getGamesData();
@@ -94,18 +99,8 @@ public class SearchFragment extends ListFragment implements AdapterView.OnItemSe
 
         adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_GAME);
 
-        if (headerView != null){
-            this.getListView().addHeaderView(headerView);
-            //this.getListView().addFooterView(footerView);
-        }
+        gamesList.setAdapter(adapter);
 
-        setListAdapter(adapter);
-
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        callback.onGameSelected(String.valueOf(id), TAG, null, null);
     }
 
     private void prepareStrings() {
@@ -154,7 +149,6 @@ public class SearchFragment extends ListFragment implements AdapterView.OnItemSe
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
         eventId = eventIdList[position];
-        emptySpinner.setSelection(position);
         filterSpinner.setSelection(position);
         getLoaderManager().restartLoader(LOADER_GAME, null, this);
 
@@ -198,9 +192,11 @@ public class SearchFragment extends ListFragment implements AdapterView.OnItemSe
                     adapter.swapCursor(data);
             }
             callback.onDataLoaded();
+            emptyView.setVisibility(View.GONE);
         } else {
             callback.onDataLoaded();
             adapter.swapCursor(null);
+            emptyView.setVisibility(View.VISIBLE);
         }
 
     }

@@ -1,5 +1,6 @@
 package com.destiny.event.scheduler.fragments;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
@@ -20,10 +21,13 @@ import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 
-public class NewEventsListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+import java.util.ArrayList;
+
+public class NewEventsListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, RefreshDataListener {
 
     public static final String TAG = "NewEventsListFragment";
 
@@ -42,10 +46,18 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     private String[] projection;
     private String[] from;
 
+    private ArrayList<String> creatorList;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
         callback = (ToActivityListener) getActivity();
+        callback.registerRefreshListener(this);
     }
 
     @Override
@@ -56,6 +68,8 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
         headerView = inflater.inflate(R.layout.list_section_layout, null);
 
         sectionTitle = (TextView) headerView.findViewById(R.id.section_title);
+
+        creatorList = new ArrayList<>();
 
         return v;
     }
@@ -72,7 +86,7 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         //Toast.makeText(getContext(), "GameID Selected: " + id, Toast.LENGTH_SHORT).show();
-        callback.onGameSelected(String.valueOf(id), TAG, null, null);
+        callback.onGameSelected(String.valueOf(id), TAG, creatorList.get(position), null);
     }
 
     private void getNewEvents() {
@@ -150,6 +164,13 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
             switch (loader.getId()){
                 case URL_LOADER_GAME:
                     adapter.swapCursor(data);
+
+                    data.moveToFirst();
+                    for (int i=0; i<data.getCount(); i++){
+                        creatorList.add(data.getString(data.getColumnIndex(GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR))));
+                        data.moveToNext();
+                    }
+
             }
             callback.onDataLoaded();
         }
@@ -161,5 +182,11 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
+    }
+
+    @Override
+    public void onRefreshData() {
+        callback.onLoadingData();
+        getLoaderManager().restartLoader(URL_LOADER_GAME, null, this);
     }
 }

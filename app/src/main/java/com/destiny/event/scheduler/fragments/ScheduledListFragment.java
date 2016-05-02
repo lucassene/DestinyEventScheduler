@@ -21,12 +21,13 @@ import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 
 import java.util.ArrayList;
 
-public class ScheduledListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class ScheduledListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, RefreshDataListener{
 
     public static final String TAG = "ScheduledListFragment";
 
@@ -51,7 +52,6 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        callback = (ToActivityListener) getActivity();
     }
 
     @Override
@@ -82,13 +82,15 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         //Toast.makeText(getContext(), "GameID Selected: " + gameIdList.get(position-1), Toast.LENGTH_SHORT).show();
-        callback.onGameSelected(gameIdList.get(position-1), TAG, gameCreatorList.get(position-1), null);
+        callback.onGameSelected(gameIdList.get(position-1), TAG, gameCreatorList.get(position-1), GameTable.GAME_SCHEDULED);
     }
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        callback = (ToActivityListener) getActivity();
+        callback.registerRefreshListener(this);
     }
 
     private void getScheduledEvents() {
@@ -186,4 +188,9 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
         adapter.swapCursor(null);
     }
 
+    @Override
+    public void onRefreshData() {
+        callback.onLoadingData();
+        getLoaderManager().restartLoader(LOADER_GAME, null, this);
+    }
 }

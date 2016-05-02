@@ -232,5 +232,16 @@
     <string name="evaluate">Avaliar</string>
     <string name="validate">Validar</string>
     <string name="waiting_validation">Esperando Validação</string>
+    <string name="game_status">Estado de Partida</string>
+    <string name="my_events">Minhas Partidas</string>
+    <string name="no_games_status">Sem partidas nesse estado.</string>
+    <string name="delete_dialog_msg">Excluir essa partida é irreversível, ela não ficará mais disponível para ninguém depois disso.</string>
+    <string name="delete_dialog_title">Excluir essa partida?</string>
+    <string name="join_dialog_title">Participar, sim?</string>
+    <string name="join_dialog_msg">Você será adicionado à esta partida e uma notificação será criada de acordo com as suas configurações de preferência.</string>
+    <string name="leave_dialog_msg">Você não estará mais participando dessa partida depois disso.</string>
+    <string name="leave_game_title">Deixar partida?</string>
+    <string name="join_full_dialog_msg">Essa partida já está cheia, você será adicionado à lista de espera. Uma notificação será criada mesmo assim, de acordo com suas configurações de preferência.</string>
+    <string name="data_refreshed">Dados atualizados!</string>
 
 </resources>

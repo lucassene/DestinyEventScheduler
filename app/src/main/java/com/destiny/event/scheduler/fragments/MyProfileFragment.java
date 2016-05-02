@@ -200,15 +200,16 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
         double totalPoints = (totalLikes/(created+played))*100;
         totalPoints = totalPoints + (created*0.5);
         totalPoints = totalPoints - totalDislikes;
+        int points = (int) totalPoints;
 
         if (Math.round(totalPoints) >= 100) {
             return "99";
         } else if (Math.round(totalPoints) <= 0){
             return "00";
         } else if (Math.round(totalPoints) < 10){
-            String finalPoint = "0" + Math.round(totalPoints);
+            String finalPoint = "0" + String.valueOf(points);
             return finalPoint;
-        } else return String.valueOf(Math.round(totalPoints));
+        } else return String.valueOf(String.valueOf(points));
 
 
 

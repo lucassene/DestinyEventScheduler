@@ -387,6 +387,11 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().restartLoader(URL_LOADER_GAME, null, this);
     }
 
+    @Override
+    public void onOrderBySet(String orderBy) {
+
+    }
+
 
     public void createNewEvent() {
         String date = dateText.getText().toString();

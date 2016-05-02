@@ -95,7 +95,6 @@
         <item>Participation points</item>
     </string-array>
 
-    <string name="wait_list">Queue</string>
     <string name="games_available">Games Available</string>
     <string name="members">Members</string>
     <string name="order_by">Order by</string>
@@ -265,6 +264,18 @@
     <string name="validate">Validate</string>
     <string name="waiting_validation">Waiting for Validation</string>
     <string name="evaluate">Evaluate</string>
+    <string name="no_games_status">No games on this status.</string>
+    <string name="game_status">Game Status</string>
+    <string name="my_events">My Matches</string>
+    <string name="leave_game_title">Leave this match?</string>
+    <string name="leave_dialog_msg">You will no longer participate in this match after this.</string>
+    <string name="delete_dialog_title">Delete this match?</string>
+    <string name="delete_dialog_msg">Deleting this match is irreversible, it won\'t be available to no one after this.</string>
+    <string name="join_dialog_title">Join, yes?</string>
+    <string name="join_dialog_msg">You will be added to this match and a notification will be created according to your preference settings.</string>
+    <string name="join_full_dialog_msg">This match is already full, you will be added to the waiting list. A notification will be created anyway, according to your preference settings.</string>
+    <string name="wait_list">Waiting List</string>
+    <string name="data_refreshed">All data refreshed!</string>
 
 
 </resources>

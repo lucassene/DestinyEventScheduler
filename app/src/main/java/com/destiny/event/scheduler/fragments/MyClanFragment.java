@@ -37,8 +37,9 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     private static final int LOADER_MEMBERS = 50;
 
-    private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE;
-    private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME;
+    private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE + " ASC";
+    private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME + " ASC";
+    private static final String POINTS_ORDER_BY = MemberTable.POINTS_COLUMNS + " DESC";
     private String orderBy;
 
     private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_SINCE};
@@ -102,9 +103,23 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         orderSpinner.setOnItemSelectedListener(this);
         orderSpinner.setAdapter(spinnerAdapter);
-        orderSpinner.setSelection(0);
 
-        orderBy = NAME_ORDER_BY + " ASC";
+        if (callback.getOrderBy() != null){
+            orderBy = callback.getOrderBy();
+        } else orderBy = NAME_ORDER_BY;
+
+        switch (orderBy){
+            case NAME_ORDER_BY:
+                orderSpinner.setSelection(0);
+                break;
+            case DATE_ORDER_BY:
+                orderSpinner.setSelection(1);
+                break;
+            case POINTS_ORDER_BY:
+                orderSpinner.setSelection(2);
+                break;
+        }
+
         setClanData();
     }
 
@@ -170,8 +185,8 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
         String[] projection;
-        //Log.w(TAG, "SQL: " + orderBy);
 
         switch (id){
             case LOADER_MEMBERS:
@@ -218,16 +233,19 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         switch (position){
             case 0:
-                orderBy = NAME_ORDER_BY + " ASC";
+                orderBy = NAME_ORDER_BY;
                 getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
+                callback.setClanOrderBy(orderBy);
                 break;
             case 1:
-                orderBy = DATE_ORDER_BY + " ASC";
+                orderBy = DATE_ORDER_BY;
                 getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
+                callback.setClanOrderBy(orderBy);
                 break;
             case 2:
-                orderBy = MemberTable.POINTS_COLUMNS + " DESC";
+                orderBy = POINTS_ORDER_BY;
                 getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
+                callback.setClanOrderBy(orderBy);
                 break;
         }
 
@@ -237,4 +255,5 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+
 }

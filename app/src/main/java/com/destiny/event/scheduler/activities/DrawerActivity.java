@@ -29,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.DrawerAdapter;
@@ -49,16 +50,18 @@ import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
+import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
+
+import java.util.ArrayList;
 
 public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>, OnEventCreatedListener, FromDialogListener{
 
     private static final String TAG = "DrawerActivity";
 
     private static final int URL_LOADER_CLAN = 40;
-
 
     private Toolbar toolbar;
 
@@ -70,7 +73,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     ProgressBar progress;
 
     private FromActivityListener newEventListener;
-    //private OnEventCreatedListener createdEventListener;
+    private ArrayList<RefreshDataListener> refreshDataListenerList;
 
     private FragmentTransaction ft;
     private FragmentManager fm;
@@ -89,6 +92,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private String gameOrigin;
 
+    private String clanOrderBy;
+
     ViewPager viewPager;
     ViewPageAdapter viewPageAdapter;
     SlidingTabLayout tabLayout;
@@ -102,7 +107,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         progress = (ProgressBar) findViewById(R.id.progress_bar);
 
         if (savedInstanceState == null){
-            //Toast.makeText(this, "Verificando usuário logado...", Toast.LENGTH_SHORT).show();
             getClanData();
         }
 
@@ -142,6 +146,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             viewPager.setAdapter(null);
         }
 
+        refreshDataListenerList = new ArrayList<>();
+
     }
 
     private void getClanData() {
@@ -156,8 +162,22 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.menu_refresh:
+                refreshLists();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshLists() {
+
+        if (openFragment == null){
+            for (int i=0; i<3; i++){
+                refreshDataListenerList.get(i).onRefreshData();
+            }
+        }
+
+        Toast.makeText(this, R.string.data_refreshed, Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -272,6 +292,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
+    public String getOrderBy() {
+        return clanOrderBy;
+    }
+
+    @Override
     public void closeFragment() {
         ft = fm.beginTransaction();
         ft.remove(openFragment);
@@ -301,14 +326,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         gameOrigin = tag;
 
-        int userCreated = 0;
-
-        if (creator != null && creator.equals(getBungieId())) userCreated = 1;
-
         Bundle bundle = new Bundle();
         bundle.putString("gameId",id);
         bundle.putString("origin",gameOrigin);
-        bundle.putInt("userCreated", userCreated);
+        bundle.putString("creator", creator);
         bundle.putString("status", status);
         tabLayout.setViewPager(null);
         viewPager.setAdapter(null);
@@ -320,6 +341,17 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void onNoScheduledGames() {
         onDataLoaded();
         viewPager.setCurrentItem(0);
+    }
+
+    @Override
+    public void setClanOrderBy(String orderBy) {
+        clanOrderBy = orderBy;
+    }
+
+    @Override
+    public void registerRefreshListener(Fragment fragment) {
+        refreshDataListenerList.add((RefreshDataListener) fragment);
+        Log.w(TAG, "Listeners: " + refreshDataListenerList.toString());
     }
 
     @Override
@@ -443,11 +475,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
         drawerLayout.closeDrawers();
         return false;
-    }
-
-    public void showNewEvent(View view){
-        view.setVisibility(View.GONE);
-        openNewEventFragment(view);
     }
 
     @Override
@@ -634,6 +661,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private boolean showLogOffDialog(View child) {
 
         DialogFragment logOffDialog = new MyAlertDialog();
+        Bundle bundle = new Bundle();
+        bundle.putInt("type",0);
         logOffDialog.show(getSupportFragmentManager(),"Logoff");
         child.playSoundEffect(SoundEffectConstants.CLICK);
         return true;
