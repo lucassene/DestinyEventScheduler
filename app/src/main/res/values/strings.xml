@@ -95,12 +95,12 @@
         <item>Participation points</item>
     </string-array>
 
-    <string name="games_available">Games Available</string>
+    <string name="games_available">Matches Available</string>
     <string name="members">Members</string>
     <string name="order_by">Order by</string>
     <string name="my_clan">My Clan</string>
     <string name="history">History</string>
-    <string name="games_played">Games Played</string>
+    <string name="games_played">Matches Played</string>
     <string name="sort_by">Sort by</string>
     <string name="system">System</string>
     <string name="my_profile">My Profile</string>
@@ -238,12 +238,12 @@
     <string name="date_you_join">The day you joined</string>
     <string name="date_member_join1">The day</string>
     <string name="date_member_join2">joined</string>
-    <string name="games_created">Games created:</string>
-    <string name="games_created_by_you">Number of games created by you.</string>
-    <string name="games_created_by_member">Number of games created by</string>
-    <string name="games_played2">Games played:</string>
-    <string name="games_played_you">Number of games played by you.</string>
-    <string name="games_played_by_member">Number of games played by</string>
+    <string name="games_created">Matches created:</string>
+    <string name="games_created_by_you">Number of matches created by you.</string>
+    <string name="games_created_by_member">Number of matches created by</string>
+    <string name="games_played2">Matches played:</string>
+    <string name="games_played_you">Number of matches played by you.</string>
+    <string name="games_played_by_member">Number of matches played by</string>
     <string name="games_played_by_member2">, not including his own.</string>
     <string name="likes">Likes:</string>
     <string name="good_and_helpful_friends">Guardians likes good and helpful friends.</string>
@@ -265,7 +265,7 @@
     <string name="waiting_validation">Waiting for Validation</string>
     <string name="evaluate">Evaluate</string>
     <string name="no_games_status">No games on this status.</string>
-    <string name="game_status">Game Status</string>
+    <string name="game_status">Match Status</string>
     <string name="my_events">My Matches</string>
     <string name="leave_game_title">Leave this match?</string>
     <string name="leave_dialog_msg">You will no longer participate in this match after this.</string>

@@ -1,5 +1,7 @@
 package com.destiny.event.scheduler.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -53,9 +55,11 @@ import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.services.AlarmReceiver;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>, OnEventCreatedListener, FromDialogListener{
 
@@ -351,7 +355,27 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void registerRefreshListener(Fragment fragment) {
         refreshDataListenerList.add((RefreshDataListener) fragment);
-        Log.w(TAG, "Listeners: " + refreshDataListenerList.toString());
+        //Log.w(TAG, "Listeners: " + refreshDataListenerList.toString());
+    }
+
+    @Override
+    public void registerAlarmTask(Calendar time, String title, int iconId) {
+
+        int requestId = (int) System.currentTimeMillis();
+
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        intent.putExtra("title",title);
+        intent.putExtra("icon", iconId);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.setAction("alarm");
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        Calendar newTime = Calendar.getInstance();
+        newTime.set(Calendar.MINUTE, time.get(Calendar.MINUTE)-1);
+
+        alarm.set(AlarmManager.RTC_WAKEUP, newTime.getTimeInMillis(), pIntent);
+        Log.w(TAG, "Alarm created! " + newTime.toString());
     }
 
     @Override

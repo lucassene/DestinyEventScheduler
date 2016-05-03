@@ -413,7 +413,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             gameValues.put(GameTable.COLUMN_TIME,fullTime);
             gameValues.put(GameTable.COLUMN_LIGHT, minLight);
             gameValues.put(GameTable.COLUMN_INSCRIPTIONS, insc);
-            gameValues.put(GameTable.COLUMN_STATUS, GameTable.GAME_SCHEDULED);
+            gameValues.put(GameTable.COLUMN_STATUS, GameTable.GAME_NEW);
 
             Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
             String id = "";

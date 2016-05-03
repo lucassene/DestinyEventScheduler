@@ -100,7 +100,7 @@
     <string name="specs">Especificações</string>
     <string name="time">Horário</string>
     <string name="wait_list">Lista de espera</string>
-    <string name="games_available">Jogos Disponíveis</string>
+    <string name="games_available">Partidas Disponíveis</string>
     <string name="members">Membros</string>
     <string name="order_by">Ordenar por</string>
     <string name="games_played">Partidas Jogadas</string>
@@ -174,7 +174,6 @@
     <string name="event_type_title">Lista de Tipos de Jogo</string>
     <string name="type">Tipo</string>
     <string name="game_info">Informações de Jogo</string>
-    <string name="game_label">Jogo</string>
     <string name="choose_game">Escolha o modo de jogo:</string>
     <string name="inferno3">Inferno 3v3</string>
     <string name="inferno6">Inferno 3v3</string>
@@ -243,5 +242,6 @@
     <string name="leave_game_title">Deixar partida?</string>
     <string name="join_full_dialog_msg">Essa partida já está cheia, você será adicionado à lista de espera. Uma notificação será criada mesmo assim, de acordo com suas configurações de preferência.</string>
     <string name="data_refreshed">Dados atualizados!</string>
+    <string name="game_label">Jogo</string>
 
 </resources>

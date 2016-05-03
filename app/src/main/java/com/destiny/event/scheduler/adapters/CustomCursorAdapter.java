@@ -94,10 +94,10 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
         TextView gameType = (TextView) view.findViewById(R.id.type_text);
 
         gameIcon.setImageResource(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", context.getPackageName()));
-        gameTitle.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.getAliasColumn(EventTable.COLUMN_NAME))), "string", context.getPackageName()));
+        gameTitle.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_NAME))), "string", context.getPackageName()));
         gameType.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_NAME))), "string", context.getPackageName()));
 
-        String creator = context.getResources().getString(R.string.created_by) + " " + cursor.getString(cursor.getColumnIndexOrThrow(GameTable.getAliasColumn(GameTable.COLUMN_CREATOR_NAME)));
+        String creator = context.getResources().getString(R.string.created_by) + " " + cursor.getString(cursor.getColumnIndexOrThrow(GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR_NAME)));
         gameCreator.setText(creator);
 
         gameDate.setText(DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));

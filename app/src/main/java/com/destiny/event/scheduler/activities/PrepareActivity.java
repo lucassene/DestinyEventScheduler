@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.services.BungieService;
 import com.destiny.event.scheduler.services.RequestResultReceiver;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 public class PrepareActivity extends Activity implements RequestResultReceiver.Receiver {
 
@@ -39,8 +38,6 @@ public class PrepareActivity extends Activity implements RequestResultReceiver.R
     ImageView img6;
 
     TextView txt6;
-
-    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

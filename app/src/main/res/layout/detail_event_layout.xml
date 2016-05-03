@@ -3,15 +3,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingRight="16dp"
-    android:paddingEnd="@dimen/global_padding"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:scrollbarStyle="outsideOverlay"
+    android:paddingTop="@dimen/global_padding">
 
     <ListView
         android:id="@id/android:list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal" />
-
+        android:layout_gravity="center_horizontal"
+        android:paddingRight="@dimen/global_padding"
+        android:scrollbarStyle="outsideOverlay"/>
 
 </LinearLayout>

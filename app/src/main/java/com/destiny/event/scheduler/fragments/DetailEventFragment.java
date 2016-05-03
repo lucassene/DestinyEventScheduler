@@ -132,7 +132,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                 break;
             case MyEventsFragment.TAG:
                 switch (gameStatus){
-                    case GameTable.GAME_SCHEDULED:
+                    case GameTable.GAME_NEW:
                         if (creator.equals(callback.getBungieId())){
                             joinButton.setText(R.string.delete);
                         } else joinButton.setText(getContext().getResources().getString(R.string.leave));
@@ -222,7 +222,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private void leaveGame(ContentValues values, Uri uri) {
 
-        values.put(GameTable.COLUMN_STATUS, GameTable.GAME_NEW);
         values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions-1);
         getContext().getContentResolver().update(uri, values,null, null);
         values.clear();
@@ -235,7 +234,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private void joinGame(ContentValues values, Uri uri) {
 
-        values.put(GameTable.COLUMN_STATUS, GameTable.GAME_SCHEDULED);
         values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions+1);
         getContext().getContentResolver().update(uri, values,null, null);
         values.clear();

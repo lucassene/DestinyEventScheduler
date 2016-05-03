@@ -6,7 +6,8 @@
     android:paddingTop="@dimen/global_padding"
     android:paddingRight="@dimen/global_padding"
     android:paddingEnd="@dimen/global_padding"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:scrollbarStyle="outsideOverlay">
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

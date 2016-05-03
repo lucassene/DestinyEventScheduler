@@ -4,15 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/global_padding"
-    android:paddingRight="@dimen/global_padding"
-    android:paddingEnd="@dimen/global_padding"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:scrollbarStyle="outsideOverlay">
 
     <ListView
         android:id="@id/android:list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:scrollbarStyle="outsideOverlay"
+        android:paddingRight="@dimen/global_padding"/>
 
     <TextView
         android:id="@android:id/empty"
