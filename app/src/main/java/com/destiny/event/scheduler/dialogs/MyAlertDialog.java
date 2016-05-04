@@ -11,12 +11,16 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.fragments.DetailEventFragment;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 
 public class MyAlertDialog extends DialogFragment {
 
     private static final String TAG = "MyAlertDialog";
+
+    public static final int LEAVE_DIALOG = 10;
+    public static final int DELETE_DIALOG = 11;
+    public static final int JOIN_DIALOG = 12;
+    public static final int ALERT_DIALOG = 13;
 
     private Dialog dialog;
 
@@ -46,13 +50,26 @@ public class MyAlertDialog extends DialogFragment {
 
         Bundle bundle = getArguments();
 
-        if (bundle == null){
-            title.setText(getResources().getString(R.string.leaving));
-            message.setText(getResources().getString(R.string.oblivion));
-        } else {
-            title.setText(bundle.getString("title"));
-            message.setText(bundle.getString("msg"));
-            btnLeave.setText(bundle.getString("posButton"));
+        if (bundle != null) {
+
+            switch (bundle.getInt("type")){
+                case 0:
+                    title.setText(getResources().getString(R.string.leaving));
+                    message.setText(getResources().getString(R.string.oblivion));
+                    break;
+                case ALERT_DIALOG:
+                    title.setText(bundle.getString("title"));
+                    message.setText(bundle.getString("msg"));
+                    btnLeave.setText(bundle.getString("posButton"));
+                    btnNevermind.setVisibility(View.GONE);
+                    break;
+                default:
+                    title.setText(bundle.getString("title"));
+                    message.setText(bundle.getString("msg"));
+                    btnLeave.setText(bundle.getString("posButton"));
+                    break;
+            }
+
         }
 
         dialogType = bundle.getInt("type");
@@ -69,13 +86,13 @@ public class MyAlertDialog extends DialogFragment {
                     case 0:
                         listener.onLogoff();
                         break;
-                    case DetailEventFragment.JOIN_DIALOG:
+                    case JOIN_DIALOG:
                         fragmentListener.onPositiveClick(null, dialogType);
                         break;
-                    case DetailEventFragment.DELETE_DIALOG:
+                    case DELETE_DIALOG:
                         fragmentListener.onPositiveClick(null, dialogType);
                         break;
-                    case DetailEventFragment.LEAVE_DIALOG:
+                    case LEAVE_DIALOG:
                         fragmentListener.onPositiveClick(null, dialogType);
                         break;
                 }

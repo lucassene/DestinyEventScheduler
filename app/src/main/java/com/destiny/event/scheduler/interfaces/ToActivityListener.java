@@ -23,4 +23,5 @@ public interface ToActivityListener {
     public void setClanOrderBy(String orderBy);
     public void registerRefreshListener(Fragment fragment);
     public void registerAlarmTask(Calendar time, String title, int iconId);
+    public void registerUserDataListener(Fragment fragment);
 }

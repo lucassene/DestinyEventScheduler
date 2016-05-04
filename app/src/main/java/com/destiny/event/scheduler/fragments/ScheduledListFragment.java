@@ -24,13 +24,14 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
+import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class ScheduledListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, RefreshDataListener{
+public class ScheduledListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, RefreshDataListener, UserDataListener{
 
     public static final String TAG = "ScheduledListFragment";
 
@@ -77,9 +78,14 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
         sectionTitle.setText(R.string.scheduled_games);
 
+        String bungieId = callback.getBungieId();
+
+        if (bungieId != null){
+            getScheduledEvents();
+        }
+
         callback.onLoadingData();
 
-        getScheduledEvents();
     }
 
     @Override
@@ -94,6 +100,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
         super.onAttach(context);
         callback = (ToActivityListener) getActivity();
         callback.registerRefreshListener(this);
+        callback.registerUserDataListener(this);
     }
 
     private void getScheduledEvents() {
@@ -213,5 +220,10 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     public void onRefreshData() {
         callback.onLoadingData();
         getLoaderManager().restartLoader(LOADER_ENTRY, null, this);
+    }
+
+    @Override
+    public void onUserDataLoaded() {
+        getScheduledEvents();
     }
 }

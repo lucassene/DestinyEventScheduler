@@ -44,10 +44,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private static final int URL_LOADER_GAME = 60;
     private static final int URL_LOADER_ENTRY_MEMBERS = 72;
 
-    public static final int LEAVE_DIALOG = 10;
-    public static final int DELETE_DIALOG = 11;
-    public static final int JOIN_DIALOG = 12;
-
     private String gameId;
     private String origin;
     private String gameStatus;
@@ -158,18 +154,18 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
                 switch (origin){
                     case NewEventsListFragment.TAG:
-                        showAlertDialog(JOIN_DIALOG);
+                        showAlertDialog(MyAlertDialog.JOIN_DIALOG);
                         break;
                     case ScheduledListFragment.TAG:
                         if (creator.equals(callback.getBungieId())){
-                            showAlertDialog(DELETE_DIALOG);
-                        } else showAlertDialog(LEAVE_DIALOG);
+                            showAlertDialog(MyAlertDialog.DELETE_DIALOG);
+                        } else showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
                         break;
                     case SearchFragment.TAG:
-                        showAlertDialog(JOIN_DIALOG);
+                        showAlertDialog(MyAlertDialog.JOIN_DIALOG);
                         break;
                     case MyEventsFragment.TAG:
-                        showAlertDialog(LEAVE_DIALOG);
+                        showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
                         break;
                 }
             }
@@ -188,17 +184,17 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
         Bundle bundle = new Bundle();
         switch (dialogType){
-            case LEAVE_DIALOG:
+            case MyAlertDialog.LEAVE_DIALOG:
                 bundle.putString(title, getContext().getResources().getString(R.string.leave_game_title));
                 bundle.putString(msg, getContext().getResources().getString(R.string.leave_dialog_msg));
                 bundle.putString(posButton, getContext().getResources().getString(R.string.leave));
                 break;
-            case DELETE_DIALOG:
+            case MyAlertDialog.DELETE_DIALOG:
                 bundle.putString(title, getContext().getResources().getString(R.string.delete_dialog_title));
                 bundle.putString(msg, getContext().getResources().getString(R.string.delete_dialog_msg));
                 bundle.putString(posButton, getContext().getResources().getString(R.string.delete));
                 break;
-            case JOIN_DIALOG:
+            case MyAlertDialog.JOIN_DIALOG:
                 bundle.putString(title, getContext().getResources().getString(R.string.join_dialog_title));
                 bundle.putString(posButton, getContext().getResources().getString(R.string.join));
                 if (inscriptions > maxGuardians){
@@ -447,13 +443,13 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         Uri uri = Uri.parse(uriString);
 
         switch (type){
-            case JOIN_DIALOG:
+            case MyAlertDialog.JOIN_DIALOG:
                 joinGame(values, uri);
                 break;
-            case LEAVE_DIALOG:
+            case MyAlertDialog.LEAVE_DIALOG:
                 leaveGame(values, uri);
                 break;
-            case DELETE_DIALOG:
+            case MyAlertDialog.DELETE_DIALOG:
                 deleteGame(uri);
                 break;
         }

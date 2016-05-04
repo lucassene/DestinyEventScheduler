@@ -40,6 +40,7 @@ public class DataProvider extends ContentProvider {
     private static final int ENTRY_ID = 71;
     public static final int ENTRY_MEMBERS = 72;
     private static final int ENTRY_MEMBERS_ID = 73;
+    private static final int DISTINCT_ENTRY = 74;
 
     private static final String AUTHORITY = "com.destiny.event.scheduler.provider";
 
@@ -59,6 +60,8 @@ public class DataProvider extends ContentProvider {
     public static final Uri ENTRY_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_PATH);
     private static final String ENTRY_MEMBERS_PATH = "entrymembers";
     public static final Uri ENTRY_MEMBERS_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_MEMBERS_PATH);
+    private static final String DISTINCT_ENTRY_PATH = "distinctentry";
+    public static final Uri DISTINCT_ENTRY_URI = Uri.parse("content://" + AUTHORITY + "/" + DISTINCT_ENTRY_PATH);
 
     public static final String EVENT_TYPE_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/alleventtype";
     public static final String EVENT_TYPE_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleeventtype";
@@ -93,6 +96,7 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, ENTRY_PATH + "/#", ENTRY_ID);
         uriMatcher.addURI(AUTHORITY, ENTRY_MEMBERS_PATH, ENTRY_MEMBERS);
         uriMatcher.addURI(AUTHORITY, ENTRY_MEMBERS_PATH + "/#", ENTRY_MEMBERS_ID);
+        uriMatcher.addURI(AUTHORITY, DISTINCT_ENTRY_PATH, DISTINCT_ENTRY);
     }
 
     @Override
@@ -230,6 +234,38 @@ public class DataProvider extends ContentProvider {
             case ENTRY_MEMBERS_ID:
                 queryBuilder.setTables(EntryTable.TABLE_NAME);
                 queryBuilder.appendWhere(EntryTable.COLUMN_ID + "=" + uri.getLastPathSegment());
+                break;
+            case DISTINCT_ENTRY:
+                StringBuilder sbDistinct = new StringBuilder();
+                queryBuilder.setDistinct(true);
+                sbDistinct.append(EntryTable.TABLE_NAME);
+                sbDistinct.append(" JOIN ");
+                sbDistinct.append(GameTable.TABLE_NAME);
+                sbDistinct.append(" ON ");
+                sbDistinct.append(EntryTable.getQualifiedColumn(EntryTable.COLUMN_GAME));
+                sbDistinct.append(" = ");
+                sbDistinct.append(GameTable.getQualifiedColumn(GameTable.COLUMN_ID));
+                sbDistinct.append(" JOIN ");
+                sbDistinct.append(EventTable.TABLE_NAME);
+                sbDistinct.append(" ON ");
+                sbDistinct.append(GameTable.getQualifiedColumn(GameTable.COLUMN_EVENT_ID));
+                sbDistinct.append(" = ");
+                sbDistinct.append(EventTable.getQualifiedColumn(EventTable.COLUMN_ID));
+                sbDistinct.append(" JOIN ");
+                sbDistinct.append(MemberTable.TABLE_NAME);
+                sbDistinct.append(" ON ");
+                sbDistinct.append(EntryTable.getQualifiedColumn(EntryTable.COLUMN_MEMBERSHIP));
+                sbDistinct.append(" = ");
+                sbDistinct.append(MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP));
+                sbDistinct.append(" JOIN ");
+                sbDistinct.append(EventTypeTable.TABLE_NAME);
+                sbDistinct.append(" ON ");
+                sbDistinct.append(EventTable.COLUMN_TYPE);
+                sbDistinct.append(" = ");
+                sbDistinct.append(EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID));
+                queryBuilder.setTables(sbDistinct.toString());
+                break;
+
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }

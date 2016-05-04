@@ -1,11 +1,8 @@
 package com.destiny.event.scheduler.activities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -18,6 +15,7 @@ import android.widget.Toast;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.utils.NetworkUtils;
 
 public class LoginActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -52,7 +50,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
     public void callWebView(View v) {
-        if (checkConnection()){
+        if (NetworkUtils.checkConnection(getApplicationContext())){
             if (v.getId() == R.id.btn_psn) {
                 selectedPlatform = PSN;
                 Intent intent = new Intent(this, WebActivity.class);
@@ -68,14 +66,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
             Toast.makeText(this, R.string.connection_needed_login, Toast.LENGTH_SHORT).show();
         }
 
-    }
-
-    private boolean checkConnection() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        if (netInfo != null){
-            return netInfo.isConnected();
-        } else return false;
     }
 
     @Override

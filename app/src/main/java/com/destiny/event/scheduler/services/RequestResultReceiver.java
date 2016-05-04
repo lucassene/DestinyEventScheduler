@@ -25,6 +25,7 @@ public class RequestResultReceiver extends ResultReceiver {
     @Override
     protected void onReceiveResult(int resultCode, Bundle resultData) {
         if (mReceiver != null){
+            //Log.w("ResultReceiver", "ResultReceiver Bundle: " + resultData.toString());
             mReceiver.onReceiveResult(resultCode, resultData);
         }
     }

@@ -1,7 +1,5 @@
 package com.destiny.event.scheduler.activities;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -38,6 +36,7 @@ import com.destiny.event.scheduler.adapters.DrawerAdapter;
 import com.destiny.event.scheduler.adapters.ViewPageAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.DBHelper;
+import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.fragments.DetailEventFragment;
 import com.destiny.event.scheduler.fragments.HistoryFragment;
@@ -54,8 +53,8 @@ import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
+import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.provider.DataProvider;
-import com.destiny.event.scheduler.services.AlarmReceiver;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
 import java.util.ArrayList;
@@ -66,6 +65,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private static final String TAG = "DrawerActivity";
 
     private static final int URL_LOADER_CLAN = 40;
+    private static final int URL_LOADER_USER = 30;
 
     private Toolbar toolbar;
 
@@ -78,6 +78,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private FromActivityListener newEventListener;
     private ArrayList<RefreshDataListener> refreshDataListenerList;
+    private UserDataListener userDataListener;
 
     private FragmentTransaction ft;
     private FragmentManager fm;
@@ -112,6 +113,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         if (savedInstanceState == null){
             getClanData();
+            getLoggedUserData();
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -120,10 +122,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             getSupportActionBar().setTitle(R.string.home_title);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
-        bungieId = getIntent().getStringExtra("bungieId");
-        userName = getIntent().getStringExtra("userName");
-
 
         String titles[] = getResources().getStringArray(R.array.tab_titles);
         int numOfTabs = titles.length;
@@ -151,6 +149,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
 
         refreshDataListenerList = new ArrayList<>();
+
+    }
+
+    private void getLoggedUserData() {
+        onLoadingData();
+        getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
 
     }
 
@@ -361,21 +365,26 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void registerAlarmTask(Calendar time, String title, int iconId) {
 
-        int requestId = (int) System.currentTimeMillis();
+        /*int requestId = (int) time.getTimeInMillis();
 
         Intent intent = new Intent(this, AlarmReceiver.class);
         intent.putExtra("title",title);
         intent.putExtra("icon", iconId);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.setAction("alarm");
-        PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         Calendar newTime = Calendar.getInstance();
         newTime.set(Calendar.MINUTE, time.get(Calendar.MINUTE)-1);
 
         alarm.set(AlarmManager.RTC_WAKEUP, newTime.getTimeInMillis(), pIntent);
-        Log.w(TAG, "Alarm created! " + newTime.toString());
+        Log.w(TAG, "Alarm created! " + newTime.toString());*/
+    }
+
+    @Override
+    public void registerUserDataListener(Fragment fragment) {
+        userDataListener = (UserDataListener) fragment;
     }
 
     @Override
@@ -517,6 +526,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         null,
                         null
                 );
+            case URL_LOADER_USER:
+                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_MEMBERSHIP, LoggedUserTable.COLUMN_NAME};
+                return new CursorLoader(
+                        this,
+                        DataProvider.LOGGED_USER_URI,
+                        projection,
+                        null,
+                        null,
+                        null);
             default:
                 return null;
         }
@@ -537,6 +555,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     clanIcon = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_ICON));
                     clanBanner = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BACKGROUND));
                     prepareDrawerMenu();
+                    break;
+                case URL_LOADER_USER:
+                    if (data.getCount() > 0) {
+                        bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
+                        userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
+                    }
+                    userDataListener.onUserDataLoaded();
                     break;
             }
             onDataLoaded();
@@ -687,6 +712,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         DialogFragment logOffDialog = new MyAlertDialog();
         Bundle bundle = new Bundle();
         bundle.putInt("type",0);
+        logOffDialog.setArguments(bundle);
         logOffDialog.show(getSupportFragmentManager(),"Logoff");
         child.playSoundEffect(SoundEffectConstants.CLICK);
         return true;

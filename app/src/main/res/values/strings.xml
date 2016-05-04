@@ -276,6 +276,7 @@
     <string name="join_full_dialog_msg">This match is already full, you will be added to the waiting list. A notification will be created anyway, according to your preference settings.</string>
     <string name="wait_list">Waiting List</string>
     <string name="data_refreshed">All data refreshed!</string>
+    <string name="notification_match_begin">The match will begin soon...</string>
 
 
 </resources>
