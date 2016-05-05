@@ -23,11 +23,12 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
+import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 
 import java.util.ArrayList;
 
-public class NewEventsListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, RefreshDataListener {
+public class NewEventsListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, RefreshDataListener, UserDataListener {
 
     public static final String TAG = "NewEventsListFragment";
 
@@ -58,6 +59,7 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
         super.onAttach(context);
         callback = (ToActivityListener) getActivity();
         callback.registerRefreshListener(this);
+        callback.registerUserDataListener(this);
     }
 
     @Override
@@ -80,7 +82,11 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
 
         sectionTitle.setText(R.string.games_available);
 
-        getNewEvents();
+        String bungieId = callback.getBungieId();
+
+        if (bungieId != null){
+            getNewEvents();
+        }
     }
 
     @Override
@@ -105,28 +111,23 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
 
     private void prepareStrings() {
 
-        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID); // game._ID;
-        String c2 = GameTable.getQualifiedColumn(GameTable.COLUMN_EVENT_ID); // game.event_id;
-        String c6 = GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR); // game.creator;
-        String c9 = GameTable.getQualifiedColumn(GameTable.COLUMN_TIME); // game.time;
-        String c10 = GameTable.getQualifiedColumn(GameTable.COLUMN_LIGHT); // game.light;
-        String c12 = GameTable.getQualifiedColumn(GameTable.COLUMN_INSCRIPTIONS); // game.inscriptions;
-        String c14 = GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR_NAME); // game.creator AS game_creator;
+        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID); ;
+        String c2 = GameTable.COLUMN_EVENT_ID;
+        String c6 = GameTable.COLUMN_CREATOR;
+        String c9 = GameTable.COLUMN_TIME;
+        String c10 = GameTable.COLUMN_LIGHT;
+        String c12 = GameTable.COLUMN_INSCRIPTIONS;
+        String c14 = GameTable.COLUMN_CREATOR_NAME;
 
-        String c3 = EventTable.getAliasExpression(EventTable.COLUMN_ID); // event._ID AS event__ID;
-        String c4 = EventTable.getQualifiedColumn(EventTable.COLUMN_ICON); // event.icon;
-        String c5 = EventTable.getQualifiedColumn(EventTable.COLUMN_NAME); // event.name AS event_name;
-        String c15 = EventTable.getQualifiedColumn(EventTable.COLUMN_TYPE); // event.type_of_event;
-        String c11 = EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS); // game.guardians;
+        String c4 = EventTable.COLUMN_ICON;
+        String c5 = EventTable.COLUMN_NAME;
+        String c11 = EventTable.COLUMN_GUARDIANS;
 
-        String c13 = MemberTable.getAliasExpression(MemberTable.COLUMN_ID); // member._ID AS member__ID;
-        String c7 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP); // member.membership;
-        String c8 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_NAME); // member.name AS member_name;
+        String c8 = MemberTable.COLUMN_NAME;
 
-        String c16 = EventTypeTable.getAliasExpression(EventTypeTable.COLUMN_ID); // event_type._ID AS event_type__ID;
-        String c17 = EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_NAME); // event_type.type_name;
+        String c17 = EventTypeTable.COLUMN_NAME;
 
-        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17};
+        projection = new String[] {c1, c2, c4, c5, c6, c8, c9, c10, c11, c12, c14, c17};
 
         from = new String[] {c5, c4, c14, c9, c9, c12, c11, c17};
 
@@ -136,7 +137,7 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        String[] selectionArgs = {GameTable.GAME_NEW};
+        String where = GameTable.getQualifiedColumn(GameTable.COLUMN_ID) + " NOT IN (SELECT game._id FROM game JOIN entry ON game._id = entry.entry_game_id WHERE entry.entry_membership = " + callback.getBungieId() + ")";
 
         callback.onLoadingData();
 
@@ -146,9 +147,9 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
                         getContext(),
                         DataProvider.GAME_URI,
                         projection,
-                        GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS) + "=?",
-                        selectionArgs,
-                        "datetime(" + GameTable.getQualifiedColumn(GameTable.COLUMN_TIME) + ") DESC"
+                        where,
+                        null,
+                        "datetime(" + GameTable.COLUMN_TIME + ") ASC"
                 );
             default:
                 return null;
@@ -167,7 +168,7 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
 
                     data.moveToFirst();
                     for (int i=0; i<data.getCount(); i++){
-                        creatorList.add(data.getString(data.getColumnIndex(GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR))));
+                        creatorList.add(data.getString(data.getColumnIndex(GameTable.COLUMN_CREATOR)));
                         data.moveToNext();
                     }
 
@@ -188,5 +189,10 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     public void onRefreshData() {
         callback.onLoadingData();
         getLoaderManager().restartLoader(URL_LOADER_GAME, null, this);
+    }
+
+    @Override
+    public void onUserDataLoaded() {
+        getNewEvents();
     }
 }

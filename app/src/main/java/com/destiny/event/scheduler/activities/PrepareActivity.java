@@ -252,13 +252,16 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
         intent.putExtra("userName",userName);
         startActivity(intent);
         finish();
-
     }
 
 
     @Override
     public void onPositiveClick(String input, int type) {
-        onBegin(null);
+        Intent intent = new Intent(this, DrawerActivity.class);
+        intent.putExtra("bungieId", membershipId);
+        intent.putExtra("userName",userName);
+        startActivity(intent);
+        finish();
     }
 
     @Override

@@ -9,9 +9,9 @@ public class EventTable {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME = "event_name";
     public static final String COLUMN_ICON = "event_icon";
-    public static final String COLUMN_TYPE = "type_of_event";
-    public static final String COLUMN_LIGHT = "min_light";
-    public static final String COLUMN_GUARDIANS = "max_guardians";
+    public static final String COLUMN_TYPE = "event_type";
+    public static final String COLUMN_LIGHT = "event_min_light";
+    public static final String COLUMN_GUARDIANS = "event_max_guardians";
 
     public static final String[] ALL_COLUMNS = {EventTable.COLUMN_ID, EventTable.COLUMN_NAME, EventTable.COLUMN_ICON, EventTable.COLUMN_TYPE, EventTable.COLUMN_LIGHT, EventTable.COLUMN_GUARDIANS};
     public static final String[] VIEW_COLUMNS = {EventTable.COLUMN_NAME, EventTable.COLUMN_ICON, EventTable.COLUMN_LIGHT, EventTable.COLUMN_GUARDIANS};

@@ -243,5 +243,6 @@
     <string name="join_full_dialog_msg">Essa partida já está cheia, você será adicionado à lista de espera. Uma notificação será criada mesmo assim, de acordo com suas configurações de preferência.</string>
     <string name="data_refreshed">Dados atualizados!</string>
     <string name="game_label">Jogo</string>
+    <string name="notification_match_begin">A partida irá começar em instantes...</string>
 
 </resources>

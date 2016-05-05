@@ -22,6 +22,8 @@ import com.destiny.event.scheduler.data.MemberTable;
 
 public class DataProvider extends ContentProvider {
 
+    private static final String TAG = "DataProvider";
+
     private DBHelper database;
 
     private static final int EVENT_TYPE = 10;

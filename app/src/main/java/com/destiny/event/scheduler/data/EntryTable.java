@@ -8,7 +8,7 @@ public class EntryTable {
     public static final String TABLE_NAME = "entry";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_MEMBERSHIP = "entry_membership";
-    public static final String COLUMN_GAME = "entry_game";
+    public static final String COLUMN_GAME = "entry_game_id";
     public static final String COLUMN_TIME = "entry_time";
 
     public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_MEMBERSHIP, COLUMN_GAME, COLUMN_TIME};

@@ -37,8 +37,8 @@ public class NotificationService extends Service {
         PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), 0, nIntent, 0);
 
         NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(this);
-        nBuilder.setSmallIcon(intent.getIntExtra("icon", R.drawable.ic_event_new));
-        nBuilder.setContentTitle(intent.getStringExtra("title"));
+        nBuilder.setSmallIcon(R.drawable.ic_event_new);
+        nBuilder.setContentTitle("title");
         nBuilder.setContentText(getString(R.string.notification_match_begin));
         nBuilder.setContentIntent(pIntent);
         nBuilder.setAutoCancel(true);

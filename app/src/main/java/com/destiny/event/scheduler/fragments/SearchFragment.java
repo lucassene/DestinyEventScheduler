@@ -105,28 +105,23 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
 
     private void prepareStrings() {
 
-        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID); // game._ID;
-        String c2 = GameTable.getQualifiedColumn(GameTable.COLUMN_EVENT_ID); // game.event_id;
-        String c6 = GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR); // game.creator;
-        String c9 = GameTable.getQualifiedColumn(GameTable.COLUMN_TIME); // game.time;
-        String c10 = GameTable.getQualifiedColumn(GameTable.COLUMN_LIGHT); // game.light;
-        String c12 = GameTable.getQualifiedColumn(GameTable.COLUMN_INSCRIPTIONS); // game.inscriptions;
-        String c14 = GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR_NAME); // game.creator AS game_creator;
+        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID); ;
+        String c2 = GameTable.COLUMN_EVENT_ID;
+        String c6 = GameTable.COLUMN_CREATOR;
+        String c9 = GameTable.COLUMN_TIME;
+        String c10 = GameTable.COLUMN_LIGHT;
+        String c12 = GameTable.COLUMN_INSCRIPTIONS;
+        String c14 = GameTable.COLUMN_CREATOR_NAME;
 
-        String c3 = EventTable.getAliasExpression(EventTable.COLUMN_ID); // event._ID AS event__ID;
-        String c4 = EventTable.getQualifiedColumn(EventTable.COLUMN_ICON); // event.icon;
-        String c5 = EventTable.getQualifiedColumn(EventTable.COLUMN_NAME); // event.name AS event_name;
-        String c11 = EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS); // game.guardians;
-        String c15 = EventTable.getQualifiedColumn(EventTable.COLUMN_TYPE); // event.type_of_event;
+        String c4 = EventTable.COLUMN_ICON;
+        String c5 = EventTable.COLUMN_NAME;
+        String c11 = EventTable.COLUMN_GUARDIANS;
 
-        String c13 = MemberTable.getAliasExpression(MemberTable.COLUMN_ID); // member._ID AS member__ID;
-        String c7 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP); // member.membership;
-        String c8 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_NAME); // member.name AS member_name;
+        String c8 = MemberTable.COLUMN_NAME;
 
-        String c16 = EventTypeTable.getAliasExpression(EventTypeTable.COLUMN_ID); // event_type._ID AS event_type__ID;
-        String c17 = EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_NAME); // event_type.type_name;
+        String c17 = EventTypeTable.COLUMN_NAME;
 
-        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17};
+        projection = new String[] {c1, c2, c4, c5, c6, c8, c9, c10, c11, c12, c14, c17};
 
         from = new String[] {c5, c4, c14, c9, c9, c12, c11, c17};
 
@@ -161,7 +156,8 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        String where = GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS) + "=" + GameTable.GAME_NEW + " AND " + EventTypeTable.getAliasColumn(EventTypeTable.COLUMN_ID) + "=" + eventId;
+        //String where = GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS) + "=" + GameTable.STATUS_NEW + " AND " + EventTypeTable.getAliasColumn(EventTypeTable.COLUMN_ID) + "=" + eventId;
+        String where = GameTable.getQualifiedColumn(GameTable.COLUMN_ID) + " NOT IN (SELECT game._id FROM game JOIN entry ON game._id = entry.entry_game_id WHERE entry.entry_membership = " + callback.getBungieId() + ") AND " + EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID) + "=" + eventId;;
 
         callback.onLoadingData();
 
@@ -173,7 +169,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
                         projection,
                         where,
                         null,
-                        "datetime(" + GameTable.getQualifiedColumn(GameTable.COLUMN_TIME) + ") DESC"
+                        "datetime(" + GameTable.COLUMN_TIME + ") ASC"
                 );
             default:
                 return null;

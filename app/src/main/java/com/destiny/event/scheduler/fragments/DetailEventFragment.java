@@ -128,12 +128,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                 break;
             case MyEventsFragment.TAG:
                 switch (gameStatus){
-                    case GameTable.GAME_NEW:
+                    case GameTable.STATUS_NEW:
                         if (creator.equals(callback.getBungieId())){
                             joinButton.setText(R.string.delete);
                         } else joinButton.setText(getContext().getResources().getString(R.string.leave));
                         break;
-                    case GameTable.GAME_WAITING:
+                    case GameTable.STATUS_WAITING:
                         if (creator.equals(callback.getBungieId())){
                             joinButton.setText(R.string.validate);
                         } else {
@@ -141,7 +141,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                             joinButton.setEnabled(false);
                         }
                         break;
-                    case GameTable.GAME_VALIDATED:
+                    case GameTable.STATUS_VALIDATED:
                         joinButton.setText(R.string.evaluate);
                         break;
                 };

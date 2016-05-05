@@ -94,15 +94,15 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
         TextView gameType = (TextView) view.findViewById(R.id.type_text);
 
         gameIcon.setImageResource(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", context.getPackageName()));
-        gameTitle.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_NAME))), "string", context.getPackageName()));
-        gameType.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_NAME))), "string", context.getPackageName()));
+        gameTitle.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", context.getPackageName()));
+        gameType.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)), "string", context.getPackageName()));
 
-        String creator = context.getResources().getString(R.string.created_by) + " " + cursor.getString(cursor.getColumnIndexOrThrow(GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR_NAME)));
+        String creator = context.getResources().getString(R.string.created_by) + " " + cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_CREATOR_NAME));
         gameCreator.setText(creator);
 
         gameDate.setText(DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
         gameTime.setText(DateUtils.getTime(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-        int max = cursor.getInt(cursor.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS)));
+        int max = cursor.getInt(cursor.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS));
         String maxS = " / " + max;
         gameMax.setText(maxS);
         int insc = cursor.getInt(cursor.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));

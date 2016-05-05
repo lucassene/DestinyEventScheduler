@@ -8,16 +8,16 @@ public class GameTable {
     public static final String TABLE_NAME = "game";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_CREATOR = "game_creator";
-    public static final String COLUMN_CREATOR_NAME = "creator_name";
+    public static final String COLUMN_CREATOR_NAME = "game_name";
     public static final String COLUMN_EVENT_ID = "game_event_id";
     public static final String COLUMN_TIME = "game_time";
     public static final String COLUMN_LIGHT = "game_light";
     public static final String COLUMN_INSCRIPTIONS = "game_inscriptions";
     public static final String COLUMN_STATUS = "game_status";
 
-    public static final String GAME_NEW = "0";
-    public static final String GAME_WAITING = "1";
-    public static final String GAME_VALIDATED = "2";
+    public static final String STATUS_NEW = "0";
+    public static final String STATUS_WAITING = "1";
+    public static final String STATUS_VALIDATED = "2";
 
     public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_CREATOR, COLUMN_CREATOR_NAME, COLUMN_EVENT_ID, COLUMN_TIME, COLUMN_LIGHT, COLUMN_INSCRIPTIONS, COLUMN_STATUS};
 

@@ -1,5 +1,7 @@
 package com.destiny.event.scheduler.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -55,6 +57,7 @@ import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.services.AlarmReceiver;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
 import java.util.ArrayList;
@@ -113,7 +116,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         if (savedInstanceState == null){
             getClanData();
-            getLoggedUserData();
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null){
+                bungieId = bundle.getString("bungieId");
+                userName = bundle.getString("userName");
+            } else getLoggedUserData();
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -365,21 +372,17 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void registerAlarmTask(Calendar time, String title, int iconId) {
 
-        /*int requestId = (int) time.getTimeInMillis();
+        int requestId = (int) time.getTimeInMillis();
 
         Intent intent = new Intent(this, AlarmReceiver.class);
-        intent.putExtra("title",title);
-        intent.putExtra("icon", iconId);
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        intent.setAction("alarm");
-        PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-        Calendar newTime = Calendar.getInstance();
-        newTime.set(Calendar.MINUTE, time.get(Calendar.MINUTE)-1);
+        Calendar scheduleTime = time;
+        scheduleTime.set(Calendar.MINUTE, time.get(Calendar.MINUTE)-1);
 
-        alarm.set(AlarmManager.RTC_WAKEUP, newTime.getTimeInMillis(), pIntent);
-        Log.w(TAG, "Alarm created! " + newTime.toString());*/
+        alarm.set(AlarmManager.RTC_WAKEUP, scheduleTime.getTimeInMillis(), pIntent);
+        Log.w(TAG, "Alarm created! " + scheduleTime.toString());
     }
 
     @Override

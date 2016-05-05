@@ -158,7 +158,7 @@ public class BungieService extends IntentService {
             values.put(GameTable.COLUMN_TIME, "2016-05-10T16:14:26");
             values.put(GameTable.COLUMN_LIGHT, 320);
             values.put(GameTable.COLUMN_INSCRIPTIONS, insc);
-            values.put(GameTable.COLUMN_STATUS, GameTable.GAME_NEW);
+            values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_NEW);
             getContentResolver().insert(DataProvider.GAME_URI, values);
             values.clear();
 

@@ -84,14 +84,12 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
             getScheduledEvents();
         }
 
-        callback.onLoadingData();
-
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         //Toast.makeText(getContext(), "GameID Selected: " + gameIdList.get(position-1), Toast.LENGTH_SHORT).show();
-        callback.onGameSelected(gameIdList.get(position-1), TAG, gameCreatorList.get(position-1), GameTable.GAME_NEW);
+        callback.onGameSelected(gameIdList.get(position-1), TAG, gameCreatorList.get(position-1), GameTable.STATUS_NEW);
     }
 
 
@@ -117,31 +115,27 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
     private void prepareStrings() {
 
-        String c1 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID); // entry._ID;
-        String c2 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_MEMBERSHIP); //entry.entry_membership;
+        String c1 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID);
+        String c2 = EntryTable.COLUMN_MEMBERSHIP;
 
-        String c3 = GameTable.getAliasExpression(GameTable.COLUMN_ID); // game._ID AS game__ID;
-        String c4 = GameTable.getQualifiedColumn(GameTable.COLUMN_EVENT_ID); // game.event_id;
-        String c5 = GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR); // game.creator;
-        String c6 = GameTable.getQualifiedColumn(GameTable.COLUMN_TIME); // game.time;
-        String c7 = GameTable.getQualifiedColumn(GameTable.COLUMN_LIGHT); // game.light;
-        String c8 = GameTable.getQualifiedColumn(GameTable.COLUMN_INSCRIPTIONS); // game.inscriptions;
-        String c9 = GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR_NAME); // game.creator AS game_creator;
+        String c3 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID);
+        String c4 = GameTable.COLUMN_EVENT_ID;
+        String c5 = GameTable.COLUMN_CREATOR;
+        String c6 = GameTable.COLUMN_TIME;
+        String c7 = GameTable.COLUMN_LIGHT;
+        String c8 = GameTable.COLUMN_INSCRIPTIONS;
+        String c9 = GameTable.COLUMN_CREATOR_NAME;
 
-        String c10 = MemberTable.getAliasExpression(MemberTable.COLUMN_ID); // member._ID AS member__ID;
-        String c11 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP); // member.membership;
-        String c12 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_NAME); // member.name AS member_name;
+        String c12 = MemberTable.COLUMN_NAME;
 
-        String c13 = EventTypeTable.getAliasExpression(EventTypeTable.COLUMN_ID); // event_type._ID AS event_type__ID;
-        String c14 = EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_NAME); // event_type.type_name;
+        String c14 = EventTypeTable.COLUMN_NAME;
 
-        String c15 = EventTable.getAliasExpression(EventTable.COLUMN_ID); // event._ID AS event__ID;
-        String c16 = EventTable.getQualifiedColumn(EventTable.COLUMN_ICON); // event.icon;
-        String c17 = EventTable.getQualifiedColumn(EventTable.COLUMN_NAME); // event.name AS event_name;
-        String c18 = EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS); // event.guardians;
-        String c19 = EventTable.getQualifiedColumn(EventTable.COLUMN_TYPE); // event.type_of_event;
+        String c16 = EventTable.COLUMN_ICON;
+        String c17 = EventTable.COLUMN_NAME;
+        String c18 = EventTable.COLUMN_GUARDIANS;
+        String c19 = EventTable.COLUMN_TYPE;
 
-        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19};
+        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c12, c14, c16, c17, c18, c19};
 
         from = new String[] {c17, c16, c5, c6, c6, c8, c18, c14};
 
@@ -151,6 +145,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] selectionArgs = {callback.getBungieId()};
+        callback.onLoadingData();
 
         switch (id){
             case LOADER_ENTRY:
@@ -158,9 +153,9 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
                         getContext(),
                         DataProvider.ENTRY_URI,
                         projection,
-                        EntryTable.getQualifiedColumn(EntryTable.COLUMN_MEMBERSHIP) + "=?",
+                        EntryTable.COLUMN_MEMBERSHIP + "=?",
                         selectionArgs,
-                        "datetime(" + GameTable.getQualifiedColumn(GameTable.COLUMN_TIME) + ") ASC"
+                        "datetime(" + GameTable.COLUMN_TIME + ") ASC"
                 );
             default:
                 return null;
@@ -182,14 +177,14 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
                     adapter.swapCursor(data);
                     data.moveToFirst();
 
-                    time = data.getString(data.getColumnIndexOrThrow(GameTable.getQualifiedColumn(GameTable.COLUMN_TIME)));
+                    time = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME));
                     icon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", getContext().getPackageName());
-                    title = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_NAME))), "string", getContext().getPackageName()));
+                    title = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", getContext().getPackageName()));
                     Log.w("NotificationService", "Origin Icon: " + icon + " / Origin Title: " + title);
 
                     for (int i=0; i < data.getCount();i++){
-                        gameIdList.add(i, data.getString(data.getColumnIndexOrThrow(GameTable.getAliasColumn(GameTable.COLUMN_ID))));
-                        gameCreatorList.add(i, data.getString(data.getColumnIndex(GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR))));
+                        gameIdList.add(i, data.getString(data.getColumnIndexOrThrow(GameTable.getQualifiedColumn(GameTable.COLUMN_ID))));
+                        gameCreatorList.add(i, data.getString(data.getColumnIndex(GameTable.COLUMN_CREATOR)));
                         data.moveToNext();
                     }
             }
