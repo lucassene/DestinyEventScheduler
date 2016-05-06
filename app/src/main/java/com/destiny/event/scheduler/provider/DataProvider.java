@@ -1,7 +1,6 @@
 package com.destiny.event.scheduler.provider;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -19,6 +18,7 @@ import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.data.NotificationTable;
 
 public class DataProvider extends ContentProvider {
 
@@ -42,7 +42,8 @@ public class DataProvider extends ContentProvider {
     private static final int ENTRY_ID = 71;
     public static final int ENTRY_MEMBERS = 72;
     private static final int ENTRY_MEMBERS_ID = 73;
-    private static final int DISTINCT_ENTRY = 74;
+    private static final int NOTIFICATION = 80;
+    private static final int NOTIFICATION_ID = 81;
 
     private static final String AUTHORITY = "com.destiny.event.scheduler.provider";
 
@@ -62,23 +63,8 @@ public class DataProvider extends ContentProvider {
     public static final Uri ENTRY_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_PATH);
     private static final String ENTRY_MEMBERS_PATH = "entrymembers";
     public static final Uri ENTRY_MEMBERS_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_MEMBERS_PATH);
-    private static final String DISTINCT_ENTRY_PATH = "distinctentry";
-    public static final Uri DISTINCT_ENTRY_URI = Uri.parse("content://" + AUTHORITY + "/" + DISTINCT_ENTRY_PATH);
-
-    public static final String EVENT_TYPE_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/alleventtype";
-    public static final String EVENT_TYPE_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleeventtype";
-    public static final String EVENT_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allevent";
-    public static final String EVENT_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleevent";
-    public static final String LOGGED_USER_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allloggeduser";
-    public static final String LOGGED_USER_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleloggeduser";
-    public static final String CLAN_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allclan";
-    public static final String CLAN_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleclan";
-    public static final String MEMBER_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allmember";
-    public static final String MEMBER_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singlemember";
-    public static final String GAME_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allgame";
-    public static final String GAME_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singlegame";
-    public static final String ENTRY_CONTENT = ContentResolver.CURSOR_DIR_BASE_TYPE + "/allentry";
-    public static final String ENTRY_ITEM_CONTENT = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/singleentry";
+    private static final String NOTIFICATION_PATH = "notifyscheduled";
+    public static final Uri NOTIFICATION_URI = Uri.parse("content://" + AUTHORITY + "/" + NOTIFICATION_PATH);
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
@@ -98,7 +84,8 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, ENTRY_PATH + "/#", ENTRY_ID);
         uriMatcher.addURI(AUTHORITY, ENTRY_MEMBERS_PATH, ENTRY_MEMBERS);
         uriMatcher.addURI(AUTHORITY, ENTRY_MEMBERS_PATH + "/#", ENTRY_MEMBERS_ID);
-        uriMatcher.addURI(AUTHORITY, DISTINCT_ENTRY_PATH, DISTINCT_ENTRY);
+        uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH, NOTIFICATION);
+        uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH + "/#", NOTIFICATION_ID);
     }
 
     @Override
@@ -112,8 +99,6 @@ public class DataProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-
-        //checkColumns(uri, projection);
 
         int uriType = uriMatcher.match(uri);
         switch (uriType){
@@ -237,37 +222,12 @@ public class DataProvider extends ContentProvider {
                 queryBuilder.setTables(EntryTable.TABLE_NAME);
                 queryBuilder.appendWhere(EntryTable.COLUMN_ID + "=" + uri.getLastPathSegment());
                 break;
-            case DISTINCT_ENTRY:
-                StringBuilder sbDistinct = new StringBuilder();
-                queryBuilder.setDistinct(true);
-                sbDistinct.append(EntryTable.TABLE_NAME);
-                sbDistinct.append(" JOIN ");
-                sbDistinct.append(GameTable.TABLE_NAME);
-                sbDistinct.append(" ON ");
-                sbDistinct.append(EntryTable.getQualifiedColumn(EntryTable.COLUMN_GAME));
-                sbDistinct.append(" = ");
-                sbDistinct.append(GameTable.getQualifiedColumn(GameTable.COLUMN_ID));
-                sbDistinct.append(" JOIN ");
-                sbDistinct.append(EventTable.TABLE_NAME);
-                sbDistinct.append(" ON ");
-                sbDistinct.append(GameTable.getQualifiedColumn(GameTable.COLUMN_EVENT_ID));
-                sbDistinct.append(" = ");
-                sbDistinct.append(EventTable.getQualifiedColumn(EventTable.COLUMN_ID));
-                sbDistinct.append(" JOIN ");
-                sbDistinct.append(MemberTable.TABLE_NAME);
-                sbDistinct.append(" ON ");
-                sbDistinct.append(EntryTable.getQualifiedColumn(EntryTable.COLUMN_MEMBERSHIP));
-                sbDistinct.append(" = ");
-                sbDistinct.append(MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP));
-                sbDistinct.append(" JOIN ");
-                sbDistinct.append(EventTypeTable.TABLE_NAME);
-                sbDistinct.append(" ON ");
-                sbDistinct.append(EventTable.COLUMN_TYPE);
-                sbDistinct.append(" = ");
-                sbDistinct.append(EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID));
-                queryBuilder.setTables(sbDistinct.toString());
+            case NOTIFICATION:
+                queryBuilder.setTables(NotificationTable.TABLE_NAME);
                 break;
-
+            case NOTIFICATION_ID:
+                queryBuilder.setTables(NotificationTable.TABLE_NAME);
+                queryBuilder.appendWhere(NotificationTable.COLUMN_ID + "=" + uri.getLastPathSegment() );
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }
@@ -321,6 +281,10 @@ public class DataProvider extends ContentProvider {
                 id = sqlDB.insert(EntryTable.TABLE_NAME, null, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return Uri.parse(ENTRY_PATH + "/" + id);
+            case NOTIFICATION:
+                id = sqlDB.insert(NotificationTable.TABLE_NAME, null, values);
+                getContext().getContentResolver().notifyChange(uri, null);
+                return Uri.parse(NOTIFICATION_PATH + "/" + id);
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }
@@ -410,6 +374,18 @@ public class DataProvider extends ContentProvider {
                     rowsDeleted = sqlDB.delete(EntryTable.TABLE_NAME, EntryTable.COLUMN_ID + "=" + id, null);
                 } else {
                     rowsDeleted = sqlDB.delete(EntryTable.TABLE_NAME, EntryTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
+                }
+                break;
+            case NOTIFICATION:
+                rowsDeleted = sqlDB.delete(NotificationTable.TABLE_NAME, selection, selectionArgs);
+                break;
+            case NOTIFICATION_ID:
+                Log.w(TAG, "Entrou no delete do NOTIFICATION_ID");
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)){
+                    rowsDeleted = sqlDB.delete(NotificationTable.TABLE_NAME, NotificationTable.COLUMN_ID + "=" + id, null);
+                } else {
+                    rowsDeleted = sqlDB.delete(NotificationTable.TABLE_NAME, NotificationTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
                 }
                 break;
             default:

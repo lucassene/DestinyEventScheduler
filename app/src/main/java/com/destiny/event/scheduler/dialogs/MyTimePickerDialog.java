@@ -36,14 +36,6 @@ public class MyTimePickerDialog extends DialogFragment implements TimePickerDial
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
-        String hour = String.valueOf(hourOfDay);
-        String min = String.valueOf(minute);
-
-        if (hour.length() == 1) hour = "0" + hour;
-        if (min.length() == 1) min = "0" + min;
-
-        String time = hour + " : " + min;
-        listener.onTimeSent(time);
+        listener.onTimeSent(hourOfDay, minute);
     }
 }

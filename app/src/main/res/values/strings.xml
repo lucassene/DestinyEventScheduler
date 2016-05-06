@@ -277,6 +277,8 @@
     <string name="wait_list">Waiting List</string>
     <string name="data_refreshed">All data refreshed!</string>
     <string name="notification_match_begin">The match will begin soon...</string>
+    <string name="your_match_of">"Your match of "</string>
+    <string name="will_begin_soon">" will begin soon..."</string>
 
 
 </resources>

@@ -21,6 +21,8 @@ import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.services.BungieService;
 import com.destiny.event.scheduler.services.RequestResultReceiver;
 
+import java.util.Calendar;
+
 public class PrepareActivity extends AppCompatActivity implements RequestResultReceiver.Receiver, FromDialogListener {
 
     private static final String TAG = "PrepareActivity";
@@ -247,30 +249,27 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
     }
 
     public void onBegin(View view) {
+        openDrawerActivity();
+    }
+
+    public void openDrawerActivity(){
         Intent intent = new Intent(this, DrawerActivity.class);
-        intent.putExtra("bungieId", membershipId);
-        intent.putExtra("userName",userName);
         startActivity(intent);
         finish();
     }
-
 
     @Override
     public void onPositiveClick(String input, int type) {
-        Intent intent = new Intent(this, DrawerActivity.class);
-        intent.putExtra("bungieId", membershipId);
-        intent.putExtra("userName",userName);
-        startActivity(intent);
-        finish();
+        openDrawerActivity();
     }
 
     @Override
-    public void onDateSent(String date) {
+    public void onDateSent(Calendar date) {
 
     }
 
     @Override
-    public void onTimeSent(String time) {
+    public void onTimeSent(int hour, int minute) {
 
     }
 

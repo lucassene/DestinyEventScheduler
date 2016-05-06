@@ -3,9 +3,10 @@ package com.destiny.event.scheduler.fragments;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -29,6 +30,7 @@ import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
@@ -36,13 +38,20 @@ import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DetailEventFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener{
 
     private static final String TAG = "DetailEventFragment";
 
-    private static final int URL_LOADER_GAME = 60;
-    private static final int URL_LOADER_ENTRY_MEMBERS = 72;
+    private static final int LOADER_GAME = 60;
+    private static final int LOADER_ENTRY_MEMBERS = 72;
+    private static final int LOADER_NOTIFICATION = 80;
+
+    private static final int DELETE_NOTIFICATION = 0;
+    private static final int CREATE_NOTIFICATION = 1;
+
+    private int notificationMethod;
 
     private String gameId;
     private String origin;
@@ -50,6 +59,10 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private String creator;
     private int inscriptions;
     private int maxGuardians;
+    private String gameEventName;
+    private String gameEventTypeName;
+    private int gameEventTypeIcon;
+    private String gameTime;
 
     private ArrayList<String> bungieIdList;
 
@@ -58,7 +71,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     ImageView eventIcon;
     TextView eventType;
     TextView eventName;
-    TextView eventCreator;
 
     TextView date;
     TextView time;
@@ -79,6 +91,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     MembersAdapter adapter;
 
     MyAlertDialog dialog;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -213,7 +226,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private void deleteGame(Uri uri) {
         getContext().getContentResolver().delete(uri,null,null);
-        callback.closeFragment();
+        notificationMethod = DELETE_NOTIFICATION;
+        getLoaderManager().initLoader(LOADER_NOTIFICATION, null, this);
     }
 
     private void leaveGame(ContentValues values, Uri uri) {
@@ -223,8 +237,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         values.clear();
         String selection = EntryTable.COLUMN_GAME + "=" + gameId + " AND " + EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
         getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
-
-        callback.closeFragment();
+        notificationMethod = DELETE_NOTIFICATION;
+        getLoaderManager().initLoader(LOADER_NOTIFICATION, null, this);
 
     }
 
@@ -240,7 +254,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
         values.clear();
 
-        callback.closeFragment();
+        notificationMethod = CREATE_NOTIFICATION;
+        getLoaderManager().initLoader(LOADER_NOTIFICATION, null, this);
 
     }
 
@@ -274,53 +289,54 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private void getGameData() {
 
         callback.onLoadingData();
-
         prepareGameStrings();
-        getLoaderManager().initLoader(URL_LOADER_GAME, null, this);
+        getLoaderManager().initLoader(LOADER_GAME, null, this);
     }
 
     private void prepareGameStrings() {
 
-        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID); // game._ID;
-        String c2 = GameTable.getQualifiedColumn(GameTable.COLUMN_EVENT_ID); // game.event_id;
-        String c3 = EventTable.getAliasExpression(EventTable.COLUMN_ID); // event._ID AS event__ID;
-        String c4 = EventTable.getQualifiedColumn(EventTable.COLUMN_ICON); // event.icon;
-        String c5 = EventTable.getAliasExpression(EventTable.COLUMN_NAME); // event.name AS event_name;
-        String c6 = GameTable.getQualifiedColumn(GameTable.COLUMN_CREATOR); // game.creator;
-        String c7 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP); // member.membership;
-        String c8 = MemberTable.getAliasExpression(MemberTable.COLUMN_NAME); // member.name AS member_name;
-        String c9 = GameTable.getQualifiedColumn(GameTable.COLUMN_TIME); // game.time;
-        String c10 = GameTable.getQualifiedColumn(GameTable.COLUMN_LIGHT); // game.light;
-        String c11 = EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS); // game.guardians;
-        String c12 = GameTable.getQualifiedColumn(GameTable.COLUMN_INSCRIPTIONS); // game.inscriptions;
-        String c13 = MemberTable.getAliasExpression(MemberTable.COLUMN_ID); // member._ID AS member__ID;
-        String c14 = GameTable.getAliasExpression(GameTable.COLUMN_CREATOR_NAME); // game.creator AS game_creator;
-        String c15 = EventTable.getQualifiedColumn(EventTable.COLUMN_TYPE); // event.type_of_event;
-        String c16 = EventTypeTable.getAliasExpression(EventTypeTable.COLUMN_ID); // event_type._ID AS event_type__ID;
-        String c17 = EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_NAME); // event_type.type_name;
+        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID);
+        String c2 = GameTable.COLUMN_EVENT_ID;
+        String c6 = GameTable.COLUMN_CREATOR;
+        String c9 = GameTable.COLUMN_TIME;
+        String c10 = GameTable.COLUMN_LIGHT;
+        String c12 = GameTable.COLUMN_INSCRIPTIONS;
+        String c14 = GameTable.COLUMN_CREATOR_NAME;
 
-        gameProjection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17};
+        String c4 = EventTable.COLUMN_ICON;
+        String c5 = EventTable.COLUMN_NAME;
+        String c11 = EventTable.COLUMN_GUARDIANS;
+        String c15 = EventTable.COLUMN_TYPE;
+
+        String c7 = MemberTable.COLUMN_MEMBERSHIP;
+        String c8 = MemberTable.COLUMN_NAME;
+
+        String c16 = EventTypeTable.COLUMN_ICON;
+        String c17 = EventTypeTable.COLUMN_NAME;
+
+        gameProjection = new String[] {c1, c2, c4, c5, c6, c7, c8, c9, c10, c11, c12,  c14, c15, c16, c17};
 
     }
 
     private void prepareMemberStrings() {
 
         String c1 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID);
-        String c2 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_GAME);
-        String c3 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_MEMBERSHIP);
-        String c4 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_TIME);
-        String c5 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_MEMBERSHIP);
-        String c6 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_NAME);
-        String c7 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_ICON);
-        String c8 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_LIKES);
-        String c9 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_DISLIKES);
-        String c10 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_CREATED);
-        String c11 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_PLAYED);
-        String c12 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_SINCE);
-        String c13 = GameTable.getAliasExpression(GameTable.COLUMN_ID);
+        String c2 = EntryTable.COLUMN_GAME;
+        String c3 = EntryTable.COLUMN_MEMBERSHIP;
+        String c4 = EntryTable.COLUMN_TIME;
+
+        String c5 = MemberTable.COLUMN_MEMBERSHIP;
+        String c6 = MemberTable.COLUMN_NAME;
+        String c7 = MemberTable.COLUMN_ICON;
+        String c8 = MemberTable.COLUMN_LIKES;
+        String c9 = MemberTable.COLUMN_DISLIKES;
+        String c10 = MemberTable.COLUMN_CREATED;
+        String c11 = MemberTable.COLUMN_PLAYED;
+        String c12 = MemberTable.COLUMN_SINCE;
+
         String c14 = MemberTable.POINTS_COLUMNS;
 
-        membersProjection = new String[] {c1, c2, c3, c4, c5, c6, c14, c7, c8, c9, c10, c11, c12, c13};
+        membersProjection = new String[] {c1, c2, c3, c4, c5, c6, c14, c7, c8, c9, c10, c11, c12};
 
     }
 
@@ -349,7 +365,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         String[] selectionArgs = {gameId};
 
         switch (id){
-            case URL_LOADER_GAME:
+            case LOADER_GAME:
                 return new CursorLoader(
                         getContext(),
                         DataProvider.GAME_URI,
@@ -358,7 +374,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                         selectionArgs,
                         null
                 );
-            case URL_LOADER_ENTRY_MEMBERS:
+            case LOADER_ENTRY_MEMBERS:
                 return new CursorLoader(
                         getContext(),
                         DataProvider.ENTRY_MEMBERS_URI,
@@ -366,6 +382,16 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                         EntryTable.getQualifiedColumn(EntryTable.COLUMN_GAME) + "=?",
                         selectionArgs,
                         "datetime(" + EntryTable.getQualifiedColumn(EntryTable.COLUMN_TIME) + ") ASC"
+                );
+            case LOADER_NOTIFICATION:
+                Log.w(TAG,"onCreateLoader de ID LOADER_NOTIFICATION criado");
+                return new CursorLoader(
+                        getContext(),
+                        DataProvider.NOTIFICATION_URI,
+                        NotificationTable.ALL_COLUMNS,
+                        NotificationTable.COLUMN_GAME + "=?",
+                        selectionArgs,
+                        null
                 );
             default:
                 return null;
@@ -377,39 +403,93 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
         if (data != null && data.moveToFirst()){
             switch (loader.getId()){
-                case URL_LOADER_GAME:
-                    eventIcon.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_ICON))), "drawable", getContext().getPackageName() ));
-                    eventName.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.getAliasColumn(EventTable.COLUMN_NAME))), "string", getContext().getPackageName()));
-                    eventType.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_NAME))), "string", getContext().getPackageName()));
+                case LOADER_GAME:
+                    eventIcon.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", getContext().getPackageName() ));
+
+                    gameEventName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", getContext().getPackageName()));
+                    eventName.setText(gameEventName);
+
+                    gameEventTypeName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)), "string", getContext().getPackageName()));
+                    gameEventTypeIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
+                    eventType.setText(gameEventTypeName);
+
+                    gameTime = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME));
+                    Log.w(TAG, "Game Time: " + gameTime);
                     date.setText(DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
                     time.setText(DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-                    light.setText(data.getString(data.getColumnIndexOrThrow(GameTable.getQualifiedColumn(GameTable.COLUMN_LIGHT))));
+                    light.setText(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_LIGHT)));
 
-                    maxGuardians = data.getInt(data.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_GUARDIANS)));
+                    maxGuardians = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS));
                     inscriptions = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
                     String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
                     guardians.setText(sg);
-                    Log.w(TAG, "Game Cursor: " + DatabaseUtils.dumpCursorToString(data));
+                    //Log.w(TAG, "Game Cursor: " + DatabaseUtils.dumpCursorToString(data));
                     setAdapter(maxGuardians);
                     prepareMemberStrings();
-                    getLoaderManager().initLoader(URL_LOADER_ENTRY_MEMBERS, null, this);
+                    getLoaderManager().initLoader(LOADER_ENTRY_MEMBERS, null, this);
                     break;
-                case URL_LOADER_ENTRY_MEMBERS:
+                case LOADER_ENTRY_MEMBERS:
                     adapter.swapCursor(data);
 
                     data.moveToFirst();
                     for (int i=0; i < data.getCount();i++){
-                        bungieIdList.add(i, data.getString(data.getColumnIndexOrThrow(EntryTable.getQualifiedColumn(EntryTable.COLUMN_MEMBERSHIP))));
+                        bungieIdList.add(i, data.getString(data.getColumnIndexOrThrow(EntryTable.COLUMN_MEMBERSHIP)));
                         data.moveToNext();
                     }
-
-                    Log.w(TAG, "Entry Cursor: " + DatabaseUtils.dumpCursorToString(data));
+                    //Log.w(TAG, "Entry Cursor: " + DatabaseUtils.dumpCursorToString(data));
                     break;
-
             }
         }
 
+        if (loader.getId() == LOADER_NOTIFICATION){
+
+            Log.w(TAG, "onLoaderFinished alcançado com ID LOADER_NOTIFICATION");
+
+            switch (notificationMethod){
+                case CREATE_NOTIFICATION:
+                    if (data == null || data.getCount()<=0){
+                        setAlarmNotification(gameTime, gameId, gameEventName, gameEventTypeName, gameEventTypeIcon);
+                    } else{
+                        Log.w(TAG, "Notification for this game already created!");
+                    }
+                    break;
+                case DELETE_NOTIFICATION:
+                    if (data!= null && data.getCount()>0){
+                        String notificationId = data.getString(data.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
+                        Uri uri = Uri.parse(DataProvider.NOTIFICATION_URI + "/" + notificationId);
+                        int deletedRow = getContext().getContentResolver().delete(uri, null, null);
+                        Log.w(TAG, "NotificationID deleted: " + String.valueOf(deletedRow));
+                    } else Log.w(TAG,"There is no Notification to be deleted!");
+                    break;
+            }
+
+        }
+
         callback.onDataLoaded();
+        checkIfCloses(loader.getId());
+
+    }
+
+    private void checkIfCloses(int loaderId) {
+        if (loaderId == LOADER_NOTIFICATION){
+            Handler handler = new Handler(){
+                @Override
+                public void handleMessage(Message msg){
+                    if (msg.what == LOADER_NOTIFICATION) callback.closeFragment();
+                }
+            };
+            handler.sendEmptyMessage(LOADER_NOTIFICATION);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+        switch (loader.getId()){
+            case LOADER_ENTRY_MEMBERS:
+                adapter.swapCursor(null);
+                break;
+        }
 
     }
 
@@ -424,14 +504,44 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         setListAdapter(adapter);
     }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    private void setAlarmNotification(String time, String gameId, String title, String typeName, int typeIcon) {
 
-        switch (loader.getId()){
-            case URL_LOADER_ENTRY_MEMBERS:
-                adapter.swapCursor(null);
-                break;
-        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, Integer.parseInt(DateUtils.getYear(time)));
+        calendar.set(Calendar.MONTH, Integer.parseInt(DateUtils.getMonth(time))-1);
+        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(DateUtils.getDay(time)));
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(DateUtils.getHour(time)));
+        calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 1);
+        calendar.set(Calendar.MINUTE, Integer.parseInt(DateUtils.getMinute(time)));
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.AM_PM, Calendar.PM);
+
+        Calendar now = Calendar.getInstance();
+
+        String agenda = calendar.get(Calendar.DAY_OF_MONTH) + "/" + calendar.get(Calendar.MONTH) + "/" + calendar.get(Calendar.YEAR) + " às " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND);
+        String agora = now.get(Calendar.DAY_OF_MONTH) + "/" + now.get(Calendar.MONTH) + "/" + now.get(Calendar.YEAR) + " às " + now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND);
+
+        Log.w(TAG, "Agora: " + agora + " / Agendamento: " + agenda);
+
+        if (calendar.getTimeInMillis() > now.getTimeInMillis()){
+
+            ContentValues values = new ContentValues();
+            values.put(NotificationTable.COLUMN_GAME, gameId);
+            values.put(NotificationTable.COLUMN_EVENT, title);
+            values.put(NotificationTable.COLUMN_TYPE, typeName);
+            values.put(NotificationTable.COLUMN_ICON, typeIcon);
+            values.put(NotificationTable.COLUMN_TIME, calendar.getTimeInMillis());
+
+            getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+
+            int newMinute = calendar.get(Calendar.MINUTE);
+            newMinute = newMinute - 5;
+
+            Log.w(TAG, "Notification for " + gameEventName + " created at " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + newMinute + ":" + calendar.get(Calendar.SECOND));
+            values.clear();
+            callback.registerAlarmTask(calendar);
+
+        } else Log.w(TAG, "Tentativa de criar uma notificação para antes do DATETIME atual");
 
     }
 
@@ -457,12 +567,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     }
 
     @Override
-    public void onDateSent(String date) {
+    public void onDateSent(Calendar date) {
 
     }
 
     @Override
-    public void onTimeSent(String time) {
+    public void onTimeSent(int hour, int minute) {
 
     }
 

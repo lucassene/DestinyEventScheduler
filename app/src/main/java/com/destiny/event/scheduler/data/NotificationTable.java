@@ -8,21 +8,27 @@ public class NotificationTable {
     public static final String TABLE_NAME = "notification";
 
     public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_GAME = "notification_game";
     public static final String COLUMN_EVENT = "notification_event";
+    public static final String COLUMN_TYPE = "notification_type";
     public static final String COLUMN_ICON = "notification_icon";
     public static final String COLUMN_TIME = "notification_time";
 
-    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_EVENT, COLUMN_TIME, COLUMN_ICON};
+    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_GAME, COLUMN_EVENT, COLUMN_TYPE, COLUMN_ICON, COLUMN_TIME};
 
     private static final String CREATE_TABLE = "CREATE TABLE "
             + TABLE_NAME
             + " ("
             + COLUMN_ID
             + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_GAME
+            + " INTEGER NOT NULL, "
             + COLUMN_EVENT
             + " TEXT NOT NULL, "
-            + COLUMN_ICON
+            + COLUMN_TYPE
             + " TEXT NOT NULL, "
+            + COLUMN_ICON
+            + " INTEGER NOT NULL, "
             + COLUMN_TIME
             + " TEXT NOT NULL"
             + ");";

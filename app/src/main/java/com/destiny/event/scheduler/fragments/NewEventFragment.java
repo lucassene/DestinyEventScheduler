@@ -29,6 +29,7 @@ import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
+import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyDatePickerDialog;
 import com.destiny.event.scheduler.dialogs.MyTimePickerDialog;
 import com.destiny.event.scheduler.dialogs.SimpleInputDialog;
@@ -39,16 +40,26 @@ import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 
 public class NewEventFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener, FromActivityListener {
 
     private static final String TAG = "NewEventFragment";
 
-    private static final int URL_LOADER_TYPE = 10;
-    private static final int URL_LOADER_GAME = 20;
+    private static final int LOADER_TYPE = 10;
+    private static final int LOADER_EVENT = 20;
+    private static final int LOADER_NOTIFICATION = 80;
 
     private String selectedType;
-    private String selectedGame;
+    private String selectedEvent;
+
+    private String gameId;
+    private String gameTime;
+    private String eventTypeName;
+    private int eventTypeIcon;
+    private String eventName;
 
     private ToActivityListener callback;
     private OnEventCreatedListener eventCallback;
@@ -78,7 +89,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         setRetainInstance(true);
 
         selectedType = "2";
-        selectedGame = "7";
+        selectedEvent = "7";
 
         Bundle bundle = getArguments();
         if (bundle != null){
@@ -88,7 +99,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                     checkGame(selectedType);
                     break;
                 case EventTable.TABLE_NAME:
-                    selectedGame = String.valueOf(bundle.getLong("id"));
+                    selectedEvent = String.valueOf(bundle.getLong("id"));
                     selectedType = String.valueOf(bundle.getString("Type"));
             }
         }
@@ -97,28 +108,28 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private void checkGame(String selectedType) {
         switch (selectedType){
             case "1":
-                selectedGame = "1";
+                selectedEvent = "1";
                 break;
             case "2":
-                selectedGame = "4";
+                selectedEvent = "4";
                 break;
             case "3":
-                selectedGame = "19";
+                selectedEvent = "19";
                 break;
             case "4":
-                selectedGame = "24";
+                selectedEvent = "24";
                 break;
             case "5":
-                selectedGame = "30";
+                selectedEvent = "30";
                 break;
             case "6":
-                selectedGame = "36";
+                selectedEvent = "36";
                 break;
             case "7":
-                selectedGame = "38";
+                selectedEvent = "38";
                 break;
             case "8":
-                selectedGame = "52";
+                selectedEvent = "52";
                 break;
         }
     }
@@ -203,7 +214,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getContext().getResources().getString(R.string.choose_game));
                 bundle.putString("table", EventTable.TABLE_NAME);
-                bundle.putString("selected", selectedGame);
+                bundle.putString("selected", selectedEvent);
                 bundle.putString("type", selectedType);
                 bundle.putString("tag", getTag());
                 callback.loadNewFragment(fragment, bundle, "game");
@@ -259,11 +270,11 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void fillgameData() {
-        getLoaderManager().initLoader(URL_LOADER_GAME, null, this);
+        getLoaderManager().initLoader(LOADER_EVENT, null, this);
     }
 
     private void fillTypeData() {
-        getLoaderManager().initLoader(URL_LOADER_TYPE, null, this);
+        getLoaderManager().initLoader(LOADER_TYPE, null, this);
     }
 
     @Override
@@ -284,7 +295,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         String[] selectionArgs;
 
         switch (id){
-            case URL_LOADER_TYPE:
+            case LOADER_TYPE:
                 projection = EventTypeTable.ALL_COLUMNS;
                 selectionArgs = new String[] {selectedType};
                 return new CursorLoader(
@@ -295,15 +306,24 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                         selectionArgs,
                         null
                 );
-            case URL_LOADER_GAME:
+            case LOADER_EVENT:
                 projection = EventTable.ALL_COLUMNS;
-                selectionArgs = new String[] {selectedGame};
+                selectionArgs = new String[] {selectedEvent};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.EVENT_URI,
                         projection,
                         EventTable.COLUMN_ID + "=?",
                         selectionArgs,
+                        null
+                );
+            case LOADER_NOTIFICATION:
+                return new CursorLoader(
+                        getContext(),
+                        DataProvider.NOTIFICATION_URI,
+                        NotificationTable.ALL_COLUMNS,
+                        NotificationTable.COLUMN_GAME + "=" + gameId,
+                        null,
                         null
                 );
             default:
@@ -313,26 +333,23 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        String iconId;
-        String textId;
-        int resId;
 
         data.moveToFirst();
         switch (loader.getId()){
-            case URL_LOADER_TYPE:
-                iconId = data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON));
-                iconType.setImageResource(getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
-                textId = data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME));
-                textType.setText(getContext().getResources().getIdentifier(textId,"string",getContext().getPackageName()));
+            case LOADER_TYPE:
+                eventTypeIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
+                iconType.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName()));
+                eventTypeName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
+                textType.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 break;
-            case URL_LOADER_GAME:
+            case LOADER_EVENT:
                 minLight = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT));
                 lightBar.setMax(335 - minLight);
                 lightText.setText(String.valueOf(minLight));
-                iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
+                String iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
                 iconGame.setImageResource(getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
-                textId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME));
-                textGame.setText(getContext().getResources().getIdentifier(textId,"string",getContext().getPackageName()));
+                eventName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
+                textGame.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 break;
         }
     }
@@ -344,7 +361,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onPositiveClick(String input, int type) {
-        int value = Integer.parseInt(input);
 
         switch (type){
             case FromDialogListener.LIGHT_TYPE:
@@ -358,13 +374,52 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onDateSent(String date) {
-        dateText.setText(date);
+    public void onDateSent(Calendar date) {
+
+        Calendar showDate = Calendar.getInstance();
+
+        if (date.get(Calendar.DATE) >= showDate.get(Calendar.DATE)){
+            showDate = date;
+        } else {
+            Toast.makeText(getContext(), "Are you a Vex wishing to playing in the past?", Toast.LENGTH_SHORT).show();
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", getResources().getConfiguration().locale);
+        String finalDate = sdf.format(showDate.getTime());
+        dateText.setText(finalDate);
+
     }
 
     @Override
-    public void onTimeSent(String time) {
-        timeText.setText(time);
+    public void onTimeSent(int hour, int minute) {
+
+        Calendar now = Calendar.getInstance();
+        String time;
+
+        if (now.get(Calendar.HOUR_OF_DAY) > hour){
+            Toast.makeText(getContext(), "Are you a Vex wishing to playing in the past?", Toast.LENGTH_SHORT).show();
+            time = null;
+        } else if (now.get(Calendar.HOUR_OF_DAY) == hour){
+            if (now.get(Calendar.MINUTE) >= minute){
+                Toast.makeText(getContext(), "Are you a Vex wishing to playing in the past?", Toast.LENGTH_SHORT).show();
+                time = null;
+            } else {
+                String hourOfTheDay = String.valueOf(hour);
+                String min = String.valueOf(minute);
+                if (hourOfTheDay.length() == 1) hourOfTheDay = "0" + hourOfTheDay;
+                if (min.length() == 1) min = "0" + min;
+                time = hourOfTheDay + " : " + min;
+            }
+        } else {
+            String hourOfTheDay = String.valueOf(hour);
+            String min = String.valueOf(minute);
+            if (hourOfTheDay.length() == 1) hourOfTheDay = "0" + hourOfTheDay;
+            if (min.length() == 1) min = "0" + min;
+            time = hourOfTheDay + " : " + min;
+        }
+
+            timeText.setText(time);
+
     }
 
     @Override
@@ -376,15 +431,15 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onEventTypeSent(String id) {
         selectedType = id;
-        getLoaderManager().restartLoader(URL_LOADER_TYPE, null, this);
+        getLoaderManager().restartLoader(LOADER_TYPE, null, this);
         checkGame(id);
-        getLoaderManager().restartLoader(URL_LOADER_GAME, null, this);
+        getLoaderManager().restartLoader(LOADER_EVENT, null, this);
     }
 
     @Override
     public void onEventGameSent(String id) {
-        selectedGame = id;
-        getLoaderManager().restartLoader(URL_LOADER_GAME, null, this);
+        selectedEvent = id;
+        getLoaderManager().restartLoader(LOADER_EVENT, null, this);
     }
 
     @Override
@@ -399,7 +454,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
         if(!date.isEmpty() || !time.isEmpty()){
 
-            String fullTime = getBungieTime(date, time);
+            gameTime = getBungieTime(date, time);
 
             int minLight = Integer.parseInt(lightText.getText().toString());
             int insc = 1;
@@ -409,28 +464,29 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             ContentValues gameValues = new ContentValues();
             gameValues.put(GameTable.COLUMN_CREATOR, bungieId);
             gameValues.put(GameTable.COLUMN_CREATOR_NAME,userName);
-            gameValues.put(GameTable.COLUMN_EVENT_ID, selectedGame);
-            gameValues.put(GameTable.COLUMN_TIME,fullTime);
+            gameValues.put(GameTable.COLUMN_EVENT_ID, selectedEvent);
+            gameValues.put(GameTable.COLUMN_TIME, gameTime);
             gameValues.put(GameTable.COLUMN_LIGHT, minLight);
             gameValues.put(GameTable.COLUMN_INSCRIPTIONS, insc);
             gameValues.put(GameTable.COLUMN_STATUS, GameTable.STATUS_NEW);
 
             Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
-            String id = "";
             if (result != null) {
-                id = result.getLastPathSegment();
+                gameId = result.getLastPathSegment();
             }
 
             String now = DateUtils.getCurrentTime();
-            //Toast.makeText(getContext(), "Time: " + now, Toast.LENGTH_SHORT).show();
 
             ContentValues entryValues = new ContentValues();
             entryValues.put(EntryTable.COLUMN_MEMBERSHIP, bungieId);
-            entryValues.put(EntryTable.COLUMN_GAME, id);
+            entryValues.put(EntryTable.COLUMN_GAME, gameId);
             entryValues.put(EntryTable.COLUMN_TIME, now);
             getContext().getContentResolver().insert(DataProvider.ENTRY_URI, entryValues);
 
-            Toast.makeText(getContext(), "Success! You've created one brand new event!", Toast.LENGTH_SHORT).show();
+            setAlarmNotification(gameTime, gameId, eventName, eventTypeName, eventTypeIcon);
+
+            Toast.makeText(getContext(), "Success! You've created one new match!", Toast.LENGTH_SHORT).show();
+
             eventCallback.onEventCreated();
 
         } else{
@@ -439,7 +495,37 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
+    private void setAlarmNotification(String time, String gameId, String title, String typeName, int typeIcon) {
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, Integer.parseInt(DateUtils.getYear(time)));
+        calendar.set(Calendar.MONTH, Integer.parseInt(DateUtils.getMonth(time))-1);
+        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(DateUtils.getDay(time)));
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(DateUtils.getHour(time)));
+        calendar.set(Calendar.MINUTE, Integer.parseInt(DateUtils.getMinute(time)));
+        calendar.set(Calendar.SECOND, 00);
+        calendar.set(Calendar.AM_PM, Calendar.PM);
+
+        Calendar now = Calendar.getInstance();
+
+        if (calendar.getTimeInMillis() > now.getTimeInMillis()){
+
+            ContentValues values = new ContentValues();
+            values.put(NotificationTable.COLUMN_GAME, gameId);
+            values.put(NotificationTable.COLUMN_EVENT, title);
+            values.put(NotificationTable.COLUMN_TYPE, typeName);
+            values.put(NotificationTable.COLUMN_ICON, typeIcon);
+            values.put(NotificationTable.COLUMN_TIME, calendar.getTimeInMillis());
+
+            getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+
+            Log.w(TAG, "Notification for " + eventName + " created at " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND));
+            values.clear();
+            callback.registerAlarmTask(calendar);
+
+        }
+
+    }
 
     private String getBungieTime(String date, String time) {
 

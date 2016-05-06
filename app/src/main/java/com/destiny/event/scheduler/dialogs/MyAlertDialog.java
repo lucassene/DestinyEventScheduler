@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -77,7 +76,7 @@ public class MyAlertDialog extends DialogFragment {
         listener = (FromDialogListener) getActivity();
 
         fragmentListener = (FromDialogListener) getFragmentManager().findFragmentById(R.id.content_frame);
-        Log.w(TAG, "Fragment Listener: " + fragmentListener);
+        //Log.w(TAG, "Fragment Listener: " + fragmentListener);
 
         btnLeave.setOnClickListener(new View.OnClickListener() {
             @Override

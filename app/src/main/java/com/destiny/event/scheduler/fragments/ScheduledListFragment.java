@@ -26,10 +26,8 @@ import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.provider.DataProvider;
-import com.destiny.event.scheduler.utils.DateUtils;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class ScheduledListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, RefreshDataListener, UserDataListener{
 
@@ -129,13 +127,14 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
         String c12 = MemberTable.COLUMN_NAME;
 
         String c14 = EventTypeTable.COLUMN_NAME;
+        String c15 = EventTypeTable.COLUMN_ICON;
 
         String c16 = EventTable.COLUMN_ICON;
         String c17 = EventTable.COLUMN_NAME;
         String c18 = EventTable.COLUMN_GUARDIANS;
         String c19 = EventTable.COLUMN_TYPE;
 
-        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c12, c14, c16, c17, c18, c19};
+        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c12, c14, c15, c16, c17, c18, c19};
 
         from = new String[] {c17, c16, c5, c6, c6, c8, c18, c14};
 
@@ -167,44 +166,34 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
         Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
 
-        String time = "";
-        int icon = 0;
-        String title = "";
-
         if (data !=null && data.moveToFirst()){
+
+            Log.w(TAG, "Scheduled Events Cursor: " + data.toString());
+
             switch (loader.getId()){
                 case LOADER_ENTRY:
+
                     adapter.swapCursor(data);
                     data.moveToFirst();
-
-                    time = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME));
-                    icon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", getContext().getPackageName());
-                    title = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", getContext().getPackageName()));
-                    Log.w("NotificationService", "Origin Icon: " + icon + " / Origin Title: " + title);
 
                     for (int i=0; i < data.getCount();i++){
                         gameIdList.add(i, data.getString(data.getColumnIndexOrThrow(GameTable.getQualifiedColumn(GameTable.COLUMN_ID))));
                         gameCreatorList.add(i, data.getString(data.getColumnIndex(GameTable.COLUMN_CREATOR)));
                         data.moveToNext();
                     }
+
+
+                    break;
             }
 
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.YEAR, Integer.parseInt(DateUtils.getYear(time)));
-            calendar.set(Calendar.MONTH, Integer.parseInt(DateUtils.getMonth(time))-1);
-            calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(DateUtils.getDay(time)));
-            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(DateUtils.getHour(time)));
-            calendar.set(Calendar.MINUTE, Integer.parseInt(DateUtils.getMinute(time)));
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.AM_PM, Calendar.PM);
-
-            callback.registerAlarmTask(calendar, title, icon);
             callback.onDataLoaded();
+
         } else {
             callback.onNoScheduledGames();
         }
 
     }
+
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {

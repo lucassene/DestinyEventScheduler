@@ -8,7 +8,6 @@ import android.widget.DatePicker;
 
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class MyDatePickerDialog extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -39,9 +38,9 @@ public class MyDatePickerDialog extends DialogFragment implements DatePickerDial
         Calendar c = Calendar.getInstance();
         c.set(year, monthOfYear, dayOfMonth);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", getResources().getConfiguration().locale);
-        String finalDate = sdf.format(c.getTime());
+        //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", getResources().getConfiguration().locale);
+        //String finalDate = sdf.format(c.getTime());
 
-        listener.onDateSent(finalDate);
+        listener.onDateSent(c);
     }
 }

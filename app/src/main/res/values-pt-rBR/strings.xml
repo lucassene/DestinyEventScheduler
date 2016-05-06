@@ -244,5 +244,7 @@
     <string name="data_refreshed">Dados atualizados!</string>
     <string name="game_label">Jogo</string>
     <string name="notification_match_begin">A partida irá começar em instantes...</string>
+    <string name="will_begin_soon">" vai começar em breve..."</string>
+    <string name="your_match_of">"Sua partida de "</string>
 
 </resources>

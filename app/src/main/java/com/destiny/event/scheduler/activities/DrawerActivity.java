@@ -81,7 +81,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private FromActivityListener newEventListener;
     private ArrayList<RefreshDataListener> refreshDataListenerList;
-    private UserDataListener userDataListener;
+    private ArrayList<UserDataListener> userDataListener;
 
     private FragmentTransaction ft;
     private FragmentManager fm;
@@ -114,14 +114,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         progress = (ProgressBar) findViewById(R.id.progress_bar);
 
-        if (savedInstanceState == null){
-            getClanData();
-            Bundle bundle = getIntent().getExtras();
-            if (bundle != null){
-                bungieId = bundle.getString("bungieId");
-                userName = bundle.getString("userName");
-            } else getLoggedUserData();
-        }
+        getClanData();
+        getLoggedUserData();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -156,6 +150,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
 
         refreshDataListenerList = new ArrayList<>();
+        userDataListener = new ArrayList<>();
 
     }
 
@@ -366,11 +361,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void registerRefreshListener(Fragment fragment) {
         refreshDataListenerList.add((RefreshDataListener) fragment);
-        //Log.w(TAG, "Listeners: " + refreshDataListenerList.toString());
     }
 
     @Override
-    public void registerAlarmTask(Calendar time, String title, int iconId) {
+    public void registerAlarmTask(Calendar time) {
 
         int requestId = (int) time.getTimeInMillis();
 
@@ -378,16 +372,14 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-        Calendar scheduleTime = time;
-        scheduleTime.set(Calendar.MINUTE, time.get(Calendar.MINUTE)-1);
-
-        alarm.set(AlarmManager.RTC_WAKEUP, scheduleTime.getTimeInMillis(), pIntent);
-        Log.w(TAG, "Alarm created! " + scheduleTime.toString());
+        time.set(Calendar.MINUTE, time.get(Calendar.MINUTE)-5);
+        alarm.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), pIntent);
+        Log.w(TAG, "Notification scheduled to: " + time.get(Calendar.HOUR_OF_DAY) + ":" + time.get(Calendar.MINUTE) + ":" + time.get(Calendar.SECOND));
     }
 
     @Override
     public void registerUserDataListener(Fragment fragment) {
-        userDataListener = (UserDataListener) fragment;
+        userDataListener.add((UserDataListener) fragment);
     }
 
     @Override
@@ -564,7 +556,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
                         userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
                     }
-                    userDataListener.onUserDataLoaded();
+                    for (int i=0; i<userDataListener.size();i++){
+                        userDataListener.get(i).onUserDataLoaded();
+                    }
                     break;
             }
             onDataLoaded();
@@ -728,12 +722,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void onDateSent(String date) {
+    public void onDateSent(Calendar date) {
 
     }
 
     @Override
-    public void onTimeSent(String time) {
+    public void onTimeSent(int hour, int minute) {
 
     }
 

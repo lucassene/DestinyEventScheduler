@@ -22,6 +22,6 @@ public interface ToActivityListener {
     public void onNoScheduledGames();
     public void setClanOrderBy(String orderBy);
     public void registerRefreshListener(Fragment fragment);
-    public void registerAlarmTask(Calendar time, String title, int iconId);
+    public void registerAlarmTask(Calendar time);
     public void registerUserDataListener(Fragment fragment);
 }
