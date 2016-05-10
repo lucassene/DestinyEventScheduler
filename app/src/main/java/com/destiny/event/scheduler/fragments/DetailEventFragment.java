@@ -63,6 +63,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private String gameEventTypeName;
     private int gameEventTypeIcon;
     private String gameTime;
+    private Calendar eventCalendar;
 
     private ArrayList<String> bungieIdList;
 
@@ -131,7 +132,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             gameStatus = bundle.getString("status");
         }
 
-        Log.w(TAG, "Creator: " + creator + ", BungieID: " + callback.getBungieId());
+        //Log.w(TAG, "Creator: " + creator + ", BungieID: " + callback.getBungieId());
 
         switch (origin){
             case ScheduledListFragment.TAG:
@@ -384,7 +385,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                         "datetime(" + EntryTable.getQualifiedColumn(EntryTable.COLUMN_TIME) + ") ASC"
                 );
             case LOADER_NOTIFICATION:
-                Log.w(TAG,"onCreateLoader de ID LOADER_NOTIFICATION criado");
+                //Log.w(TAG,"onCreateLoader de ID LOADER_NOTIFICATION criado");
                 return new CursorLoader(
                         getContext(),
                         DataProvider.NOTIFICATION_URI,
@@ -414,7 +415,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     eventType.setText(gameEventTypeName);
 
                     gameTime = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME));
-                    Log.w(TAG, "Game Time: " + gameTime);
+                    eventCalendar = DateUtils.stringToDate(gameTime);
+                    eventCalendar.add(Calendar.MINUTE, -5);
+                    Log.w(TAG, "Game Calendar: " + eventCalendar.getTime());
                     date.setText(DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
                     time.setText(DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
                     light.setText(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_LIGHT)));
@@ -443,12 +446,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
         if (loader.getId() == LOADER_NOTIFICATION){
 
-            Log.w(TAG, "onLoaderFinished alcançado com ID LOADER_NOTIFICATION");
+            //Log.w(TAG, "onLoaderFinished alcançado com ID LOADER_NOTIFICATION");
 
             switch (notificationMethod){
                 case CREATE_NOTIFICATION:
                     if (data == null || data.getCount()<=0){
-                        setAlarmNotification(gameTime, gameId, gameEventName, gameEventTypeName, gameEventTypeIcon);
+                        setAlarmNotification(eventCalendar, gameId, gameEventName, gameEventTypeName, gameEventTypeIcon);
                     } else{
                         Log.w(TAG, "Notification for this game already created!");
                     }
@@ -456,9 +459,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                 case DELETE_NOTIFICATION:
                     if (data!= null && data.getCount()>0){
                         String notificationId = data.getString(data.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
+                        String notificationTime = data.getString(data.getColumnIndexOrThrow(NotificationTable.COLUMN_TIME));
                         Uri uri = Uri.parse(DataProvider.NOTIFICATION_URI + "/" + notificationId);
                         int deletedRow = getContext().getContentResolver().delete(uri, null, null);
                         Log.w(TAG, "NotificationID deleted: " + String.valueOf(deletedRow));
+                        int requestId = Integer.parseInt(notificationId);
+                        callback.cancelAlarmTask(requestId);
                     } else Log.w(TAG,"There is no Notification to be deleted!");
                     break;
             }
@@ -504,44 +510,24 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         setListAdapter(adapter);
     }
 
-    private void setAlarmNotification(String time, String gameId, String title, String typeName, int typeIcon) {
+    private void setAlarmNotification(Calendar notifyTime, String gameId, String title, String typeName, int typeIcon) {
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, Integer.parseInt(DateUtils.getYear(time)));
-        calendar.set(Calendar.MONTH, Integer.parseInt(DateUtils.getMonth(time))-1);
-        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(DateUtils.getDay(time)));
-        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(DateUtils.getHour(time)));
-        calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 1);
-        calendar.set(Calendar.MINUTE, Integer.parseInt(DateUtils.getMinute(time)));
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.AM_PM, Calendar.PM);
+        ContentValues values = new ContentValues();
+        values.put(NotificationTable.COLUMN_GAME, gameId);
+        values.put(NotificationTable.COLUMN_EVENT, title);
+        values.put(NotificationTable.COLUMN_TYPE, typeName);
+        values.put(NotificationTable.COLUMN_ICON, typeIcon);
+        values.put(NotificationTable.COLUMN_TIME, notifyTime.getTimeInMillis());
 
-        Calendar now = Calendar.getInstance();
+        Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
 
-        String agenda = calendar.get(Calendar.DAY_OF_MONTH) + "/" + calendar.get(Calendar.MONTH) + "/" + calendar.get(Calendar.YEAR) + " às " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND);
-        String agora = now.get(Calendar.DAY_OF_MONTH) + "/" + now.get(Calendar.MONTH) + "/" + now.get(Calendar.YEAR) + " às " + now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND);
-
-        Log.w(TAG, "Agora: " + agora + " / Agendamento: " + agenda);
-
-        if (calendar.getTimeInMillis() > now.getTimeInMillis()){
-
-            ContentValues values = new ContentValues();
-            values.put(NotificationTable.COLUMN_GAME, gameId);
-            values.put(NotificationTable.COLUMN_EVENT, title);
-            values.put(NotificationTable.COLUMN_TYPE, typeName);
-            values.put(NotificationTable.COLUMN_ICON, typeIcon);
-            values.put(NotificationTable.COLUMN_TIME, calendar.getTimeInMillis());
-
-            getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
-
-            int newMinute = calendar.get(Calendar.MINUTE);
-            newMinute = newMinute - 5;
-
-            Log.w(TAG, "Notification for " + gameEventName + " created at " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + newMinute + ":" + calendar.get(Calendar.SECOND));
+        if (uri == null){
+            Log.w(TAG, "Notificação não foi criada");
+        } else {
+            int id = Integer.parseInt(uri.getLastPathSegment());
             values.clear();
-            callback.registerAlarmTask(calendar);
-
-        } else Log.w(TAG, "Tentativa de criar uma notificação para antes do DATETIME atual");
+            callback.registerAlarmTask(notifyTime, id);
+        }
 
     }
 

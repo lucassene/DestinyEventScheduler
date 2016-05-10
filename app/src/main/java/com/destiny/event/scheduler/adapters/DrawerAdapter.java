@@ -106,10 +106,10 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         switch (holder.holderId){
             case 1:
-                if (position <=5){
+                if (position <=4){
                     holder.iconView.setImageResource(icons.getResourceId(position-1,0));
                     holder.itemView.setText(items[position-1]);
-                } else if(position <=8){
+                } else if(position <=7){
                     holder.itemView.setText(items[position -2]);
                     holder.iconView.setImageResource(icons.getResourceId(position-2,0));
                 } else {
@@ -133,9 +133,9 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                 break;
             case 2:
                 if (position == 6) {
-                    holder.sectionView.setText(sections[position -6]);
+                    holder.sectionView.setText(sections[0]);
                 } else {
-                    holder.sectionView.setText(sections[position -8]);
+                    holder.sectionView.setText(sections[1]);
                 }
         }
     }
@@ -161,6 +161,6 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
     }
 
     private boolean isPositionSection(int position){
-        return position == 6 || position == 9;
+        return position == 5 || position == 8;
     }
 }

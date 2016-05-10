@@ -28,7 +28,6 @@
     <string-array name="menu_item">
         <item>Nova Partida</item>
         <item>Procurar Partida</item>
-        <item>Avaliar Partida</item>
         <item>Minhas Partidas</item>
         <item>Histórico</item>
         <item>Meu Clã</item>
@@ -246,5 +245,6 @@
     <string name="notification_match_begin">A partida irá começar em instantes...</string>
     <string name="will_begin_soon">" vai começar em breve..."</string>
     <string name="your_match_of">"Sua partida de "</string>
+    <string name="matches">Partidas</string>
 
 </resources>

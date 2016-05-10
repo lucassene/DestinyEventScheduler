@@ -153,5 +153,24 @@ public class DateUtils {
 
     }
 
+    public static Calendar stringToDate(String time){
+        int year = Integer.parseInt(getYear(time));
+        int month = Integer.parseInt(getMonth(time))-1;
+        int day = Integer.parseInt(getDay(time));
+        int hour = Integer.parseInt(getHour(time));
+        int minute = Integer.parseInt(getMinute(time));
+        int second = 0;
+
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.MONTH, month);
+        c.set(Calendar.DAY_OF_MONTH, day);
+        c.set(Calendar.HOUR_OF_DAY, hour);
+        c.set(Calendar.MINUTE, minute);
+        c.set(Calendar.SECOND, second);
+
+        return c;
+    }
+
 
 }

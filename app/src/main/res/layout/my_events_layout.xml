@@ -47,7 +47,7 @@
                     android:id="@+id/section_title"
                     android:textColor="@color/psnColor"
                     android:gravity="center_vertical"
-                    android:text="@string/games_available"
+                    android:text="@string/matches"
                     android:textSize="@dimen/secondaryTextSize" />
 
             </LinearLayout>

@@ -155,7 +155,7 @@ public class BungieService extends IntentService {
             values.put(GameTable.COLUMN_CREATOR, id);
             values.put(GameTable.COLUMN_CREATOR_NAME, membersModelList.get(member).getName());
             values.put(GameTable.COLUMN_EVENT_ID, event);
-            values.put(GameTable.COLUMN_TIME, "2016-05-06T16:43:26");
+            values.put(GameTable.COLUMN_TIME, "2016-05-10T18:13:26");
             values.put(GameTable.COLUMN_LIGHT, 320);
             values.put(GameTable.COLUMN_INSCRIPTIONS, insc);
             values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_NEW);

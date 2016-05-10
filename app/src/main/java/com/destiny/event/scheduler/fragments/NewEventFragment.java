@@ -83,6 +83,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     private SimpleInputDialog dialog;
 
+    private Calendar insertedDate;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -376,49 +378,42 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onDateSent(Calendar date) {
 
-        Calendar showDate = Calendar.getInstance();
+        insertedDate = date;
 
-        if (date.get(Calendar.DATE) >= showDate.get(Calendar.DATE)){
-            showDate = date;
-        } else {
-            Toast.makeText(getContext(), "Are you a Vex wishing to playing in the past?", Toast.LENGTH_SHORT).show();
-        }
+        Log.w(TAG, "Entrada de Date: " + insertedDate.get(Calendar.DAY_OF_MONTH) + "/" + insertedDate.get(Calendar.MONTH) + "/" + insertedDate.get(Calendar.YEAR));
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", getResources().getConfiguration().locale);
-        String finalDate = sdf.format(showDate.getTime());
+        String finalDate = sdf.format(date.getTime());
         dateText.setText(finalDate);
-
     }
 
     @Override
     public void onTimeSent(int hour, int minute) {
 
-        Calendar now = Calendar.getInstance();
-        String time;
+        String date = dateText.getText().toString();
 
-        if (now.get(Calendar.HOUR_OF_DAY) > hour){
-            Toast.makeText(getContext(), "Are you a Vex wishing to playing in the past?", Toast.LENGTH_SHORT).show();
-            time = null;
-        } else if (now.get(Calendar.HOUR_OF_DAY) == hour){
-            if (now.get(Calendar.MINUTE) >= minute){
-                Toast.makeText(getContext(), "Are you a Vex wishing to playing in the past?", Toast.LENGTH_SHORT).show();
-                time = null;
-            } else {
-                String hourOfTheDay = String.valueOf(hour);
-                String min = String.valueOf(minute);
-                if (hourOfTheDay.length() == 1) hourOfTheDay = "0" + hourOfTheDay;
-                if (min.length() == 1) min = "0" + min;
-                time = hourOfTheDay + " : " + min;
-            }
+        if (date.isEmpty()){
+            insertedDate = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", getResources().getConfiguration().locale);
+            String finalDate = sdf.format(insertedDate.getTime());
+            dateText.setText(finalDate);
+            insertedDate.set(Calendar.HOUR_OF_DAY, hour);
+            insertedDate.set(Calendar.MINUTE, minute);
+            insertedDate.set(Calendar.SECOND, 0);
         } else {
-            String hourOfTheDay = String.valueOf(hour);
-            String min = String.valueOf(minute);
-            if (hourOfTheDay.length() == 1) hourOfTheDay = "0" + hourOfTheDay;
-            if (min.length() == 1) min = "0" + min;
-            time = hourOfTheDay + " : " + min;
+            insertedDate.set(Calendar.HOUR_OF_DAY, hour);
+            insertedDate.set(Calendar.MINUTE, minute);
+            insertedDate.set(Calendar.SECOND, 0);
         }
 
-            timeText.setText(time);
+        Log.w(TAG, "Entrada de Time: " + insertedDate.get(Calendar.HOUR_OF_DAY) + ":" + insertedDate.get(Calendar.MINUTE) + ":00");
+
+        String hourOfTheDay = String.valueOf(hour);
+        String min = String.valueOf(minute);
+        if (hourOfTheDay.length() == 1) hourOfTheDay = "0" + hourOfTheDay;
+        if (min.length() == 1) min = "0" + min;
+        String time = hourOfTheDay + " : " + min;
+        timeText.setText(time);
 
     }
 
@@ -449,45 +444,67 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
 
     public void createNewEvent() {
+
         String date = dateText.getText().toString();
         String time = timeText.getText().toString();
 
+
         if(!date.isEmpty() || !time.isEmpty()){
 
-            gameTime = getBungieTime(date, time);
+            Calendar now = Calendar.getInstance();
 
-            int minLight = Integer.parseInt(lightText.getText().toString());
-            int insc = 1;
-            String bungieId = callback.getBungieId();
-            String userName = callback.getUserName();
+            Calendar notifyTime = Calendar.getInstance();
+            notifyTime.setTime(insertedDate.getTime());
+            notifyTime.add(Calendar.MINUTE, -5);
 
-            ContentValues gameValues = new ContentValues();
-            gameValues.put(GameTable.COLUMN_CREATOR, bungieId);
-            gameValues.put(GameTable.COLUMN_CREATOR_NAME,userName);
-            gameValues.put(GameTable.COLUMN_EVENT_ID, selectedEvent);
-            gameValues.put(GameTable.COLUMN_TIME, gameTime);
-            gameValues.put(GameTable.COLUMN_LIGHT, minLight);
-            gameValues.put(GameTable.COLUMN_INSCRIPTIONS, insc);
-            gameValues.put(GameTable.COLUMN_STATUS, GameTable.STATUS_NEW);
+            Calendar minimumTime = Calendar.getInstance();
+            minimumTime.setTime(insertedDate.getTime());
+            minimumTime.add(Calendar.MINUTE, -7);
 
-            Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
-            if (result != null) {
-                gameId = result.getLastPathSegment();
+            Log.w(TAG, "InsertedDate: " + insertedDate.get(Calendar.HOUR_OF_DAY) + ":" + insertedDate.get(Calendar.MINUTE) + ":00");
+            Log.w(TAG, "NotifyTime: " + notifyTime.get(Calendar.HOUR_OF_DAY) + ":" + notifyTime.get(Calendar.MINUTE) + ":00");
+            Log.w(TAG, "MinimumTime: " + minimumTime.get(Calendar.HOUR_OF_DAY) + ":" + minimumTime.get(Calendar.MINUTE) + ":00");
+
+            if (now.getTimeInMillis() <= minimumTime.getTimeInMillis()){
+
+                timeText.setText(time);
+
+                gameTime = getBungieTime(date, time);
+
+                int minLight = Integer.parseInt(lightText.getText().toString());
+                int insc = 1;
+                String bungieId = callback.getBungieId();
+                String userName = callback.getUserName();
+
+                ContentValues gameValues = new ContentValues();
+                gameValues.put(GameTable.COLUMN_CREATOR, bungieId);
+                gameValues.put(GameTable.COLUMN_CREATOR_NAME,userName);
+                gameValues.put(GameTable.COLUMN_EVENT_ID, selectedEvent);
+                gameValues.put(GameTable.COLUMN_TIME, gameTime);
+                gameValues.put(GameTable.COLUMN_LIGHT, minLight);
+                gameValues.put(GameTable.COLUMN_INSCRIPTIONS, insc);
+                gameValues.put(GameTable.COLUMN_STATUS, GameTable.STATUS_NEW);
+
+                Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
+                if (result != null) {
+                    gameId = result.getLastPathSegment();
+                }
+
+                ContentValues entryValues = new ContentValues();
+                entryValues.put(EntryTable.COLUMN_MEMBERSHIP, bungieId);
+                entryValues.put(EntryTable.COLUMN_GAME, gameId);
+                entryValues.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
+                getContext().getContentResolver().insert(DataProvider.ENTRY_URI, entryValues);
+
+                setAlarmNotification(notifyTime, gameId, eventName, eventTypeName, eventTypeIcon);
+
+                Toast.makeText(getContext(), "Success! You've created one new match!", Toast.LENGTH_SHORT).show();
+
+                eventCallback.onEventCreated();
+
+            } else {
+                Toast.makeText(getContext(), "A partida precisa ser criada com, no mínimo, 07 minutos de antecedência.", Toast.LENGTH_SHORT).show();
             }
-
-            String now = DateUtils.getCurrentTime();
-
-            ContentValues entryValues = new ContentValues();
-            entryValues.put(EntryTable.COLUMN_MEMBERSHIP, bungieId);
-            entryValues.put(EntryTable.COLUMN_GAME, gameId);
-            entryValues.put(EntryTable.COLUMN_TIME, now);
-            getContext().getContentResolver().insert(DataProvider.ENTRY_URI, entryValues);
-
-            setAlarmNotification(gameTime, gameId, eventName, eventTypeName, eventTypeIcon);
-
-            Toast.makeText(getContext(), "Success! You've created one new match!", Toast.LENGTH_SHORT).show();
-
-            eventCallback.onEventCreated();
 
         } else{
             Toast.makeText(getContext(), "Hmmm, when do you wanna play?", Toast.LENGTH_SHORT).show();
@@ -495,35 +512,24 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
-    private void setAlarmNotification(String time, String gameId, String title, String typeName, int typeIcon) {
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, Integer.parseInt(DateUtils.getYear(time)));
-        calendar.set(Calendar.MONTH, Integer.parseInt(DateUtils.getMonth(time))-1);
-        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(DateUtils.getDay(time)));
-        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(DateUtils.getHour(time)));
-        calendar.set(Calendar.MINUTE, Integer.parseInt(DateUtils.getMinute(time)));
-        calendar.set(Calendar.SECOND, 00);
-        calendar.set(Calendar.AM_PM, Calendar.PM);
-
-        Calendar now = Calendar.getInstance();
-
-        if (calendar.getTimeInMillis() > now.getTimeInMillis()){
+    private void setAlarmNotification(Calendar notifyTime, String gameId, String title, String typeName, int typeIcon) {
 
             ContentValues values = new ContentValues();
             values.put(NotificationTable.COLUMN_GAME, gameId);
             values.put(NotificationTable.COLUMN_EVENT, title);
             values.put(NotificationTable.COLUMN_TYPE, typeName);
             values.put(NotificationTable.COLUMN_ICON, typeIcon);
-            values.put(NotificationTable.COLUMN_TIME, calendar.getTimeInMillis());
+            values.put(NotificationTable.COLUMN_TIME, notifyTime.getTimeInMillis());
 
-            getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+            Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
 
-            Log.w(TAG, "Notification for " + eventName + " created at " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND));
-            values.clear();
-            callback.registerAlarmTask(calendar);
-
-        }
+            if (uri == null){
+                Log.w(TAG, "Notificação não foi inserida");
+            } else {
+                int id = Integer.parseInt(uri.getLastPathSegment());
+                values.clear();
+                callback.registerAlarmTask(notifyTime, id);
+            }
 
     }
 

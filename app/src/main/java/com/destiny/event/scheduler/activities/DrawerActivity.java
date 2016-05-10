@@ -40,6 +40,7 @@ import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
+import com.destiny.event.scheduler.fragments.DBViewerFragment;
 import com.destiny.event.scheduler.fragments.DetailEventFragment;
 import com.destiny.event.scheduler.fragments.HistoryFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
@@ -49,7 +50,6 @@ import com.destiny.event.scheduler.fragments.NewEventFragment;
 import com.destiny.event.scheduler.fragments.NewEventsListFragment;
 import com.destiny.event.scheduler.fragments.ScheduledListFragment;
 import com.destiny.event.scheduler.fragments.SearchFragment;
-import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
@@ -364,22 +364,28 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void registerAlarmTask(Calendar time) {
-
-        int requestId = (int) time.getTimeInMillis();
+    public void registerAlarmTask(Calendar time, int requestId) {
 
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-        time.set(Calendar.MINUTE, time.get(Calendar.MINUTE)-5);
         alarm.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), pIntent);
-        Log.w(TAG, "Notification scheduled to: " + time.get(Calendar.HOUR_OF_DAY) + ":" + time.get(Calendar.MINUTE) + ":" + time.get(Calendar.SECOND));
+        Log.w(TAG, "Notification scheduled to: " + time.getTime());
+        Log.w(TAG, "requestId:" + requestId);
     }
 
     @Override
     public void registerUserDataListener(Fragment fragment) {
         userDataListener.add((UserDataListener) fragment);
+    }
+
+    @Override
+    public void cancelAlarmTask(int requestId) {
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarm.cancel(pIntent);
+        Log.w(TAG, "requestId canceled: " + requestId);
     }
 
     @Override
@@ -395,16 +401,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
         NewEventFragment fragment = new NewEventFragment();
         prepareFragmentHolder(fragment, child, null, "new");
-        return true;
-    }
-
-    public boolean openValidateEventFragment(View child){
-        if (openFragment instanceof ValidateFragment){
-            drawerLayout.closeDrawers();
-            return false;
-        }
-        ValidateFragment fragment = new ValidateFragment();
-        prepareFragmentHolder(fragment, child, null, "validate");
         return true;
     }
 
@@ -469,6 +465,18 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         bundle.putInt("type", MyProfileFragment.TYPE_USER);
 
         prepareFragmentHolder(fragment, child, bundle, "profile");
+        return true;
+    }
+
+    public boolean openConfigFragment(View child){
+        if (openFragment instanceof DBViewerFragment){
+            drawerLayout.closeDrawers();
+            return false;
+        }
+
+        DBViewerFragment fragment = new DBViewerFragment();
+
+        prepareFragmentHolder(fragment, child, null, "config");
         return true;
     }
 
@@ -609,27 +617,25 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             openSearchEventFragment(child);
                             break;
                         case 3:
-                            openValidateEventFragment(child);
-                            break;
-                        case 4:
                             openMyEventsFragment(child);
                             break;
-                        case 5:
+                        case 4:
                             openHistoryFragment(child);
                             break;
-                        case 6:
+                        case 5:
                             break;
-                        case 7:
+                        case 6:
                             openMyClanFragment(child);
                             break;
-                        case 8:
+                        case 7:
                             openMyProfileFragment(child);
                             break;
+                        case 8:
+                            break;
                         case 9:
+                            openConfigFragment(child);
                             break;
                         case 10:
-                            break;
-                        case 11:
                             showLogOffDialog(child);
                             break;
                     }
@@ -652,22 +658,20 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         case 2:
                             return openSearchEventFragment(child);
                         case 3:
-                            return openValidateEventFragment(child);
-                        case 4:
                             return openMyEventsFragment(child);
-                        case 5:
+                        case 4:
                             return openHistoryFragment(child);
+                        case 5:
+                            return false;
                         case 6:
-                            return false;
-                        case 7:
                             return openMyClanFragment(child);
-                        case 8:
+                        case 7:
                             return openMyProfileFragment(child);
+                        case 8:
+                            return false;
                         case 9:
-                            return false;
+                            return openConfigFragment(child);
                         case 10:
-                            return false;
-                        case 11:
                             return showLogOffDialog(child);
                     }
                     return true;

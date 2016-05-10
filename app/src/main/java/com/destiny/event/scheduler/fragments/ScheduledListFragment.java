@@ -87,7 +87,9 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         //Toast.makeText(getContext(), "GameID Selected: " + gameIdList.get(position-1), Toast.LENGTH_SHORT).show();
-        callback.onGameSelected(gameIdList.get(position-1), TAG, gameCreatorList.get(position-1), GameTable.STATUS_NEW);
+        if (position > 0 ){
+            callback.onGameSelected(gameIdList.get(position - 1), TAG, gameCreatorList.get(position - 1), GameTable.STATUS_NEW);
+        }
     }
 
 
@@ -123,6 +125,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
         String c7 = GameTable.COLUMN_LIGHT;
         String c8 = GameTable.COLUMN_INSCRIPTIONS;
         String c9 = GameTable.COLUMN_CREATOR_NAME;
+        String c10 = GameTable.COLUMN_STATUS;
 
         String c12 = MemberTable.COLUMN_NAME;
 
@@ -134,7 +137,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
         String c18 = EventTable.COLUMN_GUARDIANS;
         String c19 = EventTable.COLUMN_TYPE;
 
-        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c12, c14, c15, c16, c17, c18, c19};
+        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c12, c14, c15, c16, c17, c18, c19};
 
         from = new String[] {c17, c16, c5, c6, c6, c8, c18, c14};
 
@@ -143,8 +146,9 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] selectionArgs = {callback.getBungieId()};
         callback.onLoadingData();
+
+        String where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_NEW;
 
         switch (id){
             case LOADER_ENTRY:
@@ -152,8 +156,8 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
                         getContext(),
                         DataProvider.ENTRY_URI,
                         projection,
-                        EntryTable.COLUMN_MEMBERSHIP + "=?",
-                        selectionArgs,
+                        where,
+                        null,
                         "datetime(" + GameTable.COLUMN_TIME + ") ASC"
                 );
             default:

@@ -158,11 +158,11 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
         switch (position){
             case 0:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
+                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_NEW;
                 gameStatus = GameTable.STATUS_NEW;
                 break;
             case 1:
-                where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING;
+                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING;
                 gameStatus = GameTable.STATUS_WAITING;
                 break;
             case 2:

@@ -91,9 +91,13 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        int newPos = position - 1;
-        //Toast.makeText(getContext(), "GameID Selected: " + id + " | Creator: " + creatorList.get(newPos) + "(" + newPos + "/" + position + ")", Toast.LENGTH_SHORT).show();
-        callback.onGameSelected(String.valueOf(id), TAG, creatorList.get(newPos), null);
+
+        if (position > 0){
+            int newPos = position - 1;
+            //Toast.makeText(getContext(), "GameID Selected: " + id + " | Creator: " + creatorList.get(newPos) + "(" + newPos + "/" + position + ")", Toast.LENGTH_SHORT).show();
+            callback.onGameSelected(String.valueOf(id), TAG, creatorList.get(newPos), null);
+        }
+
     }
 
     private void getNewEvents() {

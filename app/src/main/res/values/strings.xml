@@ -26,7 +26,6 @@
     <string-array name="menu_item">
         <item>New Match</item>
         <item>Search Matches</item>
-        <item>Evaluate Match</item>
         <item>My Matches</item>
         <item>History</item>
         <item>My Clan</item>
@@ -38,7 +37,6 @@
     <array name="menu_icons">
         <item>@drawable/ic_event_new</item>
         <item>@drawable/ic_event_search</item>
-        <item>@drawable/ic_event_validate</item>
         <item>@drawable/ic_my_events</item>
         <item>@drawable/ic_event_history</item>
         <item>@drawable/ic_clan</item>
@@ -144,6 +142,17 @@
         <item>Waiting for Validation</item>
         <item>Validated</item>
         <item>Evaluated</item>
+    </string-array>
+
+    <string-array name="table_names">
+        <item>Clan</item>
+        <item>Entry</item>
+        <item>Event</item>
+        <item>Event Type</item>
+        <item>Game</item>
+        <item>LoggedUser</item>
+        <item>Member</item>
+        <item>Notification</item>
     </string-array>
 
     <string name="tier1">Reciprocate Rune</string>
@@ -279,6 +288,7 @@
     <string name="notification_match_begin">The match will begin soon...</string>
     <string name="your_match_of">"Your match of "</string>
     <string name="will_begin_soon">" will begin soon..."</string>
+    <string name="matches">Matches</string>
 
 
 </resources>

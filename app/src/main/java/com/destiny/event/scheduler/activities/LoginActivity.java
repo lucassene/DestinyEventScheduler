@@ -10,6 +10,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
@@ -29,6 +30,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
     Button psnButton;
     Button liveButton;
+    TextView loginTitle;
 
     private String bungieId;
     private String userName;
@@ -44,6 +46,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
         psnButton = (Button) findViewById(R.id.btn_psn);
         liveButton = (Button) findViewById(R.id.btn_live);
+        loginTitle = (TextView) findViewById(R.id.login_title);
+
+        loginTitle.setVisibility(View.GONE);
+        psnButton.setVisibility(View.GONE);
+        liveButton.setVisibility(View.GONE);
 
         getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
 
@@ -111,22 +118,28 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        data.moveToFirst();
-
-        switch (loader.getId()) {
-            case URL_LOADER_USER:
-                if (data.getCount() > 0) {
-                    bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
-                    userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
-                    Intent intent = new Intent(this, DrawerActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra("bungieId",bungieId);
-                    intent.putExtra("userName",userName);
-                    startActivity(intent);
-                    finish();
-                }
-                break;
+        if (data != null && data.moveToFirst()){
+            switch (loader.getId()) {
+                case URL_LOADER_USER:
+                    if (data.getCount() > 0) {
+                        bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
+                        userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
+                        Intent intent = new Intent(this, DrawerActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("bungieId",bungieId);
+                        intent.putExtra("userName",userName);
+                        startActivity(intent);
+                        finish();
+                    }
+                    break;
+            }
+        } else{
+            loginTitle.setVisibility(View.VISIBLE);
+            psnButton.setVisibility(View.VISIBLE);
+            liveButton.setVisibility(View.VISIBLE);
         }
+
+
 
     }
 

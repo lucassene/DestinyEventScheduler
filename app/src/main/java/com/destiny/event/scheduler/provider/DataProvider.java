@@ -38,8 +38,10 @@ public class DataProvider extends ContentProvider {
     private static final int MEMBER_ID = 51;
     private static final int GAME = 60;
     private static final int GAME_ID = 61;
+    private static final int GAME_ALL = 69;
     private static final int ENTRY = 70;
     private static final int ENTRY_ID = 71;
+    private static final int ENTRY_ALL = 79;
     public static final int ENTRY_MEMBERS = 72;
     private static final int ENTRY_MEMBERS_ID = 73;
     private static final int NOTIFICATION = 80;
@@ -65,6 +67,10 @@ public class DataProvider extends ContentProvider {
     public static final Uri ENTRY_MEMBERS_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_MEMBERS_PATH);
     private static final String NOTIFICATION_PATH = "notifyscheduled";
     public static final Uri NOTIFICATION_URI = Uri.parse("content://" + AUTHORITY + "/" + NOTIFICATION_PATH);
+    private static final String ALL_GAMES_PATH = "allgames";
+    public static final Uri ALL_GAME_URI = Uri.parse("content://" + AUTHORITY + "/" + ALL_GAMES_PATH);
+    private static final String ALL_ENTRIES_PATH = "allentries";
+    public static final Uri ALL_ENTRIES_URI = Uri.parse("content://" + AUTHORITY + "/" + ALL_ENTRIES_PATH);
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
@@ -86,6 +92,8 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, ENTRY_MEMBERS_PATH + "/#", ENTRY_MEMBERS_ID);
         uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH, NOTIFICATION);
         uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH + "/#", NOTIFICATION_ID);
+        uriMatcher.addURI(AUTHORITY, ALL_GAMES_PATH, GAME_ALL);
+        uriMatcher.addURI(AUTHORITY, ALL_ENTRIES_PATH, ENTRY_ALL);
     }
 
     @Override
@@ -228,6 +236,13 @@ public class DataProvider extends ContentProvider {
             case NOTIFICATION_ID:
                 queryBuilder.setTables(NotificationTable.TABLE_NAME);
                 queryBuilder.appendWhere(NotificationTable.COLUMN_ID + "=" + uri.getLastPathSegment() );
+                break;
+            case GAME_ALL:
+                queryBuilder.setTables(GameTable.TABLE_NAME);
+                break;
+            case ENTRY_ALL:
+                queryBuilder.setTables(EntryTable.TABLE_NAME);
+                break;
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }
@@ -380,7 +395,6 @@ public class DataProvider extends ContentProvider {
                 rowsDeleted = sqlDB.delete(NotificationTable.TABLE_NAME, selection, selectionArgs);
                 break;
             case NOTIFICATION_ID:
-                Log.w(TAG, "Entrou no delete do NOTIFICATION_ID");
                 id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)){
                     rowsDeleted = sqlDB.delete(NotificationTable.TABLE_NAME, NotificationTable.COLUMN_ID + "=" + id, null);

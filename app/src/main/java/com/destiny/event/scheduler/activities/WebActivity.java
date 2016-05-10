@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,13 +27,13 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
 
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-        WebView webview = (WebView) findViewById(R.id.webview);
+/*        WebView webview = (WebView) findViewById(R.id.webview);
 
         webview.setHorizontalScrollBarEnabled(true);
         webview.getSettings().setLoadWithOverviewMode(true);
         webview.getSettings().setUseWideViewPort(true);
         webview.getSettings().setBuiltInZoomControls(true);
-        webview.getSettings().setDisplayZoomControls(false);
+        webview.getSettings().setDisplayZoomControls(false);*/
 
 /*        WebSettings webSettings = webview.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -54,6 +53,7 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
         String locale = Locale.getDefault().getLanguage();
 
         destinyWebView = (DestinyWebView) findViewById(R.id.webview);
+        destinyWebView.setHorizontalScrollBarEnabled(true);
         destinyWebView.setListener(this);
         destinyWebView.loadLoginUrl(url);
 

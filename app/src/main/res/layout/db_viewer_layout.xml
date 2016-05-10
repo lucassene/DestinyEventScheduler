@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:paddingTop="@dimen/global_padding"
+    android:scrollbarStyle="outsideOverlay">
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/header_layout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/global_padding">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/listItemHeight"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Table Name"
+                    android:paddingBottom="@dimen/paddingBottomLabelText"/>
+
+                <Spinner
+                    android:id="@+id/search_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimary" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/subheaderHeight"
+                android:id="@+id/section_title"
+                android:textColor="@color/psnColor"
+                android:gravity="center_vertical"
+                android:text="Dados encontrados"
+                android:textSize="@dimen/secondaryTextSize" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/list_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/header_layout">
+
+            <ListView
+                android:id="@+id/search_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:scrollbarStyle="outsideOverlay"
+                android:paddingRight="@dimen/global_padding"/>
+
+            <TextView
+                android:id="@+id/empty_label"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Nenhum dado encontrado"
+                android:visibility="gone"/>
+
+        </FrameLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>
