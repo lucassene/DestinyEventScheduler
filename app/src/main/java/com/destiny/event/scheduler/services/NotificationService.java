@@ -8,7 +8,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
@@ -58,16 +67,20 @@ public class NotificationService extends IntentService {
     private void makeNotification(String title, int iconId, String typeName) {
 
         Intent nIntent = new Intent(getApplicationContext(), DrawerActivity.class);
+        nIntent.putExtra("notification",1);
         nIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), 0, nIntent, 0);
 
         NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(this);
-        nBuilder.setSmallIcon(iconId);
+        nBuilder.setSmallIcon(R.drawable.ic_event_validate);
+        nBuilder.setLargeIcon(getLargeIcon(iconId));
         nBuilder.setContentTitle(title);
         nBuilder.setContentText(getString(R.string.your_match_of) + typeName + getString(R.string.will_begin_soon));
         nBuilder.setTicker("Your match will begin...");
-        nBuilder.setPriority(Notification.PRIORITY_HIGH);
+        nBuilder.setPriority(Notification.PRIORITY_DEFAULT);
         nBuilder.setContentIntent(pIntent);
+        nBuilder.setDefaults(Notification.DEFAULT_SOUND|Notification.DEFAULT_LIGHTS|Notification.DEFAULT_VIBRATE);
+        nBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
         nBuilder.setAutoCancel(true);
 
         NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -93,4 +106,24 @@ public class NotificationService extends IntentService {
         getContentResolver().delete(DataProvider.NOTIFICATION_URI,NotificationTable.COLUMN_ID + "=" + notificationId,null);
         Log.w(TAG, "Notification created, and then deleted!");
     }
+
+    private Bitmap getLargeIcon(int iconId){
+
+        if (iconId == R.drawable.ic_trials){
+            BitmapDrawable bD = (BitmapDrawable) ContextCompat.getDrawable(getApplicationContext(), iconId);
+            Bitmap bigIcon = bD.getBitmap();
+            return bigIcon;
+        } else {
+            Drawable smallIcon = ContextCompat.getDrawable(getApplicationContext(),iconId);
+            BitmapDrawable bD = (BitmapDrawable) smallIcon;
+            Bitmap bigIcon = bD.getBitmap();
+            Bitmap finalIcon = Bitmap.createBitmap(bigIcon.getWidth(), bigIcon.getHeight(), bigIcon.getConfig());
+            Canvas canvas = new Canvas(finalIcon);
+            Paint paint = new Paint();
+            paint.setColorFilter(new PorterDuffColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP));
+            canvas.drawBitmap(bigIcon,0,0,paint);
+            return finalIcon;
+        }
+    }
+
 }

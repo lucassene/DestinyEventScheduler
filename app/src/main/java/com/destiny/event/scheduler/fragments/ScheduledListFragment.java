@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -57,6 +58,13 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        callback.deleteRefreshListener(this);
+        callback.deleteUserDataListener(this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.scheduled_list_layout, container, false);
 
@@ -99,6 +107,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
         callback = (ToActivityListener) getActivity();
         callback.registerRefreshListener(this);
         callback.registerUserDataListener(this);
+        Log.w(TAG, "ScheduledListFragment attached!");
     }
 
     private void getScheduledEvents() {
@@ -208,6 +217,11 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     public void onRefreshData() {
         callback.onLoadingData();
         getLoaderManager().restartLoader(LOADER_ENTRY, null, this);
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this;
     }
 
     @Override

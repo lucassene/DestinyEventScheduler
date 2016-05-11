@@ -152,6 +152,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         refreshDataListenerList = new ArrayList<>();
         userDataListener = new ArrayList<>();
 
+        Bundle notifyBundle = getIntent().getExtras();
+        if (notifyBundle != null && notifyBundle.containsKey("notification")){
+            refreshLists();
+        }
+
     }
 
     private void getLoggedUserData() {
@@ -181,8 +186,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private void refreshLists() {
 
         if (openFragment == null){
-            for (int i=0; i<3; i++){
-                refreshDataListenerList.get(i).onRefreshData();
+            for (int i=0; i<refreshDataListenerList.size(); i++){
+                if (refreshDataListenerList.get(i).getFragment().isAdded()){
+                    refreshDataListenerList.get(i).onRefreshData();
+                } else Log.w(TAG, "Fragment " + refreshDataListenerList.get(i).getFragment().getClass().getName() + " não está atachado ainda!");
             }
         }
 
@@ -364,6 +371,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
+    public void deleteRefreshListener(Fragment fragment) {
+        refreshDataListenerList.remove(fragment);
+    }
+
+    @Override
     public void registerAlarmTask(Calendar time, int requestId) {
 
         Intent intent = new Intent(this, AlarmReceiver.class);
@@ -377,6 +389,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void registerUserDataListener(Fragment fragment) {
         userDataListener.add((UserDataListener) fragment);
+    }
+
+    @Override
+    public void deleteUserDataListener(Fragment fragment) {
+        userDataListener.remove(fragment);
     }
 
     @Override

@@ -61,7 +61,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private int maxGuardians;
     private String gameEventName;
     private String gameEventTypeName;
-    private int gameEventTypeIcon;
+    private int gameEventIcon;
     private String gameTime;
     private Calendar eventCalendar;
 
@@ -411,7 +411,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     eventName.setText(gameEventName);
 
                     gameEventTypeName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)), "string", getContext().getPackageName()));
-                    gameEventTypeIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
+                    gameEventIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
                     eventType.setText(gameEventTypeName);
 
                     gameTime = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME));
@@ -451,7 +451,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             switch (notificationMethod){
                 case CREATE_NOTIFICATION:
                     if (data == null || data.getCount()<=0){
-                        setAlarmNotification(eventCalendar, gameId, gameEventName, gameEventTypeName, gameEventTypeIcon);
+                        setAlarmNotification(eventCalendar, gameId, gameEventName, gameEventTypeName, gameEventIcon);
                     } else{
                         Log.w(TAG, "Notification for this game already created!");
                     }

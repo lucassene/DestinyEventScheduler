@@ -2,9 +2,10 @@
 <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="56dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:minHeight="56dp"
     android:id="@+id/toolbar"
     android:elevation="4dp"
-    android:background="@color/colorPrimaryDark">
+    android:background="@color/psnColor">
 
 </android.support.v7.widget.Toolbar>

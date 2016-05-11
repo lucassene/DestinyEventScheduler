@@ -22,4 +22,5 @@
     <color name="colorTextButton">#FFFFFF</color>
     <color name="primary_text_default_material_light">#ffffff</color>
     <color name="primary_text_material_light">#ffffff</color>
+    <color name="toolbarBackground">#616161</color>
 </resources>

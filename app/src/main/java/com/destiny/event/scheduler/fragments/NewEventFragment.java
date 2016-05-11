@@ -58,7 +58,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private String gameId;
     private String gameTime;
     private String eventTypeName;
-    private int eventTypeIcon;
+    private int eventIcon;
     private String eventName;
 
     private ToActivityListener callback;
@@ -98,6 +98,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             switch (bundle.getString("Table")){
                 case EventTypeTable.TABLE_NAME:
                     selectedType = String.valueOf(bundle.getLong("id"));
+                    callEventList();
                     checkGame(selectedType);
                     break;
                 case EventTable.TABLE_NAME:
@@ -105,6 +106,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                     selectedType = String.valueOf(bundle.getString("Type"));
             }
         }
+
     }
 
     private void checkGame(String selectedType) {
@@ -209,17 +211,9 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         });
 
         gameLayout.setOnClickListener(new View.OnClickListener() {
-            Fragment fragment = new GenericListFragment();
-
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString("title", getContext().getResources().getString(R.string.choose_game));
-                bundle.putString("table", EventTable.TABLE_NAME);
-                bundle.putString("selected", selectedEvent);
-                bundle.putString("type", selectedType);
-                bundle.putString("tag", getTag());
-                callback.loadNewFragment(fragment, bundle, "game");
+                callEventList();
             }
         });
 
@@ -269,6 +263,18 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         fillgameData();
 
         return v;
+    }
+
+    private void callEventList(){
+        Log.w(TAG, "Method calEventList() called!");
+        Fragment fragment = new GenericListFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("title", getContext().getResources().getString(R.string.choose_game));
+        bundle.putString("table", EventTable.TABLE_NAME);
+        bundle.putString("selected", selectedEvent);
+        bundle.putString("type", selectedType);
+        bundle.putString("tag", getTag());
+        callback.loadNewFragment(fragment, bundle, "game");
     }
 
     private void fillgameData() {
@@ -339,7 +345,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         data.moveToFirst();
         switch (loader.getId()){
             case LOADER_TYPE:
-                eventTypeIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
                 iconType.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName()));
                 eventTypeName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 textType.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
@@ -349,6 +354,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 lightBar.setMax(335 - minLight);
                 lightText.setText(String.valueOf(minLight));
                 String iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
+                eventIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
                 iconGame.setImageResource(getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
                 eventName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 textGame.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
@@ -426,9 +432,10 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onEventTypeSent(String id) {
         selectedType = id;
+        callEventList();
         getLoaderManager().restartLoader(LOADER_TYPE, null, this);
-        checkGame(id);
-        getLoaderManager().restartLoader(LOADER_EVENT, null, this);
+        //checkGame(id);
+        //getLoaderManager().restartLoader(LOADER_EVENT, null, this);
     }
 
     @Override
@@ -496,7 +503,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 entryValues.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
                 getContext().getContentResolver().insert(DataProvider.ENTRY_URI, entryValues);
 
-                setAlarmNotification(notifyTime, gameId, eventName, eventTypeName, eventTypeIcon);
+                setAlarmNotification(notifyTime, gameId, eventName, eventTypeName, eventIcon);
 
                 Toast.makeText(getContext(), "Success! You've created one new match!", Toast.LENGTH_SHORT).show();
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -55,12 +56,21 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        callback.deleteRefreshListener(this);
+        callback.deleteUserDataListener(this);
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         callback = (ToActivityListener) getActivity();
         callback.registerRefreshListener(this);
         callback.registerUserDataListener(this);
+        Log.w(TAG, "NewEventsListFragment attached!");
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -193,6 +203,11 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     public void onRefreshData() {
         callback.onLoadingData();
         getLoaderManager().restartLoader(URL_LOADER_GAME, null, this);
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this;
     }
 
     @Override
