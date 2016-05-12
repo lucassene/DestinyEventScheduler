@@ -8,6 +8,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -37,13 +39,13 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     private static final int LOADER_MEMBERS = 50;
 
-    private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE + " ASC";
+    //private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE + " ASC";
     private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME + " ASC";
-    private static final String POINTS_ORDER_BY = MemberTable.POINTS_COLUMNS + " DESC";
+    private static final String POINTS_ORDER_BY = MemberTable.COLUMN_EXP + " DESC";
     private String orderBy;
 
-    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_SINCE};
-    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points};
+    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_EXP, MemberTable.COLUMN_EXP};
+    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points, R.id.xp_bar};
 
     private ArrayList<String> bungieIdList;
     private String bungieId;
@@ -112,11 +114,8 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
             case NAME_ORDER_BY:
                 orderSpinner.setSelection(0);
                 break;
-            case DATE_ORDER_BY:
-                orderSpinner.setSelection(1);
-                break;
             case POINTS_ORDER_BY:
-                orderSpinner.setSelection(2);
+                orderSpinner.setSelection(1);
                 break;
         }
 
@@ -140,6 +139,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         getLoaderManager().initLoader(LOADER_MEMBERS, null, this);
         adapter = new CustomCursorAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, LOADER_MEMBERS);
+        adapter.setViewBinder(new CustomViewBinder());
 
         if (headerView != null){
             this.getListView().addHeaderView(headerView);
@@ -190,7 +190,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         switch (id){
             case LOADER_MEMBERS:
-                projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, MemberTable.POINTS_COLUMNS, MemberTable.COLUMN_SINCE};
+                projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, MemberTable.COLUMN_EXP};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.MEMBER_URI,
@@ -238,11 +238,6 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
                 callback.setClanOrderBy(orderBy);
                 break;
             case 1:
-                orderBy = DATE_ORDER_BY;
-                getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
-                callback.setClanOrderBy(orderBy);
-                break;
-            case 2:
                 orderBy = POINTS_ORDER_BY;
                 getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
                 callback.setClanOrderBy(orderBy);
@@ -254,6 +249,57 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    public class CustomViewBinder implements SimpleCursorAdapter.ViewBinder{
+
+        @Override
+        public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+
+            if (columnIndex == cursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP)){
+
+                int totalPoints = cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
+                Log.w(TAG, "Total Points: " + totalPoints);
+
+                double xp = (double) totalPoints;
+                double delta = 1 + 8*xp;
+                double lvl = (-1 + Math.sqrt(delta))/2;
+                int mLvl = (int) lvl;
+
+                double xpNeeded = ((lvl+2)*(lvl)+(lvl+2))/2;
+                Log.w(TAG, "xpNeeded: " + xpNeeded);
+
+
+                if (view.getId() == R.id.text_points){
+
+                    TextView points = (TextView) view;
+
+                    if (Math.round(mLvl) >= 100) {
+                        points.setText("99");
+                    } else if (Math.round(mLvl) <= 0) {
+                        points.setText("00");
+                    } else if (Math.round(mLvl) < 10) {
+                        String finalPoint = "0" + Math.round(mLvl);
+                        points.setText(finalPoint);
+                    } else points.setText(String.valueOf(mLvl));
+
+                }
+
+                if (view.getId() == R.id.xp_bar){
+
+                    ProgressBar xpBar = (ProgressBar) view;
+
+                    xpBar.setMax((int)xpNeeded);
+                    xpBar.setProgress(totalPoints);
+
+                }
+
+                return true;
+
+            }
+
+            return false;
+        }
     }
 
 }

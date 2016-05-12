@@ -19,7 +19,6 @@ import android.widget.TextView;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.provider.DataProvider;
-import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
@@ -152,20 +151,20 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
                 String name = data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_NAME));
                 userName.setText(name);
 
-                String date = DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
-                joinDate.setText(date);
+                //String date = DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
+                //joinDate.setText(date);
 
-                float created = (float) data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED));
-                gamesCreated.setText(valueToString(created));
+                int created = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED));
+                gamesCreated.setText(String.valueOf(created));
 
-                float played = (float) data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED));
-                gamesPlayed.setText(valueToString(played+created));
+                int played = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED));
+                gamesPlayed.setText(String.valueOf(played+created));
 
-                float totalLikes = (float) data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES));
-                likes.setText(valueToString(totalLikes));
+                int totalLikes = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES));
+                likes.setText(String.valueOf(totalLikes));
 
-                float totalDislikes = (float) data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES));
-                dislikes.setText(valueToString(totalDislikes));
+                int totalDislikes = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES));
+                dislikes.setText(String.valueOf(totalDislikes));
 
                 String totalPoints = getPoints(created, played, totalLikes, totalDislikes);
                 points.setText(totalPoints);
@@ -195,34 +194,21 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
 
     }
 
-    private String getPoints(float created, float played, float totalLikes, float totalDislikes) {
+    private String getPoints(int created, int played, int totalLikes, int totalDislikes) {
 
-        double totalPoints = (totalLikes/(created+played))*100;
-        totalPoints = totalPoints + (created*0.5);
-        totalPoints = totalPoints - totalDislikes;
-        int points = (int) totalPoints;
+        double xp = (double) (totalLikes*Integer.parseInt(MemberTable.LIKE_MODIFIER) + (created*Integer.parseInt(MemberTable.CREATOR_MODIFIER)) + (played*Integer.parseInt(MemberTable.PLAYED_MODIFIER)) - (totalDislikes*Integer.parseInt(MemberTable.DISLIKE_MODIFIER)));
+        double delta = 1 + 8*xp;
+        double lvl = (-1 + Math.sqrt(delta))/2;
+        int mLvl = (int) lvl;
 
-        if (Math.round(totalPoints) >= 100) {
+        if (Math.round(mLvl) >= 100) {
             return "99";
-        } else if (Math.round(totalPoints) <= 0){
+        } else if (Math.round(mLvl) <= 0){
             return "00";
-        } else if (Math.round(totalPoints) < 10){
-            String finalPoint = "0" + String.valueOf(points);
+        } else if (Math.round(mLvl) < 10){
+            String finalPoint = "0" + String.valueOf(mLvl);
             return finalPoint;
-        } else return String.valueOf(String.valueOf(points));
-
-
-
-    }
-
-    private String valueToString(float number){
-
-        if (Math.round(number) <= 0){
-            return "00";
-        } else if (Math.round(number) < 10){
-            String finalString = "0" + Math.round(number);
-            return finalString;
-        } else return String.valueOf(Math.round(number));
+        } else return String.valueOf(String.valueOf(mLvl));
 
     }
 

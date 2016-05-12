@@ -86,7 +86,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private String[] gameProjection;
     private String[] membersProjection;
 
-    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_SINCE};
+    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_EXP};
     private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points};
 
     MembersAdapter adapter;
@@ -333,11 +333,10 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         String c9 = MemberTable.COLUMN_DISLIKES;
         String c10 = MemberTable.COLUMN_CREATED;
         String c11 = MemberTable.COLUMN_PLAYED;
-        String c12 = MemberTable.COLUMN_SINCE;
 
-        String c14 = MemberTable.POINTS_COLUMNS;
+        String c14 = MemberTable.COLUMN_EXP;
 
-        membersProjection = new String[] {c1, c2, c3, c4, c5, c6, c14, c7, c8, c9, c10, c11, c12};
+        membersProjection = new String[] {c1, c2, c3, c4, c5, c6, c14, c7, c8, c9, c10, c11};
 
     }
 

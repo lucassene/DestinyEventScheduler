@@ -6,6 +6,6 @@
     android:minHeight="56dp"
     android:id="@+id/toolbar"
     android:elevation="4dp"
-    android:background="@color/psnColor">
+    android:background="@color/colorPrimaryDark">
 
 </android.support.v7.widget.Toolbar>

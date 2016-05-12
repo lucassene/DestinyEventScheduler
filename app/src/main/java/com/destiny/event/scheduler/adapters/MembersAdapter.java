@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.MemberTable;
-import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
@@ -70,7 +69,7 @@ public class MembersAdapter extends SimpleCursorAdapter {
 
         TextView name = (TextView) view.findViewById(R.id.primary_text);
         ImageView profile = (ImageView) view.findViewById(R.id.profile_pic);
-        TextView memberSince = (TextView) view.findViewById(R.id.secondary_text);
+        //TextView memberSince = (TextView) view.findViewById(R.id.secondary_text);
         TextView points = (TextView) view.findViewById(R.id.text_points);
 
 
@@ -81,22 +80,27 @@ public class MembersAdapter extends SimpleCursorAdapter {
             e.printStackTrace();
         }
 
-        int totalPoints = cursor.getInt(6);
+        int totalPoints = cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
         Log.w(TAG, "Total Points: " + totalPoints);
 
-        if (Math.round(totalPoints) >= 100) {
+        double xp = (double) totalPoints;
+        double delta = 1 + 8*xp;
+        double lvl = (-1 + Math.sqrt(delta))/2;
+        int mLvl = (int) lvl;
+
+        if (Math.round(mLvl) >= 100) {
             points.setText("99");
-        } else if (Math.round(totalPoints) <= 0) {
+        } else if (Math.round(mLvl) <= 0) {
             points.setText("00");
-        } else if (Math.round(totalPoints) < 10) {
-            String finalPoint = "0" + Math.round(totalPoints);
+        } else if (Math.round(mLvl) < 10) {
+            String finalPoint = "0" + Math.round(mLvl);
             points.setText(finalPoint);
-        } else points.setText(String.valueOf(totalPoints));
+        } else points.setText(String.valueOf(mLvl));
 
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
 
-        String sinceString = DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
-        memberSince.setText(sinceString);
+        //String sinceString = DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
+        //memberSince.setText(sinceString);
     }
 
     @Override

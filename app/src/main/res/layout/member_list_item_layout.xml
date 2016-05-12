@@ -31,12 +31,6 @@
             android:textAppearance="?android:textAppearanceMedium"/>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/member_since"
-            android:textSize="@dimen/secondaryTextSize" />
-
-        <TextView
             android:id="@+id/secondary_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,33 +44,26 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:orientation="vertical"
-        android:layout_centerVertical="true"
-        android:layout_gravity="center_vertical"
         android:paddingRight="8dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="P T S"
-            android:textStyle="bold"
-            android:textColor="@color/lineColor"
-            android:layout_gravity="center_horizontal"/>
 
         <TextView
             android:id="@+id/text_points"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="99"
-            android:textSize="32sp"
+            android:textSize="46sp"
             android:layout_gravity="center_horizontal" />
-
 
     </LinearLayout>
 
-    <View
+    <ProgressBar
+        android:id="@+id/xp_bar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:indeterminate="false"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/colorPrimary"
-        android:layout_alignParentBottom="true"/>
+        android:layout_height="wrap_content"
+        android:paddingRight="8dp"
+        android:layout_alignBottom="@id/profile_pic"
+        android:layout_toRightOf="@id/profile_pic" />
 
 </RelativeLayout>

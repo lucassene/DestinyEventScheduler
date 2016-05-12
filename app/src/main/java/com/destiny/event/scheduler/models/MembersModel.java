@@ -12,7 +12,7 @@ public class MembersModel {
     private String dislikes;
     private String gamesCreated;
     private String gamesPlayed;
-    private String memberSince;
+    //private String memberSince;
 
     public String getClanId() {
         return clanId;
@@ -78,13 +78,13 @@ public class MembersModel {
         this.membershipId = membershipId;
     }
 
-    public String getMemberSince() {
-        return memberSince;
-    }
+    //public String getMemberSince() {
+       // return memberSince;
+    //}
 
-    public void setMemberSince(String memberSince) {
-        this.memberSince = memberSince;
-    }
+    //public void setMemberSince(String memberSince) {
+        //this.memberSince = memberSince;
+    //}
 
     public String getName() {
         return name;

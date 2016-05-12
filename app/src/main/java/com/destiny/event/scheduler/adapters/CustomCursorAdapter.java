@@ -40,6 +40,8 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
         this.code = code;
     }
 
+
+
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         super.bindView(view, context, cursor);
@@ -57,6 +59,8 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
         }
 
     }
+
+
 
     private void getEvents(View view, Context context, Cursor cursor) {
 
@@ -118,9 +122,7 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
 
         TextView name = (TextView) view.findViewById(R.id.primary_text);
         ImageView profile = (ImageView) view.findViewById(R.id.profile_pic);
-        TextView memberSince = (TextView) view.findViewById(R.id.secondary_text);
-        TextView points = (TextView) view.findViewById(R.id.text_points);
-
+        //TextView memberSince = (TextView) view.findViewById(R.id.secondary_text);
 
         try {
             profile.setImageBitmap(ImageUtils.loadImage(context, cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_ICON))));
@@ -129,26 +131,15 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
             e.printStackTrace();
         }
 
-        int totalPoints = cursor.getInt(6);
-        Log.w(TAG, "Total Points: " + totalPoints);
-
-        if (Math.round(totalPoints) >= 100) {
-            points.setText("99");
-        } else if (Math.round(totalPoints) <= 0) {
-            points.setText("00");
-        } else if (Math.round(totalPoints) < 10) {
-            String finalPoint = "0" + Math.round(totalPoints);
-            points.setText(finalPoint);
-        } else points.setText(String.valueOf(totalPoints));
-
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
 
-        String sinceString = DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
-        memberSince.setText(sinceString);
+        //String sinceString = DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
+        //memberSince.setText(sinceString);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return super.newView(context, cursor, parent);
     }
+
 }

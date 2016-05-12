@@ -43,7 +43,6 @@
 
     <string-array name="clan_order_by">
         <item>Nome</item>
-        <item>Data de admissão</item>
         <item>Pontos de participação</item>
     </string-array>
 

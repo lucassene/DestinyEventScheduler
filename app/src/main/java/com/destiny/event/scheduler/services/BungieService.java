@@ -213,9 +213,9 @@ public class BungieService extends IntentService {
             values.put(MemberTable.COLUMN_DISLIKES, dislikes);
             values.put(MemberTable.COLUMN_CREATED, created);
             values.put(MemberTable.COLUMN_PLAYED, played);
-            String dateBefore = membersModelList.get(i).getMemberSince();
-            String dateAfter = dateBefore.substring(0,dateBefore.length()-1);
-            values.put(MemberTable.COLUMN_SINCE, dateAfter);
+            //String dateBefore = membersModelList.get(i).getMemberSince();
+            //String dateAfter = dateBefore.substring(0,dateBefore.length()-1);
+            //values.put(MemberTable.COLUMN_SINCE, dateAfter);
             getContentResolver().insert(DataProvider.MEMBER_URI, values);
 
             //Log.w(TAG, membersModelList.get(i).getName() + ": Likes: " + likes + ", Dislikes: " + dislikes + ", Created: " + created + ", Played: " + played);
@@ -512,12 +512,12 @@ public class BungieService extends IntentService {
                 JSONObject bungieInfo = memberJSON.getJSONObject("destinyUserInfo");
 
                 MembersModel member = new MembersModel();
-                try {
+                /*try {
                     member.setMemberSince(memberJSON.getString("approvalDate"));
                 } catch (JSONException e){
                     member.setMemberSince("2016-12-30T23:59:59.00Z");
-                    //Log.w(TAG, "approvalDate TAG not found.");
-                }
+                    Log.w(TAG, "approvalDate TAG not found.");
+                }*/
                 member.setMembershipId(bungieInfo.getString("membershipId"));
                 membersModelList.add(i, member);
             }

@@ -89,7 +89,6 @@
 
     <string-array name="clan_order_by">
         <item>Name</item>
-        <item>Join date</item>
         <item>Participation points</item>
     </string-array>
 

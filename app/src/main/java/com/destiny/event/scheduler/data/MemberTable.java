@@ -17,13 +17,17 @@ public class MemberTable {
     public static final String COLUMN_DISLIKES = "dislikes";
     public static final String COLUMN_CREATED = "games_created";
     public static final String COLUMN_PLAYED = "games_played";
-    public static final String COLUMN_SINCE = "member_since";
+    //public static final String COLUMN_SINCE = "member_since";
 
-    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_NAME, COLUMN_MEMBERSHIP, COLUMN_CLAN, COLUMN_ICON, COLUMN_PLATFORM, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED, COLUMN_SINCE};
-    public static final String[] VIEW_COLUMNS = {COLUMN_NAME, COLUMN_ICON, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED, COLUMN_SINCE};
+    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_NAME, COLUMN_MEMBERSHIP, COLUMN_CLAN, COLUMN_ICON, COLUMN_PLATFORM, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED};
+    public static final String[] VIEW_COLUMNS = {COLUMN_NAME, COLUMN_ICON, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED};
 
-    public static final String POINTS_COLUMNS = "((" + COLUMN_LIKES + "*1.0)/(" + COLUMN_CREATED + "+" + COLUMN_PLAYED + "))*100+(" + COLUMN_CREATED + "*0.5)-" + COLUMN_DISLIKES;
-    public static final String QUALIFIED_POINTS_COLUMNS = "((" + getQualifiedColumn(COLUMN_LIKES) + "*1.0)/(" + getQualifiedColumn(COLUMN_CREATED) + "+" + getQualifiedColumn(COLUMN_PLAYED) + "))*100+(" + getQualifiedColumn(COLUMN_CREATED) + "*0.5)-" + getQualifiedColumn(COLUMN_DISLIKES);
+    //public static final String POINTS_COLUMNS = "((" + COLUMN_LIKES + "*1.0)/(" + COLUMN_CREATED + "+" + COLUMN_PLAYED + "))*100+(" + COLUMN_CREATED + "*0.5)-" + COLUMN_DISLIKES;
+    public static final String LIKE_MODIFIER = "1";
+    public static final String CREATOR_MODIFIER = "5";
+    public static final String PLAYED_MODIFIER = "3";
+    public static final String DISLIKE_MODIFIER = "1";
+    public static final String COLUMN_EXP = "(" + COLUMN_LIKES + "*" + LIKE_MODIFIER + ") + (" + COLUMN_CREATED + "*" + CREATOR_MODIFIER + ") + (" + COLUMN_PLAYED + "*" + PLAYED_MODIFIER + ") - (" + COLUMN_DISLIKES + "*" + DISLIKE_MODIFIER + ")";
 
     public static final String CREATE_TABLE = "CREATE TABLE "
             + TABLE_NAME
@@ -47,9 +51,7 @@ public class MemberTable {
             + COLUMN_CREATED
             + " INTEGER, "
             + COLUMN_PLAYED
-            + " INTEGER, "
-            + COLUMN_SINCE
-            + " TEXT"
+            + " INTEGER"
             + ");";
 
     public static void onCreate(SQLiteDatabase db){
