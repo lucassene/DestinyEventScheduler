@@ -96,7 +96,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     public void onListItemClick(ListView l, View v, int position, long id) {
         //Toast.makeText(getContext(), "GameID Selected: " + gameIdList.get(position-1), Toast.LENGTH_SHORT).show();
         if (position > 0 ){
-            callback.onGameSelected(gameIdList.get(position - 1), TAG, gameCreatorList.get(position - 1), GameTable.STATUS_NEW);
+            callback.onGameSelected(gameIdList.get(position - 1), TAG, gameCreatorList.get(position - 1), GameTable.STATUS_SCHEDULED);
         }
     }
 

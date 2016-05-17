@@ -38,6 +38,7 @@ import com.destiny.event.scheduler.adapters.DrawerAdapter;
 import com.destiny.event.scheduler.adapters.ViewPageAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.DBHelper;
+import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.fragments.DBViewerFragment;
@@ -50,6 +51,7 @@ import com.destiny.event.scheduler.fragments.NewEventFragment;
 import com.destiny.event.scheduler.fragments.NewEventsListFragment;
 import com.destiny.event.scheduler.fragments.ScheduledListFragment;
 import com.destiny.event.scheduler.fragments.SearchFragment;
+import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
@@ -342,15 +344,25 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void onGameSelected(String id, String tag, String creator, String status) {
 
         gameOrigin = tag;
-
+        Fragment fragment;
         Bundle bundle = new Bundle();
-        bundle.putString("gameId",id);
-        bundle.putString("origin",gameOrigin);
-        bundle.putString("creator", creator);
-        bundle.putString("status", status);
+        bundle.clear();
+
+        if (status.equals(GameTable.STATUS_WAITING) || status.equals(GameTable.STATUS_VALIDATED)){
+            bundle.putString("gameId",id);
+            bundle.putString("creator", creator);
+            fragment = new ValidateFragment();
+        } else {
+            bundle.putString("gameId",id);
+            bundle.putString("origin",gameOrigin);
+            bundle.putString("creator", creator);
+            bundle.putString("status", status);
+            fragment = new DetailEventFragment();
+        }
+
         tabLayout.setViewPager(null);
         viewPager.setAdapter(null);
-        loadNewFragment(new DetailEventFragment(), bundle, id);
+        loadNewFragment(fragment, bundle, id);
 
     }
 

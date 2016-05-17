@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/profile_pic"
-        android:layout_alignTop="@id/profile_pic"
+        android:layout_centerVertical="true"
         android:paddingLeft="5dp">
 
         <TextView
@@ -44,7 +44,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:orientation="vertical"
-        android:paddingRight="8dp">
+        android:paddingRight="8dp"
+        android:layout_centerVertical="true">
 
         <TextView
             android:id="@+id/text_points"
@@ -55,15 +56,5 @@
             android:layout_gravity="center_horizontal" />
 
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/xp_bar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:indeterminate="false"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingRight="8dp"
-        android:layout_alignBottom="@id/profile_pic"
-        android:layout_toRightOf="@id/profile_pic" />
 
 </RelativeLayout>

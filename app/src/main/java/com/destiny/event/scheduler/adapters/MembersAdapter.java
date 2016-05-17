@@ -50,6 +50,8 @@ public class MembersAdapter extends SimpleCursorAdapter {
 
         if (viewType == VIEW_TYPE_CREATOR){
             view.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            TextView points = (TextView) view.findViewById(R.id.text_points);
+            points.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
             getMembers(view, context, cursor);
         } else if (viewType == VIEW_TYPE_WAIT_SECTION){
             getWaitSection(view, context);

@@ -132,35 +132,30 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             gameStatus = bundle.getString("status");
         }
 
-        //Log.w(TAG, "Creator: " + creator + ", BungieID: " + callback.getBungieId());
+         if (gameStatus != null) {
+             switch (gameStatus){
+                 case GameTable.STATUS_NEW:
+                     joinButton.setText(R.string.join);
+                     break;
+                 case GameTable.STATUS_SCHEDULED:
+                     if (creator.equals(callback.getBungieId())){
+                         joinButton.setText(R.string.delete);
+                     } else joinButton.setText(getContext().getResources().getString(R.string.leave));
+                     break;
+                 case GameTable.STATUS_WAITING:
+                     if (creator.equals(callback.getBungieId())){
+                         joinButton.setText(R.string.validate);
+                     } else {
+                         joinButton.setText(R.string.waiting_validation);
+                         joinButton.setEnabled(false);
+                     }
+                     break;
+                 case GameTable.STATUS_VALIDATED:
+                     joinButton.setText(R.string.evaluate);
+                     break;
+             };
+         }
 
-        switch (origin){
-            case ScheduledListFragment.TAG:
-                if (creator.equals(callback.getBungieId())){
-                    joinButton.setText(R.string.delete);
-                } else joinButton.setText(R.string.leave);
-                break;
-            case MyEventsFragment.TAG:
-                switch (gameStatus){
-                    case GameTable.STATUS_NEW:
-                        if (creator.equals(callback.getBungieId())){
-                            joinButton.setText(R.string.delete);
-                        } else joinButton.setText(getContext().getResources().getString(R.string.leave));
-                        break;
-                    case GameTable.STATUS_WAITING:
-                        if (creator.equals(callback.getBungieId())){
-                            joinButton.setText(R.string.validate);
-                        } else {
-                            joinButton.setText(R.string.waiting_validation);
-                            joinButton.setEnabled(false);
-                        }
-                        break;
-                    case GameTable.STATUS_VALIDATED:
-                        joinButton.setText(R.string.evaluate);
-                        break;
-                };
-                break;
-        };
 
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,6 +183,15 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         bungieIdList = new ArrayList<>();
 
         return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+
+        super.onViewCreated(view, savedInstanceState);
+
+        getGameData();
+
     }
 
     private void showAlertDialog(int dialogType) {
@@ -260,14 +264,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-
-        super.onViewCreated(view, savedInstanceState);
-
-        getGameData();
-
-    }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
