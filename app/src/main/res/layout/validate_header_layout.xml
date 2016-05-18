@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/subheaderHeight"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -28,14 +29,14 @@
                 android:id="@+id/time_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="99/99/9999 at 99:99"
-                android:textSize="12sp"/>
+                android:text="99/99/9999 at 99:99" />
 
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/checkbox_layout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/subheaderHeight"
         android:orientation="horizontal"
@@ -56,8 +57,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/uncheck_match_not_happened"
-                android:textSize="12sp"/>
+                android:text="@string/uncheck_match_not_happened" />
 
         </LinearLayout>
 

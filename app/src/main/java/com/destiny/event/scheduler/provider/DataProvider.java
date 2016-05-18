@@ -13,6 +13,7 @@ import android.util.Log;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.data.EntryTable;
+import com.destiny.event.scheduler.data.EvaluationTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
@@ -46,6 +47,8 @@ public class DataProvider extends ContentProvider {
     private static final int ENTRY_MEMBERS_ID = 73;
     private static final int NOTIFICATION = 80;
     private static final int NOTIFICATION_ID = 81;
+    private static final int EVALUATION = 90;
+    private static final int EVALUATION_ID = 91;
 
     private static final String AUTHORITY = "com.destiny.event.scheduler.provider";
 
@@ -71,6 +74,8 @@ public class DataProvider extends ContentProvider {
     public static final Uri ALL_GAME_URI = Uri.parse("content://" + AUTHORITY + "/" + ALL_GAMES_PATH);
     private static final String ALL_ENTRIES_PATH = "allentries";
     public static final Uri ALL_ENTRIES_URI = Uri.parse("content://" + AUTHORITY + "/" + ALL_ENTRIES_PATH);
+    private static final String EVALUATION_PATH = "evaluation";
+    public static final Uri EVALUATION_URI = Uri.parse("content://" + AUTHORITY + "/" + EVALUATION_PATH);
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
@@ -94,6 +99,8 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH + "/#", NOTIFICATION_ID);
         uriMatcher.addURI(AUTHORITY, ALL_GAMES_PATH, GAME_ALL);
         uriMatcher.addURI(AUTHORITY, ALL_ENTRIES_PATH, ENTRY_ALL);
+        uriMatcher.addURI(AUTHORITY, EVALUATION_PATH, EVALUATION);
+        uriMatcher.addURI(AUTHORITY, EVALUATION_PATH + "/#", EVALUATION_ID);
     }
 
     @Override
@@ -243,6 +250,13 @@ public class DataProvider extends ContentProvider {
             case ENTRY_ALL:
                 queryBuilder.setTables(EntryTable.TABLE_NAME);
                 break;
+            case EVALUATION:
+                queryBuilder.setTables(EvaluationTable.TABLE_NAME);
+                break;
+            case EVALUATION_ID:
+                queryBuilder.setTables(EvaluationTable.TABLE_NAME);
+                queryBuilder.appendWhere(EvaluationTable.COLUMN_ID + "=" + uri.getLastPathSegment());
+                break;
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }
@@ -300,6 +314,10 @@ public class DataProvider extends ContentProvider {
                 id = sqlDB.insert(NotificationTable.TABLE_NAME, null, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return Uri.parse(NOTIFICATION_PATH + "/" + id);
+            case EVALUATION:
+                id = sqlDB.insert(EvaluationTable.TABLE_NAME, null, values);
+                getContext().getContentResolver().notifyChange(uri, null);
+                return Uri.parse(EVALUATION_PATH + "/" + id);
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }

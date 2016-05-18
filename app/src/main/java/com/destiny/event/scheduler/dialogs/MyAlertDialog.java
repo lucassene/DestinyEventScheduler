@@ -21,6 +21,7 @@ public class MyAlertDialog extends DialogFragment {
     public static final int DELETE_DIALOG = 11;
     public static final int JOIN_DIALOG = 12;
     public static final int ALERT_DIALOG = 13;
+    public static final int CONFIRM_DIALOG = 14;
 
     private Dialog dialog;
 
@@ -99,6 +100,12 @@ public class MyAlertDialog extends DialogFragment {
                         fragmentListener.onPositiveClick(null, dialogType);
                         break;
                     case LEAVE_DIALOG:
+                        fragmentListener.onPositiveClick(null, dialogType);
+                        break;
+                    case ALERT_DIALOG:
+                        listener.onPositiveClick(null, dialogType);
+                        break;
+                    case CONFIRM_DIALOG:
                         fragmentListener.onPositiveClick(null, dialogType);
                         break;
                 }

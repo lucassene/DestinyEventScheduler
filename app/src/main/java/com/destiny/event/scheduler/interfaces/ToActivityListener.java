@@ -27,4 +27,7 @@ public interface ToActivityListener {
     public void registerUserDataListener(Fragment fragment);
     public void deleteUserDataListener(Fragment fragment);
     public void cancelAlarmTask(int requestId);
+    public void setSpinnerSelection(String tag, int position);
+    public int getSpinnerSelection(String tag);
+    public void onSelectedFragment(int id);
 }

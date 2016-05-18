@@ -9,12 +9,14 @@ public class EvaluationTable {
 
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_GAME = "eval_game_id";
-    public static final String COLUMN_MEMBERSHIP = "eval_member_id";
+    public static final String COLUMN_MEMBERSHIP_A = "eval_member_a";
+    public static final String COLUMN_MEMBERSHIP_B = "eval_member_b";
     public static final String COLUMN_EVALUATION = "rate";
 
-    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_GAME, COLUMN_MEMBERSHIP, COLUMN_EVALUATION};
+    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_GAME, COLUMN_MEMBERSHIP_A, COLUMN_MEMBERSHIP_B, COLUMN_EVALUATION};
 
-    public static final int DISLIKE = 0;
+    public static final int DISLIKE = -1;
+    public static final int NEUTRAL = 0;
     public static final int LIKE = 1;
 
     private static final String CREATE_TABLE = "CREATE TABLE "
@@ -24,7 +26,9 @@ public class EvaluationTable {
             + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_GAME
             + " TEXT NOT NULL, "
-            + COLUMN_MEMBERSHIP
+            + COLUMN_MEMBERSHIP_A
+            + " TEXT NOT NULL, "
+            + COLUMN_MEMBERSHIP_B
             + " TEXT NOT NULL, "
             + COLUMN_EVALUATION
             + " INTEGER NOT NULL"

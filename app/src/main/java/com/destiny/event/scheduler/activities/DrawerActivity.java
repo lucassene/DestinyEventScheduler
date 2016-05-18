@@ -72,6 +72,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private static final int URL_LOADER_CLAN = 40;
     private static final int URL_LOADER_USER = 30;
 
+    public static final String TAG_MY_EVENTS = "myEvents";
+    public static final String TAG_SEARCH_EVENTS = "searchEvents";
+
     private Toolbar toolbar;
 
     RecyclerView rView;
@@ -107,6 +110,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     ViewPager viewPager;
     ViewPageAdapter viewPageAdapter;
     SlidingTabLayout tabLayout;
+    private int selectedTabFragment;
+
+    private Bundle spinnerSelections = new Bundle();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,7 +149,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 return getResources().getColor(R.color.tabIndicatorColor);
             }
         });
-        viewPager.setCurrentItem(1);
+
+        if (selectedTabFragment != 0) viewPager.setCurrentItem(selectedTabFragment);
 
         if (getSupportFragmentManager().getBackStackEntryCount()>0){
             Log.w("DrawerActivity", "Fragment BackStack Count: " + String.valueOf(getSupportFragmentManager().getBackStackEntryCount()));
@@ -158,6 +165,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (notifyBundle != null && notifyBundle.containsKey("notification")){
             refreshLists();
         }
+
+        spinnerSelections.putInt(TAG_MY_EVENTS, 0);
+        spinnerSelections.putInt(TAG_SEARCH_EVENTS, 0);
 
     }
 
@@ -348,9 +358,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Bundle bundle = new Bundle();
         bundle.clear();
 
-        if (status !=null && status.equals(GameTable.STATUS_WAITING) || status!= null && status.equals(GameTable.STATUS_VALIDATED)){
+        if (status !=null && status.equals(GameTable.STATUS_WAITING) || status!= null && status.equals(GameTable.STATUS_VALIDATED) || status != null && status.equals(GameTable.STATUS_EVALUATED)){
             bundle.putString("gameId",id);
             bundle.putString("creator", creator);
+            bundle.putString("status", status);
             fragment = new ValidateFragment();
         } else {
             bundle.putString("gameId",id);
@@ -369,7 +380,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onNoScheduledGames() {
         onDataLoaded();
-        viewPager.setCurrentItem(0);
+        if (selectedTabFragment == 1){
+            viewPager.setCurrentItem(0);
+        } else viewPager.setCurrentItem(selectedTabFragment);
     }
 
     @Override
@@ -415,6 +428,21 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarm.cancel(pIntent);
         Log.w(TAG, "requestId canceled: " + requestId);
+    }
+
+    @Override
+    public void setSpinnerSelection(String tag, int position) {
+        spinnerSelections.putInt(tag, position);
+    }
+
+    @Override
+    public int getSpinnerSelection(String tag) {
+        return spinnerSelections.getInt(tag);
+    }
+
+    @Override
+    public void onSelectedFragment(int id) {
+        selectedTabFragment = id;
     }
 
     @Override

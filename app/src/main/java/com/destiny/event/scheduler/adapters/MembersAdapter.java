@@ -2,7 +2,6 @@ package com.destiny.event.scheduler.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,9 +48,6 @@ public class MembersAdapter extends SimpleCursorAdapter {
         int viewType = getItemViewType(cursor.getPosition());
 
         if (viewType == VIEW_TYPE_CREATOR){
-            view.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
-            TextView points = (TextView) view.findViewById(R.id.text_points);
-            points.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
             getMembers(view, context, cursor);
         } else if (viewType == VIEW_TYPE_WAIT_SECTION){
             getWaitSection(view, context);
@@ -112,7 +108,7 @@ public class MembersAdapter extends SimpleCursorAdapter {
         int layoutId = -1;
         switch (viewType){
             case VIEW_TYPE_CREATOR:
-                layoutId = layout;
+                layoutId = R.layout.creator_list_item;
                 break;
             case VIEW_TYPE_NORMAL:
                 layoutId = layout;

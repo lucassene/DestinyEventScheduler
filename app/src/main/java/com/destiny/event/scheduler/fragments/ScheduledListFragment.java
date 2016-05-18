@@ -2,7 +2,6 @@ package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
@@ -82,6 +81,8 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        callback.onSelectedFragment(1);
+
         sectionTitle.setText(R.string.scheduled_games);
 
         String bungieId = callback.getBungieId();
@@ -157,7 +158,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         callback.onLoadingData();
 
-        String where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_NEW;
+        String where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
 
         switch (id){
             case LOADER_ENTRY:
@@ -177,11 +178,9 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
+        //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
 
         if (data !=null && data.moveToFirst()){
-
-            Log.w(TAG, "Scheduled Events Cursor: " + data.toString());
 
             switch (loader.getId()){
                 case LOADER_ENTRY:

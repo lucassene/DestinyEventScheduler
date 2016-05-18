@@ -20,7 +20,7 @@
     <string-array name="tab_titles">
         <item>NEW</item>
         <item>SCHEDULED</item>
-        <item>EVALUATE</item>
+        <item>FINISHED</item>
     </string-array>
 
     <string-array name="menu_item">
@@ -151,6 +151,7 @@
         <item>LoggedUser</item>
         <item>Member</item>
         <item>Notification</item>
+        <item>Evaluation</item>
     </string-array>
 
     <string name="tier1">Reciprocate Rune</string>
@@ -281,7 +282,7 @@
     <string name="join_dialog_title">Join, yes?</string>
     <string name="join_dialog_msg">You will be added to this match and a notification will be created according to your preference settings.</string>
     <string name="join_full_dialog_msg">This match is already full, you will be added to the waiting list. A notification will be created anyway, according to your preference settings.</string>
-    <string name="wait_list">Waiting List</string>
+    <string name="wait_list">Wait List</string>
     <string name="data_refreshed">All data refreshed!</string>
     <string name="notification_match_begin">The match will begin soon...</string>
     <string name="your_match_of">"Your match of "</string>
@@ -297,6 +298,8 @@
     <string name="validation_dialog_msg">After validation, this match will be availabe for other guardians evaluate each other.</string>
     <string name="deleting_match">Deleting match</string>
     <string name="deleting_match_dialog_msg">This match will no longer be available to anyone after this.</string>
+    <string name="at">" at "</string>
+    <string name="evaluate_match">Evaluate match</string>
 
 
 </resources>

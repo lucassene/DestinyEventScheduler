@@ -90,6 +90,8 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        callback.onSelectedFragment(0);
+
         sectionTitle.setText(R.string.games_available);
 
         String bungieId = callback.getBungieId();

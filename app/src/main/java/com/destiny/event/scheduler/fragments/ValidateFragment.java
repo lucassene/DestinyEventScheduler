@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.SimpleMemberAdapter;
 import com.destiny.event.scheduler.data.EntryTable;
+import com.destiny.event.scheduler.data.EvaluationTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
@@ -47,6 +48,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
 
     private static final int LOADER_GAME = 60;
     private static final int LOADER_ENTRY_MEMBERS = 72;
+    private static final int LOADER_EVALUATION = 90;
 
     private static final int TYPE_ONLY_CREATOR = 1;
     private static final int TYPE_NO_EVALUATIONS = 2;
@@ -54,8 +56,8 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     private static final int TYPE_DELETE = 4;
 
     private String gameId;
-    private String gameStatus;
     private String creator;
+    private int selectedType;
 
     private ArrayList<String> bungieIdList;
 
@@ -67,9 +69,9 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     TextView eventType;
     TextView eventName;
 
-    TextView date;
     TextView time;
     CheckBox checkBox;
+    LinearLayout checkLayout;
 
     boolean listStatus = true;
 
@@ -81,13 +83,17 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     private String[] gameProjection;
     private String[] membersProjection;
 
-    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_EXP};
-    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points};
-
     SimpleMemberAdapter adapter;
 
     MyAlertDialog dialog;
 
+    String originStatus;
+    int status;
+
+    private static final int STATUS_WAITING_CREATOR = 1;
+    private static final int STATUS_WAITING = 0;
+    private static final int STATUS_VALIDATED = 2;
+    private static final int STATUS_EVALUATED = 3;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,7 +106,6 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.validate_event_title);
         View v = inflater.inflate(R.layout.detail_event_layout, container, false);
 
         headerView = inflater.inflate(R.layout.validate_header_layout, null);
@@ -114,10 +119,9 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
 
         time = (TextView) headerView.findViewById(R.id.time_text);
         checkBox = (CheckBox) headerView.findViewById(R.id.confirm_check);
+        checkLayout = (LinearLayout) headerView.findViewById(R.id.checkbox_layout);
 
         joinButton = (Button) footerView.findViewById(R.id.btn_join);
-
-        //joinButton = (Button) v.findViewById(R.id.btn_validate);
 
         joinButton.setText(R.string.validate);
 
@@ -125,7 +129,10 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
         if (bundle != null){
             gameId = bundle.getString("gameId");
             creator = bundle.getString("creator");
+            originStatus = bundle.getString("status");
         }
+
+        prepareViews();
 
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,6 +156,39 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
         memberList = new ArrayList<>();
 
         return v;
+    }
+
+    private void prepareViews() {
+        switch (originStatus){
+            case GameTable.STATUS_WAITING:
+                if (creator.equals(callback.getBungieId())){
+                    joinButton.setVisibility(View.VISIBLE);
+                    checkLayout.setVisibility(View.VISIBLE);
+                    joinButton.setEnabled(true);
+                    status = STATUS_WAITING_CREATOR;
+                } else{
+                    checkLayout.setVisibility(View.GONE);
+                    joinButton.setText(R.string.waiting_validation);
+                    joinButton.setEnabled(false);
+                    status = STATUS_WAITING;
+                }
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.validate_event_title);
+                break;
+            case GameTable.STATUS_VALIDATED:
+                joinButton.setEnabled(true);
+                joinButton.setVisibility(View.VISIBLE);
+                checkLayout.setVisibility(View.GONE);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.evaluate_match);
+                status = STATUS_VALIDATED;
+                break;
+            case GameTable.STATUS_EVALUATED:
+                joinButton.setEnabled(true);
+                joinButton.setVisibility(View.GONE);
+                checkLayout.setVisibility(View.GONE);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.event_details);
+                status = STATUS_EVALUATED;
+                break;
+        }
     }
 
     public void changeListStatus(){
@@ -202,6 +242,9 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
             this.getListView().addFooterView(footerView);
         }
 
+        adapter = new SimpleMemberAdapter(getContext(), memberList);
+        getListView().setAdapter(adapter);
+
         getGameData();
 
     }
@@ -234,6 +277,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
         final String negButton = "negButton";
 
         if (!listStatus) dialogType = TYPE_DELETE;
+        selectedType = dialogType;
 
         Bundle bundle = new Bundle();
         switch (dialogType){
@@ -263,7 +307,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                 break;
         }
 
-        bundle.putInt("type", MyAlertDialog.ALERT_DIALOG);
+        bundle.putInt("type", MyAlertDialog.CONFIRM_DIALOG);
 
         dialog = new MyAlertDialog();
         dialog.setArguments(bundle);
@@ -273,6 +317,22 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+
+        switch (status){
+            case STATUS_WAITING_CREATOR:
+                changeListItem(v, position, status);
+                break;
+            case STATUS_WAITING:
+                break;
+            case STATUS_VALIDATED:
+                changeListItem(v, position, status);
+            case STATUS_EVALUATED:
+                break;
+        }
+
+    }
+
+    private void changeListItem(View v, int position, int status) {
 
         if (listStatus){
             ImageView img = (ImageView) v.findViewById(R.id.rate_img);
@@ -285,15 +345,20 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                 if (member.isChecked()){
                     switch (member.getRating()){
                         case -1:
-                            newRating = 0;
-                            member.setChecked(false);
-                            memberList.get(newpos).setChecked(false);
-                            img.setImageResource(R.drawable.ic_error);
-                            img.setVisibility(View.VISIBLE);
-                            AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
-                            anim.setDuration(250);
-                            anim.setFillAfter(true);
-                            v.startAnimation(anim);
+                            if (status == STATUS_WAITING_CREATOR){
+                                newRating = 0;
+                                member.setChecked(false);
+                                memberList.get(newpos).setChecked(false);
+                                img.setImageResource(R.drawable.ic_error);
+                                img.setVisibility(View.VISIBLE);
+                                AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
+                                anim.setDuration(250);
+                                anim.setFillAfter(true);
+                                v.startAnimation(anim);
+                            } else {
+                                newRating = 0;
+                                img.setVisibility(View.GONE);
+                            }
                             break;
                         case 0:
                             newRating = 1;
@@ -309,13 +374,15 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                             break;
                     }
                 } else {
-                    member.setChecked(true);
-                    memberList.get(newpos).setChecked(true);
-                    img.setVisibility(View.GONE);
-                    AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
-                    anim.setDuration(250);
-                    anim.setFillAfter(true);
-                    v.startAnimation(anim);
+                    if (status == STATUS_WAITING_CREATOR) {
+                        member.setChecked(true);
+                        memberList.get(newpos).setChecked(true);
+                        img.setVisibility(View.GONE);
+                        AlphaAnimation anim = new AlphaAnimation(0.3f, 1.0f);
+                        anim.setDuration(250);
+                        anim.setFillAfter(true);
+                        v.startAnimation(anim);
+                    }
                 }
             }
 
@@ -341,6 +408,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
         String c10 = GameTable.COLUMN_LIGHT;
         String c12 = GameTable.COLUMN_INSCRIPTIONS;
         String c14 = GameTable.COLUMN_CREATOR_NAME;
+        String c18 = GameTable.COLUMN_STATUS;
 
         String c4 = EventTable.COLUMN_ICON;
         String c5 = EventTable.COLUMN_NAME;
@@ -353,7 +421,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
         String c16 = EventTypeTable.COLUMN_ICON;
         String c17 = EventTypeTable.COLUMN_NAME;
 
-        gameProjection = new String[] {c1, c2, c4, c5, c6, c7, c8, c9, c10, c11, c12,  c14, c15, c16, c17};
+        gameProjection = new String[] {c1, c2, c4, c5, c6, c7, c8, c9, c10, c11, c12,  c14, c15, c16, c17, c18};
 
     }
 
@@ -420,6 +488,15 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                         selectionArgs,
                         "datetime(" + EntryTable.getQualifiedColumn(EntryTable.COLUMN_TIME) + ") ASC"
                 );
+            case LOADER_EVALUATION:
+                return new CursorLoader(
+                        getContext(),
+                        DataProvider.EVALUATION_URI,
+                        EvaluationTable.ALL_COLUMNS,
+                        EvaluationTable.COLUMN_GAME + "=" + gameId + " AND " + EvaluationTable.COLUMN_MEMBERSHIP_A + "=" + callback.getBungieId(),
+                        null,
+                        null
+                );
             default:
                 return null;
         }
@@ -441,13 +518,13 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
 
                     String date = DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME)));
                     String hour = DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME)));
-                    String timeString = date + " at " + hour;
-                    //date.setText(DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-                    //time.setText(DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
+                    String timeString = date + getResources().getString(R.string.at) + hour;
                     time.setText(timeString);
 
                     prepareMemberStrings();
                     getLoaderManager().initLoader(LOADER_ENTRY_MEMBERS, null, this);
+
+                    if (originStatus.equals(GameTable.STATUS_EVALUATED)) getLoaderManager().initLoader(LOADER_EVALUATION, null, this);
 
                     break;
                 case LOADER_ENTRY_MEMBERS:
@@ -461,14 +538,30 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                         memberModel.setIcon(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_ICON)));
                         memberModel.setRating(0);
                         memberModel.setChecked(true);
+                        memberModel.setEntryId(data.getInt(data.getColumnIndexOrThrow(EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID))));
                         memberList.add(memberModel);
                         bungieIdList.add(i, data.getString(data.getColumnIndexOrThrow(EntryTable.COLUMN_MEMBERSHIP)));
                         data.moveToNext();
                     }
 
-                    adapter = new SimpleMemberAdapter(getContext(), memberList);
-                    getListView().setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+
                     break;
+                case LOADER_EVALUATION:
+
+                    data.moveToFirst();
+                    for (int i=0;i<memberList.size();i++){
+                        for (int x=0;x<data.getCount();x++){
+                            if (data.getString(data.getColumnIndexOrThrow(EvaluationTable.COLUMN_MEMBERSHIP_B)).equals(memberList.get(i).getMembershipId())){
+                                memberList.get(i).setRating(data.getInt(data.getColumnIndexOrThrow(EvaluationTable.COLUMN_EVALUATION)));
+                                Log.w(TAG, "Member: " + memberList.get(i).getMembershipId() + " rated " + data.getInt(data.getColumnIndexOrThrow(EvaluationTable.COLUMN_EVALUATION)));
+                                break;
+                            }
+                            data.moveToNext();
+                        }
+                        data.moveToFirst();
+                    }
+                    adapter.notifyDataSetChanged();
             }
         }
 
@@ -488,6 +581,68 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
         String uriString = DataProvider.GAME_URI + "/" + gameId;
         Uri uri = Uri.parse(uriString);
 
+        switch (selectedType){
+            case TYPE_DELETE:
+                deleteGame(uri);
+                break;
+            case TYPE_NO_EVALUATIONS:
+                if (status == STATUS_WAITING_CREATOR){
+                    validateGame(values, uri);
+                } else evaluateGame(values, uri);
+                break;
+            case TYPE_OK:
+                if (status == STATUS_WAITING_CREATOR){
+                    validateGame(values, uri);
+                } else evaluateGame(values, uri);
+                break;
+            case TYPE_ONLY_CREATOR:
+                deleteGame(uri);
+                break;
+        }
+
+        values.clear();
+
+    }
+
+    private void evaluateGame(ContentValues values, Uri uri) {
+
+        for (int i=0;i<memberList.size();i++){
+            if (!memberList.get(i).getMembershipId().equals(callback.getBungieId())){
+                values.put(EvaluationTable.COLUMN_GAME, gameId);
+                values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, callback.getBungieId());
+                values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, memberList.get(i).getMembershipId());
+                values.put(EvaluationTable.COLUMN_EVALUATION, memberList.get(i).getRating());
+                getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+                values.clear();
+            }
+        }
+
+        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_EVALUATED);
+        getContext().getContentResolver().update(uri, values, null, null);
+
+    }
+
+    private void validateGame(ContentValues values, Uri uri) {
+        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_VALIDATED);
+        getContext().getContentResolver().update(uri, values, null, null);
+
+        String selection = "";
+        for (int i=0; i<memberList.size(); i++){
+            if (!memberList.get(i).isChecked()){
+                selection = selection + EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID) + "=" + memberList.get(i).getEntryId();
+                Log.w(TAG, "Entry ID a ser deletado: " + memberList.get(i).getEntryId());
+            }
+        }
+        if (!selection.isEmpty()) getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
+
+        callback.closeFragment();
+    }
+
+    private void deleteGame(Uri uri) {
+        getContext().getContentResolver().delete(uri, null, null);
+        String selection = GameTable.getQualifiedColumn(GameTable.COLUMN_ID) + "=" + gameId;
+        getContext().getContentResolver().delete(DataProvider.GAME_URI, selection, null);
+        callback.closeFragment();
     }
 
     @Override

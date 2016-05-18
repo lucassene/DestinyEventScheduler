@@ -69,7 +69,6 @@
                 android:layout_height="wrap_content"
                 android:text="99"
                 android:textSize="46sp"
-                android:textColor="@color/colorPrimary"
                 android:layout_gravity="center_horizontal" />
 
 

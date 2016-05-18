@@ -231,6 +231,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private void deleteGame(Uri uri) {
         getContext().getContentResolver().delete(uri,null,null);
+        String selection = EntryTable.COLUMN_GAME + "=" + gameId;
+        getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
         notificationMethod = DELETE_NOTIFICATION;
         getLoaderManager().initLoader(LOADER_NOTIFICATION, null, this);
     }
@@ -250,6 +252,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private void joinGame(ContentValues values, Uri uri) {
 
         values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions+1);
+        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_SCHEDULED);
         getContext().getContentResolver().update(uri, values,null, null);
         values.clear();
 

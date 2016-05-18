@@ -8,7 +8,9 @@
         android:id="@id/android:list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:paddingRight="@dimen/global_padding"
+        android:scrollbarStyle="outsideOverlay"/>
 
     <TextView
         android:id="@android:id/empty"

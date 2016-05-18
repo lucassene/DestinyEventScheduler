@@ -56,10 +56,34 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
             case R.layout.game_list_item_layout:
                 getGames(view, context, cursor);
                 break;
+            case R.layout.done_game_item:
+                getDoneGames(view, context, cursor);
+                break;
         }
 
     }
 
+    private void getDoneGames(View view, Context context, Cursor cursor) {
+
+        ImageView gameIcon = (ImageView) view.findViewById(R.id.game_image);
+        TextView gameTitle = (TextView) view.findViewById(R.id.primary_text);
+        TextView gameCreator = (TextView) view.findViewById(R.id.secondary_text);
+        TextView gameType = (TextView) view.findViewById(R.id.type_text);
+        ImageView statusImg = (ImageView) view.findViewById(R.id.status_img);
+
+        gameIcon.setImageResource(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", context.getPackageName()));
+        gameTitle.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", context.getPackageName()));
+        gameType.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)), "string", context.getPackageName()));
+
+        String creator = context.getResources().getString(R.string.created_by) + " " + cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_CREATOR_NAME));
+        gameCreator.setText(creator);
+
+        String gameStatus = cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_STATUS));
+        if (gameStatus.equals(GameTable.STATUS_WAITING)){
+            statusImg.setImageResource(R.drawable.ic_waiting);
+        } else statusImg.setImageResource(R.drawable.ic_done);
+
+    }
 
 
     private void getEvents(View view, Context context, Cursor cursor) {

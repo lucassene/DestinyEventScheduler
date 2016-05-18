@@ -8,6 +8,7 @@ public class SimpleMemberModel {
     private boolean isChecked;
     private int rating;
     private String icon;
+    private int entryId;
 
     public boolean isChecked() {
         return isChecked;
@@ -47,5 +48,13 @@ public class SimpleMemberModel {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public int getEntryId() {
+        return entryId;
+    }
+
+    public void setEntryId(int entryId) {
+        this.entryId = entryId;
     }
 }

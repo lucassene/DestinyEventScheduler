@@ -145,9 +145,9 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
             case EvaluationTable.TABLE_NAME:
                 lbl1.setText(EvaluationTable.COLUMN_ID);
                 lbl2.setText(EvaluationTable.COLUMN_GAME);
-                lbl3.setText(EvaluationTable.COLUMN_MEMBERSHIP);
+                lbl3.setText(EvaluationTable.COLUMN_MEMBERSHIP_A);
                 lbl4.setText(EvaluationTable.COLUMN_EVALUATION);
-                lbl5.setVisibility(View.GONE);
+                lbl5.setText(EvaluationTable.COLUMN_MEMBERSHIP_B);
                 lbl6.setVisibility(View.GONE);
                 lbl7.setVisibility(View.GONE);
                 lbl8.setVisibility(View.GONE);
@@ -156,9 +156,9 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 lbl11.setVisibility(View.GONE);
                 txt1.setText(cursor.getString(cursor.getColumnIndexOrThrow(EvaluationTable.COLUMN_ID)));
                 txt2.setText(cursor.getString(cursor.getColumnIndexOrThrow(EvaluationTable.COLUMN_GAME)));
-                txt3.setText(cursor.getString(cursor.getColumnIndexOrThrow(EvaluationTable.COLUMN_MEMBERSHIP)));
+                txt3.setText(cursor.getString(cursor.getColumnIndexOrThrow(EvaluationTable.COLUMN_MEMBERSHIP_A)));
                 txt4.setText(cursor.getString(cursor.getColumnIndexOrThrow(EvaluationTable.COLUMN_EVALUATION)));
-                txt5.setVisibility(View.GONE);
+                txt5.setText(cursor.getString(cursor.getColumnIndexOrThrow(EvaluationTable.COLUMN_MEMBERSHIP_B)));
                 txt6.setVisibility(View.GONE);
                 txt7.setVisibility(View.GONE);
                 txt8.setVisibility(View.GONE);

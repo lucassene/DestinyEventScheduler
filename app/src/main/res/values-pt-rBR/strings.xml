@@ -22,7 +22,7 @@
     <string-array name="tab_titles">
         <item>NOVOS</item>
         <item>AGENDADOS</item>
-        <item>AVALIAR</item>
+        <item>CONCLUÍDOS</item>
     </string-array>
 
     <string-array name="menu_item">
@@ -219,7 +219,7 @@
     <string name="leaving">Você está saindo guardião?</string>
     <string name="oblivion">Esteja ciente de que todas suas informações serão apagadas e você será esquecido para sempre.</string>
     <string name="nevermind">Deixa pra lá</string>
-    <string name="event_details">Detalhes de partida</string>
+    <string name="event_details">Detalhes da partida</string>
     <string name="of">de</string>
     <string name="empty_game">Oops! Será que essa partida está vazia?</string>
     <string name="search_empty_list">Parece que ninguém quer jogar esse tipo de jogo...</string>
@@ -254,5 +254,7 @@
     <string name="uncheck_match_not_happened">Desmarque se essa partida não aconteceu</string>
     <string name="validation">Validação</string>
     <string name="validation_dialog_msg">Depois da validação, essa partida estará disponível para outros guardiões se avaliarem.</string>
+    <string name="at">" às "</string>
+    <string name="evaluate_match">Avaliar partida</string>
 
 </resources>

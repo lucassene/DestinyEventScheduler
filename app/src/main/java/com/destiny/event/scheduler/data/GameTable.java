@@ -18,6 +18,7 @@ public class GameTable {
     public static final String STATUS_NEW = "0";
     public static final String STATUS_WAITING = "1";
     public static final String STATUS_VALIDATED = "2";
+    public static final String STATUS_EVALUATED = "3";
     public static final String STATUS_SCHEDULED = "9";
 
     public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_CREATOR, COLUMN_CREATOR_NAME, COLUMN_EVENT_ID, COLUMN_TIME, COLUMN_LIGHT, COLUMN_INSCRIPTIONS, COLUMN_STATUS};

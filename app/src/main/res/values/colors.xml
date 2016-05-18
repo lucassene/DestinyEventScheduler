@@ -9,18 +9,12 @@
     <color name="liveColor">#388E3C</color>
     <color name="redFilter">#F44336</color>
     <color name="navigationBarColor">#212121</color>
-    <color name="primary_material_dark">#212121</color>
     <color name="tabIndicatorColor">#9E9E9E</color>
     <color name="background_dark">#ffffff</color>
-    <color name="primary_text_default_material_dark">#00000000</color>
     <color name="primary_text_material_dark">#000000</color>
-    <color name="background_material_light">#fafafa</color>
-    <color name="accent_material_light">#fb8c00</color>
-    <color name="primary_dark_material_light">#311b92</color>
     <color name="colorButtonNormal">#1976D2</color>
     <color name="colorToolbarTitle">#FFFFFF</color>
     <color name="colorTextButton">#FFFFFF</color>
-    <color name="primary_text_default_material_light">#ffffff</color>
     <color name="primary_text_material_light">#ffffff</color>
     <color name="toolbarBackground">#616161</color>
 </resources>
