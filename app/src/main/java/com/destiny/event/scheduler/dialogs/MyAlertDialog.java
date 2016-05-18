@@ -61,7 +61,9 @@ public class MyAlertDialog extends DialogFragment {
                     title.setText(bundle.getString("title"));
                     message.setText(bundle.getString("msg"));
                     btnLeave.setText(bundle.getString("posButton"));
-                    btnNevermind.setVisibility(View.GONE);
+                    if (bundle.containsKey("negButton")){
+                        btnNevermind.setText(bundle.getString("negButton"));
+                    } else btnNevermind.setVisibility(View.GONE);
                     break;
                 default:
                     title.setText(bundle.getString("title"));

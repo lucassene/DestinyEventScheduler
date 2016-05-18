@@ -47,7 +47,7 @@
             android:layout_height="50dp"
             android:id="@+id/btn_validar"
             android:layout_marginTop="@dimen/settingsMargin"
-            android:text="@string/validate_button"
+            android:text="@string/validate"
             android:background="@color/colorButtonNormal"
             android:layout_gravity="center_horizontal" />
 

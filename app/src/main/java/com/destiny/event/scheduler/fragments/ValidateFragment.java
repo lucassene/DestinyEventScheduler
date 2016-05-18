@@ -10,13 +10,16 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -45,12 +48,14 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     private static final int LOADER_GAME = 60;
     private static final int LOADER_ENTRY_MEMBERS = 72;
 
+    private static final int TYPE_ONLY_CREATOR = 1;
+    private static final int TYPE_NO_EVALUATIONS = 2;
+    private static final int TYPE_OK = 3;
+    private static final int TYPE_DELETE = 4;
+
     private String gameId;
-    private String origin;
     private String gameStatus;
     private String creator;
-    private int inscriptions;
-    private int maxGuardians;
 
     private ArrayList<String> bungieIdList;
 
@@ -61,12 +66,12 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     ImageView eventIcon;
     TextView eventType;
     TextView eventName;
-    TextView sectionTitle;
 
     TextView date;
     TextView time;
-    TextView light;
-    TextView guardians;
+    CheckBox checkBox;
+
+    boolean listStatus = true;
 
     View footerView;
     Button joinButton;
@@ -95,10 +100,10 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Validar Partida");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.validate_event_title);
         View v = inflater.inflate(R.layout.detail_event_layout, container, false);
 
-        headerView = inflater.inflate(R.layout.detail_header_layout, null);
+        headerView = inflater.inflate(R.layout.validate_header_layout, null);
         footerView = inflater.inflate(R.layout.detail_footer_layout, null);
 
         includedView = headerView.findViewById(R.id.header);
@@ -107,13 +112,14 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
         eventType = (TextView) includedView.findViewById(R.id.secondary_text);
         eventName = (TextView) includedView.findViewById(R.id.primary_text);
 
-        date = (TextView) headerView.findViewById(R.id.date);
-        time = (TextView) headerView.findViewById(R.id.time);
-        light = (TextView) headerView.findViewById(R.id.light);
-        guardians = (TextView) headerView.findViewById(R.id.guardians);
-        sectionTitle = (TextView) headerView.findViewById(R.id.section_guardians);
+        time = (TextView) headerView.findViewById(R.id.time_text);
+        checkBox = (CheckBox) headerView.findViewById(R.id.confirm_check);
 
         joinButton = (Button) footerView.findViewById(R.id.btn_join);
+
+        //joinButton = (Button) v.findViewById(R.id.btn_validate);
+
+        joinButton.setText(R.string.validate);
 
         Bundle bundle = getArguments();
         if (bundle != null){
@@ -124,32 +130,66 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (getCheckedMembers()==1){
+                    showAlertDialog(TYPE_ONLY_CREATOR);
+                } else if (getEvaluatedMembers()==0){
+                    showAlertDialog(TYPE_NO_EVALUATIONS);
+                } else showAlertDialog(TYPE_OK);
+            }
+        });
 
-                switch (origin){
-                    case NewEventsListFragment.TAG:
-                        showAlertDialog(MyAlertDialog.JOIN_DIALOG);
-                        break;
-                    case ScheduledListFragment.TAG:
-                        if (creator.equals(callback.getBungieId())){
-                            showAlertDialog(MyAlertDialog.DELETE_DIALOG);
-                        } else showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
-                        break;
-                    case SearchFragment.TAG:
-                        showAlertDialog(MyAlertDialog.JOIN_DIALOG);
-                        break;
-                    case MyEventsFragment.TAG:
-                        showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
-                        break;
-                }
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeListStatus();
             }
         });
 
         bungieIdList = new ArrayList<>();
         memberList = new ArrayList<>();
 
-        sectionTitle.setText("Guardiões participantes");
-
         return v;
+    }
+
+    public void changeListStatus(){
+        if (listStatus){
+
+            listStatus = false;
+
+            AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
+            anim.setDuration(250);
+            anim.setFillAfter(true);
+
+            for (int i=1; i<=memberList.size();i++){
+                View v = getListView().getChildAt(i);
+                v.startAnimation(anim);
+                v.setEnabled(false);
+                adapter.getItem(i-1).setChecked(false);
+                adapter.notifyDataSetChanged();
+            }
+
+            joinButton.setText(R.string.delete);
+
+        } else {
+
+            listStatus = true;
+
+            AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
+            anim.setDuration(250);
+            anim.setFillAfter(true);
+
+            for (int i=1;i<=memberList.size();i++){
+                View v = getListView().getChildAt(i);
+                v.startAnimation(anim);
+                v.setEnabled(true);
+                adapter.getItem(i-1).setChecked(true);
+                adapter.notifyDataSetChanged();
+            }
+
+            joinButton.setText(R.string.validate);
+
+        }
+
     }
 
     @Override
@@ -166,34 +206,64 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
 
     }
 
+    private int getCheckedMembers(){
+        int result = 0;
+        for (int i=0; i<memberList.size(); i++){
+            if (memberList.get(i).isChecked()){
+                result ++;
+            }
+        }
+        return result;
+    }
+
+    private int getEvaluatedMembers(){
+        int result = 0;
+        for (int i=0; i<memberList.size();i++){
+            if (memberList.get(i).getRating() != 0){
+                result ++;
+            }
+        }
+        return result;
+    }
+
     private void showAlertDialog(int dialogType) {
 
         final String title = "title";
         final String msg = "msg";
         final String posButton = "posButton";
+        final String negButton = "negButton";
+
+        if (!listStatus) dialogType = TYPE_DELETE;
 
         Bundle bundle = new Bundle();
         switch (dialogType){
-            case MyAlertDialog.LEAVE_DIALOG:
-                bundle.putString(title, getContext().getResources().getString(R.string.leave_game_title));
-                bundle.putString(msg, getContext().getResources().getString(R.string.leave_dialog_msg));
-                bundle.putString(posButton, getContext().getResources().getString(R.string.leave));
+            case TYPE_ONLY_CREATOR:
+                bundle.putString(title,getResources().getString(R.string.no_guardians));
+                bundle.putString(msg, getResources().getString(R.string.no_guardians_dialog_msg));
+                bundle.putString(posButton, getResources().getString(R.string.delete));
+                bundle.putString(negButton, getResources().getString(R.string.nevermind));
                 break;
-            case MyAlertDialog.DELETE_DIALOG:
-                bundle.putString(title, getContext().getResources().getString(R.string.delete_dialog_title));
-                bundle.putString(msg, getContext().getResources().getString(R.string.delete_dialog_msg));
-                bundle.putString(posButton, getContext().getResources().getString(R.string.delete));
+            case TYPE_NO_EVALUATIONS:
+                bundle.putString(title, getResources().getString(R.string.no_evaluations));
+                bundle.putString(msg, getResources().getString(R.string.no_evaluations_dialog_msg));
+                bundle.putString(posButton, getResources().getString(R.string.validate));
+                bundle.putString(negButton, getResources().getString(R.string.nevermind));
                 break;
-            case MyAlertDialog.JOIN_DIALOG:
-                bundle.putString(title, getContext().getResources().getString(R.string.join_dialog_title));
-                bundle.putString(posButton, getContext().getResources().getString(R.string.join));
-                if (inscriptions > maxGuardians){
-                    bundle.putString(msg, getContext().getResources().getString(R.string.join_full_dialog_msg));
-                } else bundle.putString(msg, getContext().getResources().getString(R.string.join_dialog_msg));
+            case TYPE_OK:
+                bundle.putString(title, getResources().getString(R.string.validate_event_title));
+                bundle.putString(msg, getResources().getString(R.string.validation_dialog_msg));
+                bundle.putString(posButton, getResources().getString(R.string.validate));
+                bundle.putString(negButton, getResources().getString(R.string.nevermind));
+                break;
+            case TYPE_DELETE:
+                bundle.putString(title, getResources().getString(R.string.deleting_match));
+                bundle.putString(msg, getResources().getString(R.string.deleting_match_dialog_msg));
+                bundle.putString(posButton, getResources().getString(R.string.delete));
+                bundle.putString(negButton, getResources().getString(R.string.nevermind));
                 break;
         }
 
-        bundle.putInt("type", dialogType);
+        bundle.putInt("type", MyAlertDialog.ALERT_DIALOG);
 
         dialog = new MyAlertDialog();
         dialog.setArguments(bundle);
@@ -201,54 +271,57 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
 
     }
 
-
-
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
-        ImageView img = (ImageView) v.findViewById(R.id.rate_img);
+        if (listStatus){
+            ImageView img = (ImageView) v.findViewById(R.id.rate_img);
 
-        int newpos = position -1;
-        SimpleMemberModel member = adapter.getItem(newpos);
-        int newRating = 0;
+            int newpos = position -1;
+            SimpleMemberModel member = adapter.getItem(newpos);
+            int newRating = 0;
 
-        if (!member.getMembershipId().equals(callback.getBungieId())){
-            if (member.isChecked()){
-                switch (member.getRating()){
-                    case -1:
-                        newRating = 0;
-                        member.setChecked(false);
-                        img.setImageResource(R.drawable.ic_error);
-                        img.setVisibility(View.VISIBLE);
-                        AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
-                        anim.setDuration(250);
-                        anim.setFillAfter(true);
-                        v.startAnimation(anim);
-                        break;
-                    case 0:
-                        newRating = 1;
-                        img.setImageResource(R.drawable.ic_like);
-                        img.setVisibility(View.VISIBLE);
-                        //img.setColorFilter(R.color.psnColor, PorterDuff.Mode.SRC_IN);
-                        break;
-                    case 1:
-                        newRating = -1;
-                        img.setImageResource(R.drawable.ic_dislike);
-                        img.setVisibility(View.VISIBLE);
-                        //img.setColorFilter(R.color.redFilter, PorterDuff.Mode.SRC_IN);
-                        break;
+            if (!member.getMembershipId().equals(callback.getBungieId())){
+                if (member.isChecked()){
+                    switch (member.getRating()){
+                        case -1:
+                            newRating = 0;
+                            member.setChecked(false);
+                            memberList.get(newpos).setChecked(false);
+                            img.setImageResource(R.drawable.ic_error);
+                            img.setVisibility(View.VISIBLE);
+                            AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
+                            anim.setDuration(250);
+                            anim.setFillAfter(true);
+                            v.startAnimation(anim);
+                            break;
+                        case 0:
+                            newRating = 1;
+                            img.setImageResource(R.drawable.ic_like);
+                            img.setVisibility(View.VISIBLE);
+                            //img.setColorFilter(R.color.psnColor, PorterDuff.Mode.SRC_IN);
+                            break;
+                        case 1:
+                            newRating = -1;
+                            img.setImageResource(R.drawable.ic_dislike);
+                            img.setVisibility(View.VISIBLE);
+                            //img.setColorFilter(R.color.redFilter, PorterDuff.Mode.SRC_IN);
+                            break;
+                    }
+                } else {
+                    member.setChecked(true);
+                    memberList.get(newpos).setChecked(true);
+                    img.setVisibility(View.GONE);
+                    AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
+                    anim.setDuration(250);
+                    anim.setFillAfter(true);
+                    v.startAnimation(anim);
                 }
-            } else {
-                member.setChecked(true);
-                img.setVisibility(View.GONE);
-                AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
-                anim.setDuration(250);
-                anim.setFillAfter(true);
-                v.startAnimation(anim);
             }
-        }
 
-        adapter.setRating(newpos, newRating);
+            memberList.get(newpos).setRating(newRating);
+            adapter.setRating(newpos, newRating);
+        }
 
     }
 
@@ -366,14 +439,12 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                     String gameEventTypeName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)), "string", getContext().getPackageName()));
                     eventType.setText(gameEventTypeName);
 
-                    date.setText(DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-                    time.setText(DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-                    light.setText(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_LIGHT)));
-
-                    maxGuardians = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS));
-                    inscriptions = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
-                    String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
-                    guardians.setText(sg);
+                    String date = DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME)));
+                    String hour = DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME)));
+                    String timeString = date + " at " + hour;
+                    //date.setText(DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
+                    //time.setText(DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
+                    time.setText(timeString);
 
                     prepareMemberStrings();
                     getLoaderManager().initLoader(LOADER_ENTRY_MEMBERS, null, this);

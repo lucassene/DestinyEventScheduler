@@ -4,11 +4,11 @@
     <string name="default_img_desc">Icone</string>
     <string name="default_username">nome de usuário</string>
     <string name="back_desc">Voltar</string>
-    <string name="menu_new_event">Nova Partida</string>
+    <string name="menu_new_event">Nova partida</string>
     <string name="open_menu">Abrir menu</string>
     <string name="close_menu">Fechar menu</string>
     <string name="menu">Menu</string>
-    <string name="def_clan_header">Nome do Clã</string>
+    <string name="def_clan_header">Nome do clã</string>
     <string name="def_clan_desc">"Aqui vai a Descrição do Clã"</string>
 
     <string name="new_tab_header">NOVOS</string>
@@ -75,41 +75,40 @@
         <item>Avaliadas</item>
     </string-array>
 
-    <string name="refresh_lists">Atualizar Listas</string>
-    <string name="game_type_label">Tipo de Jogo</string>
-    <string name="max_guardians_label">Mínimo de Guardiões</string>
-    <string name="min_light_label">Luz Mínima</string>
-    <string name="new_event_button">Criar Partida</string>
-    <string name="new_event_title">Nova Partida</string>
+    <string name="refresh_lists">Atualizar listas</string>
+    <string name="game_type_label">Tipo de jogo</string>
+    <string name="max_guardians_label">Mínimo de guardiões</string>
+    <string name="min_light_label">Luz mínima</string>
+    <string name="new_event_button">Criar partida</string>
+    <string name="new_event_title">Nova partida</string>
     <string name="date_label">Data</string>
     <string name="time_label">Horário</string>
     <string name="event_confirmation">A partida aconteceu?</string>
-    <string name="validate_button">Avaliar </string>
-    <string name="validate_event_title">Avaliar Partida</string>
-    <string name="search_title">Procurar Partida</string>
+    <string name="validate_event_title">Validar partida</string>
+    <string name="search_title">Procurar partida</string>
     <string name="created_by">Criado por</string>
     <string name="date">Data</string>
-    <string name="date_time_section">Dia e Horário</string>
+    <string name="date_time_section">Dia e horário</string>
     <string name="guardians">Guardiões</string>
-    <string name="guardians_participating">Guardiões Participando</string>
+    <string name="guardians_participating">Guardiões participando</string>
     <string name="join">Participar</string>
     <string name="min_light">Luz mínima</string>
-    <string name="participants_guardians">Guardiões Participantes</string>
+    <string name="participants_guardians">Guardiões participantes</string>
     <string name="specs">Especificações</string>
     <string name="time">Horário</string>
     <string name="wait_list">Lista de espera</string>
-    <string name="games_available">Partidas Disponíveis</string>
+    <string name="games_available">Partidas disponíveis</string>
     <string name="members">Membros</string>
     <string name="order_by">Ordenar por</string>
-    <string name="games_played">Partidas Jogadas</string>
+    <string name="games_played">Partidas jogadas</string>
     <string name="history">Histórico</string>
-    <string name="my_clan">Meu Clã</string>
+    <string name="my_clan">Meu clã</string>
     <string name="sort_by">Classificar por</string>
     <string name="crucible">Crisol</string>
     <string name="events_created">Partidas criadas:</string>
     <string name="joined_events">Partidas Jogadas:</string>
     <string name="member_since">Membro desde:</string>
-    <string name="my_profile">Meu Perfil</string>
+    <string name="my_profile">Meu perfil</string>
     <string name="patrol">Patrulha</string>
     <string name="prison">Prisão dos Anciões</string>
     <string name="raid">Incursão</string>
@@ -169,7 +168,7 @@
     <string name="will">A Vontade de Crota</string>
     <string name="winter">Caminho Invernal</string>
     <string name="choose_type">Escolha o tipo de jogo:</string>
-    <string name="event_type_title">Lista de Tipos de Jogo</string>
+    <string name="event_type_title">Lista de tipos de jogo</string>
     <string name="type">Tipo</string>
     <string name="game_info">Informações de Jogo</string>
     <string name="choose_game">Escolha o modo de jogo:</string>
@@ -215,12 +214,12 @@
     <string name="date_member_join1">O dia em que</string>
     <string name="date_member_join2">entrou no</string>
     <string name="games_played_by_member2">, não incluindo os próprios</string>
-    <string name="scheduled_games">Partidas Agendadas</string>
+    <string name="scheduled_games">Partidas agendadas</string>
     <string name="leave">Sair</string>
     <string name="leaving">Você está saindo guardião?</string>
     <string name="oblivion">Esteja ciente de que todas suas informações serão apagadas e você será esquecido para sempre.</string>
     <string name="nevermind">Deixa pra lá</string>
-    <string name="event_details">Detalhes de Partida</string>
+    <string name="event_details">Detalhes de partida</string>
     <string name="of">de</string>
     <string name="empty_game">Oops! Será que essa partida está vazia?</string>
     <string name="search_empty_list">Parece que ninguém quer jogar esse tipo de jogo...</string>
@@ -228,9 +227,9 @@
     <string name="delete">Excluir</string>
     <string name="evaluate">Avaliar</string>
     <string name="validate">Validar</string>
-    <string name="waiting_validation">Esperando Validação</string>
-    <string name="game_status">Estado de Partida</string>
-    <string name="my_events">Minhas Partidas</string>
+    <string name="waiting_validation">Esperando validação</string>
+    <string name="game_status">Estado de partida</string>
+    <string name="my_events">Minhas partidas</string>
     <string name="no_games_status">Sem partidas nesse estado.</string>
     <string name="delete_dialog_msg">Excluir essa partida é irreversível, ela não ficará mais disponível para ninguém depois disso.</string>
     <string name="delete_dialog_title">Excluir essa partida?</string>
@@ -245,5 +244,15 @@
     <string name="will_begin_soon">" vai começar em breve..."</string>
     <string name="your_match_of">"Sua partida de "</string>
     <string name="matches">Partidas</string>
+    <string name="confirm_match">Confirmar partida</string>
+    <string name="deleting_match">Excluindo partida</string>
+    <string name="deleting_match_dialog_msg">Essa partida não estará mais disponível para ninguém depois disso.</string>
+    <string name="no_evaluations">Nenhuma avaliação?</string>
+    <string name="no_evaluations_dialog_msg">Nenhum guardião foi avaliado, validar mesmo assim?</string>
+    <string name="no_guardians">Sem outros guardiões</string>
+    <string name="no_guardians_dialog_msg">Há apenas você nessa partida, ela será excluída se você continuar.</string>
+    <string name="uncheck_match_not_happened">Desmarque se essa partida não aconteceu</string>
+    <string name="validation">Validação</string>
+    <string name="validation_dialog_msg">Depois da validação, essa partida estará disponível para outros guardiões se avaliarem.</string>
 
 </resources>

@@ -348,7 +348,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Bundle bundle = new Bundle();
         bundle.clear();
 
-        if (status.equals(GameTable.STATUS_WAITING) || status.equals(GameTable.STATUS_VALIDATED)){
+        if (status !=null && status.equals(GameTable.STATUS_WAITING) || status!= null && status.equals(GameTable.STATUS_VALIDATED)){
             bundle.putString("gameId",id);
             bundle.putString("creator", creator);
             fragment = new ValidateFragment();

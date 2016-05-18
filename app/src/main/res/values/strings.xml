@@ -7,13 +7,13 @@
     <string name="default_username">username</string>
     <string name="default_img_desc">Icon</string>
     <string name="back_desc">Back</string>
-    <string name="menu_new_event">New Match</string>
+    <string name="menu_new_event">New match</string>
     <string name="open_menu">Open menu</string>
     <string name="close_menu">Close menu</string>
     <string name="new_tab_header">NEW</string>
     <string name="scheduled_tab_header">SCHEDULED</string>
     <string name="validate_tab_header">VALIDAR</string>
-    <string name="new_event_title">New Match</string>
+    <string name="new_event_title">New match</string>
 
     <string name="tx_login">Welcome Guardian! What is the secret code?</string>
 
@@ -51,35 +51,34 @@
     </string-array>
 
     <string name="def_clan_desc">"Here goes Clan\'s description"</string>
-    <string name="def_clan_header">Clan\'s Name</string>
+    <string name="def_clan_header">Clan\'s name</string>
     <string name="empty_new_events">It seems that nobody is playing huh?</string>
     <string name="empty_validate_event">First you play, then you evaluate, got it?</string>
     <string name="empty_scheduled_list">You don\'t have any scheduled match.</string>
     <string name="menu">Menu</string>
-    <string name="refresh_lists">Refresh Lists</string>
-    <string name="game_type_label">Game Type</string>
+    <string name="refresh_lists">Refresh lists</string>
+    <string name="game_type_label">GametType</string>
     <string name="game_label">Game</string>
     <string name="date_label">Date</string>
     <string name="time_label">Time</string>
-    <string name="max_guardians_label">Min Guardians</string>
-    <string name="min_light_label">Min Light</string>
-    <string name="new_event_button">Create Match</string>
+    <string name="max_guardians_label">Min guardians</string>
+    <string name="min_light_label">Min light</string>
+    <string name="new_event_button">Create match</string>
     <string name="home_title">Main</string>
-    <string name="validate_event_title">Evaluate Match</string>
+    <string name="validate_event_title">Validate match</string>
     <string name="event_confirmation">This match happened?</string>
-    <string name="validate_button">Evaluate</string>
-    <string name="search_title">Search Match</string>
-    <string name="date_time_section">Date and Time</string>
+    <string name="search_title">Search match</string>
+    <string name="date_time_section">Date and time</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
     <string name="specs">Specs</string>
     <string name="min_light">Min light</string>
     <string name="guardians">Guardians</string>
-    <string name="guardians_participating">Guardians Participating</string>
+    <string name="guardians_participating">Guardians participating</string>
     <string name="join">Join</string>
-    <string name="participants_guardians">Participants Guardians</string>
+    <string name="participants_guardians">Participants guardians</string>
     <string name="created_by">Created by</string>
-    <string name="scheduled_games">Scheduled Matches</string>
+    <string name="scheduled_games">Scheduled matches</string>
 
     <string-array name="new_event_section">
         <item>What</item>
@@ -92,15 +91,15 @@
         <item>Participation points</item>
     </string-array>
 
-    <string name="games_available">Matches Available</string>
+    <string name="games_available">Matches available</string>
     <string name="members">Members</string>
     <string name="order_by">Order by</string>
-    <string name="my_clan">My Clan</string>
+    <string name="my_clan">My clan</string>
     <string name="history">History</string>
-    <string name="games_played">Matches Played</string>
+    <string name="games_played">Matches played</string>
     <string name="sort_by">Sort by</string>
     <string name="system">System</string>
-    <string name="my_profile">My Profile</string>
+    <string name="my_profile">My profile</string>
     <string name="joined_events">Joined Events:</string>
     <string name="events_created">Matches created:</string>
     <string name="member_since">Member since:</string>
@@ -223,9 +222,9 @@
 
     <string name="choose_type">Choose the game type:</string>
     <string name="choose_game">Choose the game mode:</string>
-    <string name="event_type_title">Game Type List</string>
+    <string name="event_type_title">Game type list</string>
     <string name="type">Type</string>
-    <string name="game_info">Game Info</string>
+    <string name="game_info">Game info</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="values_between1">"Value between 2 and "</string>
@@ -263,18 +262,18 @@
     <string name="oblivion">Be aware that all your data will be deleted, and you\'ll be forgot in the oblivion.</string>
     <string name="leave">Leave</string>
     <string name="nevermind">Nevermind</string>
-    <string name="event_details">Match Details</string>
+    <string name="event_details">Match details</string>
     <string name="of">of</string>
     <string name="empty_game">Oops! Is this game empty?</string>
     <string name="search_empty_list">Looks like no one wants to play this kind of game...</string>
     <string name="no_match_type">Have you created one match of this type?</string>
     <string name="delete">Delete</string>
     <string name="validate">Validate</string>
-    <string name="waiting_validation">Waiting for Validation</string>
+    <string name="waiting_validation">Waiting for validation</string>
     <string name="evaluate">Evaluate</string>
     <string name="no_games_status">No games on this status.</string>
-    <string name="game_status">Match Status</string>
-    <string name="my_events">My Matches</string>
+    <string name="game_status">Match status</string>
+    <string name="my_events">My matches</string>
     <string name="leave_game_title">Leave this match?</string>
     <string name="leave_dialog_msg">You will no longer participate in this match after this.</string>
     <string name="delete_dialog_title">Delete this match?</string>
@@ -288,6 +287,16 @@
     <string name="your_match_of">"Your match of "</string>
     <string name="will_begin_soon">" will begin soon..."</string>
     <string name="matches">Matches</string>
+    <string name="confirm_match">Confirm Match</string>
+    <string name="uncheck_match_not_happened">Uncheck if this match do not happened</string>
+    <string name="no_guardians">No other guardians</string>
+    <string name="no_guardians_dialog_msg">There is only you in this match, it will be deleted if you proceed.</string>
+    <string name="no_evaluations">No evaluations?</string>
+    <string name="no_evaluations_dialog_msg">No guardian was evaluated, validate anyway?</string>
+    <string name="validation">Validation</string>
+    <string name="validation_dialog_msg">After validation, this match will be availabe for other guardians evaluate each other.</string>
+    <string name="deleting_match">Deleting match</string>
+    <string name="deleting_match_dialog_msg">This match will no longer be available to anyone after this.</string>
 
 
 </resources>
