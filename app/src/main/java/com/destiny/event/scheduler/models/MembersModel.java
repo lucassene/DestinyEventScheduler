@@ -8,10 +8,38 @@ public class MembersModel {
     private String clanId;
     private String iconPath;
     private String platformId;
-    private String likes;
-    private String dislikes;
-    private String gamesCreated;
-    private String gamesPlayed;
+    private int likes;
+    private int dislikes;
+    private int gamesCreated;
+    private int gamesPlayed;
+
+    public int getEntryId() {
+        return entryId;
+    }
+
+    public void setEntryId(int entryId) {
+        this.entryId = entryId;
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    private boolean isChecked;
+    private int rating;
+    private int entryId;
     //private String memberSince;
 
     public String getClanId() {
@@ -22,27 +50,27 @@ public class MembersModel {
         this.clanId = clanId;
     }
 
-    public String getDislikes() {
+    public int getDislikes() {
         return dislikes;
     }
 
-    public void setDislikes(String dislikes) {
+    public void setDislikes(int dislikes) {
         this.dislikes = dislikes;
     }
 
-    public String getGamesCreated() {
+    public int getGamesCreated() {
         return gamesCreated;
     }
 
-    public void setGamesCreated(String gamesCreated) {
+    public void setGamesCreated(int gamesCreated) {
         this.gamesCreated = gamesCreated;
     }
 
-    public String getGamesPlayed() {
+    public int getGamesPlayed() {
         return gamesPlayed;
     }
 
-    public void setGamesPlayed(String gamesPlayed) {
+    public void setGamesPlayed(int gamesPlayed) {
         this.gamesPlayed = gamesPlayed;
     }
 
@@ -62,11 +90,11 @@ public class MembersModel {
         this.id = id;
     }
 
-    public String getLikes() {
+    public int getLikes() {
         return likes;
     }
 
-    public void setLikes(String likes) {
+    public void setLikes(int likes) {
         this.likes = likes;
     }
 

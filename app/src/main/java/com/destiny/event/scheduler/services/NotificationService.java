@@ -96,7 +96,7 @@ public class NotificationService extends IntentService {
     private void updateGameStatus() {
         ContentValues values = new ContentValues();
         //values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING);
-        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_VALIDATED); //Deixando o Status para Validated para fins de testes
+        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING); //Deixando o Status para Validated para fins de testes
         Uri uri = Uri.parse(DataProvider.GAME_URI + "/" + gameId);
         getContentResolver().update(uri, values, GameTable.COLUMN_ID + "=" + gameId, null);
         Log.w(TAG, "Game status from ID: " + gameId + " updated to Waiting for Validation");

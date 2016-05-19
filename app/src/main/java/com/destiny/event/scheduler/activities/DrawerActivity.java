@@ -43,7 +43,7 @@ import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.fragments.DBViewerFragment;
 import com.destiny.event.scheduler.fragments.DetailEventFragment;
-import com.destiny.event.scheduler.fragments.HistoryFragment;
+import com.destiny.event.scheduler.fragments.HistoryListFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
 import com.destiny.event.scheduler.fragments.MyEventsFragment;
 import com.destiny.event.scheduler.fragments.MyProfileFragment;
@@ -358,22 +358,33 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Bundle bundle = new Bundle();
         bundle.clear();
 
-        if (status !=null && status.equals(GameTable.STATUS_WAITING) || status!= null && status.equals(GameTable.STATUS_VALIDATED) || status != null && status.equals(GameTable.STATUS_EVALUATED)){
-            bundle.putString("gameId",id);
-            bundle.putString("creator", creator);
-            bundle.putString("status", status);
-            fragment = new ValidateFragment();
-        } else {
-            bundle.putString("gameId",id);
-            bundle.putString("origin",gameOrigin);
-            bundle.putString("creator", creator);
-            bundle.putString("status", status);
-            fragment = new DetailEventFragment();
-        }
+        if (status!= null){
+            switch (status){
+                case GameTable.STATUS_WAITING:
+                case GameTable.STATUS_VALIDATED:
+                case GameTable.STATUS_EVALUATED:
+                    bundle.putString("gameId",id);
+                    bundle.putString("creator", creator);
+                    bundle.putString("status", status);
+                    fragment = new ValidateFragment();
+                    break;
+                case HistoryListFragment.STATUS_HISTORY:
+                    //do something;
+                    fragment = new HistoryListFragment();
+                    break;
+                default:
+                    bundle.putString("gameId",id);
+                    bundle.putString("origin",gameOrigin);
+                    bundle.putString("creator", creator);
+                    bundle.putString("status", status);
+                    fragment = new DetailEventFragment();
+                    break;
+            }
 
-        tabLayout.setViewPager(null);
-        viewPager.setAdapter(null);
-        loadNewFragment(fragment, bundle, id);
+            tabLayout.setViewPager(null);
+            viewPager.setAdapter(null);
+            loadNewFragment(fragment, bundle, id);
+        }
 
     }
 
@@ -483,11 +494,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openHistoryFragment(View child){
-        if (openFragment instanceof HistoryFragment){
+        if (openFragment instanceof HistoryListFragment){
             drawerLayout.closeDrawers();
             return false;
         }
-        HistoryFragment fragment = new HistoryFragment();
+        HistoryListFragment fragment = new HistoryListFragment();
         prepareFragmentHolder(fragment, child, null, "history");
         return true;
     }

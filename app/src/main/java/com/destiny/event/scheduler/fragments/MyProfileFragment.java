@@ -197,8 +197,8 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
     private String getPoints(int created, int played, int totalLikes, int totalDislikes) {
 
         double xp = (double) (totalLikes*Integer.parseInt(MemberTable.LIKE_MODIFIER) + (created*Integer.parseInt(MemberTable.CREATOR_MODIFIER)) + (played*Integer.parseInt(MemberTable.PLAYED_MODIFIER)) - (totalDislikes*Integer.parseInt(MemberTable.DISLIKE_MODIFIER)));
-        double delta = 1 + 8*xp;
-        double lvl = (-1 + Math.sqrt(delta))/2;
+        double delta = 1 + 80*xp;
+        double lvl = (-1 + Math.sqrt(delta))/20;
         int mLvl = (int) lvl;
 
         if (Math.round(mLvl) >= 100) {

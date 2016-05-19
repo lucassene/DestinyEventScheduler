@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.models.SimpleMemberModel;
+import com.destiny.event.scheduler.models.MembersModel;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
@@ -21,10 +21,10 @@ public class SimpleMemberAdapter extends BaseAdapter {
     private static final String TAG = "SimpleMemberAdapter";
 
     private Context context;
-    private List<SimpleMemberModel> memberList;
+    private List<MembersModel> memberList;
     private LayoutInflater inflater;
 
-    public SimpleMemberAdapter(Context context, List<SimpleMemberModel> memberList){
+    public SimpleMemberAdapter(Context context, List<MembersModel> memberList){
         this.context = context;
         this.memberList = memberList;
         inflater = LayoutInflater.from(context);
@@ -36,7 +36,7 @@ public class SimpleMemberAdapter extends BaseAdapter {
     }
 
     @Override
-    public SimpleMemberModel getItem(int position) {
+    public MembersModel getItem(int position) {
         return memberList.get(position);
     }
 
@@ -57,11 +57,11 @@ public class SimpleMemberAdapter extends BaseAdapter {
             vViewHolder = (ValidateViewHolder) convertView.getTag();
         }
 
-        SimpleMemberModel currentMember = getItem(position);
+        MembersModel currentMember = getItem(position);
 
         vViewHolder.memberName.setText(currentMember.getName());
         try {
-            vViewHolder.memberIcon.setImageBitmap(ImageUtils.loadImage(context, currentMember.getIcon()));
+            vViewHolder.memberIcon.setImageBitmap(ImageUtils.loadImage(context, currentMember.getIconPath()));
         } catch (IOException e) {
             Log.w(TAG, "Image not found!");
             e.printStackTrace();

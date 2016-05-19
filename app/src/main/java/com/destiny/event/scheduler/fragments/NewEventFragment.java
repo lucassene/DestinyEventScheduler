@@ -489,8 +489,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 gameValues.put(GameTable.COLUMN_EVENT_ID, selectedEvent);
                 gameValues.put(GameTable.COLUMN_TIME, gameTime);
                 gameValues.put(GameTable.COLUMN_LIGHT, minLight);
-                gameValues.put(GameTable.COLUMN_INSCRIPTIONS, insc);
-                gameValues.put(GameTable.COLUMN_STATUS, GameTable.STATUS_NEW);
+                gameValues.put(GameTable.COLUMN_INSCRIPTIONS, 4);
+                gameValues.put(GameTable.COLUMN_STATUS, GameTable.STATUS_SCHEDULED); //Inserir STATUS_NEW no Servidor
 
                 Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
                 if (result != null) {
@@ -502,6 +502,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 entryValues.put(EntryTable.COLUMN_GAME, gameId);
                 entryValues.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
                 getContext().getContentResolver().insert(DataProvider.ENTRY_URI, entryValues);
+
+                createFakeEntries();
 
                 setAlarmNotification(notifyTime, gameId, eventName, eventTypeName, eventIcon);
 
@@ -516,6 +518,32 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         } else{
             Toast.makeText(getContext(), "Hmmm, when do you wanna play?", Toast.LENGTH_SHORT).show();
         }
+
+    }
+
+    //Inserindo entries falsas apenas para testes
+    private void createFakeEntries() {
+
+        ContentValues values = new ContentValues();
+        values.put(EntryTable.COLUMN_MEMBERSHIP,"4611686018446566077");
+        values.put(EntryTable.COLUMN_GAME, gameId);
+        values.put(EntryTable.COLUMN_TIME,"2016-05-30T16:43:00");
+        getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
+        values.clear();
+
+        values = new ContentValues();
+        values.put(EntryTable.COLUMN_MEMBERSHIP,"4611686018434509539");
+        values.put(EntryTable.COLUMN_GAME, gameId);
+        values.put(EntryTable.COLUMN_TIME,"2016-05-30T16:43:00");
+        getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
+        values.clear();
+
+        values = new ContentValues();
+        values.put(EntryTable.COLUMN_MEMBERSHIP,"4611686018444413912");
+        values.put(EntryTable.COLUMN_GAME, gameId);
+        values.put(EntryTable.COLUMN_TIME,"2016-05-30T16:43:00");
+        getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
+        values.clear();
 
     }
 

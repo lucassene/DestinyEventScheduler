@@ -45,6 +45,7 @@ public class DataProvider extends ContentProvider {
     private static final int ENTRY_ALL = 79;
     public static final int ENTRY_MEMBERS = 72;
     private static final int ENTRY_MEMBERS_ID = 73;
+    private static final int ENTRY_HISTORY = 74;
     private static final int NOTIFICATION = 80;
     private static final int NOTIFICATION_ID = 81;
     private static final int EVALUATION = 90;
@@ -68,6 +69,8 @@ public class DataProvider extends ContentProvider {
     public static final Uri ENTRY_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_PATH);
     private static final String ENTRY_MEMBERS_PATH = "entrymembers";
     public static final Uri ENTRY_MEMBERS_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_MEMBERS_PATH);
+    private static final String ENTRY_HISTORY_PATH = "entryhistory";
+    public static final Uri ENTRY_HISTORY_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_HISTORY_PATH);
     private static final String NOTIFICATION_PATH = "notifyscheduled";
     public static final Uri NOTIFICATION_URI = Uri.parse("content://" + AUTHORITY + "/" + NOTIFICATION_PATH);
     private static final String ALL_GAMES_PATH = "allgames";
@@ -95,6 +98,7 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, ENTRY_PATH + "/#", ENTRY_ID);
         uriMatcher.addURI(AUTHORITY, ENTRY_MEMBERS_PATH, ENTRY_MEMBERS);
         uriMatcher.addURI(AUTHORITY, ENTRY_MEMBERS_PATH + "/#", ENTRY_MEMBERS_ID);
+        uriMatcher.addURI(AUTHORITY, ENTRY_HISTORY_PATH, ENTRY_HISTORY);
         uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH, NOTIFICATION);
         uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH + "/#", NOTIFICATION_ID);
         uriMatcher.addURI(AUTHORITY, ALL_GAMES_PATH, GAME_ALL);
@@ -114,6 +118,8 @@ public class DataProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
+        String groupBy = null;
 
         int uriType = uriMatcher.match(uri);
         switch (uriType){
@@ -237,6 +243,41 @@ public class DataProvider extends ContentProvider {
                 queryBuilder.setTables(EntryTable.TABLE_NAME);
                 queryBuilder.appendWhere(EntryTable.COLUMN_ID + "=" + uri.getLastPathSegment());
                 break;
+            case ENTRY_HISTORY:
+                StringBuilder sbHistory = new StringBuilder();
+                sbHistory.append(EntryTable.TABLE_NAME);
+                sbHistory.append(" JOIN ");
+                sbHistory.append(GameTable.TABLE_NAME);
+                sbHistory.append(" ON ");
+                sbHistory.append(EntryTable.COLUMN_GAME);
+                sbHistory.append(" = ");
+                sbHistory.append(GameTable.getQualifiedColumn(GameTable.COLUMN_ID));
+                sbHistory.append(" JOIN ");
+                sbHistory.append(EvaluationTable.TABLE_NAME);
+                sbHistory.append(" ON ");
+                sbHistory.append(EvaluationTable.COLUMN_GAME);
+                sbHistory.append(" = ");
+                sbHistory.append(GameTable.getQualifiedColumn(GameTable.COLUMN_ID));
+                sbHistory.append(" JOIN ");
+                sbHistory.append(MemberTable.TABLE_NAME);
+                sbHistory.append(" ON ");
+                sbHistory.append(EntryTable.COLUMN_MEMBERSHIP);
+                sbHistory.append(" = ");
+                sbHistory.append(MemberTable.COLUMN_MEMBERSHIP);
+                sbHistory.append(" JOIN ");
+                sbHistory.append(EventTable.TABLE_NAME);
+                sbHistory.append(" ON ");
+                sbHistory.append(GameTable.COLUMN_EVENT_ID);
+                sbHistory.append(" = ");
+                sbHistory.append(EventTable.getQualifiedColumn(EventTable.COLUMN_ID));
+                sbHistory.append(" JOIN ");
+                sbHistory.append(EventTypeTable.TABLE_NAME);
+                sbHistory.append(" ON ");
+                sbHistory.append(EventTable.COLUMN_TYPE);
+                sbHistory.append(" = ");
+                sbHistory.append(EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID));
+                groupBy = EntryTable.COLUMN_MEMBERSHIP;
+                queryBuilder.setTables(sbHistory.toString());
             case NOTIFICATION:
                 queryBuilder.setTables(NotificationTable.TABLE_NAME);
                 break;
@@ -262,7 +303,7 @@ public class DataProvider extends ContentProvider {
         }
 
         SQLiteDatabase db = database.getWritableDatabase();
-        Cursor cursor = queryBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+        Cursor cursor = queryBuilder.query(db, projection, selection, selectionArgs, groupBy, null, sortOrder);
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
         return cursor;

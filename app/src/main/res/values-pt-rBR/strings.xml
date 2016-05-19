@@ -256,5 +256,6 @@
     <string name="validation_dialog_msg">Depois da validação, essa partida estará disponível para outros guardiões se avaliarem.</string>
     <string name="at">" às "</string>
     <string name="evaluate_match">Avaliar partida</string>
+    <string name="matches_played">Partidas disputadas</string>
 
 </resources>

@@ -34,7 +34,7 @@ import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
-import com.destiny.event.scheduler.models.SimpleMemberModel;
+import com.destiny.event.scheduler.models.MembersModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 
@@ -59,9 +59,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     private String creator;
     private int selectedType;
 
-    private ArrayList<String> bungieIdList;
-
-    private List<SimpleMemberModel> memberList;
+    private List<MembersModel> memberList;
 
     View headerView;
     View includedView;
@@ -152,7 +150,6 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
             }
         });
 
-        bungieIdList = new ArrayList<>();
         memberList = new ArrayList<>();
 
         return v;
@@ -176,6 +173,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                 break;
             case GameTable.STATUS_VALIDATED:
                 joinButton.setEnabled(true);
+                joinButton.setText(R.string.evaluate);
                 joinButton.setVisibility(View.VISIBLE);
                 checkLayout.setVisibility(View.GONE);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.evaluate_match);
@@ -338,7 +336,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
             ImageView img = (ImageView) v.findViewById(R.id.rate_img);
 
             int newpos = position -1;
-            SimpleMemberModel member = adapter.getItem(newpos);
+            MembersModel member = adapter.getItem(newpos);
             int newRating = 0;
 
             if (!member.getMembershipId().equals(callback.getBungieId())){
@@ -532,15 +530,18 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                     memberList.clear();
                     data.moveToFirst();
                     for (int i=0; i < data.getCount();i++){
-                        SimpleMemberModel memberModel = new SimpleMemberModel();
+                        MembersModel memberModel = new MembersModel();
                         memberModel.setMembershipId(data.getString(data.getColumnIndexOrThrow(EntryTable.COLUMN_MEMBERSHIP)));
                         memberModel.setName(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
-                        memberModel.setIcon(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_ICON)));
+                        memberModel.setIconPath(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_ICON)));
                         memberModel.setRating(0);
                         memberModel.setChecked(true);
                         memberModel.setEntryId(data.getInt(data.getColumnIndexOrThrow(EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID))));
+                        memberModel.setLikes(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES)));
+                        memberModel.setDislikes(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES)));
+                        memberModel.setGamesCreated(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED)));
+                        memberModel.setGamesPlayed(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED)));
                         memberList.add(memberModel);
-                        bungieIdList.add(i, data.getString(data.getColumnIndexOrThrow(EntryTable.COLUMN_MEMBERSHIP)));
                         data.moveToNext();
                     }
 
@@ -554,7 +555,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                         for (int x=0;x<data.getCount();x++){
                             if (data.getString(data.getColumnIndexOrThrow(EvaluationTable.COLUMN_MEMBERSHIP_B)).equals(memberList.get(i).getMembershipId())){
                                 memberList.get(i).setRating(data.getInt(data.getColumnIndexOrThrow(EvaluationTable.COLUMN_EVALUATION)));
-                                Log.w(TAG, "Member: " + memberList.get(i).getMembershipId() + " rated " + data.getInt(data.getColumnIndexOrThrow(EvaluationTable.COLUMN_EVALUATION)));
+                                //Log.w(TAG, "Member: " + memberList.get(i).getMembershipId() + " rated " + data.getInt(data.getColumnIndexOrThrow(EvaluationTable.COLUMN_EVALUATION)));
                                 break;
                             }
                             data.moveToNext();
@@ -588,11 +589,13 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
             case TYPE_NO_EVALUATIONS:
                 if (status == STATUS_WAITING_CREATOR){
                     validateGame(values, uri);
+                    evaluateGame(values, uri);
                 } else evaluateGame(values, uri);
                 break;
             case TYPE_OK:
                 if (status == STATUS_WAITING_CREATOR){
                     validateGame(values, uri);
+                    evaluateGame(values, uri);
                 } else evaluateGame(values, uri);
                 break;
             case TYPE_ONLY_CREATOR:
@@ -607,35 +610,81 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     private void evaluateGame(ContentValues values, Uri uri) {
 
         for (int i=0;i<memberList.size();i++){
+            //Log.w(TAG, "Membro " + memberList.get(i).getName() + " está vai entrar no loop de avaliação...");
             if (!memberList.get(i).getMembershipId().equals(callback.getBungieId())){
-                values.put(EvaluationTable.COLUMN_GAME, gameId);
-                values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, callback.getBungieId());
-                values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, memberList.get(i).getMembershipId());
-                values.put(EvaluationTable.COLUMN_EVALUATION, memberList.get(i).getRating());
-                getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-                values.clear();
-            }
+                if (memberList.get(i).getRating() != 0){
+                    values.put(EvaluationTable.COLUMN_GAME, gameId);
+                    values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, callback.getBungieId());
+                    values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, memberList.get(i).getMembershipId());
+                    values.put(EvaluationTable.COLUMN_EVALUATION, memberList.get(i).getRating());
+                    getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+                    values.clear();
+                    //Log.w(TAG, "Membro " + memberList.get(i).getName() + " foi avaliado em " + memberList.get(i).getRating());
+                } //else Log.w(TAG, "Membro " + memberList.get(i).getName() + " está com rate 0, portanto não foi criada uma entrada");
+            } //else Log.w(TAG, "Membro " + memberList.get(i).getName() + " não foi avaliado pois é o criador da partida");
         }
 
         values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_EVALUATED);
         getContext().getContentResolver().update(uri, values, null, null);
 
+        callback.closeFragment();
+
     }
 
     private void validateGame(ContentValues values, Uri uri) {
-        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_VALIDATED);
+
+        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_EVALUATED); //inserir STATUS_VALIDATED no servidor
         getContext().getContentResolver().update(uri, values, null, null);
 
-        String selection = "";
-        for (int i=0; i<memberList.size(); i++){
-            if (!memberList.get(i).isChecked()){
-                selection = selection + EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID) + "=" + memberList.get(i).getEntryId();
-                Log.w(TAG, "Entry ID a ser deletado: " + memberList.get(i).getEntryId());
+        for (int i=0; i<memberList.size(); i++) {
+            //Log.w(TAG, "Membro " + memberList.get(i).getName() + " está marcado como " + memberList.get(i).isChecked());
+            if (!memberList.get(i).isChecked()) {
+                String selection = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID) + "=" + memberList.get(i).getEntryId();
+                getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
+                //Log.w(TAG, "Membro " + memberList.get(i).getName() + " foi removido!");
+                memberList.remove(i);
+                i--;
+            } else {
+                //Log.w(TAG, "Membro " + memberList.get(i).getName() + " terá seus status atualizados...");
+                updateMemberStatuses(i);
             }
         }
-        if (!selection.isEmpty()) getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
 
-        callback.closeFragment();
+        values.clear();
+
+    }
+
+    private void updateMemberStatuses(int position) {
+
+        ContentValues memberValues = new ContentValues();
+
+        switch (memberList.get(position).getRating()){
+            case -1:
+                int newValue = memberList.get(position).getDislikes() + 1;
+                memberValues.put(MemberTable.COLUMN_DISLIKES,newValue);
+                Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Dislikes atualizado de " + memberList.get(position).getDislikes() + " para " + newValue);
+                break;
+            case 1:
+                newValue = memberList.get(position).getLikes() + 1;
+                memberValues.put(MemberTable.COLUMN_LIKES,newValue);
+                Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Likes atualizado de " + memberList.get(position).getLikes() + " para " + newValue);
+                break;
+        }
+
+        if (memberList.get(position).getMembershipId().equals(callback.getBungieId())){
+            int newValue = memberList.get(position).getGamesCreated() + 1;
+            memberValues.put(MemberTable.COLUMN_CREATED,newValue);
+            Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Created atualizado de " + memberList.get(position).getGamesCreated() + " para " + newValue);
+        } else {
+            int newValue = memberList.get(position).getGamesPlayed() + 1;
+            memberValues.put(MemberTable.COLUMN_PLAYED, newValue);
+            Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Played atualizado de " + memberList.get(position).getGamesPlayed() + " para " + newValue);
+        }
+
+        String where = MemberTable.COLUMN_MEMBERSHIP + "=" + memberList.get(position).getMembershipId();
+        getContext().getContentResolver().update(DataProvider.MEMBER_URI, memberValues, where, null);
+        memberValues.clear();
+
     }
 
     private void deleteGame(Uri uri) {

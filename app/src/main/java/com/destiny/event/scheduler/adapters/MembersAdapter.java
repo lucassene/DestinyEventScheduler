@@ -82,8 +82,8 @@ public class MembersAdapter extends SimpleCursorAdapter {
         Log.w(TAG, "Total Points: " + totalPoints);
 
         double xp = (double) totalPoints;
-        double delta = 1 + 8*xp;
-        double lvl = (-1 + Math.sqrt(delta))/2;
+        double delta = 1 + 80*xp;
+        double lvl = (-1 + Math.sqrt(delta))/20;
         int mLvl = (int) lvl;
 
         if (Math.round(mLvl) >= 100) {

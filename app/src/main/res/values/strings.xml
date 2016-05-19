@@ -300,6 +300,7 @@
     <string name="deleting_match_dialog_msg">This match will no longer be available to anyone after this.</string>
     <string name="at">" at "</string>
     <string name="evaluate_match">Evaluate match</string>
+    <string name="matches_played">Matches played</string>
 
 
 </resources>
