@@ -50,6 +50,7 @@ public class DataProvider extends ContentProvider {
     private static final int NOTIFICATION_ID = 81;
     private static final int EVALUATION = 90;
     private static final int EVALUATION_ID = 91;
+    private static final int EVALUATION_HISTORY = 92;
 
     private static final String AUTHORITY = "com.destiny.event.scheduler.provider";
 
@@ -79,6 +80,8 @@ public class DataProvider extends ContentProvider {
     public static final Uri ALL_ENTRIES_URI = Uri.parse("content://" + AUTHORITY + "/" + ALL_ENTRIES_PATH);
     private static final String EVALUATION_PATH = "evaluation";
     public static final Uri EVALUATION_URI = Uri.parse("content://" + AUTHORITY + "/" + EVALUATION_PATH);
+    private static final String EVALUATION_HISTORY_PATH = "evalhistory";
+    public static final Uri EVALUATION_HISTORY_URI = Uri.parse("content://" + AUTHORITY + "/" + EVALUATION_HISTORY_PATH);
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
@@ -105,6 +108,7 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, ALL_ENTRIES_PATH, ENTRY_ALL);
         uriMatcher.addURI(AUTHORITY, EVALUATION_PATH, EVALUATION);
         uriMatcher.addURI(AUTHORITY, EVALUATION_PATH + "/#", EVALUATION_ID);
+        uriMatcher.addURI(AUTHORITY, EVALUATION_HISTORY_PATH, EVALUATION_HISTORY);
     }
 
     @Override
@@ -278,6 +282,7 @@ public class DataProvider extends ContentProvider {
                 sbHistory.append(EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID));
                 groupBy = EntryTable.COLUMN_MEMBERSHIP;
                 queryBuilder.setTables(sbHistory.toString());
+                break;
             case NOTIFICATION:
                 queryBuilder.setTables(NotificationTable.TABLE_NAME);
                 break;
@@ -297,6 +302,12 @@ public class DataProvider extends ContentProvider {
             case EVALUATION_ID:
                 queryBuilder.setTables(EvaluationTable.TABLE_NAME);
                 queryBuilder.appendWhere(EvaluationTable.COLUMN_ID + "=" + uri.getLastPathSegment());
+                break;
+            case EVALUATION_HISTORY:
+                StringBuilder sbHistory2 = new StringBuilder();
+                sbHistory2.append(EvaluationTable.TABLE_NAME);
+                groupBy = EvaluationTable.COLUMN_MEMBERSHIP_B;
+                queryBuilder.setTables(sbHistory2.toString());
                 break;
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);

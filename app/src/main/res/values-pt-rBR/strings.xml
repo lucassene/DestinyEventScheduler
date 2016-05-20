@@ -75,6 +75,14 @@
         <item>Avaliadas</item>
     </string-array>
 
+    <string-array name="pref_time_list_entries">
+        <item>30 minutos</item>
+        <item>15 minutos</item>
+        <item>10 minutos</item>
+        <item>5 minutos</item>
+        <item>Na hora</item>
+    </string-array>
+
     <string name="refresh_lists">Atualizar listas</string>
     <string name="game_type_label">Tipo de jogo</string>
     <string name="max_guardians_label">Mínimo de guardiões</string>

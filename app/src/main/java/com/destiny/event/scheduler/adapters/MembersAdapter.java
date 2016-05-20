@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class MembersAdapter extends SimpleCursorAdapter {
 
-    private static final String TAG = "CustomCursorAdapter";
+    private static final String TAG = "MembersAdapter";
 
     private Context context;
     private int layout;

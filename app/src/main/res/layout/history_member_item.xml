@@ -37,8 +37,7 @@
                 android:layout_height="wrap_content"
                 android:text="Primary Text"
                 android:textStyle="bold"
-                android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="@color/lineColor"/>
+                android:textAppearance="?android:textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/secondary_text"
@@ -52,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="+ 60 XP"
-                android:textColor="@color/colorPrimary"/>
+                android:alpha="0.40"/>
 
         </LinearLayout>
 
@@ -82,8 +81,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_like"
-                    android:tint="@color/psnColor"
-                    android:alpha="0.75"/>
+                    android:tint="@color/lineColor" />
 
             </LinearLayout>
 
@@ -105,7 +103,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_dislike"
-                    android:tint="@color/redFilter"
                     android:alpha="0.75"/>
 
             </LinearLayout>

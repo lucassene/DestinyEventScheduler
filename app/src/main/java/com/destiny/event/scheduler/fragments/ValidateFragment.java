@@ -41,6 +41,7 @@ import com.destiny.event.scheduler.utils.DateUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 public class ValidateFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener{
 
@@ -58,6 +59,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     private String gameId;
     private String creator;
     private int selectedType;
+    private int inscriptions;
 
     private List<MembersModel> memberList;
 
@@ -519,6 +521,8 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                     String timeString = date + getResources().getString(R.string.at) + hour;
                     time.setText(timeString);
 
+                    inscriptions = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
+
                     prepareMemberStrings();
                     getLoaderManager().initLoader(LOADER_ENTRY_MEMBERS, null, this);
 
@@ -624,6 +628,75 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
             } //else Log.w(TAG, "Membro " + memberList.get(i).getName() + " não foi avaliado pois é o criador da partida");
         }
 
+        Random random = new Random();
+
+        //Fake Evaluations para 4611686018446566077
+        values.put(EvaluationTable.COLUMN_GAME, gameId);
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, "4611686018446566077");
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, callback.getBungieId());
+        values.put(EvaluationTable.COLUMN_EVALUATION, 1);
+        getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+        values.clear();
+
+        values.put(EvaluationTable.COLUMN_GAME, gameId);
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, "4611686018446566077");
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, "4611686018434509539");
+        values.put(EvaluationTable.COLUMN_EVALUATION, -1);
+        getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+        values.clear();
+
+        values.put(EvaluationTable.COLUMN_GAME, gameId);
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, "4611686018446566077");
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, "4611686018444413912");
+        values.put(EvaluationTable.COLUMN_EVALUATION, 1);
+        getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+        values.clear();
+
+        //Fake evaluations para 4611686018434509539
+        values.put(EvaluationTable.COLUMN_GAME, gameId);
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, "4611686018434509539");
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, callback.getBungieId());
+        values.put(EvaluationTable.COLUMN_EVALUATION, 1);
+        getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+        values.clear();
+
+        values.put(EvaluationTable.COLUMN_GAME, gameId);
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, "4611686018434509539");
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, "4611686018446566077");
+        values.put(EvaluationTable.COLUMN_EVALUATION, 1);
+        getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+        values.clear();
+
+        values.put(EvaluationTable.COLUMN_GAME, gameId);
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, "4611686018434509539");
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, "4611686018444413912");
+        values.put(EvaluationTable.COLUMN_EVALUATION, -1);
+        getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+        values.clear();
+
+        //Fake evaluations para 4611686018444413912
+        values.put(EvaluationTable.COLUMN_GAME, gameId);
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, "4611686018444413912");
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, callback.getBungieId());
+        values.put(EvaluationTable.COLUMN_EVALUATION, -1);
+        getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+        values.clear();
+
+        values.put(EvaluationTable.COLUMN_GAME, gameId);
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, "4611686018444413912");
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, "4611686018446566077");
+        values.put(EvaluationTable.COLUMN_EVALUATION, 1);
+        getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+        values.clear();
+
+        values.put(EvaluationTable.COLUMN_GAME, gameId);
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, "4611686018444413912");
+        values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, "4611686018434509539");
+        values.put(EvaluationTable.COLUMN_EVALUATION, 1);
+        getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+        values.clear();
+
+        values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions);
         values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_EVALUATED);
         getContext().getContentResolver().update(uri, values, null, null);
 
@@ -643,6 +716,7 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
                 getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
                 //Log.w(TAG, "Membro " + memberList.get(i).getName() + " foi removido!");
                 memberList.remove(i);
+                inscriptions--;
                 i--;
             } else {
                 //Log.w(TAG, "Membro " + memberList.get(i).getName() + " terá seus status atualizados...");

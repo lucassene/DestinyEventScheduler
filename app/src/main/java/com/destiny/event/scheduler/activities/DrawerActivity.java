@@ -41,8 +41,8 @@ import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
-import com.destiny.event.scheduler.fragments.DBViewerFragment;
 import com.destiny.event.scheduler.fragments.DetailEventFragment;
+import com.destiny.event.scheduler.fragments.DetailHistoryFragment;
 import com.destiny.event.scheduler.fragments.HistoryListFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
 import com.destiny.event.scheduler.fragments.MyEventsFragment;
@@ -51,6 +51,7 @@ import com.destiny.event.scheduler.fragments.NewEventFragment;
 import com.destiny.event.scheduler.fragments.NewEventsListFragment;
 import com.destiny.event.scheduler.fragments.ScheduledListFragment;
 import com.destiny.event.scheduler.fragments.SearchFragment;
+import com.destiny.event.scheduler.fragments.SettingsFragment;
 import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
@@ -92,6 +93,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private FragmentManager fm;
     private Fragment openFragment;
     private String fragmentTag;
+    private boolean configFragOpened = false;
     //private ArrayList<String> backStackList;
 
     private String clanName;
@@ -369,8 +371,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     fragment = new ValidateFragment();
                     break;
                 case HistoryListFragment.STATUS_HISTORY:
-                    //do something;
-                    fragment = new HistoryListFragment();
+                    bundle.putString("gameId",id);
+                    fragment = new DetailHistoryFragment();
                     break;
                 default:
                     bundle.putString("gameId",id);
@@ -537,13 +539,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openConfigFragment(View child){
-        if (openFragment instanceof DBViewerFragment){
+        if (openFragment instanceof SettingsFragment){
             drawerLayout.closeDrawers();
             return false;
         }
 
-        DBViewerFragment fragment = new DBViewerFragment();
-
+        SettingsFragment fragment = new SettingsFragment();
         prepareFragmentHolder(fragment, child, null, "config");
         return true;
     }

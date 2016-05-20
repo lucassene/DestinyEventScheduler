@@ -59,31 +59,7 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
             case R.layout.done_game_item:
                 getDoneGames(view, context, cursor);
                 break;
-            case R.layout.history_member_item:
-                getHistoryMembers(view, context, cursor);
-                break;
         }
-
-    }
-
-    private void getHistoryMembers(View view, Context context, Cursor cursor) {
-
-        TextView name = (TextView) view.findViewById(R.id.primary_text);
-        ImageView profile = (ImageView) view.findViewById(R.id.profile_pic);
-        TextView likesText = (TextView) view.findViewById(R.id.txt_likes);
-        TextView dislikesText = (TextView) view.findViewById(R.id.txt_dislikes);
-        TextView xpText = (TextView) view.findViewById(R.id.txt_xp);
-
-        name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
-
-        try {
-            profile.setImageBitmap(ImageUtils.loadImage(context, cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_ICON))));
-        } catch (IOException e) {
-            Log.w(TAG, "Image Bitmap not Found");
-            e.printStackTrace();
-        }
-
-
 
     }
 

@@ -154,6 +154,22 @@
         <item>Evaluation</item>
     </string-array>
 
+    <string-array name="pref_time_list_entries">
+        <item>30 minutes</item>
+        <item>15 minutes</item>
+        <item>10 minutes</item>
+        <item>5 minutes</item>
+        <item>On time</item>
+    </string-array>
+
+    <string-array name="pref_time_list_values">
+        <item>30</item>
+        <item>15</item>
+        <item>10</item>
+        <item>5</item>
+        <item>0</item>
+    </string-array>
+
     <string name="tier1">Reciprocate Rune</string>
     <string name="tier2">Stolen Rune</string>
     <string name="tier3">Antiquated Rune</string>

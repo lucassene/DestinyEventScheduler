@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Settings"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+<android.support.v7.preference.PreferenceCategory android:title="Scheduled Matches">
+
+    <android.support.v7.preference.SwitchPreferenceCompat
+        android:key="switch_scheduled"
+        android:title="Notifications"
+        android:summary="Notifies matches you joined"
+        android:defaultValue="true" />
+
+    <android.support.v7.preference.ListPreference
+        android:key="list_time"
+        android:title="Time"
+        android:summary="10 minutes before match"
+        android:entryValues="@array/pref_time_list_values"
+        android:entries="@array/pref_time_list_entries"/>
+
+    <android.support.v7.preference.CheckBoxPreference
+        android:key="check_scheduled_sound"
+        android:title="Sounds"
+        android:summaryOn="On"
+        android:summaryOff="Off"
+        android:defaultValue="true"/>
+
+</android.support.v7.preference.PreferenceCategory>
+
+<android.support.v7.preference.PreferenceCategory android:title="New Matches">
+
+    <android.support.v7.preference.SwitchPreferenceCompat
+        android:key="switch_new"
+        android:title="Notifications"
+        android:defaultValue="false"
+        android:summary="Notifies when new matches are created"/>
+
+    <android.support.v7.preference.CheckBoxPreference
+        android:key="check_scheduled_sound"
+        android:title="Sounds"
+        android:summaryOn="On"
+        android:summaryOff="Off"
+        android:defaultValue="false"
+        android:enabled="false"/>
+
+    <android.support.v7.preference.MultiSelectListPreference
+        android:key="list_pref_types"
+        android:title="Preferences"
+        android:summary="Game type you want to be notified"
+        android:enabled="false"
+        android:entries="@array/event_types"
+        android:entryValues="@array/event_type_ids"/>
+
+</android.support.v7.preference.PreferenceCategory>
+
+<android.support.v7.preference.PreferenceCategory android:title="About">
+    <android.support.v7.preference.Preference
+        android:key="version"
+        android:title="Version"
+        android:summary="1.0"
+        android:selectable="false"/>
+
+    <android.support.v7.preference.Preference
+        android:key="creator"
+        android:title="Creator"
+        android:summary="Lucas Sene Grandchamp"
+        android:selectable="false"/>
+
+    <android.support.v7.preference.Preference
+        android:key="contact"
+        android:title="Contact"
+        android:summary="lsgrandchamp@gmail.com"
+        android:selectable="false"/>
+</android.support.v7.preference.PreferenceCategory>
+
+</android.support.v7.preference.PreferenceScreen>
