@@ -1,20 +1,22 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <style name="DestinyApp" parent="Theme.AppCompat.NoActionBar" >
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="colorButtonNormal">@color/colorButtonNormal</item>
+        <item name="android:alertDialogTheme">@style/DestinyApp.AlertDialog</item>
     </style>
 
-    <style name="DestinyApp" parent="Theme.AppCompat.NoActionBar" >
-        <item name="android:colorBackground">@android:color/background_dark</item>
-        <item name="colorAccent">@color/lineColor</item>
-        <item name="colorButtonNormal">@color/colorButtonNormal</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    <style name="DestinyApp.AlertDialog" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@color/colorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:windowTitleStyle">@style/DestinyApp.AlertDialog.Title</item>
     </style>
+
+    <style name="DestinyApp.AlertDialog.Title">
+        <item name="android:textColor">@color/tabIndicatorColor</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+    </style>
+
     
 </resources>

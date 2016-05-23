@@ -277,4 +277,9 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
     public void onLogoff() {
 
     }
+
+    @Override
+    public void onItemSelected(String entry, int value) {
+
+    }
 }

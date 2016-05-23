@@ -1,78 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.preference.PreferenceScreen
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="Settings"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-<android.support.v7.preference.PreferenceCategory android:title="Scheduled Matches">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingRight="@dimen/global_padding"
+        android:paddingEnd="@dimen/global_padding">
 
-    <android.support.v7.preference.SwitchPreferenceCompat
-        android:key="switch_scheduled"
-        android:title="Notifications"
-        android:summary="Notifies matches you joined"
-        android:defaultValue="true" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheaderHeight"
+            android:textColor="@color/psnColor"
+            android:gravity="center_vertical"
+            android:textSize="13sp"
+            android:text="@string/scheduled_games"
+            android:textStyle="bold"/>
 
-    <android.support.v7.preference.ListPreference
-        android:key="list_time"
-        android:title="Time"
-        android:summary="10 minutes before match"
-        android:entryValues="@array/pref_time_list_values"
-        android:entries="@array/pref_time_list_entries"/>
+        <LinearLayout
+            android:id="@+id/scheduled_switch_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <android.support.v7.preference.CheckBoxPreference
-        android:key="check_scheduled_sound"
-        android:title="Sounds"
-        android:summaryOn="On"
-        android:summaryOff="Off"
-        android:defaultValue="true"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:orientation="vertical">
 
-</android.support.v7.preference.PreferenceCategory>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/notifications"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"/>
 
-<android.support.v7.preference.PreferenceCategory android:title="New Matches">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/scheduled_notify_text"
+                    android:textSize="13sp"
+                    android:alpha="0.75"/>
 
-    <android.support.v7.preference.SwitchPreferenceCompat
-        android:key="switch_new"
-        android:title="Notifications"
-        android:defaultValue="false"
-        android:summary="Notifies when new matches are created"/>
+            </LinearLayout>
 
-    <android.support.v7.preference.CheckBoxPreference
-        android:key="check_scheduled_sound"
-        android:title="Sounds"
-        android:summaryOn="On"
-        android:summaryOff="Off"
-        android:defaultValue="false"
-        android:enabled="false"/>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/scheduled_switch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true" />
 
-    <android.support.v7.preference.MultiSelectListPreference
-        android:key="list_pref_types"
-        android:title="Preferences"
-        android:summary="Game type you want to be notified"
-        android:enabled="false"
-        android:entries="@array/event_types"
-        android:entryValues="@array/event_type_ids"/>
+        </LinearLayout>
 
-</android.support.v7.preference.PreferenceCategory>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"
+            android:alpha="0.75"/>
 
-<android.support.v7.preference.PreferenceCategory android:title="About">
-    <android.support.v7.preference.Preference
-        android:key="version"
-        android:title="Version"
-        android:summary="1.0"
-        android:selectable="false"/>
+        <LinearLayout
+            android:id="@+id/scheduled_list_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground">
 
-    <android.support.v7.preference.Preference
-        android:key="creator"
-        android:title="Creator"
-        android:summary="Lucas Sene Grandchamp"
-        android:selectable="false"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/time"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
 
-    <android.support.v7.preference.Preference
-        android:key="contact"
-        android:title="Contact"
-        android:summary="lsgrandchamp@gmail.com"
-        android:selectable="false"/>
-</android.support.v7.preference.PreferenceCategory>
+            <TextView
+                android:id="@+id/scheduled_list_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/minutes_before"
+                android:textSize="13sp"
+                android:alpha="0.75"/>
 
-</android.support.v7.preference.PreferenceScreen>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"
+            android:alpha="0.75"/>
+
+        <LinearLayout
+            android:id="@+id/scheduled_check_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sounds"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"/>
+
+                <TextView
+                    android:id="@+id/scheduled_check_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/on"
+                    android:textSize="13sp"
+                    android:alpha="0.75"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <CheckBox
+                    android:id="@+id/scheduled_check"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true" />
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheaderHeight"
+            android:textColor="@color/psnColor"
+            android:gravity="center_vertical"
+            android:textSize="13sp"
+            android:text="@string/other"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:id="@+id/about_preference"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/about"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/more_info"
+                android:textSize="13sp"
+                android:alpha="0.75"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

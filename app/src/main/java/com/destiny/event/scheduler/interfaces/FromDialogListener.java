@@ -12,4 +12,5 @@ public interface FromDialogListener {
     public void onDateSent(Calendar date);
     public void onTimeSent(int hour, int minute);
     public void onLogoff();
+    public void onItemSelected(String entry, int value);
 }

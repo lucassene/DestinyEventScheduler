@@ -226,7 +226,7 @@
     <string name="leave">Sair</string>
     <string name="leaving">Você está saindo guardião?</string>
     <string name="oblivion">Esteja ciente de que todas suas informações serão apagadas e você será esquecido para sempre.</string>
-    <string name="nevermind">Deixa pra lá</string>
+    <string name="nevermind">Cancelar</string>
     <string name="event_details">Detalhes da partida</string>
     <string name="of">de</string>
     <string name="empty_game">Oops! Será que essa partida está vazia?</string>
@@ -265,5 +265,23 @@
     <string name="at">" às "</string>
     <string name="evaluate_match">Avaliar partida</string>
     <string name="matches_played">Partidas disputadas</string>
+    <string name="about">Sobre</string>
+    <string name="contact">Contato</string>
+    <string name="creator">Criador</string>
+    <string name="minutes_before">minutos antes</string>
+    <string name="more_info">Mais informações sobre o app</string>
+    <string name="new_matches">Novas partidas</string>
+    <string name="new_notify_text">Notifica novas partidas criadas</string>
+    <string name="notifications">Notificações</string>
+    <string name="off">Desligado</string>
+    <string name="on">Ligado</string>
+    <string name="other">Outros</string>
+    <string name="pref_list_text">Tipo de jogo que você quer ser notificado</string>
+    <string name="preferences">Preferências</string>
+    <string name="scheduled_notify_text">Notifica partidas agendadas</string>
+    <string name="sounds">Som</string>
+    <string name="version">Versão</string>
+    <string name="settings">Configurações</string>
+    <string name="on_time">Na hora</string>
 
 </resources>

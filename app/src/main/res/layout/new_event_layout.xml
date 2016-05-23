@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheaderHeight"
             android:id="@+id/section_game"
-            android:textColor="@color/lineColor"
+            android:textColor="@color/colorAccent"
             android:textSize="@dimen/secondaryTextSize"
             android:text="@string/game_info"
             android:gravity="center_vertical"/>
@@ -107,7 +107,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheaderHeight"
             android:id="@+id/section_wait_list"
-            android:textColor="@color/lineColor"
+            android:textColor="@color/colorAccent"
             android:textSize="@dimen/secondaryTextSize"
             android:text="@string/date_time_section"
             android:gravity="center_vertical"/>
@@ -156,7 +156,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheaderHeight"
-            android:textColor="@color/lineColor"
+            android:textColor="@color/colorAccent"
             android:textSize="@dimen/secondaryTextSize"
             android:text="@string/specs"
             android:gravity="center_vertical"/>

@@ -782,4 +782,9 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     public void onLogoff() {
 
     }
+
+    @Override
+    public void onItemSelected(String entry, int value) {
+
+    }
 }

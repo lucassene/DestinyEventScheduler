@@ -564,4 +564,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     public void onLogoff() {
 
     }
+
+    @Override
+    public void onItemSelected(String entry, int value) {
+
+    }
 }

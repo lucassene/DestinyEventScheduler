@@ -1,14 +1,11 @@
 package com.destiny.event.scheduler.dialogs;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
@@ -37,17 +34,12 @@ public class MyAlertDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity(), R.style.DestinyApp_AlertDialog);
 
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View v = inflater.inflate(R.layout.alert_dialog_layout, null);
-
-        dialogBuilder.setView(v);
-
-        TextView title = (TextView) v.findViewById(R.id.alert_title);
-        TextView message = (TextView) v.findViewById(R.id.alert_message);
-        Button btnLeave = (Button) v.findViewById(R.id.btn_leave);
-        Button btnNevermind = (Button) v.findViewById(R.id.btn_nevermind);
+        String title = "";
+        String message = "";
+        String posButton = "";
+        String negButton = "";
 
         Bundle bundle = getArguments();
 
@@ -55,27 +47,28 @@ public class MyAlertDialog extends DialogFragment {
 
             switch (bundle.getInt("type")){
                 case 0:
-                    title.setText(getResources().getString(R.string.leaving));
-                    message.setText(getResources().getString(R.string.oblivion));
+                    title = getResources().getString(R.string.leaving);
+                    message = getResources().getString(R.string.oblivion);
+                    posButton = getResources().getString(R.string.leave);
+                    negButton = getResources().getString(R.string.cancel);
                     break;
                 case ALERT_DIALOG:
-                    title.setText(bundle.getString("title"));
-                    message.setText(bundle.getString("msg"));
-                    btnLeave.setText(bundle.getString("posButton"));
-                    if (bundle.containsKey("negButton")){
-                        btnNevermind.setText(bundle.getString("negButton"));
-                    } else btnNevermind.setVisibility(View.GONE);
+                    title = (bundle.getString("title"));
+                    message = (bundle.getString("msg"));
+                    posButton = bundle.getString("posButton");
+                    negButton = bundle.getString("negButton");
                     break;
                 default:
-                    title.setText(bundle.getString("title"));
-                    message.setText(bundle.getString("msg"));
-                    btnLeave.setText(bundle.getString("posButton"));
+                    title = (bundle.getString("title"));
+                    message = (bundle.getString("msg"));
+                    posButton = (bundle.getString("posButton"));
+                    negButton = getResources().getString(R.string.cancel);
                     break;
             }
 
-        }
+            dialogType = bundle.getInt("type");
 
-        dialogType = bundle.getInt("type");
+        }
 
         listener = (FromDialogListener) getActivity();
 
@@ -86,39 +79,43 @@ public class MyAlertDialog extends DialogFragment {
         }
         //Log.w(TAG, "Fragment Listener: " + fragmentListener);
 
-        btnLeave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (dialogType){
-                    case 0:
-                        listener.onLogoff();
-                        break;
-                    case JOIN_DIALOG:
-                        fragmentListener.onPositiveClick(null, dialogType);
-                        break;
-                    case DELETE_DIALOG:
-                        fragmentListener.onPositiveClick(null, dialogType);
-                        break;
-                    case LEAVE_DIALOG:
-                        fragmentListener.onPositiveClick(null, dialogType);
-                        break;
-                    case ALERT_DIALOG:
-                        listener.onPositiveClick(null, dialogType);
-                        break;
-                    case CONFIRM_DIALOG:
-                        fragmentListener.onPositiveClick(null, dialogType);
-                        break;
-                }
-                dialog.dismiss();
-            }
-        });
+        dialogBuilder.setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(posButton, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (dialogType){
+                            case 0:
+                                listener.onLogoff();
+                                break;
+                            case JOIN_DIALOG:
+                                fragmentListener.onPositiveClick(null, dialogType);
+                                break;
+                            case DELETE_DIALOG:
+                                fragmentListener.onPositiveClick(null, dialogType);
+                                break;
+                            case LEAVE_DIALOG:
+                                fragmentListener.onPositiveClick(null, dialogType);
+                                break;
+                            case ALERT_DIALOG:
+                                listener.onPositiveClick(null, dialogType);
+                                break;
+                            case CONFIRM_DIALOG:
+                                fragmentListener.onPositiveClick(null, dialogType);
+                                break;
+                        }
+                        dialog.dismiss();
+                    }
+                });
 
-        btnNevermind.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+                if (negButton != null && !negButton.isEmpty()){
+                    dialogBuilder.setNegativeButton(negButton, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                }
 
         dialog = dialogBuilder.create();
 

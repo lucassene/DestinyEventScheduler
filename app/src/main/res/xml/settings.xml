@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:title="Settings">
 
     <PreferenceCategory android:title="Scheduled Matches">
@@ -53,7 +53,13 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="About">
+    <PreferenceCategory android:title="Other">
+
+        <PreferenceScreen
+            android:key="about"
+            android:title="About"
+            android:summary="More information about this app">
+
         <Preference
             android:key="version"
             android:title="Version"
@@ -71,6 +77,9 @@
             android:title="Contact"
             android:summary="lsgrandchamp@gmail.com"
             android:selectable="false"/>
+
+        </PreferenceScreen>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

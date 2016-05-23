@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#424242</color>
     <color name="colorPrimaryDark">#151515</color>
-    <color name="colorAccent">#E0E0E0</color>
+    <color name="colorAccent">#FF9100</color>
     <color name="textColorPrimary">#F5F5F5</color>
     <color name="lineColor">#F57C00</color>
     <color name="psnColor">#0288D1</color>
@@ -17,4 +17,6 @@
     <color name="colorTextButton">#FFFFFF</color>
     <color name="primary_text_material_light">#ffffff</color>
     <color name="toolbarBackground">#616161</color>
+    <color name="preference_accent">#F57C00</color>
+    <color name="preference_fallback_accent_color">@color/psnColor</color>
 </resources>

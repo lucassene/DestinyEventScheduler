@@ -44,6 +44,7 @@ import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.fragments.DetailEventFragment;
 import com.destiny.event.scheduler.fragments.DetailHistoryFragment;
 import com.destiny.event.scheduler.fragments.HistoryListFragment;
+import com.destiny.event.scheduler.fragments.MainSettingsFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
 import com.destiny.event.scheduler.fragments.MyEventsFragment;
 import com.destiny.event.scheduler.fragments.MyProfileFragment;
@@ -51,7 +52,6 @@ import com.destiny.event.scheduler.fragments.NewEventFragment;
 import com.destiny.event.scheduler.fragments.NewEventsListFragment;
 import com.destiny.event.scheduler.fragments.ScheduledListFragment;
 import com.destiny.event.scheduler.fragments.SearchFragment;
-import com.destiny.event.scheduler.fragments.SettingsFragment;
 import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
@@ -75,6 +75,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     public static final String TAG_MY_EVENTS = "myEvents";
     public static final String TAG_SEARCH_EVENTS = "searchEvents";
+
+    public static final String SHARED_PREFS = "myDestinyPrefs";
+    public static final String NOTIFY_PREF = "allowNotify";
+    public static final String TIME_PREF = "notificationTime";
+    public static final String SOUND_PREF = "notificationSound";
 
     private Toolbar toolbar;
 
@@ -539,14 +544,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openConfigFragment(View child){
-        if (openFragment instanceof SettingsFragment){
+       if (openFragment instanceof MainSettingsFragment){
             drawerLayout.closeDrawers();
             return false;
         }
 
-        SettingsFragment fragment = new SettingsFragment();
+        MainSettingsFragment fragment = new MainSettingsFragment();
         prepareFragmentHolder(fragment, child, null, "config");
         return true;
+
     }
 
     public boolean openMainActivity(View child){
@@ -813,6 +819,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         startActivity(intent);
         finish();
     }
+
+    @Override
+    public void onItemSelected(String entry, int value) {
+
+    }
+
 }
 
 
