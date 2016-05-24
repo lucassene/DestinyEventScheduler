@@ -6,7 +6,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="@dimen/subheaderHeight"
-        android:textColor="@color/psnColor"
+        android:textColor="@color/lineColor"
         android:gravity="center_vertical"
         android:textSize="13sp"
         android:text="@string/about"

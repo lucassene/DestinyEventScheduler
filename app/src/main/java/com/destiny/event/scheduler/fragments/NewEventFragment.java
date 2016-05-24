@@ -432,6 +432,11 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     public void onItemSelected(String entry, int value) {
     }
 
+    @Override
+    public void onMultiItemSelected(boolean[] items) {
+
+    }
+
 
     @Override
     public void onEventTypeSent(String id) {

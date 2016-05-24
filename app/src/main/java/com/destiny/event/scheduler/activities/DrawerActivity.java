@@ -77,9 +77,18 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String TAG_SEARCH_EVENTS = "searchEvents";
 
     public static final String SHARED_PREFS = "myDestinyPrefs";
-    public static final String NOTIFY_PREF = "allowNotify";
-    public static final String TIME_PREF = "notificationTime";
-    public static final String SOUND_PREF = "notificationSound";
+    public static final String SCHEDULED_NOTIFY_PREF = "allowScheduledNotify";
+    public static final String SCHEDULED_TIME_PREF = "notificationTime";
+    public static final String SOUND_PREF = "scheduledNotifySound";
+    public static final String NEW_NOTIFY_PREF = "allowNewNotify";
+    public static final String COURT_PREF = "1";
+    public static final String CRUCIBLE_PREF = "2";
+    public static final String PATROL_PREF = "3";
+    public static final String PRISON_PREF = "4";
+    public static final String RAID_PREF = "5";
+    public static final String STORY_PREF = "6";
+    public static final String STRIKE_PREF = "7";
+    public static final String STRIKE_LIST_PREF = "8";
 
     private Toolbar toolbar;
 
@@ -822,6 +831,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void onItemSelected(String entry, int value) {
+
+    }
+
+    @Override
+    public void onMultiItemSelected(boolean[] items) {
 
     }
 

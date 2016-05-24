@@ -6,22 +6,27 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
+import com.destiny.event.scheduler.dialogs.MultiChoiceDialog;
 import com.destiny.event.scheduler.dialogs.SingleChoiceDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class MainSettingsFragment extends Fragment implements FromDialogListener {
 
@@ -30,15 +35,22 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     private SwitchCompat scheduledSwitch;
     private LinearLayout scheduledListLayout;
     private TextView timeText;
-    private LinearLayout scheduledSoundLayout;
-    private TextView scheduledCheckText;
-    private CheckBox scheduledCheckBox;
+    private LinearLayout soundLayout;
+    private TextView soundText;
+    private CheckBox soundCheckBox;
 
-    private LinearLayout aboutLayout;
+    private SwitchCompat newSwitch;
+    private LinearLayout newListLayout;
+    private TextView listText;
 
     private ToActivityListener callback;
 
-    SharedPreferences sharedPrefs;
+    private SharedPreferences sharedPrefs;
+    private SharedPreferences.Editor prefsEditor;
+
+    private boolean[] checkedItems;
+
+    private int switchType;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,15 +65,17 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         scheduledSwitch = (SwitchCompat) v.findViewById(R.id.scheduled_switch);
         scheduledListLayout = (LinearLayout) v.findViewById(R.id.scheduled_list_layout);
         timeText = (TextView) v.findViewById(R.id.scheduled_list_text);
-        scheduledSoundLayout = (LinearLayout) v.findViewById(R.id.scheduled_check_layout);
-        scheduledCheckText = (TextView) v.findViewById(R.id.scheduled_check_text);
-        scheduledCheckBox = (CheckBox) v.findViewById(R.id.scheduled_check);
+        soundLayout = (LinearLayout) v.findViewById(R.id.scheduled_check_layout);
+        soundText = (TextView) v.findViewById(R.id.scheduled_check_text);
+        soundCheckBox = (CheckBox) v.findViewById(R.id.scheduled_check);
 
-        aboutLayout = (LinearLayout) v.findViewById(R.id.about_preference);
+        newSwitch = (SwitchCompat) v.findViewById(R.id.new_switch);
+        newListLayout = (LinearLayout) v.findViewById(R.id.new_list_layout);
+        listText = (TextView) v.findViewById(R.id.new_list_text);
 
-        scheduledSwitch.setOnClickListener(new View.OnClickListener() {
+        scheduledSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 changeScheduledStatus();
             }
         });
@@ -71,7 +85,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString("title",getResources().getString(R.string.time));
-                bundle.putInt("selectedItem",0);
+                bundle.putInt("selectedItem", getSelectedTime());
                 bundle.putString("fragTag",getTag());
 
                 SingleChoiceDialog dialog = new SingleChoiceDialog();
@@ -80,32 +94,84 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             }
         });
 
-        scheduledCheckBox.setOnClickListener(new View.OnClickListener() {
+        soundCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                changeCheckText(scheduledCheckBox, scheduledCheckText);
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                changeCheckText(soundCheckBox, soundText);
+                saveSoundPref(DrawerActivity.SOUND_PREF, soundCheckBox.isChecked());
             }
         });
 
-        aboutLayout.setOnClickListener(new View.OnClickListener() {
+        newSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                changeNewStatus();
+            }
+        });
+
+        newListLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragment = new AboutSettingsFragment();
-                callback.loadNewFragment(fragment, null, "about");
+                Bundle bundle = new Bundle();
+                bundle.putString("title",getResources().getString(R.string.game_type_label));
+                bundle.putBooleanArray("selectedItems",checkedItems);
+                bundle.putString("fragTag",getTag());
+
+                MultiChoiceDialog dialog = new MultiChoiceDialog();
+                dialog.setArguments(bundle);
+                dialog.show(getFragmentManager(),"multiChoiceDialog");
             }
         });
 
         sharedPrefs = getActivity().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
 
+        setCheckedItems();
         updateViews();
 
         return v;
     }
 
-    private void updateViews() {
-        scheduledSwitch.setChecked(sharedPrefs.getBoolean(DrawerActivity.NOTIFY_PREF, true));
+    private void setCheckedItems() {
+        checkedItems = new boolean[] {false, false, false, false, false, false, false, false};
+        HashMap<Integer, Boolean> map = new HashMap<>();
+        int[] ids = getResources().getIntArray(R.array.event_type_ids);
+        for (int id : ids) {
+            map.put(id, sharedPrefs.getBoolean(String.valueOf(id), false));
+        }
+        Log.w(TAG, map.toString());
+        for (int i=0;i<map.size();i++){
+            checkedItems[i] = map.get(ids[i]);
+        }
+    }
 
-        int time = sharedPrefs.getInt(DrawerActivity.TIME_PREF, 10);
+    private int getSelectedTime() {
+        int selected = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0);
+        switch (selected){
+            case 0:
+                return 4;
+            case 5:
+                return 3;
+            case 10:
+                return 2;
+            case 15:
+                return 1;
+            case 30:
+                return 0;
+            default:
+                return 0;
+        }
+    }
+
+    private void saveSoundPref(String scheduledSoundPref, boolean checked) {
+        prefsEditor = sharedPrefs.edit();
+        prefsEditor.putBoolean(scheduledSoundPref, checked);
+        prefsEditor.apply();
+    }
+
+    private void updateViews() {
+        scheduledSwitch.setChecked(sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, true));
+
+        int time = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 10);
         String text;
         if (time == 0){
             text = getResources().getString(R.string.on_time);
@@ -113,50 +179,101 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             text = time + " " + getResources().getString(R.string.minutes_before);
         }
         timeText.setText(text);
+        soundCheckBox.setChecked(sharedPrefs.getBoolean(DrawerActivity.SOUND_PREF, true));
 
-        scheduledCheckBox.setChecked(sharedPrefs.getBoolean(DrawerActivity.SOUND_PREF, true));
+        newSwitch.setChecked(sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, true));
+        updateListText(checkedItems);
     }
 
     private void changeCheckText(CheckBox checkBox, TextView textView) {
         if (checkBox.isChecked()){
             textView.setText(R.string.on);
-            sharedPrefs.edit().putBoolean(DrawerActivity.SOUND_PREF, checkBox.isChecked());
         } else {
             textView.setText(R.string.off);
-            sharedPrefs.edit().putBoolean(DrawerActivity.SOUND_PREF, checkBox.isChecked());
         }
-        sharedPrefs.edit().apply();
     }
 
     private void changeScheduledStatus() {
+        prefsEditor = sharedPrefs.edit();
         if (scheduledSwitch.isChecked()){
-            sharedPrefs.edit().putBoolean(DrawerActivity.NOTIFY_PREF, true);
+            if (newSwitch.isChecked()){
+                switchType = 2;
+            } else switchType = 1;
+            prefsEditor.putBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, true);
             AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
             anim.setDuration(250);
             anim.setFillAfter(true);
             scheduledListLayout.startAnimation(anim);
             scheduledListLayout.setClickable(true);
             scheduledListLayout.setFocusable(true);
-
-            scheduledSoundLayout.startAnimation(anim);
-            scheduledSoundLayout.setClickable(true);
-            scheduledSoundLayout.setFocusable(true);
-            scheduledCheckBox.setEnabled(true);
+            changeSoundStatus();
         } else {
-            sharedPrefs.edit().putBoolean(DrawerActivity.NOTIFY_PREF, false);
+            if (!newSwitch.isChecked()){
+                switchType = 0;
+            } else switchType = 1;
+            prefsEditor.putBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
             AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
             anim.setDuration(250);
             anim.setFillAfter(true);
             scheduledListLayout.startAnimation(anim);
             scheduledListLayout.setClickable(false);
             scheduledListLayout.setFocusable(false);
-
-            scheduledSoundLayout.startAnimation(anim);
-            scheduledSoundLayout.setClickable(false);
-            scheduledSoundLayout.setFocusable(false);
-            scheduledCheckBox.setEnabled(false);
+            changeSoundStatus();
         }
-        sharedPrefs.edit().apply();
+        Toast.makeText(getContext(), "switchType: " + switchType, Toast.LENGTH_SHORT).show();
+        prefsEditor.apply();
+    }
+
+    private void changeNewStatus() {
+        prefsEditor = sharedPrefs.edit();
+        if (newSwitch.isChecked()){
+            if (scheduledSwitch.isChecked()){
+                switchType = 2;
+            } else switchType = 1;
+            prefsEditor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, true);
+            AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
+            anim.setDuration(250);
+            anim.setFillAfter(true);
+            newListLayout.startAnimation(anim);
+            newListLayout.setClickable(true);
+            newListLayout.setFocusable(true);
+            changeSoundStatus();
+        } else {
+            if (!scheduledSwitch.isChecked()){
+                switchType = 0;
+            } else switchType = 1;
+            prefsEditor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
+            AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
+            anim.setDuration(250);
+            anim.setFillAfter(true);
+            newListLayout.startAnimation(anim);
+            newListLayout.setClickable(false);
+            newListLayout.setFocusable(false);
+            changeSoundStatus();
+        }
+        prefsEditor.apply();
+    }
+
+    private void changeSoundStatus(){
+        if (switchType == 0){
+            AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
+            anim.setDuration(250);
+            anim.setFillAfter(true);
+            soundLayout.startAnimation(anim);
+            soundLayout.setClickable(false);
+            soundLayout.setFocusable(false);
+            soundCheckBox.setEnabled(false);
+        } else if (switchType == 1) {
+            if (!soundCheckBox.isEnabled()){
+                AlphaAnimation anim = new AlphaAnimation(0.3f, 1.0f);
+                anim.setDuration(250);
+                anim.setFillAfter(true);
+                soundLayout.startAnimation(anim);
+                soundLayout.setClickable(true);
+                soundLayout.setFocusable(true);
+                soundCheckBox.setEnabled(true);
+            }
+        }
     }
 
     @Override
@@ -199,14 +316,55 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     @Override
     public void onItemSelected(String entry, int value) {
+        prefsEditor = sharedPrefs.edit();
         String text;
         if (value == 0){
             text = getResources().getString(R.string.on_time);
         } else {
             text = value + " " + getResources().getString(R.string.minutes_before);
         }
-        sharedPrefs.edit().putInt(DrawerActivity.TIME_PREF, value);
-        sharedPrefs.edit().apply();
+        prefsEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, value);
+        prefsEditor.apply();
         timeText.setText(text);
     }
+
+    @Override
+    public void onMultiItemSelected(boolean[] items) {
+        updateListText(items);
+        saveCheckedItems(items);
+    }
+
+    private void saveCheckedItems(boolean[] items) {
+        String[] events = getResources().getStringArray(R.array.event_types);
+        int[] ids = getResources().getIntArray(R.array.event_type_ids);
+        prefsEditor = sharedPrefs.edit();
+        for (int i=0;i<items.length;i++){
+            prefsEditor.putBoolean(String.valueOf(ids[i]),items[i]);
+            Log.w(TAG, events[i] + " marcado como " + items[i]);
+        }
+        prefsEditor.apply();
+    }
+
+    private void updateListText(boolean[] items){
+        String[] eventList = getResources().getStringArray(R.array.event_types);
+        int count = 0;
+        String selectedEvent = "";
+        for (int i = 0; i < items.length; i++) {
+            if (items[i]) {
+                count++;
+                selectedEvent = eventList[i];
+            }
+        }
+        String text;
+        if (count == 0){
+            text = getResources().getString(R.string.no_game_selected);
+        } else if (count == 1){
+            text = selectedEvent;
+        } else {
+            text = String.valueOf(count) + " " + getResources().getString(R.string.games_selected);
+        }
+        listText.setText(text);
+
+    }
+
 }

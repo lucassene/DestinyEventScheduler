@@ -283,5 +283,9 @@
     <string name="version">Versão</string>
     <string name="settings">Configurações</string>
     <string name="on_time">Na hora</string>
+    <string name="games_selected">itens selecionados</string>
+    <string name="none">Nenhum</string>
+    <string name="game_selected"></string>
+    <string name="no_game_selected">Nenhum item selecionado</string>
 
 </resources>

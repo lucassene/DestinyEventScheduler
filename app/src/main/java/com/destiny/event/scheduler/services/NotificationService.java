@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -79,6 +80,9 @@ public class NotificationService extends IntentService {
         nBuilder.setTicker("Your match will begin...");
         nBuilder.setPriority(Notification.PRIORITY_DEFAULT);
         nBuilder.setContentIntent(pIntent);
+
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        boolean sound = sharedPrefs.getBoolean(DrawerActivity.SOUND_PREF,false);
         nBuilder.setDefaults(Notification.DEFAULT_SOUND|Notification.DEFAULT_LIGHTS|Notification.DEFAULT_VIBRATE);
         nBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
         nBuilder.setAutoCancel(true);

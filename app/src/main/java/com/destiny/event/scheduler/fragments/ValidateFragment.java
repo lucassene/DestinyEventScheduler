@@ -787,4 +787,9 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     public void onItemSelected(String entry, int value) {
 
     }
+
+    @Override
+    public void onMultiItemSelected(boolean[] items) {
+
+    }
 }

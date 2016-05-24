@@ -14,10 +14,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheaderHeight"
-            android:textColor="@color/psnColor"
+            android:textColor="@color/lineColor"
             android:gravity="center_vertical"
             android:textSize="13sp"
-            android:text="@string/scheduled_games"
+            android:text="@string/notifications"
             android:textStyle="bold"/>
 
         <LinearLayout
@@ -36,7 +36,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/notifications"
+                    android:text="@string/scheduled_games"
                     android:textSize="16sp"
                     android:textColor="@android:color/white"/>
 
@@ -98,6 +98,77 @@
             android:alpha="0.75"/>
 
         <LinearLayout
+            android:id="@+id/new_switch_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_matches"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_notify_text"
+                    android:textSize="13sp"
+                    android:alpha="0.75"/>
+
+            </LinearLayout>
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/new_switch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"
+            android:alpha="0.75"/>
+
+        <LinearLayout
+            android:id="@+id/new_list_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/game_type_label"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/new_list_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/games_selected"
+                android:textSize="13sp"
+                android:alpha="0.75"/>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/scheduled_check_layout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/listItemHeight"
@@ -143,45 +214,6 @@
                     android:layout_weight="1"
                     android:checked="true" />
             </LinearLayout>
-
-
-
-        </LinearLayout>
-
-
-        <TextView
-            android:layout_marginTop="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/subheaderHeight"
-            android:textColor="@color/psnColor"
-            android:gravity="center_vertical"
-            android:textSize="13sp"
-            android:text="@string/other"
-            android:textStyle="bold"/>
-
-        <LinearLayout
-            android:id="@+id/about_preference"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/listItemHeight"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackground">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about"
-                android:textSize="16sp"
-                android:textColor="@android:color/white"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/more_info"
-                android:textSize="13sp"
-                android:alpha="0.75"/>
 
         </LinearLayout>
 

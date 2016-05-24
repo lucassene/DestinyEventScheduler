@@ -282,4 +282,9 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
     public void onItemSelected(String entry, int value) {
 
     }
+
+    @Override
+    public void onMultiItemSelected(boolean[] items) {
+
+    }
 }

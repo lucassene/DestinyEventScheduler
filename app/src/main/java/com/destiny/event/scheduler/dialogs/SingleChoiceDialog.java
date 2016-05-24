@@ -44,6 +44,8 @@ public class SingleChoiceDialog extends DialogFragment implements DialogInterfac
         return dialog.create();
     }
 
+
+
     @Override
     public void onClick(DialogInterface dialog, int which) {
         String[] entries = getResources().getStringArray(R.array.pref_time_list_entries);

@@ -569,4 +569,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     public void onItemSelected(String entry, int value) {
 
     }
+
+    @Override
+    public void onMultiItemSelected(boolean[] items) {
+
+    }
 }
