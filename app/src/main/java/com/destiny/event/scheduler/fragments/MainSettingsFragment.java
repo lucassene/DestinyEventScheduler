@@ -16,7 +16,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
@@ -55,6 +54,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
@@ -220,7 +220,6 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             scheduledListLayout.setFocusable(false);
             changeSoundStatus();
         }
-        Toast.makeText(getContext(), "switchType: " + switchType, Toast.LENGTH_SHORT).show();
         prefsEditor.apply();
     }
 

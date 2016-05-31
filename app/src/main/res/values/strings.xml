@@ -31,6 +31,7 @@
         <item>My Clan</item>
         <item>My Stats</item>
         <item>Settings</item>
+        <item>About</item>
         <item>Logout</item>
     </string-array>
 
@@ -42,6 +43,7 @@
         <item>@drawable/ic_clan</item>
         <item>@drawable/ic_person</item>
         <item>@drawable/ic_settings</item>
+        <item>@drawable/ic_help</item>
         <item>@drawable/ic_exit</item>
     </array>
 
@@ -339,6 +341,10 @@
     <string name="games_selected">items selected</string>
     <string name="no_game_selected">No items selected</string>
     <string name="none">No</string>
+    <string name="match_must_created">The match must be created with at least</string>
+    <string name="minutes_advance">minutes in advance</string>
+    <string name="create_match_success">Success! Match created.</string>
+    <string name="when_play">When do you wanna play?</string>
 
 
 </resources>

@@ -65,7 +65,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:scrollbars="vertical"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/navigationBarColor"
 />
 
 </android.support.v4.widget.DrawerLayout>

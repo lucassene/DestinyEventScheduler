@@ -17,6 +17,4 @@
     <color name="colorTextButton">#FFFFFF</color>
     <color name="primary_text_material_light">#ffffff</color>
     <color name="toolbarBackground">#616161</color>
-    <color name="preference_accent">#F57C00</color>
-    <color name="preference_fallback_accent_color">@color/psnColor</color>
 </resources>

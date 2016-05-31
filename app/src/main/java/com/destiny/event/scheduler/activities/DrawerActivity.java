@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -41,6 +40,7 @@ import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
+import com.destiny.event.scheduler.fragments.DBViewerFragment;
 import com.destiny.event.scheduler.fragments.DetailEventFragment;
 import com.destiny.event.scheduler.fragments.DetailHistoryFragment;
 import com.destiny.event.scheduler.fragments.HistoryListFragment;
@@ -564,6 +564,17 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     }
 
+    private boolean openAboutFragment(View child) {
+        if (openFragment instanceof DBViewerFragment){
+            drawerLayout.closeDrawers();
+            return false;
+        }
+
+        DBViewerFragment fragment = new DBViewerFragment();
+        prepareFragmentHolder(fragment, child, null, "about");
+        return true;
+    }
+
     public boolean openMainActivity(View child){
         if(openFragment != null){
             ft = fm.beginTransaction();
@@ -631,7 +642,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        Log.w(TAG, "Clan Cursor: " + DatabaseUtils.dumpCursorToString(data));
+        //Log.w(TAG, "Clan Cursor: " + DatabaseUtils.dumpCursorToString(data));
 
         if (data.moveToFirst() && data != null){
             switch (loader.getId()){
@@ -720,6 +731,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             openConfigFragment(child);
                             break;
                         case 10:
+                            break;
+                        case 11:
                             showLogOffDialog(child);
                             break;
                     }
@@ -756,6 +769,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         case 9:
                             return openConfigFragment(child);
                         case 10:
+                            return openAboutFragment(child);
+                        case 11:
                             return showLogOffDialog(child);
                     }
                     return true;

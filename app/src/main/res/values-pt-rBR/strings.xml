@@ -33,6 +33,7 @@
         <item>Meu Clã</item>
         <item>Meu Perfil</item>
         <item>Configurações</item>
+        <item>Sobre</item>
         <item>Sair</item>
     </string-array>
 
@@ -287,5 +288,9 @@
     <string name="none">Nenhum</string>
     <string name="game_selected"></string>
     <string name="no_game_selected">Nenhum item selecionado</string>
+    <string name="create_match_success">Sucesso! Partida criada.</string>
+    <string name="match_must_created">A partida deve ser criada com, no mínimo,</string>
+    <string name="minutes_advance">minutos de antecedência</string>
+    <string name="when_play">Quando você quer jogar?</string>
 
 </resources>

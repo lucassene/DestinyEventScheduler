@@ -1,5 +1,6 @@
 package com.destiny.event.scheduler.services;
 
+import android.annotation.TargetApi;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -67,34 +68,56 @@ public class NotificationService extends IntentService {
 
     private void makeNotification(String title, int iconId, String typeName) {
 
-        Intent nIntent = new Intent(getApplicationContext(), DrawerActivity.class);
-        nIntent.putExtra("notification",1);
-        nIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), 0, nIntent, 0);
-
-        NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(this);
-        nBuilder.setSmallIcon(R.drawable.ic_event_validate);
-        nBuilder.setLargeIcon(getLargeIcon(iconId));
-        nBuilder.setContentTitle(title);
-        nBuilder.setContentText(getString(R.string.your_match_of) + typeName + getString(R.string.will_begin_soon));
-        nBuilder.setTicker("Your match will begin...");
-        nBuilder.setPriority(Notification.PRIORITY_DEFAULT);
-        nBuilder.setContentIntent(pIntent);
-
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        boolean sound = sharedPrefs.getBoolean(DrawerActivity.SOUND_PREF,false);
-        nBuilder.setDefaults(Notification.DEFAULT_SOUND|Notification.DEFAULT_LIGHTS|Notification.DEFAULT_VIBRATE);
+
+        if (sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false)){
+
+            Intent nIntent = new Intent(getApplicationContext(), DrawerActivity.class);
+            nIntent.putExtra("notification",1);
+            nIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), 0, nIntent, 0);
+
+            NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(this);
+            nBuilder.setSmallIcon(R.drawable.ic_event_validate);
+            nBuilder.setLargeIcon(getLargeIcon(iconId));
+            nBuilder.setContentTitle(title);
+            nBuilder.setContentText(getString(R.string.your_match_of) + typeName + getString(R.string.will_begin_soon));
+            nBuilder.setTicker("Your match will begin...");
+            setPriority(nBuilder);
+            nBuilder.setContentIntent(pIntent);
+
+            boolean sound = sharedPrefs.getBoolean(DrawerActivity.SOUND_PREF,false);
+
+            if (sound){
+                nBuilder.setDefaults(Notification.DEFAULT_ALL);
+            } else nBuilder.setDefaults(Notification.DEFAULT_LIGHTS|Notification.DEFAULT_VIBRATE);
+
+            setVisibility(nBuilder);
+            nBuilder.setAutoCancel(true);
+
+            NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nManager.notify(0, nBuilder.build());
+
+            deleteShowedNotification();
+            updateGameStatus();
+
+            this.stopSelf();
+
+        } else {
+            updateGameStatus();
+            this.stopSelf();
+        }
+
+    }
+
+    @TargetApi(21)
+    private void setVisibility(NotificationCompat.Builder nBuilder) {
         nBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
-        nBuilder.setAutoCancel(true);
+    }
 
-        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nManager.notify(0, nBuilder.build());
-
-        deleteShowedNotification();
-        updateGameStatus();
-
-        this.stopSelf();
-
+    @TargetApi(16)
+    private void setPriority(NotificationCompat.Builder nBuilder) {
+        nBuilder.setPriority(Notification.PRIORITY_DEFAULT);
     }
 
     private void updateGameStatus() {
@@ -116,8 +139,7 @@ public class NotificationService extends IntentService {
 
         if (iconId == R.drawable.ic_trials){
             BitmapDrawable bD = (BitmapDrawable) ContextCompat.getDrawable(getApplicationContext(), iconId);
-            Bitmap bigIcon = bD.getBitmap();
-            return bigIcon;
+            return bD.getBitmap();
         } else {
             Drawable smallIcon = ContextCompat.getDrawable(getApplicationContext(),iconId);
             BitmapDrawable bD = (BitmapDrawable) smallIcon;

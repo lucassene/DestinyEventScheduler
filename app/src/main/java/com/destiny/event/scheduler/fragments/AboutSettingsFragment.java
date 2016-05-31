@@ -17,11 +17,12 @@ public class AboutSettingsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.settings);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.about);
         View v = inflater.inflate(R.layout.about_settings_layout, container, false);
 
         return v;

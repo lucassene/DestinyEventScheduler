@@ -2,6 +2,7 @@ package com.destiny.event.scheduler.fragments;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.MembersAdapter;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
@@ -62,7 +64,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private String gameEventName;
     private String gameEventTypeName;
     private int gameEventIcon;
-    private String gameTime;
     private Calendar eventCalendar;
 
     private ArrayList<String> bungieIdList;
@@ -412,9 +413,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     gameEventIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
                     eventType.setText(gameEventTypeName);
 
-                    gameTime = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME));
+                    String gameTime = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME));
                     eventCalendar = DateUtils.stringToDate(gameTime);
-                    eventCalendar.add(Calendar.MINUTE, -5);
                     Log.w(TAG, "Game Calendar: " + eventCalendar.getTime());
                     date.setText(DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
                     time.setText(DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
@@ -449,7 +449,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             switch (notificationMethod){
                 case CREATE_NOTIFICATION:
                     if (data == null || data.getCount()<=0){
-                        setAlarmNotification(eventCalendar, gameId, gameEventName, gameEventTypeName, gameEventIcon);
+                        setAlarmNotification(getNotifyTime(), gameId, gameEventName, gameEventTypeName, gameEventIcon);
                     } else{
                         Log.w(TAG, "Notification for this game already created!");
                     }
@@ -472,6 +472,17 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         callback.onDataLoaded();
         checkIfCloses(loader.getId());
 
+    }
+
+    private Calendar getNotifyTime() {
+        Calendar notifyTime = Calendar.getInstance();
+        notifyTime.setTime(eventCalendar.getTime());
+
+        SharedPreferences sharedPrefs = getActivity().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 10)*-1;
+        notifyTime.add(Calendar.MINUTE,alarmTime);
+
+        return notifyTime;
     }
 
     private void checkIfCloses(int loaderId) {

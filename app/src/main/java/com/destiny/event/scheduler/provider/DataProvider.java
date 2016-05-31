@@ -37,6 +37,7 @@ public class DataProvider extends ContentProvider {
     private static final int CLAN_ID = 41;
     private static final int MEMBER = 50;
     private static final int MEMBER_ID = 51;
+    private static final int PROFILE = 52;
     private static final int GAME = 60;
     private static final int GAME_ID = 61;
     private static final int GAME_ALL = 69;
@@ -64,6 +65,8 @@ public class DataProvider extends ContentProvider {
     public static final Uri CLAN_URI = Uri.parse("content://" + AUTHORITY + "/" + CLAN_PATH);
     private static final String MEMBER_PATH = "members";
     public static final Uri MEMBER_URI = Uri.parse("content://" + AUTHORITY + "/" + MEMBER_PATH);
+    private static final String PROFILE_PATH = "profile";
+    public static final Uri PROFILE_URI = Uri.parse("content://" + AUTHORITY + "/" + PROFILE_PATH);
     private static final String GAME_PATH = "game";
     public static final Uri GAME_URI = Uri.parse("content://" + AUTHORITY + "/" + GAME_PATH);
     private static final String ENTRY_PATH = "entry";
@@ -95,6 +98,7 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, CLAN_PATH + "/#", CLAN_ID);
         uriMatcher.addURI(AUTHORITY, MEMBER_PATH, MEMBER);
         uriMatcher.addURI(AUTHORITY, MEMBER_PATH + "/#", MEMBER_ID);
+        uriMatcher.addURI(AUTHORITY, PROFILE_PATH, PROFILE);
         uriMatcher.addURI(AUTHORITY, GAME_PATH, GAME);
         uriMatcher.addURI(AUTHORITY, GAME_PATH + "/#", GAME_ID);
         uriMatcher.addURI(AUTHORITY, ENTRY_PATH, ENTRY);
@@ -165,6 +169,36 @@ public class DataProvider extends ContentProvider {
             case MEMBER_ID:
                 queryBuilder.setTables(MemberTable.TABLE_NAME);
                 queryBuilder.appendWhere(MemberTable.COLUMN_ID + "=" + uri.getLastPathSegment());
+                break;
+            case PROFILE:
+                StringBuilder profileBuilder = new StringBuilder();
+                profileBuilder.append(MemberTable.TABLE_NAME);
+                profileBuilder.append(" JOIN ");
+                profileBuilder.append(EntryTable.TABLE_NAME);
+                profileBuilder.append(" ON ");
+                profileBuilder.append(MemberTable.COLUMN_MEMBERSHIP);
+                profileBuilder.append(" = ");
+                profileBuilder.append(EntryTable.COLUMN_MEMBERSHIP);
+                profileBuilder.append(" JOIN ");
+                profileBuilder.append(GameTable.TABLE_NAME);
+                profileBuilder.append(" ON ");
+                profileBuilder.append(EntryTable.COLUMN_GAME);
+                profileBuilder.append(" = ");
+                profileBuilder.append(GameTable.getQualifiedColumn(GameTable.COLUMN_ID));
+                profileBuilder.append(" JOIN ");
+                profileBuilder.append(EventTable.TABLE_NAME);
+                profileBuilder.append(" ON ");
+                profileBuilder.append(GameTable.COLUMN_EVENT_ID);
+                profileBuilder.append(" = ");
+                profileBuilder.append(EventTable.getQualifiedColumn(EventTable.COLUMN_ID));
+                profileBuilder.append(" JOIN ");
+                profileBuilder.append(EventTypeTable.TABLE_NAME);
+                profileBuilder.append(" ON ");
+                profileBuilder.append(EventTable.COLUMN_TYPE);
+                profileBuilder.append(" = ");
+                profileBuilder.append(EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID));
+                groupBy = EventTable.getQualifiedColumn(EventTable.COLUMN_ID);
+                queryBuilder.setTables(profileBuilder.toString());
                 break;
             case GAME:
                 StringBuilder sbGType = new StringBuilder();

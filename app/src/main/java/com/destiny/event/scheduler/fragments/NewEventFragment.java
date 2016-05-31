@@ -2,6 +2,7 @@ package com.destiny.event.scheduler.fragments;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
@@ -84,6 +86,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private SimpleInputDialog dialog;
 
     private Calendar insertedDate;
+    private int minimumIntTime;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -469,17 +472,13 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
             Calendar now = Calendar.getInstance();
 
-            Calendar notifyTime = Calendar.getInstance();
-            notifyTime.setTime(insertedDate.getTime());
-            notifyTime.add(Calendar.MINUTE, -5);
-
             Calendar minimumTime = Calendar.getInstance();
-            minimumTime.setTime(insertedDate.getTime());
-            minimumTime.add(Calendar.MINUTE, -7);
+            Calendar notifyTime = getNotifyTime();
+            minimumTime.setTime(notifyTime.getTime());
+            minimumTime.add(Calendar.MINUTE, -10);
 
-            Log.w(TAG, "InsertedDate: " + insertedDate.get(Calendar.HOUR_OF_DAY) + ":" + insertedDate.get(Calendar.MINUTE) + ":00");
-            Log.w(TAG, "NotifyTime: " + notifyTime.get(Calendar.HOUR_OF_DAY) + ":" + notifyTime.get(Calendar.MINUTE) + ":00");
             Log.w(TAG, "MinimumTime: " + minimumTime.get(Calendar.HOUR_OF_DAY) + ":" + minimumTime.get(Calendar.MINUTE) + ":00");
+            Log.w(TAG, "NotifyTime: " + notifyTime.get(Calendar.HOUR_OF_DAY) + ":" + notifyTime.get(Calendar.MINUTE) + ":00");
 
             if (now.getTimeInMillis() <= minimumTime.getTimeInMillis()){
 
@@ -516,18 +515,30 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
                 setAlarmNotification(notifyTime, gameId, eventName, eventTypeName, eventIcon);
 
-                Toast.makeText(getContext(), "Success! You've created one new match!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.create_match_success, Toast.LENGTH_SHORT).show();
 
                 eventCallback.onEventCreated();
 
             } else {
-                Toast.makeText(getContext(), "A partida precisa ser criada com, no mínimo, 07 minutos de antecedência.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getResources().getString(R.string.match_must_created) + " " + minimumIntTime + " " + getResources().getString(R.string.minutes_advance), Toast.LENGTH_SHORT).show();
             }
 
         } else{
-            Toast.makeText(getContext(), "Hmmm, when do you wanna play?", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.when_play, Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    private Calendar getNotifyTime() {
+        Calendar notifyTime = Calendar.getInstance();
+        notifyTime.setTime(insertedDate.getTime());
+
+        SharedPreferences sharedPrefs = getActivity().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 10)*-1;
+        notifyTime.add(Calendar.MINUTE,alarmTime);
+        minimumIntTime = (alarmTime*-1) + 10;
+
+        return notifyTime;
     }
 
     //Inserindo entries falsas apenas para testes
