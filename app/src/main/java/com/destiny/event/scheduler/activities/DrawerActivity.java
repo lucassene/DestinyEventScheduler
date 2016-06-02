@@ -47,6 +47,7 @@ import com.destiny.event.scheduler.fragments.HistoryListFragment;
 import com.destiny.event.scheduler.fragments.MainSettingsFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
 import com.destiny.event.scheduler.fragments.MyEventsFragment;
+import com.destiny.event.scheduler.fragments.MyNewProfileFragment;
 import com.destiny.event.scheduler.fragments.MyProfileFragment;
 import com.destiny.event.scheduler.fragments.NewEventFragment;
 import com.destiny.event.scheduler.fragments.NewEventsListFragment;
@@ -537,11 +538,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openMyProfileFragment(View child){
-        if (openFragment instanceof MyProfileFragment){
+        if (openFragment instanceof MyNewProfileFragment){
             drawerLayout.closeDrawers();
             return false;
         }
-        MyProfileFragment fragment = new MyProfileFragment();
+        MyNewProfileFragment fragment = new MyNewProfileFragment();
 
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);

@@ -101,7 +101,7 @@
         android:layout_marginTop="4dp"/>
 
     <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/matches_chart"
+        android:id="@+id/events_chart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"/>
@@ -187,7 +187,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Matches"/>
+                android:text="Events"/>
 
             <TextView
                 android:id="@+id/fav_game_played"

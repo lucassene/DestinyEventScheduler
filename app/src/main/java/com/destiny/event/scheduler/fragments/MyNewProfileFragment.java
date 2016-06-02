@@ -19,8 +19,14 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.ImageUtils;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.formatter.PercentFormatter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MyNewProfileFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -36,6 +42,8 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
     ProgressBar progressBar;
 
     private String memberId;
+
+    PieChart eventsChart;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,6 +70,15 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
         profilePic = (ImageView) v.findViewById(R.id.profile_pic);
         userName = (TextView) v.findViewById(R.id.primary_text);
+        memberLevel = (TextView) v.findViewById(R.id.member_level);
+        progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
+
+        eventsChart = (PieChart) v.findViewById(R.id.events_chart);
+        eventsChart.setUsePercentValues(true);
+        eventsChart.setDescription("");
+        eventsChart.setExtraOffsets(5, 10, 5, 5);
+        eventsChart.setDrawHoleEnabled(false);
+        eventsChart.setRotationEnabled(false);
 
         getMemberData();
 
@@ -126,17 +143,36 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                     userName.setText(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
                     memberLevel.setText(getMemberLevel(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_EXP))));
                     progressBar.setProgress(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_EXP)));
-                    progressBar.setMax(getMax());
+                    progressBar.setMax(MemberTable.getExpNeeded(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_EXP))));
+
+                    int created = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED));
+                    int played = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED));
+                    setEventChart(created, played);
+
                     break;
             }
         }
     }
 
-    private int getMax() {
+    private void setEventChart(int created, int played) {
+        ArrayList<String> xValues = new ArrayList<>();
+        xValues.add("Created");
+        xValues.add("Played");
 
+        ArrayList<Entry> yValues = new ArrayList<>();
+        yValues.add(new Entry((float)created, 0));
+        yValues.add(new Entry((float)played, 1));
 
+        PieDataSet dataSet = new PieDataSet(yValues, "Events");
+        dataSet.setSliceSpace(3f);
+        dataSet.setSelectionShift(5f);
 
-        return 0;
+        PieData data = new PieData(xValues, dataSet);
+        data.setValueFormatter(new PercentFormatter());
+        data.setValueTextSize(11f);
+        eventsChart.setData(data);
+        eventsChart.highlightValue(null);
+        eventsChart.invalidate();
     }
 
     private String getMemberLevel(int memberXP) {

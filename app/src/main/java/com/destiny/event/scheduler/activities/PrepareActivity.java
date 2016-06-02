@@ -131,7 +131,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                     progressBar.setVisibility(View.GONE);
                     errorCode = BungieService.ERROR_CURRENT_USER;
                     break;
-                } else img1.setColorFilter(ContextCompat.getColor(this, R.color.accent_material_light), PorterDuff.Mode.SRC_ATOP);
+                } else img1.setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
 
                 membershipId = resultData.getString("bungieId");
                 userName = resultData.getString("userName");
@@ -140,7 +140,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
 
                 break;
             case BungieService.STATUS_VERIFY:
-                img2.setColorFilter(ContextCompat.getColor(this, R.color.accent_material_light), PorterDuff.Mode.SRC_ATOP);
+                img2.setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
                 lay3.setVisibility(View.VISIBLE);
                 img3.setColorFilter(ContextCompat.getColor(this, android.R.color.black), PorterDuff.Mode.SRC_ATOP);
                 break;
@@ -150,7 +150,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                     img3.setImageResource(R.drawable.ic_warning);
                     errorCode = BungieService.ERROR_NO_ICON;
                 } else {
-                    img3.setColorFilter(ContextCompat.getColor(this, R.color.accent_material_light), PorterDuff.Mode.SRC_ATOP);
+                    img3.setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
                 }
                 //img3.setColorFilter(ContextCompat.getColor(this, R.color.accent_material_light), PorterDuff.Mode.MULTIPLY);
                 lay4.setVisibility(View.VISIBLE);
@@ -164,7 +164,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                     progressBar.setVisibility(View.GONE);
                     errorCode = BungieService.ERROR_NO_CLAN;
                     break;
-                } else img4.setColorFilter(ContextCompat.getColor(this, R.color.accent_material_light), PorterDuff.Mode.SRC_ATOP);
+                } else img4.setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
                 lay5.setVisibility(View.VISIBLE);
                 img5.setColorFilter(ContextCompat.getColor(this, android.R.color.black), PorterDuff.Mode.SRC_ATOP);
 
@@ -173,7 +173,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
 
                 switch (resultData.getInt(BungieService.ERROR_TAG)){
                     case 0:
-                        img5.setColorFilter(ContextCompat.getColor(this, R.color.accent_material_light), PorterDuff.Mode.SRC_ATOP);
+                        img5.setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
                         txt6.setText("Criando banco de dados de teste...");
                         lay6.setVisibility(View.VISIBLE);
                         img6.setColorFilter(ContextCompat.getColor(this, android.R.color.black), PorterDuff.Mode.SRC_ATOP);
@@ -215,7 +215,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
 
                 break;
             case BungieService.STATUS_FINISHED:
-                img6.setColorFilter(ContextCompat.getColor(this, R.color.accent_material_light), PorterDuff.Mode.SRC_ATOP);
+                img6.setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
                 if (errorCode != 0){
                     showAlertDialog();
                 }

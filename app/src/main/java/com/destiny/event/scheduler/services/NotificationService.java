@@ -29,6 +29,8 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.provider.DataProvider;
 
+import java.util.Random;
+
 public class NotificationService extends IntentService {
 
     private static final String TAG = "NotificationService";
@@ -123,7 +125,16 @@ public class NotificationService extends IntentService {
     private void updateGameStatus() {
         ContentValues values = new ContentValues();
         //values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING);
-        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING); //Deixando o Status para Validated para fins de testes
+        Random r = new Random();
+        int n = r.nextInt(1);
+
+        //Alterando o status para fins de testes
+        if (n==1){
+            values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING);
+        } else if (n==0){
+            values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_VALIDATED);
+        }
+
         Uri uri = Uri.parse(DataProvider.GAME_URI + "/" + gameId);
         getContentResolver().update(uri, values, GameTable.COLUMN_ID + "=" + gameId, null);
         Log.w(TAG, "Game status from ID: " + gameId + " updated to Waiting for Validation");
