@@ -169,12 +169,10 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         bungieId = bungieIdList.get(position-1);
 
-        Fragment fragment = new MyProfileFragment();
+        Fragment fragment = new MyNewProfileFragment();
 
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
-        bundle.putInt("type", MyProfileFragment.TYPE_MEMBER);
-        bundle.putString("clanName", clanName);
 
         callback.loadNewFragment(fragment, bundle, "profile");
 

@@ -18,6 +18,7 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.ImageUtils;
+import com.destiny.event.scheduler.utils.StringUtils;
 
 import java.io.IOException;
 
@@ -157,22 +158,9 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
             e.printStackTrace();
         }
 
-        int totalPoints = cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
-        Log.w(TAG, "Total Points: " + totalPoints);
-
-        double xp = (double) totalPoints;
-        double delta = 1 + 80*xp;
-        double lvl = (-1 + Math.sqrt(delta))/20;
-        int mLvl = (int) lvl;
-
-        if (Math.round(mLvl) >= 100) {
-            points.setText("99");
-        } else if (Math.round(mLvl) <= 0) {
-            points.setText("00");
-        } else if (Math.round(mLvl) < 10) {
-            String finalPoint = "0" + Math.round(mLvl);
-            points.setText(finalPoint);
-        } else points.setText(String.valueOf(mLvl));
+        int xp = cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
+        int lvl = MemberTable.getMemberLevel(xp);
+        points.setText(StringUtils.parseString(lvl));
 
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
 

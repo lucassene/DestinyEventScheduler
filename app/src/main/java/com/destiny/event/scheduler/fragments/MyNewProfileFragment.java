@@ -2,13 +2,17 @@ package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,11 +23,15 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.ImageUtils;
+import com.destiny.event.scheduler.utils.StringUtils;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,10 +48,12 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
     TextView titleText;
     TextView memberLevel;
     ProgressBar progressBar;
+    TextView xpText;
 
     private String memberId;
 
     PieChart eventsChart;
+    PieChart likesChart;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,20 +75,38 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.my_profile);
         View v = inflater.inflate(R.layout.my_new_profile_layout, container, false);
 
         profilePic = (ImageView) v.findViewById(R.id.profile_pic);
         userName = (TextView) v.findViewById(R.id.primary_text);
         memberLevel = (TextView) v.findViewById(R.id.member_level);
         progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
+        xpText = (TextView) v.findViewById(R.id.xp_text);
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int chartHeight = metrics.widthPixels - 32;
 
         eventsChart = (PieChart) v.findViewById(R.id.events_chart);
+        eventsChart.setMinimumHeight(chartHeight);
         eventsChart.setUsePercentValues(true);
         eventsChart.setDescription("");
         eventsChart.setExtraOffsets(5, 10, 5, 5);
         eventsChart.setDrawHoleEnabled(false);
         eventsChart.setRotationEnabled(false);
+        Legend eventsLeg = eventsChart.getLegend();
+        eventsLeg.setEnabled(false);
+
+        likesChart = (PieChart) v.findViewById(R.id.evaluation_chart);
+        likesChart.setMinimumHeight(chartHeight);
+        likesChart.setUsePercentValues(true);
+        likesChart.setDescription("");
+        likesChart.setExtraOffsets(5, 10, 5, 5);
+        likesChart.setDrawHoleEnabled(false);
+        likesChart.setRotationEnabled(false);
+        Legend likesLeg = likesChart.getLegend();
+        likesLeg.setEnabled(false);
 
         getMemberData();
 
@@ -132,6 +160,9 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         if (data != null && data.moveToFirst()){
+
+            Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
+
             switch (loader.getId()){
                 case LOADER_MEMBER:
                     try {
@@ -141,61 +172,119 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                         e.printStackTrace();
                     }
                     userName.setText(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
-                    memberLevel.setText(getMemberLevel(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_EXP))));
-                    progressBar.setProgress(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_EXP)));
-                    progressBar.setMax(MemberTable.getExpNeeded(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_EXP))));
+                    int xp = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
+                    int lvl = MemberTable.getMemberLevel(xp);
+                    memberLevel.setText(StringUtils.parseString(lvl));
+                    progressBar.setMax(MemberTable.getExpNeeded(xp));
+                    progressBar.setProgress(xp);
+                    String xpTxt = xp + " / " + MemberTable.getExpNeeded(xp);
+                    xpText.setText(xpTxt);
+                    //Log.w(TAG, "Player XP: " + progressBar.getProgress() + "/" + progressBar.getMax());
 
                     int created = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED));
                     int played = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED));
+                    //Log.w(TAG, "Created: " + created + "; Played: " + played);
+
+                    int likes = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES));
+                    int dislikes = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES));
+                    Log.w(TAG, "Likes: " + likes + "; Dislikes: " + dislikes);
+
                     setEventChart(created, played);
+                    setLikesChart(likes, dislikes);
 
                     break;
             }
         }
     }
 
+    private void setLikesChart(int likes, int dislikes) {
+        int index = 0;
+        ArrayList<String> labels = new ArrayList<>();
+
+        if (likes>0){
+            labels.add(getResources().getString(R.string.likes));
+            index++;
+        }
+        if (dislikes>0) {
+            labels.add(getResources().getString(R.string.dislikes));
+            index++;
+        }
+
+        if (index>0){
+            ArrayList<Entry> yValues = new ArrayList<>();
+            if (likes>0) yValues.add(new Entry((float)likes, 0));
+            if (dislikes>0) yValues.add(new Entry((float)dislikes, index-1));
+
+            PieDataSet dataSet = new PieDataSet(yValues, getResources().getString(R.string.evaluations));
+            if (index>1) {
+                dataSet.setSliceSpace(6f);
+            } else dataSet.setSliceSpace(0f);
+            dataSet.setSelectionShift(12f);
+            dataSet.setColors(ColorTemplate.LIBERTY_COLORS);
+
+            PieData data = new PieData(labels, dataSet);
+            data.setValueFormatter(new PercentFormatter());
+            data.setValueTextSize(13f);
+            Highlight h = new Highlight(getBigger(likes, dislikes),0);
+            likesChart.highlightValues(new Highlight[] {h});
+            likesChart.setData(data);
+            likesChart.invalidate();
+        }
+
+    }
+
     private void setEventChart(int created, int played) {
-        ArrayList<String> xValues = new ArrayList<>();
-        xValues.add("Created");
-        xValues.add("Played");
+        int index = 0;
+        ArrayList<String> labels = new ArrayList<>();
 
-        ArrayList<Entry> yValues = new ArrayList<>();
-        yValues.add(new Entry((float)created, 0));
-        yValues.add(new Entry((float)played, 1));
+        if (created>0){
+            labels.add(getResources().getString(R.string.created));
+            index++;
+        }
+        if (played>0) {
+            labels.add(getResources().getString(R.string.played));
+            index++;
+        }
 
-        PieDataSet dataSet = new PieDataSet(yValues, "Events");
-        dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(5f);
+        if (index>0){
+            ArrayList<Entry> yValues = new ArrayList<>();
+            if (created>0) yValues.add(new Entry((float)created, 0));
+            if (played>0) yValues.add(new Entry((float)played, index-1));
 
-        PieData data = new PieData(xValues, dataSet);
-        data.setValueFormatter(new PercentFormatter());
-        data.setValueTextSize(11f);
-        eventsChart.setData(data);
-        eventsChart.highlightValue(null);
-        eventsChart.invalidate();
+            PieDataSet dataSet = new PieDataSet(yValues, getResources().getString(R.string.events));
+            if (index>1){
+                dataSet.setSliceSpace(6f);
+            } else dataSet.setSliceSpace(0f);
+            dataSet.setSelectionShift(12f);
+            dataSet.setColors(ColorTemplate.LIBERTY_COLORS);
+
+            PieData data = new PieData(labels, dataSet);
+            data.setValueFormatter(new PercentFormatter());
+            data.setValueTextSize(13f);
+            Highlight h = new Highlight(getBigger(created, played),0);
+            eventsChart.highlightValues(new Highlight[] {h});
+            eventsChart.setData(data);
+            eventsChart.invalidate();
+        }
+
     }
 
-    private String getMemberLevel(int memberXP) {
-        double xp = (double) memberXP;
-        double delta = 1 + 80*xp;
-        double lvl = (-1 + Math.sqrt(delta))/20;
-        int mLvl = (int) lvl;
-
-        String points = "";
-
-        if (Math.round(mLvl) >= 100) {
-            points = "99";
-        } else if (Math.round(mLvl) <= 0) {
-            points = "00";
-        } else if (Math.round(mLvl) < 10) {
-            points = "0" + Math.round(mLvl);
-        } else points = String.valueOf(mLvl);
-
-        return points;
+    public int getBigger(int value1, int value2){
+        if (value1 >= value2){
+            return 0;
+        } else return 1;
     }
+
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.clear();
+    }
+
 }

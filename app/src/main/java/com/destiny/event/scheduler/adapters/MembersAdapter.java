@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.utils.ImageUtils;
+import com.destiny.event.scheduler.utils.StringUtils;
 
 import java.io.IOException;
 
@@ -78,8 +79,9 @@ public class MembersAdapter extends SimpleCursorAdapter {
             e.printStackTrace();
         }
 
-        String totalPoints = cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
-        points.setText(MemberTable.getMemberLevel(totalPoints));
+        int xp = cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
+        int lvl = MemberTable.getMemberLevel(xp);
+        points.setText(StringUtils.parseString(lvl));
 
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
 

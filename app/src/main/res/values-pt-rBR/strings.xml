@@ -117,7 +117,7 @@
     <string name="events_created">Partidas criadas:</string>
     <string name="joined_events">Partidas Jogadas:</string>
     <string name="member_since">Membro desde:</string>
-    <string name="my_profile">Meu perfil</string>
+    <string name="my_profile">Perfil</string>
     <string name="patrol">Patrulha</string>
     <string name="prison">Prisão dos Anciões</string>
     <string name="raid">Incursão</string>
@@ -292,5 +292,11 @@
     <string name="match_must_created">A partida deve ser criada com, no mínimo,</string>
     <string name="minutes_advance">minutos de antecedência</string>
     <string name="when_play">Quando você quer jogar?</string>
+    <string name="created">Criados</string>
+    <string name="evaluations">Avaliações</string>
+    <string name="events">Eventos</string>
+    <string name="favorite_game">Jogo favorito</string>
+    <string name="games">Jogos</string>
+    <string name="played">Jogados</string>
 
 </resources>

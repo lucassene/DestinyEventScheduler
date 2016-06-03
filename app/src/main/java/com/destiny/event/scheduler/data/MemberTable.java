@@ -78,23 +78,16 @@ public class MemberTable {
         return getQualifiedColumn(column) + " AS " + getAliasColumn(column);
     }
 
-    public static String getMemberLevel(String exp){
-        double xp = (double) Integer.parseInt(exp);
-        double lvl = Math.sqrt(xp/ MemberTable.EXP_CONSTANT);
-        int mLvl = (int) lvl;
-
-        if (Math.round(mLvl) >= 100) {
-            return "99";
-        } else if (Math.round(mLvl) <= 0) {
-            return "01";
-        } else if (Math.round(mLvl) < 10) {
-            return "0" + String.valueOf(mLvl);
-        } else return String.valueOf(mLvl);
+    public static int getMemberLevel(int exp){
+        double xp = (double) exp;
+        double lvl = Math.sqrt(xp/MemberTable.EXP_CONSTANT);
+        return (int) Math.round(lvl);
     }
 
     public static int getExpNeeded(int xp){
-        int lvl = Integer.parseInt(getMemberLevel(String.valueOf(xp)));
-        return MemberTable.EXP_CONSTANT * (lvl^MemberTable.EXP_FACTOR);
+        int lvl = getMemberLevel(xp) + 1;
+        double result = MemberTable.EXP_CONSTANT * Math.pow((double)lvl,(double)MemberTable.EXP_FACTOR);
+        return (int) Math.round(result);
     }
 
 }

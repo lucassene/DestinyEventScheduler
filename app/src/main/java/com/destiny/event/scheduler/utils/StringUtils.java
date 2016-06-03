@@ -12,4 +12,15 @@ public class StringUtils {
         return isEmpty(s) || s.toString().trim().isEmpty();
     }
 
+    public static String parseString(int number){
+        if (Math.round(number) >= 100) {
+            return "99";
+        } else if (Math.round(number) <= 0) {
+            return "01";
+        } else if (Math.round(number) < 10) {
+            return "0" + String.valueOf(number);
+        } else return String.valueOf(number);
+    }
+
+
 }

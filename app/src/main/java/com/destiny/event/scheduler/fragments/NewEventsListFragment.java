@@ -2,7 +2,6 @@ package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
@@ -174,7 +173,7 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
+        //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
 
         if (data != null && data.moveToFirst()){
             switch (loader.getId()){

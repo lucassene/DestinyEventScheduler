@@ -273,16 +273,10 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     public void onListItemClick(ListView l, View v, int position, long id) {
         String bungieId = bungieIdList.get(position-1);
 
-        Fragment fragment = new MyProfileFragment();
+        Fragment fragment = new MyNewProfileFragment();
 
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
-        if (bungieId.equals(callback.getBungieId())){
-            bundle.putInt("type", MyProfileFragment.TYPE_USER);
-        } else{
-            bundle.putInt("type", MyProfileFragment.TYPE_MEMBER);
-        }
-        bundle.putString("clanName", callback.getClanName());
 
         callback.loadNewFragment(fragment, bundle, "profile");
     }

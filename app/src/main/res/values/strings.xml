@@ -101,7 +101,7 @@
     <string name="games_played">Matches played</string>
     <string name="sort_by">Sort by</string>
     <string name="system">System</string>
-    <string name="my_profile">My profile</string>
+    <string name="my_profile">Profile</string>
     <string name="joined_events">Joined Events:</string>
     <string name="events_created">Matches created:</string>
     <string name="member_since">Member since:</string>
@@ -345,6 +345,12 @@
     <string name="minutes_advance">minutes in advance</string>
     <string name="create_match_success">Success! Match created.</string>
     <string name="when_play">When do you wanna play?</string>
+    <string name="evaluations">Evaluations</string>
+    <string name="games">Games</string>
+    <string name="events">Events</string>
+    <string name="favorite_game">Favorite game</string>
+    <string name="created">Created</string>
+    <string name="played">Played</string>
 
 
 </resources>
