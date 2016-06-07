@@ -20,6 +20,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.data.EntryTable;
+import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.ImageUtils;
@@ -41,7 +43,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
     private static final String TAG = "MyNewProfileFragment";
 
     private static final int LOADER_MEMBER = 50;
-    private static final int LOADER_PROFILE = 52;
+    private static final int LOADER_PROFILE = 75;
 
     ImageView profilePic;
     TextView userName;
@@ -54,6 +56,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
     PieChart eventsChart;
     PieChart likesChart;
+    PieChart gamesChart;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,6 +111,16 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
         Legend likesLeg = likesChart.getLegend();
         likesLeg.setEnabled(false);
 
+        gamesChart = (PieChart) v.findViewById(R.id.game_chart);
+        gamesChart.setMinimumHeight(chartHeight);
+        gamesChart.setUsePercentValues(true);
+        gamesChart.setDescription("");
+        gamesChart.setExtraOffsets(5, 10, 5, 5);
+        gamesChart.setDrawHoleEnabled(false);
+        gamesChart.setRotationEnabled(false);
+        Legend gamesLeg = gamesChart.getLegend();
+        gamesLeg.setEnabled(false);
+
         getMemberData();
 
         return v;
@@ -116,6 +129,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
     private void getMemberData() {
 
         getLoaderManager().initLoader(LOADER_MEMBER, null, this);
+        getLoaderManager().initLoader(LOADER_PROFILE, null, this);
 
     }
 
@@ -137,9 +151,27 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                         null,
                         null
                 );
+            case LOADER_PROFILE:
+                return new CursorLoader(
+                        getContext(),
+                        DataProvider.ENTRY_PROFILE_URI,
+                        getProfileProjection(),
+                        EntryTable.COLUMN_MEMBERSHIP + "=" + memberId,
+                        null,
+                        "type_total DESC"
+                );
         }
 
         return null;
+    }
+
+    private String[] getProfileProjection() {
+
+        //String c1 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID);
+        String c2 = "COUNT(*) AS type_total";
+        String c3 = EventTypeTable.COLUMN_NAME;
+
+        return new String[] {c2, c3};
     }
 
     private String[] getMemberProjection() {
@@ -161,7 +193,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
         if (data != null && data.moveToFirst()){
 
-            Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
+            //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
 
             switch (loader.getId()){
                 case LOADER_MEMBER:
@@ -187,26 +219,69 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
                     int likes = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES));
                     int dislikes = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES));
-                    Log.w(TAG, "Likes: " + likes + "; Dislikes: " + dislikes);
+                    //Log.w(TAG, "Likes: " + likes + "; Dislikes: " + dislikes);
 
                     setEventChart(created, played);
                     setLikesChart(likes, dislikes);
+
+                    break;
+                case LOADER_PROFILE:
+                    Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
+                    ArrayList<String> labels = new ArrayList<>();
+                    ArrayList<Integer> values = new ArrayList<>();
+
+                    data.moveToFirst();
+                    for(int i=0;i<data.getCount();i++){
+                        String text = getResources().getString(getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
+                        labels.add(text);
+                        int value = data.getInt(data.getColumnIndexOrThrow("type_total"));
+                        values.add(value);
+                        data.moveToNext();
+                    }
+
+                    setGamesChart(labels, values);
 
                     break;
             }
         }
     }
 
+    private void setGamesChart(ArrayList<String> labels, ArrayList<Integer> values) {
+
+        ArrayList<Entry> yValues = new ArrayList<>();
+
+        for(int i=0;i<values.size();i++){
+            yValues.add(new Entry((float)values.get(i),i));
+        }
+
+        PieDataSet dataSet = new PieDataSet(yValues, "Games");
+        if(values.size()>1) {
+            dataSet.setSliceSpace(6f);
+        } else dataSet.setSliceSpace(0f);;
+        dataSet.setSelectionShift(12f);
+        dataSet.setColors(ColorTemplate.LIBERTY_COLORS);
+
+        PieData data = new PieData(labels,dataSet);
+        data.setValueFormatter(new PercentFormatter());
+        data.setValueTextSize(13f);
+        Highlight h = new Highlight(0,0);
+        gamesChart.highlightValues(new Highlight[] {h});
+        gamesChart.setData(data);
+        gamesChart.invalidate();
+
+    }
+
+
     private void setLikesChart(int likes, int dislikes) {
         int index = 0;
         ArrayList<String> labels = new ArrayList<>();
 
         if (likes>0){
-            labels.add(getResources().getString(R.string.likes));
+            labels.add("");
             index++;
         }
         if (dislikes>0) {
-            labels.add(getResources().getString(R.string.dislikes));
+            labels.add("");
             index++;
         }
 
@@ -223,8 +298,9 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
             dataSet.setColors(ColorTemplate.LIBERTY_COLORS);
 
             PieData data = new PieData(labels, dataSet);
-            data.setValueFormatter(new PercentFormatter());
-            data.setValueTextSize(13f);
+            //data.setValueFormatter(new PercentFormatter());
+            //data.setValueTextSize(13f);
+            data.setDrawValues(false);
             Highlight h = new Highlight(getBigger(likes, dislikes),0);
             likesChart.highlightValues(new Highlight[] {h});
             likesChart.setData(data);

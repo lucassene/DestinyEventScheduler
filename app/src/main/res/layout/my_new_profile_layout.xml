@@ -194,7 +194,8 @@
                 android:layout_height="wrap_content"
                 android:scaleType="fitStart"
                 android:gravity="center"
-                android:src="@drawable/ic_iron_banner"/>
+                android:src="@drawable/ic_iron_banner"
+                android:layout_centerVertical="true"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
