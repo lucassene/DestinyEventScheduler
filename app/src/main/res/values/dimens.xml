@@ -24,6 +24,7 @@
     <dimen name="paddingBottomTopListItem">20dp</dimen>
     <dimen name="paddingList">8dp</dimen>
     <dimen name="listItemHeight">72dp</dimen>
+    <dimen name="smallItemHeight">56dp</dimen>
 
     <dimen name="primaryTextSize">16sp</dimen>
     <dimen name="primaryTextLeftPadding">56dp</dimen>

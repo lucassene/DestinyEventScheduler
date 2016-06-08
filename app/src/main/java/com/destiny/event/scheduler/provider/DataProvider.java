@@ -46,6 +46,7 @@ public class DataProvider extends ContentProvider {
     private static final int ENTRY_MEMBERS_ID = 73;
     private static final int ENTRY_HISTORY = 74;
     private static final int ENTRY_PROFILE = 75;
+    private static final int ENTRY_FAVORITE = 76;
     private static final int ENTRY_ALL = 79;
     private static final int NOTIFICATION = 80;
     private static final int NOTIFICATION_ID = 81;
@@ -75,6 +76,8 @@ public class DataProvider extends ContentProvider {
     public static final Uri ENTRY_HISTORY_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_HISTORY_PATH);
     private static final String ENTRY_PROFILE_PATH = "profile";
     public static final Uri ENTRY_PROFILE_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_PROFILE_PATH);
+    private static final String ENTRY_FAVORITE_PATH= "favorite";
+    public static final Uri ENTRY_FAVORITE_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_FAVORITE_PATH);
     private static final String NOTIFICATION_PATH = "notifyscheduled";
     public static final Uri NOTIFICATION_URI = Uri.parse("content://" + AUTHORITY + "/" + NOTIFICATION_PATH);
     private static final String ALL_GAMES_PATH = "allgames";
@@ -106,6 +109,7 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, ENTRY_MEMBERS_PATH + "/#", ENTRY_MEMBERS_ID);
         uriMatcher.addURI(AUTHORITY, ENTRY_HISTORY_PATH, ENTRY_HISTORY);
         uriMatcher.addURI(AUTHORITY, ENTRY_PROFILE_PATH, ENTRY_PROFILE);
+        uriMatcher.addURI(AUTHORITY, ENTRY_FAVORITE_PATH, ENTRY_FAVORITE);
         uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH, NOTIFICATION);
         uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH + "/#", NOTIFICATION_ID);
         uriMatcher.addURI(AUTHORITY, ALL_GAMES_PATH, GAME_ALL);
@@ -310,6 +314,30 @@ public class DataProvider extends ContentProvider {
                 sbProfile.append(EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID));
                 groupBy = EventTypeTable.COLUMN_NAME;
                 queryBuilder.setTables(sbProfile.toString());
+                break;
+            case ENTRY_FAVORITE:
+                StringBuilder sbFavorite = new StringBuilder();
+                sbFavorite.append(EntryTable.TABLE_NAME);
+                sbFavorite.append(" JOIN ");
+                sbFavorite.append(GameTable.TABLE_NAME);
+                sbFavorite.append(" ON ");
+                sbFavorite.append(EntryTable.COLUMN_GAME);
+                sbFavorite.append(" = ");
+                sbFavorite.append(GameTable.getQualifiedColumn(GameTable.COLUMN_ID));
+                sbFavorite.append(" JOIN ");
+                sbFavorite.append(EventTable.TABLE_NAME);
+                sbFavorite.append(" ON ");
+                sbFavorite.append(GameTable.COLUMN_EVENT_ID);
+                sbFavorite.append(" = ");
+                sbFavorite.append(EventTable.getQualifiedColumn(EventTable.COLUMN_ID));
+                sbFavorite.append(" JOIN ");
+                sbFavorite.append(EventTypeTable.TABLE_NAME);
+                sbFavorite.append(" ON ");
+                sbFavorite.append(EventTable.COLUMN_TYPE);
+                sbFavorite.append(" = ");
+                sbFavorite.append(EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID));
+                groupBy = EventTable.COLUMN_NAME;
+                queryBuilder.setTables(sbFavorite.toString());
                 break;
             case NOTIFICATION:
                 queryBuilder.setTables(NotificationTable.TABLE_NAME);

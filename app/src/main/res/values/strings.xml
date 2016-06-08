@@ -172,6 +172,13 @@
         <item>0</item>
     </string-array>
 
+    <string-array name="level_title">
+        <item>Apprentice</item>
+        <item>Adventurer</item>
+        <item>Master</item>
+        <Item>Champion</Item>
+    </string-array>
+
     <string name="tier1">Reciprocate Rune</string>
     <string name="tier2">Stolen Rune</string>
     <string name="tier3">Antiquated Rune</string>
@@ -351,6 +358,7 @@
     <string name="favorite_game">Favorite game</string>
     <string name="created">Created</string>
     <string name="played">Played</string>
+    <string name="value">Value</string>
 
 
 </resources>

@@ -84,6 +84,13 @@
         <item>Na hora</item>
     </string-array>
 
+    <string-array name="level_title">
+        <item>Apprentice</item>
+        <item>Adventurer</item>
+        <item>Master</item>
+        <Item>Champion</Item>
+    </string-array>
+
     <string name="refresh_lists">Atualizar listas</string>
     <string name="game_type_label">Tipo de jogo</string>
     <string name="max_guardians_label">Mínimo de guardiões</string>
@@ -125,7 +132,7 @@
     <string name="strike">Assalto</string>
     <string name="system">Sistema</string>
     <string name="clash">Enfrentamento</string>
-    <string name="classic1">Clássico Briga</string>
+    <string name="classic1">Briga Clássica</string>
     <string name="classic3">Clássico 3v3</string>
     <string name="classic6">Clássic 6v6</string>
     <string name="control">Controle</string>
@@ -298,5 +305,6 @@
     <string name="favorite_game">Jogo favorito</string>
     <string name="games">Jogos</string>
     <string name="played">Jogados</string>
+    <string name="value">Valor</string>
 
 </resources>
