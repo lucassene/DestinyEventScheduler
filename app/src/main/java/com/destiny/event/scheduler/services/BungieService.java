@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.GameTable;
@@ -181,6 +182,17 @@ public class BungieService extends IntentService {
 
         }
 
+        ArrayList<String> memberIdList = new ArrayList<>();
+
+        for (int i=0;i<membersModelList.size();i++){
+            memberIdList.add(membersModelList.get(i).getMembershipId());
+        }
+
+        Log.w(TAG, "Iniciando TitleService...");
+        Intent intent = new Intent(getApplicationContext(),TitleService.class);
+        intent.putStringArrayListExtra("membershipList",memberIdList);
+        startService(intent);
+
         receiver.send(STATUS_FINISHED, Bundle.EMPTY);
 
     }
@@ -205,6 +217,7 @@ public class BungieService extends IntentService {
 
             values.put(MemberTable.COLUMN_ICON, imageName);
             values.put(MemberTable.COLUMN_PLATFORM, platformId);
+            values.put(MemberTable.COLUMN_TITLE, getResources().getString(R.string.default_title));
             int created = (random.nextInt(5));
             int played = (random.nextInt(10)+1);
             int likes = (random.nextInt(created+played));
@@ -434,6 +447,11 @@ public class BungieService extends IntentService {
 
                 return bundle;
 
+            } else {
+                Log.w(TAG, "Erro tentando pegar dados do usuário");
+                bundle.putInt(ERROR_TAG,ERROR_CURRENT_USER);
+                receiver.send(STATUS_DOCS, bundle);
+                this.stopSelf();
             }
 
         } catch (JSONException e) {

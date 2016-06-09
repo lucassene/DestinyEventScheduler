@@ -6,6 +6,8 @@ import android.util.Log;
 
 public class MemberTable {
 
+    private static final String TAG = "MemberTable";
+
     public static final String TABLE_NAME = "members";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME = "member_name";
@@ -17,10 +19,8 @@ public class MemberTable {
     public static final String COLUMN_DISLIKES = "dislikes";
     public static final String COLUMN_CREATED = "games_created";
     public static final String COLUMN_PLAYED = "games_played";
+    public static final String COLUMN_TITLE = "member_title";
     //public static final String COLUMN_SINCE = "member_since";
-
-    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_NAME, COLUMN_MEMBERSHIP, COLUMN_CLAN, COLUMN_ICON, COLUMN_PLATFORM, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED};
-    public static final String[] VIEW_COLUMNS = {COLUMN_NAME, COLUMN_ICON, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED};
 
     //public static final String POINTS_COLUMNS = "((" + COLUMN_LIKES + "*1.0)/(" + COLUMN_CREATED + "+" + COLUMN_PLAYED + "))*100+(" + COLUMN_CREATED + "*0.5)-" + COLUMN_DISLIKES;
     public static final String LIKE_MODIFIER = "16";
@@ -30,6 +30,9 @@ public class MemberTable {
     public static final int EXP_CONSTANT = 8;
     public static final int EXP_FACTOR = 2;
     public static final String COLUMN_EXP = "(" + COLUMN_LIKES + "*" + LIKE_MODIFIER + ") + (" + COLUMN_CREATED + "*" + CREATOR_MODIFIER + ") + (" + COLUMN_PLAYED + "*" + PLAYED_MODIFIER + ") - (" + COLUMN_DISLIKES + "*" + DISLIKE_MODIFIER + ")";
+
+    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_NAME, COLUMN_MEMBERSHIP, COLUMN_CLAN, COLUMN_ICON, COLUMN_PLATFORM, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED, COLUMN_EXP, COLUMN_TITLE};
+    public static final String[] VIEW_COLUMNS = {COLUMN_NAME, COLUMN_ICON, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED, COLUMN_TITLE};
 
     public static final String CREATE_TABLE = "CREATE TABLE "
             + TABLE_NAME
@@ -53,7 +56,9 @@ public class MemberTable {
             + COLUMN_CREATED
             + " INTEGER, "
             + COLUMN_PLAYED
-            + " INTEGER"
+            + " INTEGER, "
+            + COLUMN_TITLE
+            + " TEXT NOT NULL"
             + ");";
 
     public static void onCreate(SQLiteDatabase db){
@@ -79,13 +84,15 @@ public class MemberTable {
     }
 
     public static int getMemberLevel(int exp){
-        double xp = (double) exp;
-        double lvl = Math.sqrt(xp/MemberTable.EXP_CONSTANT);
-        return (int) Math.round(lvl);
+        double lvl = Math.sqrt(exp/MemberTable.EXP_CONSTANT);
+        int inteiro = (int) lvl;
+        double resto = lvl - inteiro;
+        if (resto>0) inteiro++;
+        return inteiro;
     }
 
     public static int getExpNeeded(int xp){
-        int lvl = getMemberLevel(xp) + 1;
+        int lvl = getMemberLevel(xp);
         double result = MemberTable.EXP_CONSTANT * Math.pow((double)lvl,(double)MemberTable.EXP_FACTOR);
         return (int) Math.round(result);
     }

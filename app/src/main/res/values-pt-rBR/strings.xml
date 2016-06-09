@@ -44,7 +44,7 @@
 
     <string-array name="clan_order_by">
         <item>Nome</item>
-        <item>Pontos de participação</item>
+        <item>Nível</item>
     </string-array>
 
     <string-array name="event_types">
@@ -85,10 +85,40 @@
     </string-array>
 
     <string-array name="level_title">
-        <item>Apprentice</item>
-        <item>Adventurer</item>
-        <item>Master</item>
-        <Item>Champion</Item>
+        <item>Aprendiz</item>
+        <item>Aventureiro</item>
+        <item>Mestre</item>
+        <item>Campeão</item>
+    </string-array>
+
+    <string-array name="event_title">
+        <item>das Runas</item>
+        <item>da Guerra</item>
+        <item>das Antigas</item>
+        <item>do Controle</item>
+        <item>da Irmandade</item>
+        <item>Assassino</item>
+        <item>do Inferno</item>
+        <item>de Ferro</item>
+        <item>Louco</item>
+        <item>da Fissura</item>
+        <item>das Relíquias</item>
+        <item>da Batalha</item>
+        <item>de Osiris</item>
+        <item>das Zonas</item>
+        <item>da Cidade</item>
+        <item>da Colméia</item>
+        <item>das Areias</item>
+        <item>Lunático</item>
+        <item>de Ishtar</item>
+        <item>das Correntes</item>
+        <item>da Eris</item>
+        <item>do Tempo</item>
+        <item>Regicida</item>
+        <item>da Vanguarda</item>
+        <item>do Alvorecer</item>
+        <item>Solitário</item>
+        <item>da Galáxia</item>
     </string-array>
 
     <string name="refresh_lists">Atualizar listas</string>
@@ -306,5 +336,6 @@
     <string name="games">Jogos</string>
     <string name="played">Jogados</string>
     <string name="value">Valor</string>
+    <string name="default_title">Novo Aprendiz</string>
 
 </resources>

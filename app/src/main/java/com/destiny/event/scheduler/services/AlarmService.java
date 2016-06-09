@@ -14,8 +14,8 @@ public class AlarmService extends IntentService {
 
     private static final String TAG = "AlarmService";
 
-    public AlarmService(String name) {
-        super(name);
+    public AlarmService() {
+        super(AlarmService.class.getName());
     }
 
     @Override

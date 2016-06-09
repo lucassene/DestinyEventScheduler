@@ -90,7 +90,7 @@
 
     <string-array name="clan_order_by">
         <item>Name</item>
-        <item>Participation points</item>
+        <item>Level</item>
     </string-array>
 
     <string name="games_available">Matches available</string>
@@ -176,8 +176,40 @@
         <item>Apprentice</item>
         <item>Adventurer</item>
         <item>Master</item>
-        <Item>Champion</Item>
+        <item>Champion</item>
     </string-array>
+
+    <string-array name="event_title">
+        <item>Rune</item>
+        <item>of War</item>
+        <item>of Olds</item>
+        <item>Control</item>
+        <item>of the Brotherhood</item>
+        <item>Assassin</item>
+        <item>from Hell</item>
+        <item>Iron</item>
+        <item>Madman</item>
+        <item>Rift</item>
+        <item>of Relics</item>
+        <item>Battle</item>
+        <item>of Osiris</item>
+        <item>Zone</item>
+        <item>of the City</item>
+        <item>Hive</item>
+        <item>of Sands</item>
+        <item>Lunatic</item>
+        <item>of Ishtar</item>
+        <item>of Chains</item>
+        <item>Eri\'s</item>
+        <item>of Time</item>
+        <item>Regicide</item>
+        <item>Vanguard</item>
+        <item>of Dawn</item>
+        <item>Lone</item>
+        <item>Galaxy</item>
+    </string-array>
+
+    <string name="default_title">New Apprentice</string>
 
     <string name="tier1">Reciprocate Rune</string>
     <string name="tier2">Stolen Rune</string>

@@ -26,6 +26,7 @@ public class DBHelper extends SQLiteOpenHelper{
         EntryTable.onCreate(db);
         EvaluationTable.onCreate(db);
         NotificationTable.onCreate(db);
+        TitleTable.onCreate(db);
     }
 
     @Override
@@ -40,6 +41,7 @@ public class DBHelper extends SQLiteOpenHelper{
         EntryTable.onUpdate(db, oldVersion, newVersion);
         EvaluationTable.onUpdate(db, oldVersion, newVersion);
         NotificationTable.onUpdate(db, oldVersion, newVersion);
+        TitleTable.onUpdate(db, oldVersion, newVersion);
     }
 
     @Override

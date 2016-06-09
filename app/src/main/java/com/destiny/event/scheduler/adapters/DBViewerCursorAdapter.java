@@ -273,7 +273,7 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 lbl8.setText(MemberTable.COLUMN_DISLIKES);
                 lbl9.setText(MemberTable.COLUMN_CREATED);
                 lbl10.setText(MemberTable.COLUMN_PLAYED);
-                //lbl11.setText(MemberTable.COLUMN_SINCE);
+                lbl11.setText(MemberTable.COLUMN_TITLE);
 
                 txt1.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_ID)));
                 txt2.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
@@ -285,7 +285,7 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 txt8.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES)));
                 txt9.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED)));
                 txt10.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED)));
-                //txt11.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
+                txt11.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
                 break;
             case NotificationTable.TABLE_NAME:
                 lbl1.setText(NotificationTable.COLUMN_ID);

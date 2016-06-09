@@ -51,6 +51,11 @@
             android:exported="false"
             android:enabled="true">
         </service>
+
+        <service android:name=".services.TitleService"
+            android:exported="false"
+            android:enabled="true">
+        </service>
         
         <receiver android:name=".services.AlarmReceiver">
             <intent-filter>

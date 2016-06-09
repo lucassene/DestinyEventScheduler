@@ -20,6 +20,7 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.NotificationTable;
+import com.destiny.event.scheduler.data.TitleTable;
 
 public class DataProvider extends ContentProvider {
 
@@ -53,6 +54,8 @@ public class DataProvider extends ContentProvider {
     private static final int EVALUATION = 90;
     private static final int EVALUATION_ID = 91;
     private static final int EVALUATION_HISTORY = 92;
+    private static final int TITLE = 100;
+    private static final int TITLE_ID = 101;
 
     private static final String AUTHORITY = "com.destiny.event.scheduler.provider";
 
@@ -88,6 +91,8 @@ public class DataProvider extends ContentProvider {
     public static final Uri EVALUATION_URI = Uri.parse("content://" + AUTHORITY + "/" + EVALUATION_PATH);
     private static final String EVALUATION_HISTORY_PATH = "evalhistory";
     public static final Uri EVALUATION_HISTORY_URI = Uri.parse("content://" + AUTHORITY + "/" + EVALUATION_HISTORY_PATH);
+    private static final String TITLE_PATH = "titles";
+    public static final Uri TITLE_URI = Uri.parse("content://" + AUTHORITY + "/" + TITLE_PATH);
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
@@ -117,6 +122,8 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, EVALUATION_PATH, EVALUATION);
         uriMatcher.addURI(AUTHORITY, EVALUATION_PATH + "/#", EVALUATION_ID);
         uriMatcher.addURI(AUTHORITY, EVALUATION_HISTORY_PATH, EVALUATION_HISTORY);
+        uriMatcher.addURI(AUTHORITY, TITLE_PATH, TITLE);
+        uriMatcher.addURI(AUTHORITY, TITLE_PATH + "/#", TITLE_ID);
     }
 
     @Override
@@ -364,6 +371,13 @@ public class DataProvider extends ContentProvider {
                 sbHistory2.append(EvaluationTable.TABLE_NAME);
                 groupBy = EvaluationTable.COLUMN_MEMBERSHIP_B;
                 queryBuilder.setTables(sbHistory2.toString());
+                break;
+            case TITLE:
+                queryBuilder.setTables(TitleTable.TABLE_NAME);
+                break;
+            case TITLE_ID:
+                queryBuilder.setTables(TitleTable.TABLE_NAME);
+                queryBuilder.appendWhere(TitleTable.COLUMN_ID + "=" + uri.getLastPathSegment());
                 break;
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);

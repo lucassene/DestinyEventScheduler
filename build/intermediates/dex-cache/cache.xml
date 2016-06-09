@@ -1,3 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
 
+    <item
+        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="96401d946c4ea97e0631043298267605fc7e7c44">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_528c79f81cd48a8de8f9cfb90d233d6ed022fc30\classes.dex" />
+    </item>
+
+</items>
