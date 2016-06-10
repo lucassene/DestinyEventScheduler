@@ -391,6 +391,15 @@
     <string name="created">Created</string>
     <string name="played">Played</string>
     <string name="value">Value</string>
+    <string name="problem_bungie_net">Problem connecting to Bungie.net</string>
+    <string name="just_warning">Just a warning...</string>
+    <string name="no_icon_msg">For security reasons, some guardians choose not to show their face. For these, we will use a default photo, okay?</string>
+    <string name="got_it">Got it</string>
+    <string name="error">Error</string>
+    <string name="some_problem_msg">Some problem occurred. Please try again later.</string>
+    <string name="no_connection_msg">No connection found. Please connect to the internet or try again later.</string>
+    <string name="bungie_net_error_msg">Incorrect response from Bungie.net. Please try again later.</string>
+    <string name="no_clan_msg">Sorry guardian, but is needed that you join a clan to use this app.</string>
 
 
 </resources>

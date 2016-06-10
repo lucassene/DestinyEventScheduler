@@ -73,7 +73,7 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
 
     @Override
     public void onLoginFailed() {
-        Toast.makeText(this, "Login failed!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.problem_bungie_net, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         setResult(Activity.RESULT_CANCELED, intent);
         finish();

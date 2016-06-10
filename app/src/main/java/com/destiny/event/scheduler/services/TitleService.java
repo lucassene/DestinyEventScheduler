@@ -51,7 +51,9 @@ public class TitleService extends IntentService {
 
                 Cursor favCursor = getContentResolver().query(DataProvider.ENTRY_FAVORITE_URI, getFavoriteProjection(), EntryTable.COLUMN_MEMBERSHIP + "=" + membershipList.get(i), null, "total DESC");
                 if (favCursor != null && favCursor.moveToFirst()){
-                    eventId = favCursor.getInt(favCursor.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_ID)));
+                    if (favCursor.getCount() == 0){
+                        eventId = 999;
+                    } else eventId = favCursor.getInt(favCursor.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_ID)));
                     favCursor.close();
                 }
 
@@ -86,33 +88,39 @@ public class TitleService extends IntentService {
         int type = 0;
         int titleIndex = 0;
 
-        String newTitle;
+        String newTitle = "";
 
-        Cursor titleCursor = getContentResolver().query(DataProvider.TITLE_URI, TitleTable.ALL_COLUMNS, TitleTable.COLUMN_EVENT + "=" + eventId, null, null);
-        if (titleCursor != null && titleCursor.moveToFirst()){
-            type = titleCursor.getInt(titleCursor.getColumnIndexOrThrow(TitleTable.COLUMN_ORDER));
-            titleIndex = titleCursor.getInt(titleCursor.getColumnIndexOrThrow(TitleTable.COLUMN_TITLE));
-            titleCursor.close();
+        if (eventId != 999){
+            Cursor titleCursor = getContentResolver().query(DataProvider.TITLE_URI, TitleTable.ALL_COLUMNS, TitleTable.COLUMN_EVENT + "=" + eventId, null, null);
+            if (titleCursor != null && titleCursor.moveToFirst()){
+                type = titleCursor.getInt(titleCursor.getColumnIndexOrThrow(TitleTable.COLUMN_ORDER));
+                titleIndex = titleCursor.getInt(titleCursor.getColumnIndexOrThrow(TitleTable.COLUMN_TITLE));
+                titleCursor.close();
+            }
+
+            if (lvl<=25){
+                newTitle = levelTitles[0];
+            } else if (lvl<=50){
+                newTitle = levelTitles[1];
+            } else if (lvl<=75){
+                newTitle = levelTitles[2];
+            } else newTitle = levelTitles[3];
         }
 
-        if (lvl<=25){
-            newTitle = levelTitles[0];
-        } else if (lvl<=50){
-            newTitle = levelTitles[1];
-        } else if (lvl<=75){
-            newTitle = levelTitles[2];
-        } else newTitle = levelTitles[3];
-
-        String eventTitle = eventTitles[titleIndex];
-
-        Locale current = getResources().getConfiguration().locale;
-
-        if (current.getLanguage().equals("pt")){
-            newTitle = newTitle + " " + eventTitle;
+        if (eventId == 999){
+            newTitle = "New Guardian";
         } else {
-            if (type == 0){
-                newTitle = eventTitle + " " + newTitle;
-            } else newTitle = newTitle + " " + eventTitle;
+            String eventTitle = eventTitles[titleIndex];
+
+            Locale current = getResources().getConfiguration().locale;
+
+            if (current.getLanguage().equals("pt")){
+                newTitle = newTitle + " " + eventTitle;
+            } else {
+                if (type == 0){
+                    newTitle = eventTitle + " " + newTitle;
+                } else newTitle = newTitle + " " + eventTitle;
+            }
         }
 
         Log.w(TAG, "newTitle: " + newTitle);

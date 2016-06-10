@@ -84,6 +84,8 @@ public class BungieService extends IntentService {
     public static final int ERROR_MEMBERS_OF_CLAN = 160;
     public static final int ERROR_CLAN_MEMBER = 170;
 
+    private int error = 0;
+
     private String iconPath;
     private String displayName;
     private String membershipType;
@@ -131,10 +133,18 @@ public class BungieService extends IntentService {
         switch (request) {
             case GET_CURRENT_ACCOUNT:
                 getBungieAccount(receiver);
-                insertLoggedUser();
-                insertClan();
-                insertClanMembers();
-                insertFakeEvents(receiver);
+                if (error == 0){
+                    insertLoggedUser();
+                    insertClan();
+                    insertClanMembers();
+                    insertFakeEvents(receiver);
+                } else {
+                    Log.w(TAG,"Algum problema ocorreu, avisando o usuário");
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(ERROR_TAG, error);
+                    receiver.send(STATUS_ERROR, bundle);
+                    this.stopSelf();
+                }
                 break;
         }
 
@@ -281,7 +291,6 @@ public class BungieService extends IntentService {
 
     }
 
-
     private void getBungieAccount(ResultReceiver receiver){
 
         String myURL = BASE_URL + USER_PREFIX + GET_CURRENT_ACCOUNT;
@@ -339,6 +348,7 @@ public class BungieService extends IntentService {
                     Log.w(TAG, "Response Code do JSON diferente de 200");
                     bundle.putInt(ERROR_TAG, ERROR_RESPONSE_CODE);
                     receiver.send(STATUS_ERROR, bundle);
+                    error = ERROR_RESPONSE_CODE;
                     this.stopSelf();
                 }
 
@@ -346,6 +356,7 @@ public class BungieService extends IntentService {
                 Log.w(TAG, "Sem conexão com a internet");
                 bundle.putInt(ERROR_TAG, ERROR_NO_CONNECTION);
                 receiver.send(STATUS_ERROR, bundle);
+                error = ERROR_NO_CONNECTION;
                 this.stopSelf();
             }
 
@@ -354,6 +365,7 @@ public class BungieService extends IntentService {
             bundle.putInt(ERROR_TAG, ERROR_HTTP_REQUEST);
             receiver.send(STATUS_ERROR, bundle);
             e.printStackTrace();
+            error = ERROR_HTTP_REQUEST;
             this.stopSelf();
         }
 
@@ -434,8 +446,9 @@ public class BungieService extends IntentService {
                         getMembersOfClan(receiver, 1);
 
                         for (int i = 0; i< membersModelList.size(); i++){
-                             int iconStatus = getClanMemberAccount(receiver, membersModelList.get(i).getMembershipId(), platformId, i);
-                            bundle.putInt(ERROR_TAG, ERROR_NO_ICON);
+                            getClanMemberAccount(receiver, membersModelList.get(i).getMembershipId(), platformId, i);
+                            if (error!=0) break;
+                             //bundle.putInt(ERROR_TAG, ERROR_NO_ICON);
                         }
 
                         break;
@@ -451,6 +464,7 @@ public class BungieService extends IntentService {
                 Log.w(TAG, "Erro tentando pegar dados do usuário");
                 bundle.putInt(ERROR_TAG,ERROR_CURRENT_USER);
                 receiver.send(STATUS_DOCS, bundle);
+                error = ERROR_CURRENT_USER;
                 this.stopSelf();
             }
 
@@ -459,6 +473,7 @@ public class BungieService extends IntentService {
             bundle.putInt(ERROR_TAG, ERROR_CURRENT_USER);
             receiver.send(STATUS_DOCS, bundle);
             e.printStackTrace();
+            error = ERROR_CURRENT_USER;
             this.stopSelf();
         }
 
@@ -497,6 +512,7 @@ public class BungieService extends IntentService {
                     Log.w(TAG, "Response Code do JSON diferente de 200");
                     bundle.putInt(ERROR_TAG, ERROR_RESPONSE_CODE);
                     receiver.send(STATUS_PARTY, bundle);
+                    error = ERROR_RESPONSE_CODE;
                     this.stopSelf();
                 }
 
@@ -504,6 +520,7 @@ public class BungieService extends IntentService {
                 Log.w(TAG, "Sem conexão com a Internet");
                 bundle.putInt(ERROR_TAG, ERROR_NO_CONNECTION);
                 receiver.send(STATUS_PARTY, bundle);
+                error = ERROR_NO_CONNECTION;
                 this.stopSelf();
             }
 
@@ -512,6 +529,7 @@ public class BungieService extends IntentService {
             bundle.putInt(ERROR_TAG, ERROR_HTTP_REQUEST);
             receiver.send(STATUS_PARTY, Bundle.EMPTY);
             e.printStackTrace();
+            error = ERROR_HTTP_REQUEST;
             this.stopSelf();
         }
     }
@@ -555,6 +573,7 @@ public class BungieService extends IntentService {
             bundle.putInt(ERROR_TAG, ERROR_MEMBERS_OF_CLAN);
             receiver.send(STATUS_PARTY, bundle);
             e.printStackTrace();
+            error = ERROR_MEMBERS_OF_CLAN;
             this.stopSelf();
         }
     }
@@ -599,11 +618,11 @@ public class BungieService extends IntentService {
                                 iconsList.add(membersModelList.get(position).getIconPath());
                             } else {
                                 for (int i=0; i<iconsList.size();i++){
-                                    if (iconsList.get(i).equals(membersModelList.get(position).getIconPath())){
+                                    if (iconsList.get(i) != null && iconsList.get(i).equals(membersModelList.get(position).getIconPath())){
                                         notAdd = 1;
                                         //Log.w(TAG, "Number of Images: " + i);
                                         break;
-                                    }
+                                    } else break;
                                 }
                                 if (notAdd != 1){
                                     iconsList.add(membersModelList.get(position).getIconPath());
@@ -617,12 +636,14 @@ public class BungieService extends IntentService {
                     Log.w(TAG, "Response Code do JSON diferente de 200");
                     bundle.putInt(ERROR_TAG, ERROR_RESPONSE_CODE);
                     receiver.send(STATUS_PARTY, bundle);
+                    error = ERROR_RESPONSE_CODE;
                     this.stopSelf();
                 }
             } else {
                 Log.w(TAG, "Sem conexão com a Internet");
                 bundle.putInt(ERROR_TAG, ERROR_NO_CONNECTION);
                 receiver.send(STATUS_PARTY, bundle);
+                error = ERROR_NO_CONNECTION;
                 this.stopSelf();
             }
 
@@ -631,6 +652,7 @@ public class BungieService extends IntentService {
             bundle.putInt(ERROR_TAG, ERROR_HTTP_REQUEST);
             receiver.send(STATUS_PARTY, Bundle.EMPTY);
             e.printStackTrace();
+            error = ERROR_HTTP_REQUEST;
             this.stopSelf();
         }
 
@@ -675,6 +697,7 @@ public class BungieService extends IntentService {
             bundle.putInt(ERROR_TAG, ERROR_CLAN_MEMBER);
             receiver.send(STATUS_PARTY, bundle);
             e.printStackTrace();
+            error = ERROR_CLAN_MEMBER;
             this.stopSelf();
         }
 

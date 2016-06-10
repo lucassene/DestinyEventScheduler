@@ -323,7 +323,6 @@
     <string name="on_time">Na hora</string>
     <string name="games_selected">itens selecionados</string>
     <string name="none">Nenhum</string>
-    <string name="game_selected"></string>
     <string name="no_game_selected">Nenhum item selecionado</string>
     <string name="create_match_success">Sucesso! Partida criada.</string>
     <string name="match_must_created">A partida deve ser criada com, no mínimo,</string>
@@ -337,5 +336,14 @@
     <string name="played">Jogados</string>
     <string name="value">Valor</string>
     <string name="default_title">Novo Aprendiz</string>
+    <string name="bungie_net_error_msg">Resposta incorreta de Bungie.net. Por favor, tente novamente mais tarde.</string>
+    <string name="error">Erro</string>
+    <string name="got_it">Entendi</string>
+    <string name="just_warning">Só um aviso...</string>
+    <string name="no_connection_msg">Nenhuma conexão encontrada. Por favor conecte-se à internet ou tente novamente mais tarde.</string>
+    <string name="no_icon_msg">Por motivo de segurança, alguns guardiões optam por não mostrar seus rosto. Para esses, usaremos uma foto padrão, ok?</string>
+    <string name="problem_bungie_net">Problema ao conectar com Bungie.net</string>
+    <string name="some_problem_msg">Algum problema ocorreu. Por favor, tente novamente mais tarde.</string>
+    <string name="no_clan_msg">Desculpe guardião, mas é necessário que você esteja em um clã para usar este aplicativo.</string>
 
 </resources>
