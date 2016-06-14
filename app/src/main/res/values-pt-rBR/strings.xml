@@ -333,7 +333,7 @@
     <string name="events">Eventos</string>
     <string name="favorite_game">Jogo favorito</string>
     <string name="games">Jogos</string>
-    <string name="played">Jogados</string>
+    <string name="played">Jogado</string>
     <string name="value">Valor</string>
     <string name="default_title">Novo Aprendiz</string>
     <string name="bungie_net_error_msg">Resposta incorreta de Bungie.net. Por favor, tente novamente mais tarde.</string>
@@ -345,5 +345,7 @@
     <string name="problem_bungie_net">Problema ao conectar com Bungie.net</string>
     <string name="some_problem_msg">Algum problema ocorreu. Por favor, tente novamente mais tarde.</string>
     <string name="no_clan_msg">Desculpe guardião, mas é necessário que você esteja em um clã para usar este aplicativo.</string>
+    <string name="no_events_played">Nenhum evento jogado</string>
+    <string name="times">vezes</string>
 
 </resources>

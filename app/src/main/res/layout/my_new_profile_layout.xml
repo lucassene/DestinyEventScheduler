@@ -108,13 +108,29 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="8dp"/>
 
-                <com.github.mikephil.charting.charts.PieChart
-                    android:id="@+id/evaluation_chart"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:focusable="false"/>
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/empty_eval_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/listItemHeight"
+                        android:gravity="center"
+                        android:text="@string/no_events_played"
+                        android:visibility="gone"
+                        android:alpha=".75"/>
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/evaluation_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:focusable="false"/>
+
+                </FrameLayout>
 
                 <LinearLayout
+                    android:id="@+id/like_chart_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -174,13 +190,29 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="8dp"/>
 
-                <com.github.mikephil.charting.charts.PieChart
-                    android:id="@+id/events_chart"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:focusable="false"/>
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/empty_events_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/listItemHeight"
+                        android:gravity="center"
+                        android:text="@string/no_events_played"
+                        android:visibility="gone"
+                        android:alpha=".75"/>
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/events_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:focusable="false"/>
+
+                </FrameLayout>
 
                 <LinearLayout
+                    android:id="@+id/event_chart_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -230,7 +262,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/games"
+                android:text="@string/game_type_label"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/white"
                 android:layout_marginTop="@dimen/global_padding"/>
@@ -242,13 +274,30 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="8dp"/>
 
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/game_chart"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="false"/>
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/empty_game_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/listItemHeight"
+                    android:gravity="center"
+                    android:text="@string/no_events_played"
+                    android:visibility="gone"
+                    android:alpha=".75"/>
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/game_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"/>
+
+
+            </FrameLayout>
 
             <LinearLayout
+                android:id="@+id/game_chart_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -302,69 +351,91 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="8dp"/>
 
-        <RelativeLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/listItemHeight">
 
-            <ImageView
-                android:id="@+id/game_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="fitStart"
+            <TextView
+                android:id="@+id/empty_fav"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/no_events_played"
                 android:gravity="center"
-                android:src="@drawable/ic_iron_banner"
-                android:layout_centerVertical="true"
-                android:layout_margin="6dp"/>
+                android:visibility="gone"
+                android:alpha=".75"/>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="8dp"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@id/game_icon">
+            <RelativeLayout
+                android:id="@+id/fav_layout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/listItemHeight">
 
-                <TextView
-                    android:id="@+id/game_title"
+                <ImageView
+                    android:id="@+id/game_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Game Title"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/colorAccent"/>
+                    android:scaleType="fitStart"
+                    android:gravity="center"
+                    android:src="@drawable/ic_iron_banner"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="6dp"/>
 
-                <TextView
-                    android:id="@+id/game_type"
+                <LinearLayout
+                    android:id="@+id/fav_text_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Game type"/>
+                    android:orientation="vertical"
+                    android:paddingLeft="8dp"
+                    android:layout_toRightOf="@id/game_icon"
+                    android:layout_alignTop="@id/game_icon">
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/game_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Game Title"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/colorAccent"/>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:paddingRight="8dp">
+                    <TextView
+                        android:id="@+id/game_type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Game type"/>
 
-                <TextView
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/events"/>
+                    android:orientation="horizontal"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignBottom="@id/fav_text_layout">
 
-                <TextView
-                    android:id="@+id/fav_game_played"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="99"
-                    android:textSize="28dp"
-                    android:layout_gravity="center_horizontal"
-                    android:textColor="@color/colorPrimary"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/played"
+                        android:alpha="0.5"/>
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/fav_game_played"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="XX"
+                        android:alpha=".5"/>
 
-        </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/times"
+                        android:alpha=".5"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </FrameLayout>
+
 
     </LinearLayout>
 

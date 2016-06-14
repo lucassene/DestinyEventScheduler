@@ -39,7 +39,7 @@ public class TitleService extends IntentService {
         ArrayList<String> membershipList = bundle.getStringArrayList("membershipList");
 
         if (membershipList!=null){
-            Log.w(TAG, "membershipList is not null");
+            //Log.w(TAG, "membershipList is not null");
             for (int i=0;i<membershipList.size();i++){
 
                 Cursor xpCursor = getContentResolver().query(DataProvider.MEMBER_URI, MemberTable.ALL_COLUMNS, MemberTable.COLUMN_MEMBERSHIP + "=" + membershipList.get(i), null, null);

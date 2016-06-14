@@ -68,7 +68,7 @@ public class MembersAdapter extends SimpleCursorAdapter {
 
         TextView name = (TextView) view.findViewById(R.id.primary_text);
         ImageView profile = (ImageView) view.findViewById(R.id.profile_pic);
-        //TextView memberSince = (TextView) view.findViewById(R.id.secondary_text);
+        TextView title = (TextView) view.findViewById(R.id.secondary_text);
         TextView points = (TextView) view.findViewById(R.id.text_points);
 
 
@@ -84,6 +84,7 @@ public class MembersAdapter extends SimpleCursorAdapter {
         points.setText(StringUtils.parseString(lvl));
 
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
+        title.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
 
         //String sinceString = DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
         //memberSince.setText(sinceString);

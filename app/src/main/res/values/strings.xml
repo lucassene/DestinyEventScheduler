@@ -59,7 +59,7 @@
     <string name="empty_scheduled_list">You don\'t have any scheduled match.</string>
     <string name="menu">Menu</string>
     <string name="refresh_lists">Refresh lists</string>
-    <string name="game_type_label">Game Type</string>
+    <string name="game_type_label">Game type</string>
     <string name="game_label">Game</string>
     <string name="date_label">Date</string>
     <string name="time_label">Time</string>
@@ -400,6 +400,8 @@
     <string name="no_connection_msg">No connection found. Please connect to the internet or try again later.</string>
     <string name="bungie_net_error_msg">Incorrect response from Bungie.net. Please try again later.</string>
     <string name="no_clan_msg">Sorry guardian, but is needed that you join a clan to use this app.</string>
+    <string name="no_events_played">No events played</string>
+    <string name="times">times</string>
 
 
 </resources>

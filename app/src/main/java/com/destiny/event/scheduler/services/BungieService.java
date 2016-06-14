@@ -482,7 +482,7 @@ public class BungieService extends IntentService {
 
     private void getMembersOfClan(ResultReceiver receiver, int page){
 
-        String myURL = BASE_URL + GROUP_PREFIX + clanId + "/" + GET_MEMBERS_OF_CLAN + "?" + CURRENT_PAGE + String.valueOf(page) + "&" + MEMBER_TYPE + "0&" + PLATFORM_TYPE + platformId + "&" + SORT + "0";
+        String myURL = BASE_URL + GROUP_PREFIX + clanId + "/" + GET_MEMBERS_OF_CLAN + "?" + CURRENT_PAGE + String.valueOf(page) + "&" + MEMBER_TYPE + "-1&" + PLATFORM_TYPE + platformId + "&" + SORT + "0";
         //Log.w(TAG,myURL);
         receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 

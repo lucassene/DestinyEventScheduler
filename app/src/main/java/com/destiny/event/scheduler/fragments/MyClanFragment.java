@@ -42,8 +42,8 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     private static final String POINTS_ORDER_BY = MemberTable.COLUMN_EXP + " DESC";
     private String orderBy;
 
-    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_EXP};
-    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points};
+    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_EXP, MemberTable.COLUMN_TITLE};
+    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points, R.id.secondary_text};
 
     private ArrayList<String> bungieIdList;
     private String bungieId;
@@ -185,7 +185,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         switch (id){
             case LOADER_MEMBERS:
-                projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, MemberTable.COLUMN_EXP};
+                projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, MemberTable.COLUMN_EXP, MemberTable.COLUMN_TITLE};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.MEMBER_URI,
