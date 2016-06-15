@@ -55,6 +55,12 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
         return v;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        setListAdapter(null);
+    }
+
     private void fillData(String title, String tableName) {
 
         String[] from;

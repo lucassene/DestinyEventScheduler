@@ -249,6 +249,12 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
 
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        setListAdapter(null);
+    }
+
     private int getCheckedMembers(){
         int result = 0;
         for (int i=0; i<memberList.size(); i++){

@@ -144,6 +144,10 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
         super.onPause();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

@@ -101,6 +101,12 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        setListAdapter(null);
+    }
+
+    @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
         if (position > 0){

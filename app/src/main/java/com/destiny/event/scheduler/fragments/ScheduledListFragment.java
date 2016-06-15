@@ -94,6 +94,12 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        setListAdapter(null);
+    }
+
+    @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         //Toast.makeText(getContext(), "GameID Selected: " + gameIdList.get(position-1), Toast.LENGTH_SHORT).show();
         if (position > 0 ){

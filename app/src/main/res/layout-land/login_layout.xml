@@ -14,7 +14,7 @@
         android:layout_gravity="center" />
 
         <TextView
-            android:id="@+id/login_text"
+            android:id="@+id/login_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/tx_login"
@@ -31,8 +31,8 @@
                 android:layout_marginTop="@dimen/button_margin"
                 android:text="@string/psn"
                 android:gravity="left|center"
-                android:layout_alignLeft="@+id/login_text"
-                android:layout_below="@id/login_text"
+                android:layout_alignLeft="@+id/login_title"
+                android:layout_below="@id/login_title"
                 android:drawableLeft="@drawable/ic_psn"
                 android:backgroundTint="@android:color/holo_blue_dark"
                 android:onClick="callWebView"/>

@@ -112,6 +112,12 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        setListAdapter(null);
+    }
+
+    @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         String bungieId = bungieIdList.get(position - 1);
 

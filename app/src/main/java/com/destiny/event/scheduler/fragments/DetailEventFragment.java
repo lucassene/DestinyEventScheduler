@@ -94,6 +94,11 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     MyAlertDialog dialog;
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        setListAdapter(null);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -124,6 +129,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         guardians = (TextView) headerView.findViewById(R.id.guardians);
 
         joinButton = (Button) footerView.findViewById(R.id.btn_join);
+
+        setListAdapter(null);
 
         Bundle bundle = getArguments();
         if (bundle != null){
@@ -504,6 +511,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     }
 
     private void setAdapter(int max) {
+        setListAdapter(null);
         adapter = new MembersAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, max);
 
         if (headerView != null && footerView != null){

@@ -179,6 +179,12 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        setListAdapter(null);
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         String[] projection;

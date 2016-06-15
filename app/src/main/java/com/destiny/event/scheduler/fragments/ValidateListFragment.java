@@ -100,6 +100,12 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
 
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        setListAdapter(null);
+    }
+
     private void getEvents() {
 
         prepareStrings();
