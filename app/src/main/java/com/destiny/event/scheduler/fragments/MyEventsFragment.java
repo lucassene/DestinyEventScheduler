@@ -1,5 +1,6 @@
 package com.destiny.event.scheduler.fragments;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -61,7 +63,19 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         super.onDetach();
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+        setHasOptionsMenu(true);
+    }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.clear();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -105,7 +119,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
         prepareStrings();
 
-        /*switch (filterSpinner.getSelectedItemPosition()){
+        switch (filterSpinner.getSelectedItemPosition()){
             case 0:
                 where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
                 getLoaderManager().initLoader(LOADER_ENTRY, null, this);
@@ -124,7 +138,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
                 prepareGameStrings();
                 getLoaderManager().initLoader(LOADER_GAME, null, this);
                 break;
-        }*/
+        }
 
         adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_ENTRY);
         gameList.setAdapter(adapter);

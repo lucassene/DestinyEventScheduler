@@ -1,5 +1,6 @@
 package com.destiny.event.scheduler.fragments;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.DBViewerCursorAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.EntryTable;
@@ -29,6 +31,7 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.NotificationTable;
+import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 
 public class DBViewerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemSelectedListener {
@@ -57,6 +60,14 @@ public class DBViewerFragment extends Fragment implements LoaderManager.LoaderCa
     private Uri selectedUri;
     private String[] projection;
 
+    private ToActivityListener callback;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+    }
 
     @Nullable
     @Override

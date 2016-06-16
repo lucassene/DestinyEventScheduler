@@ -104,9 +104,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-        callback = (ToActivityListener) getActivity();
-
     }
 
     @Override
@@ -346,6 +343,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         setHasOptionsMenu(true);
     }
 

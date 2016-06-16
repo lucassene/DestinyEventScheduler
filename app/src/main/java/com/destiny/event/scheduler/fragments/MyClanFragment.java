@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
@@ -149,6 +150,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     public void onAttach(Context context) {
         super.onAttach(context);
         callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         setHasOptionsMenu(true);
     }
 
@@ -173,6 +175,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
+        bundle.putInt("type", MyNewProfileFragment.TYPE_MEMBER);
 
         callback.loadNewFragment(fragment, bundle, "profile");
 

@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -112,6 +113,12 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+    }
+
     private void checkGame(String selectedType) {
         switch (selectedType){
             case "1":
@@ -146,6 +153,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         super.onAttach(context);
         setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         eventCallback = (OnEventCreatedListener) getActivity();
     }
 

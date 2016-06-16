@@ -208,6 +208,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
         } else {
             callback.onNoScheduledGames();
+            callback.onSelectedFragment(0);
         }
 
     }

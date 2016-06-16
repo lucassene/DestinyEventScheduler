@@ -206,6 +206,8 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
 
                     break;
             }
+        } else {
+            callback.onSelectedFragment(0);
         }
 
         callback.onDataLoaded();

@@ -85,9 +85,12 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater layoutInflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         switch (viewType){
             case TYPE_ITEM:
-                View vItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_item_layout, parent, false);
+                //parent.setLayoutParams(new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.MATCH_PARENT, DrawerLayout.LayoutParams.WRAP_CONTENT));
+                //View vItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_item_layout, parent, false);
+                View vItem = layoutInflater.inflate(R.layout.drawer_item_layout, parent, false);
                 ViewHolder vhItem = new ViewHolder(vItem, viewType);
                 return vhItem;
             case TYPE_HEADER:
@@ -118,11 +121,11 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                 }
                 break;
             case 0:
-                Log.w(TAG, "Clan Name: " + clanName);
+                //Log.w(TAG, "Clan Name: " + clanName);
                 holder.headerView.setText(clanName);
                 try {
-                    Log.w(TAG, "Clan Icon: " + clanIcon);
-                    Log.w(TAG, "Clan Banner: " + clanBanner);
+                    //Log.w(TAG, "Clan Icon: " + clanIcon);
+                    //Log.w(TAG, "Clan Banner: " + clanBanner);
                     holder.logoView.setImageBitmap(ImageUtils.loadImage(context,clanIcon));
                     holder.bannerView.setImageBitmap(ImageUtils.loadImage(context,clanBanner));
                 } catch (IOException e) {

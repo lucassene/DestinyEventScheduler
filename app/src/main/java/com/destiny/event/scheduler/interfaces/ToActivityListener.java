@@ -8,7 +8,6 @@ import java.util.Calendar;
 public interface ToActivityListener {
     public void updateViewPager();
     public void loadNewFragment(Fragment fragment, Bundle bundle, String tag);
-    public void loadWithoutBackStack(Fragment fragment, Bundle bundle, String tag);
     public void onEventTypeSelected(String id);
     public void onEventGameSelected(String id);
     public String getBungieId();
@@ -30,4 +29,5 @@ public interface ToActivityListener {
     public void setSpinnerSelection(String tag, int position);
     public int getSpinnerSelection(String tag);
     public void onSelectedFragment(int id);
+    public void setFragmentType(int type);
 }

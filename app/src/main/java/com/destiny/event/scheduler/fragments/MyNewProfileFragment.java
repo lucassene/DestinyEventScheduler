@@ -23,11 +23,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.ChartLegendAdapter;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.models.ChartLegendModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.ImageUtils;
@@ -50,6 +52,11 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
     private static final int LOADER_MEMBER = 50;
     private static final int LOADER_PROFILE = 75;
     private static final int LOADER_FAVORITE = 76;
+
+    public static final int TYPE_USER = 1;
+    public static final int TYPE_MEMBER = 2;
+
+    private int type;
 
     ImageView profilePic;
     TextView userName;
@@ -84,22 +91,29 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
     PieChart likesChart;
     PieChart gamesChart;
 
+    private ToActivityListener callback;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-        Bundle bundle = getArguments();
-
-        if (bundle != null){
-            memberId = bundle.getString("bungieId");
-        }
-
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        Bundle bundle = getArguments();
+
+        if (bundle != null){
+            memberId = bundle.getString("bungieId");
+            type = bundle.getInt("type");
+        }
+
+        callback = (ToActivityListener) getActivity();
+        if (type == TYPE_USER) {
+            callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+        } else callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
         setHasOptionsMenu(true);
     }
 
@@ -146,6 +160,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
         eventsChart.setExtraOffsets(5, 10, 5, 5);
         eventsChart.setDrawHoleEnabled(false);
         eventsChart.setRotationEnabled(false);
+        eventsChart.setNoDataText(getString(R.string.no_events_played));
         Legend eventsLeg = eventsChart.getLegend();
         eventsLeg.setEnabled(false);
 
@@ -156,6 +171,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
         likesChart.setExtraOffsets(5, 10, 5, 5);
         likesChart.setDrawHoleEnabled(false);
         likesChart.setRotationEnabled(false);
+        likesChart.setNoDataText(getString(R.string.no_events_played));
         Legend likesLeg = likesChart.getLegend();
         likesLeg.setEnabled(false);
 
@@ -166,6 +182,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
         gamesChart.setExtraOffsets(5, 10, 5, 5);
         gamesChart.setDrawHoleEnabled(false);
         gamesChart.setRotationEnabled(false);
+        gamesChart.setNoDataText(getString(R.string.no_events_played));
         Legend gamesLeg = gamesChart.getLegend();
         gamesLeg.setEnabled(false);
 
@@ -176,6 +193,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
     private void getMemberData() {
 
+        callback.onLoadingData();
         getLoaderManager().initLoader(LOADER_MEMBER, null, this);
         getLoaderManager().initLoader(LOADER_PROFILE, null, this);
         getLoaderManager().initLoader(LOADER_FAVORITE, null, this);
@@ -327,7 +345,6 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                             values.add(value);
                             data.moveToNext();
                         }
-
                         setGamesChart(labels, values);
                     } else {
                         emptyGame.setVisibility(View.VISIBLE);
@@ -352,6 +369,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                         favLayout.setVisibility(View.GONE);
                     }
 
+                    callback.onDataLoaded();
                     break;
             }
         //}

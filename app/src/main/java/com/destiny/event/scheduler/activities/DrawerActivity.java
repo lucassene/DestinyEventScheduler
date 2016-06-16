@@ -40,6 +40,7 @@ import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
+import com.destiny.event.scheduler.fragments.AboutSettingsFragment;
 import com.destiny.event.scheduler.fragments.DBViewerFragment;
 import com.destiny.event.scheduler.fragments.DetailEventFragment;
 import com.destiny.event.scheduler.fragments.DetailHistoryFragment;
@@ -48,10 +49,7 @@ import com.destiny.event.scheduler.fragments.MainSettingsFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
 import com.destiny.event.scheduler.fragments.MyEventsFragment;
 import com.destiny.event.scheduler.fragments.MyNewProfileFragment;
-import com.destiny.event.scheduler.fragments.MyProfileFragment;
 import com.destiny.event.scheduler.fragments.NewEventFragment;
-import com.destiny.event.scheduler.fragments.NewEventsListFragment;
-import com.destiny.event.scheduler.fragments.ScheduledListFragment;
 import com.destiny.event.scheduler.fragments.SearchFragment;
 import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
@@ -82,14 +80,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String SCHEDULED_TIME_PREF = "notificationTime";
     public static final String SOUND_PREF = "scheduledNotifySound";
     public static final String NEW_NOTIFY_PREF = "allowNewNotify";
-    public static final String COURT_PREF = "1";
-    public static final String CRUCIBLE_PREF = "2";
-    public static final String PATROL_PREF = "3";
-    public static final String PRISON_PREF = "4";
-    public static final String RAID_PREF = "5";
-    public static final String STORY_PREF = "6";
-    public static final String STRIKE_PREF = "7";
-    public static final String STRIKE_LIST_PREF = "8";
+
+    public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
+    public static final int FRAGMENT_TYPE_WITH_BACKSTACK = 1;
 
     private Toolbar toolbar;
 
@@ -106,9 +99,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private FragmentTransaction ft;
     private FragmentManager fm;
-    private Fragment openFragment;
+    private Fragment openedFragment;
+    private int openedFragmentType;
     private String fragmentTag;
-    private boolean configFragOpened = false;
     //private ArrayList<String> backStackList;
 
     private String clanName;
@@ -170,7 +163,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (selectedTabFragment != 0) viewPager.setCurrentItem(selectedTabFragment);
 
         if (getSupportFragmentManager().getBackStackEntryCount()>0){
-            Log.w("DrawerActivity", "Fragment BackStack Count: " + String.valueOf(getSupportFragmentManager().getBackStackEntryCount()));
+            //Log.w("DrawerActivity", "Fragment BackStack Count: " + String.valueOf(getSupportFragmentManager().getBackStackEntryCount()));
             tabLayout.setViewPager(null);
             viewPager.setAdapter(null);
         }
@@ -214,7 +207,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private void refreshLists() {
 
-        if (openFragment == null){
+        if (openedFragment == null){
             for (int i=0; i<refreshDataListenerList.size(); i++){
                 if (refreshDataListenerList.get(i).getFragment().isAdded()){
                     refreshDataListenerList.get(i).onRefreshData();
@@ -244,16 +237,48 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             //Toast.makeText(this, "Back Count: " + fm.getBackStackEntryCount(), Toast.LENGTH_SHORT).show();
-            if (fm.getBackStackEntryCount() == 1) {
-                super.onBackPressed();
+            //Toast.makeText(this, "prior openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
+            if (fragmentTag == null){
+                finish();
+            } else if (openedFragmentType == FRAGMENT_TYPE_WITHOUT_BACKSTACK){
                 openMainActivity(null);
+                //Toast.makeText(this, "openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
             } else {
                 super.onBackPressed();
-                openFragment = fm.findFragmentById(R.id.content_frame);
-                if (openFragment != null) fragmentTag = openFragment.getTag();
+                openedFragment = fm.findFragmentById(R.id.content_frame);
+                if (openedFragment != null) fragmentTag = openedFragment.getTag();
+                //Toast.makeText(this, "openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
+                openedFragmentType = FRAGMENT_TYPE_WITHOUT_BACKSTACK;
             }
         }
+    }
 
+    public boolean openMainActivity(View child){
+        if(openedFragment != null){
+            ft = fm.beginTransaction();
+            ft.remove(openedFragment);
+            ft.commit();
+            updateViewPager();
+            drawerLayout.closeDrawers();
+            if (child != null) child.playSoundEffect(SoundEffectConstants.CLICK);
+
+            /*if (gameOrigin != null){
+                switch (gameOrigin){
+                    case NewEventsListFragment.TAG:
+                        viewPager.setCurrentItem(0);
+                        break;
+                    case ScheduledListFragment.TAG:
+                        viewPager.setCurrentItem(1);
+                        break;
+                    default:
+                        viewPager.setCurrentItem(1);
+                        break;
+                }
+            }*/
+            return true;
+        }
+        drawerLayout.closeDrawers();
+        return false;
     }
 
     @Override
@@ -272,10 +297,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void updateViewPager() {
-        openFragment = null;
+        fragmentTag = null;
+        openedFragment = null;
         viewPager.setAdapter(viewPageAdapter);
         tabLayout.setViewPager(viewPager);
-        viewPager.setCurrentItem(1);
+        //viewPager.setCurrentItem(1);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.home_title);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -291,21 +317,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         ft.addToBackStack(null);
         ft.commit();
         fragmentTag = tag;
-        openFragment = fragment;
+        //Toast.makeText(this, "openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
+        openedFragment = fragment;
         invalidateOptionsMenu();
-    }
-
-    @Override
-    public void loadWithoutBackStack(Fragment fragment, Bundle bundle, String tag) {
-
-        fragment.setArguments(bundle);
-        ft = fm.beginTransaction();
-        ft.replace(R.id.content_frame, fragment, tag);
-        ft.commit();
-        fragmentTag = tag;
-        openFragment = fragment;
-        invalidateOptionsMenu();
-
     }
 
     @Override
@@ -318,6 +332,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onEventGameSelected(String id) {
         fm.popBackStack();
+        openedFragment = fm.findFragmentByTag("new");
+        if (openedFragment != null) fragmentTag = openedFragment.getTag();
         newEventListener = (FromActivityListener) getSupportFragmentManager().findFragmentByTag("new");
         newEventListener.onEventGameSent(id);
     }
@@ -345,15 +361,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void closeFragment() {
         ft = fm.beginTransaction();
-        ft.remove(openFragment);
+        ft.remove(openedFragment);
         ft.commit();
         fm.popBackStack();
         fragmentTag = null;
         if (fm.getBackStackEntryCount() == 1){
             updateViewPager();
         } else {
-            openFragment = fm.findFragmentById(R.id.content_frame);
-            fragmentTag = openFragment.getTag();
+            openedFragment = fm.findFragmentById(R.id.content_frame);
+            fragmentTag = openedFragment.getTag();
         }
     }
 
@@ -400,7 +416,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
             tabLayout.setViewPager(null);
             viewPager.setAdapter(null);
-            loadNewFragment(fragment, bundle, id);
+            loadNewFragment(fragment, bundle, "game");
         }
 
     }
@@ -408,7 +424,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onNoScheduledGames() {
         onDataLoaded();
-        if (selectedTabFragment == 1){
+        if (selectedTabFragment != 0){
             viewPager.setCurrentItem(0);
         } else viewPager.setCurrentItem(selectedTabFragment);
     }
@@ -474,13 +490,18 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
+    public void setFragmentType(int type) {
+        openedFragmentType = type;
+    }
+
+    @Override
     public void onEventCreated() {
         closeFragment();
     }
 
 
     public boolean openNewEventFragment(View child){
-        if (openFragment instanceof NewEventFragment){
+        if (openedFragment instanceof NewEventFragment){
             drawerLayout.closeDrawers();
             return false;
         }
@@ -490,7 +511,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openSearchEventFragment(View child){
-        if (openFragment instanceof SearchFragment){
+        if (openedFragment instanceof SearchFragment){
             drawerLayout.closeDrawers();
             return false;
         }
@@ -500,7 +521,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     private boolean openMyEventsFragment(View child) {
-        if (openFragment instanceof MyEventsFragment){
+        if (openedFragment instanceof MyEventsFragment){
             drawerLayout.closeDrawers();
             return false;
         }
@@ -511,7 +532,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openHistoryFragment(View child){
-        if (openFragment instanceof HistoryListFragment){
+        if (openedFragment instanceof HistoryListFragment){
             drawerLayout.closeDrawers();
             return false;
         }
@@ -521,7 +542,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openMyClanFragment(View child){
-        if (openFragment instanceof MyClanFragment){
+        if (openedFragment instanceof MyClanFragment){
             drawerLayout.closeDrawers();
             return false;
         }
@@ -538,7 +559,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openMyProfileFragment(View child){
-        if (openFragment instanceof MyNewProfileFragment){
+        if (openedFragment instanceof MyNewProfileFragment){
             drawerLayout.closeDrawers();
             return false;
         }
@@ -547,14 +568,14 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
         bundle.putString("clanName", clanName);
-        bundle.putInt("type", MyProfileFragment.TYPE_USER);
+        bundle.putInt("type", MyNewProfileFragment.TYPE_USER);
 
         prepareFragmentHolder(fragment, child, bundle, "profile");
         return true;
     }
 
     public boolean openConfigFragment(View child){
-       if (openFragment instanceof MainSettingsFragment){
+       if (openedFragment instanceof MainSettingsFragment){
             drawerLayout.closeDrawers();
             return false;
         }
@@ -566,48 +587,27 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     private boolean openAboutFragment(View child) {
-        if (openFragment instanceof DBViewerFragment){
+        if (openedFragment instanceof AboutSettingsFragment){
+            drawerLayout.closeDrawers();
+            return false;
+        }
+
+        AboutSettingsFragment fragment = new AboutSettingsFragment();
+        prepareFragmentHolder(fragment, child, null, "about");
+        return true;
+    }
+
+    private boolean openDBViewerFragment(View child) {
+        if (openedFragment instanceof DBViewerFragment){
             drawerLayout.closeDrawers();
             return false;
         }
 
         DBViewerFragment fragment = new DBViewerFragment();
-        prepareFragmentHolder(fragment, child, null, "about");
+        prepareFragmentHolder(fragment, child, null, "dbviewer");
         return true;
     }
 
-    public boolean openMainActivity(View child){
-        if(openFragment != null){
-            ft = fm.beginTransaction();
-            ft.remove(openFragment);
-            ft.commit();
-            fragmentTag = null;
-            updateViewPager();
-            drawerLayout.closeDrawers();
-            if (child != null) child.playSoundEffect(SoundEffectConstants.CLICK);
-
-
-            if (gameOrigin != null){
-                switch (gameOrigin){
-                    case NewEventsListFragment.TAG:
-                        viewPager.setCurrentItem(0);
-                        break;
-                    case ScheduledListFragment.TAG:
-                        viewPager.setCurrentItem(1);
-                        break;
-                    default:
-                        viewPager.setCurrentItem(1);
-                        break;
-                }
-            }
-
-
-
-            return true;
-        }
-        drawerLayout.closeDrawers();
-        return false;
-    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -732,6 +732,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             openConfigFragment(child);
                             break;
                         case 10:
+                            openDBViewerFragment(child);
                             break;
                         case 11:
                             showLogOffDialog(child);

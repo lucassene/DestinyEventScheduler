@@ -11,8 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.activities.DrawerActivity;
+import com.destiny.event.scheduler.interfaces.ToActivityListener;
 
 public class AboutSettingsFragment extends Fragment {
+
+    private ToActivityListener callback;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,6 +41,8 @@ public class AboutSettingsFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         setHasOptionsMenu(true);
+        callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
     }
 
     @Override

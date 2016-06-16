@@ -42,10 +42,13 @@ public class TitleService extends IntentService {
             //Log.w(TAG, "membershipList is not null");
             for (int i=0;i<membershipList.size();i++){
 
+                String memberName = "";
+
                 Cursor xpCursor = getContentResolver().query(DataProvider.MEMBER_URI, MemberTable.ALL_COLUMNS, MemberTable.COLUMN_MEMBERSHIP + "=" + membershipList.get(i), null, null);
                 if (xpCursor != null && xpCursor.moveToFirst()){
                     xp = xpCursor.getInt(xpCursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
                     lvl = MemberTable.getMemberLevel(xp);
+                    memberName = xpCursor.getString(xpCursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME));
                     xpCursor.close();
                 }
 
@@ -55,9 +58,12 @@ public class TitleService extends IntentService {
                         eventId = 999;
                     } else eventId = favCursor.getInt(favCursor.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_ID)));
                     favCursor.close();
-                }
+                } else eventId = 999;
+
+                Log.w(TAG, memberName + " fav event: " + eventId);
 
                 String newTitle = getTitle(lvl, eventId);
+                Log.w(TAG, memberName + " new Title: " + newTitle);
                 updateMemberTitle(membershipList.get(i),newTitle);
 
             }
@@ -108,7 +114,7 @@ public class TitleService extends IntentService {
         }
 
         if (eventId == 999){
-            newTitle = "New Guardian";
+            newTitle = getString(R.string.new_guardian);
         } else {
             String eventTitle = eventTitles[titleIndex];
 
@@ -123,7 +129,7 @@ public class TitleService extends IntentService {
             }
         }
 
-        Log.w(TAG, "newTitle: " + newTitle);
+        //Log.w(TAG, "newTitle: " + newTitle);
         return newTitle;
     }
 

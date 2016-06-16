@@ -347,5 +347,10 @@
     <string name="no_clan_msg">Desculpe guardião, mas é necessário que você esteja em um clã para usar este aplicativo.</string>
     <string name="no_events_played">Nenhum evento jogado</string>
     <string name="times">vezes</string>
+    <string name="new_guardian">Novo Guardião</string>
+    <string name="application">Aplicativo</string>
+    <string name="client_side">Cliente</string>
+    <string name="developers">Desenvolvedores</string>
+    <string name="server_side">Servidor</string>
 
 </resources>

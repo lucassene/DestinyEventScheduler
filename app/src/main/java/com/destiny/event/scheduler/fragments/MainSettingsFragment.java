@@ -283,8 +283,9 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+        setHasOptionsMenu(true);
     }
 
     @Override
