@@ -122,6 +122,8 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
+        callback.onLoadingData();
+
         String[] projection;
         CursorLoader cursorLoader;
         String[] selectionArgs;
@@ -162,6 +164,8 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
             data.moveToFirst();
             gameType = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_TYPE));
         }
+
+        callback.onDataLoaded();
     }
 
     @Override

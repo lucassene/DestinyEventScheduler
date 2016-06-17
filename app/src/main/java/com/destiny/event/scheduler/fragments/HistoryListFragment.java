@@ -32,7 +32,7 @@ import com.destiny.event.scheduler.provider.DataProvider;
 
 public class HistoryListFragment extends Fragment implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String TAG = "HistoryListFragment";
+    public static final String TAG = "HistoryListFragment";
     public static final String STATUS_HISTORY = "99";
 
     Spinner filterSpinner;
@@ -88,6 +88,7 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
         eventIdList = getContext().getResources().getIntArray(R.array.event_type_ids);
 
         callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
         gamesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

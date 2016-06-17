@@ -44,9 +44,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
-public class ValidateFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener{
+public class DetailValidationFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener{
 
-    private static final String TAG = "ValidateFragment";
+    private static final String TAG = "DetailValidationFragment";
 
     private static final int LOADER_GAME = 60;
     private static final int LOADER_ENTRY_MEMBERS = 72;
@@ -102,7 +102,9 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
         setRetainInstance(true);
 
         callback = (ToActivityListener) getActivity();
-        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
+        if (callback.getFmBackStackCount()>=1){
+            callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
+        } else callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
     }
 
@@ -402,7 +404,6 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
 
     private void getGameData() {
 
-        callback.onLoadingData();
         prepareGameStrings();
         getLoaderManager().initLoader(LOADER_GAME, null, this);
     }
@@ -476,6 +477,8 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         String[] selectionArgs = {gameId};
+
+        callback.onLoadingData();
 
         switch (id){
             case LOADER_GAME:
@@ -624,15 +627,13 @@ public class ValidateFragment extends ListFragment implements LoaderManager.Load
         for (int i=0;i<memberList.size();i++){
             //Log.w(TAG, "Membro " + memberList.get(i).getName() + " está vai entrar no loop de avaliação...");
             if (!memberList.get(i).getMembershipId().equals(callback.getBungieId())){
-                if (memberList.get(i).getRating() != 0){
-                    values.put(EvaluationTable.COLUMN_GAME, gameId);
-                    values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, callback.getBungieId());
-                    values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, memberList.get(i).getMembershipId());
-                    values.put(EvaluationTable.COLUMN_EVALUATION, memberList.get(i).getRating());
-                    getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-                    values.clear();
+                values.put(EvaluationTable.COLUMN_GAME, gameId);
+                values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, callback.getBungieId());
+                values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, memberList.get(i).getMembershipId());
+                values.put(EvaluationTable.COLUMN_EVALUATION, memberList.get(i).getRating());
+                getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
+                values.clear();
                     //Log.w(TAG, "Membro " + memberList.get(i).getName() + " foi avaliado em " + memberList.get(i).getRating());
-                } //else Log.w(TAG, "Membro " + memberList.get(i).getName() + " está com rate 0, portanto não foi criada uma entrada");
             } //else Log.w(TAG, "Membro " + memberList.get(i).getName() + " não foi avaliado pois é o criador da partida");
         }
 

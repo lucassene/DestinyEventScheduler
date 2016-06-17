@@ -313,6 +313,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         String[] projection;
         String[] selectionArgs;
 
+        callback.onLoadingData();
+
         switch (id){
             case LOADER_TYPE:
                 projection = EventTypeTable.ALL_COLUMNS;
@@ -371,6 +373,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 textGame.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 break;
         }
+        callback.onDataLoaded();
+
     }
 
     @Override
@@ -555,21 +559,21 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         ContentValues values = new ContentValues();
         values.put(EntryTable.COLUMN_MEMBERSHIP,"4611686018446566077");
         values.put(EntryTable.COLUMN_GAME, gameId);
-        values.put(EntryTable.COLUMN_TIME,"2016-05-30T16:43:00");
+        values.put(EntryTable.COLUMN_TIME,"2016-10-30T16:43:00");
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
         values.clear();
 
         values = new ContentValues();
         values.put(EntryTable.COLUMN_MEMBERSHIP,"4611686018434509539");
         values.put(EntryTable.COLUMN_GAME, gameId);
-        values.put(EntryTable.COLUMN_TIME,"2016-05-30T16:43:00");
+        values.put(EntryTable.COLUMN_TIME,"2016-10-30T16:43:00");
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
         values.clear();
 
         values = new ContentValues();
         values.put(EntryTable.COLUMN_MEMBERSHIP,"4611686018444413912");
         values.put(EntryTable.COLUMN_GAME, gameId);
-        values.put(EntryTable.COLUMN_TIME,"2016-05-30T16:43:00");
+        values.put(EntryTable.COLUMN_TIME,"2016-10-30T16:43:00");
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
         values.clear();
 

@@ -161,6 +161,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
              };
          }
 
+        if (origin.equals(SearchFragment.TAG) || origin.equals(MyEventsFragment.TAG) || origin.equals(HistoryListFragment.TAG)){
+            callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
+        } else callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -281,13 +284,13 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
+        bundle.putInt("type", MyNewProfileFragment.TYPE_DETAIL);
 
         callback.loadNewFragment(fragment, bundle, "profile");
     }
 
     private void getGameData() {
 
-        callback.onLoadingData();
         prepareGameStrings();
         getLoaderManager().initLoader(LOADER_GAME, null, this);
     }
@@ -362,6 +365,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        callback.onLoadingData();
 
         String[] selectionArgs = {gameId};
 

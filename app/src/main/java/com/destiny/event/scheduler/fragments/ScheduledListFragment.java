@@ -54,6 +54,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
@@ -200,16 +201,17 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
                         data.moveToNext();
                     }
 
+                    callback.onScheduledGames(true);
 
                     break;
             }
 
-            callback.onDataLoaded();
-
         } else {
-            callback.onNoScheduledGames();
+            callback.onScheduledGames(false);
             callback.onSelectedFragment(0);
         }
+
+        callback.onDataLoaded();
 
     }
 

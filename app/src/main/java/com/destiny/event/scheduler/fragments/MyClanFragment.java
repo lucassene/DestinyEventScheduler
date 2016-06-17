@@ -82,6 +82,9 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         bungieIdList = new ArrayList<>();
 
+        callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+
         return v;
     }
 
@@ -175,7 +178,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
-        bundle.putInt("type", MyNewProfileFragment.TYPE_MEMBER);
+        bundle.putInt("type", MyNewProfileFragment.TYPE_DETAIL);
 
         callback.loadNewFragment(fragment, bundle, "profile");
 
@@ -191,6 +194,8 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         String[] projection;
+
+        callback.onLoadingData();
 
         switch (id){
             case LOADER_MEMBERS:
@@ -223,6 +228,8 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
                 }
                 break;
         }
+
+        callback.onDataLoaded();
 
     }
 

@@ -44,6 +44,7 @@ import com.destiny.event.scheduler.fragments.AboutSettingsFragment;
 import com.destiny.event.scheduler.fragments.DBViewerFragment;
 import com.destiny.event.scheduler.fragments.DetailEventFragment;
 import com.destiny.event.scheduler.fragments.DetailHistoryFragment;
+import com.destiny.event.scheduler.fragments.DetailValidationFragment;
 import com.destiny.event.scheduler.fragments.HistoryListFragment;
 import com.destiny.event.scheduler.fragments.MainSettingsFragment;
 import com.destiny.event.scheduler.fragments.MyClanFragment;
@@ -51,7 +52,6 @@ import com.destiny.event.scheduler.fragments.MyEventsFragment;
 import com.destiny.event.scheduler.fragments.MyNewProfileFragment;
 import com.destiny.event.scheduler.fragments.NewEventFragment;
 import com.destiny.event.scheduler.fragments.SearchFragment;
-import com.destiny.event.scheduler.fragments.ValidateFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
@@ -84,8 +84,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
     public static final int FRAGMENT_TYPE_WITH_BACKSTACK = 1;
 
-    private Toolbar toolbar;
-
     RecyclerView rView;
     RecyclerView.Adapter rAdapter;
     RecyclerView.LayoutManager rLayoutManager;
@@ -113,9 +111,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private String bungieId;
     private String userName;
 
-    private String gameOrigin;
-
     private String clanOrderBy;
+
+    private String isNewScheduledOrValidated = GameTable.STATUS_NEW;
+    private boolean hasScheduledGames = true;
+    private boolean hasvalidateGames = true;
 
     ViewPager viewPager;
     ViewPageAdapter viewPageAdapter;
@@ -135,7 +135,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         getClanData();
         getLoggedUserData();
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.home_title);
@@ -167,9 +167,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             tabLayout.setViewPager(null);
             viewPager.setAdapter(null);
         }
-
-        refreshDataListenerList = new ArrayList<>();
-        userDataListener = new ArrayList<>();
 
         Bundle notifyBundle = getIntent().getExtras();
         if (notifyBundle != null && notifyBundle.containsKey("notification")){
@@ -242,39 +239,41 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 finish();
             } else if (openedFragmentType == FRAGMENT_TYPE_WITHOUT_BACKSTACK){
                 openMainActivity(null);
+                switch (isNewScheduledOrValidated){
+                    case GameTable.STATUS_NEW:
+                        viewPager.setCurrentItem(0);
+                        break;
+                    case GameTable.STATUS_SCHEDULED:
+                        if (hasScheduledGames){
+                            viewPager.setCurrentItem(1);
+                        } else viewPager.setCurrentItem(0);
+                        break;
+                    case GameTable.STATUS_VALIDATED:
+                        if (hasvalidateGames){
+                            viewPager.setCurrentItem(2);
+                        } else viewPager.setCurrentItem(0);
+                        break;
+                    default:
+                        viewPager.setCurrentItem(0);
+                        break;
+                }
                 //Toast.makeText(this, "openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
             } else {
                 super.onBackPressed();
                 openedFragment = fm.findFragmentById(R.id.content_frame);
                 if (openedFragment != null) fragmentTag = openedFragment.getTag();
                 //Toast.makeText(this, "openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
-                openedFragmentType = FRAGMENT_TYPE_WITHOUT_BACKSTACK;
+                //openedFragmentType = FRAGMENT_TYPE_WITHOUT_BACKSTACK;
             }
         }
     }
 
     public boolean openMainActivity(View child){
         if(openedFragment != null){
-            ft = fm.beginTransaction();
-            ft.remove(openedFragment);
-            ft.commit();
+            fm.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             updateViewPager();
             drawerLayout.closeDrawers();
             if (child != null) child.playSoundEffect(SoundEffectConstants.CLICK);
-
-            /*if (gameOrigin != null){
-                switch (gameOrigin){
-                    case NewEventsListFragment.TAG:
-                        viewPager.setCurrentItem(0);
-                        break;
-                    case ScheduledListFragment.TAG:
-                        viewPager.setCurrentItem(1);
-                        break;
-                    default:
-                        viewPager.setCurrentItem(1);
-                        break;
-                }
-            }*/
             return true;
         }
         drawerLayout.closeDrawers();
@@ -386,7 +385,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onGameSelected(String id, String tag, String creator, String status) {
 
-        gameOrigin = tag;
+        String gameOrigin = tag;
         Fragment fragment;
         Bundle bundle = new Bundle();
         bundle.clear();
@@ -399,15 +398,34 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     bundle.putString("gameId",id);
                     bundle.putString("creator", creator);
                     bundle.putString("status", status);
-                    fragment = new ValidateFragment();
+                    //Toast.makeText(this, "Backstack count: " + fm.getBackStackEntryCount(), Toast.LENGTH_SHORT).show();
+                    isNewScheduledOrValidated = GameTable.STATUS_VALIDATED;
+                    fragment = new DetailValidationFragment();
                     break;
                 case HistoryListFragment.STATUS_HISTORY:
                     bundle.putString("gameId",id);
+                    isNewScheduledOrValidated = GameTable.STATUS_NEW;
                     fragment = new DetailHistoryFragment();
+                    break;
+                case GameTable.STATUS_NEW:
+                    bundle.putString("gameId",id);
+                    bundle.putString("origin", gameOrigin);
+                    bundle.putString("creator", creator);
+                    bundle.putString("status", status);
+                    fragment = new DetailEventFragment();
+                    isNewScheduledOrValidated = GameTable.STATUS_NEW;
+                    break;
+                case GameTable.STATUS_SCHEDULED:
+                    bundle.putString("gameId",id);
+                    bundle.putString("origin", gameOrigin);
+                    bundle.putString("creator", creator);
+                    bundle.putString("status", status);
+                    fragment = new DetailEventFragment();
+                    isNewScheduledOrValidated = GameTable.STATUS_SCHEDULED;
                     break;
                 default:
                     bundle.putString("gameId",id);
-                    bundle.putString("origin",gameOrigin);
+                    bundle.putString("origin", gameOrigin);
                     bundle.putString("creator", creator);
                     bundle.putString("status", status);
                     fragment = new DetailEventFragment();
@@ -422,11 +440,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void onNoScheduledGames() {
+    public void onScheduledGames(boolean status) {
         onDataLoaded();
-        if (selectedTabFragment != 0){
-            viewPager.setCurrentItem(0);
-        } else viewPager.setCurrentItem(selectedTabFragment);
+        hasScheduledGames = status;
+    }
+
+    @Override
+    public void onValidateGames(boolean status) {
+        onDataLoaded();
+        hasvalidateGames = status;
     }
 
     @Override
@@ -436,6 +458,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void registerRefreshListener(Fragment fragment) {
+        if (refreshDataListenerList == null){
+            refreshDataListenerList = new ArrayList<>();
+        }
         refreshDataListenerList.add((RefreshDataListener) fragment);
     }
 
@@ -457,6 +482,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void registerUserDataListener(Fragment fragment) {
+        if (userDataListener == null){
+            userDataListener = new ArrayList<>();
+        }
         userDataListener.add((UserDataListener) fragment);
     }
 
@@ -495,8 +523,14 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
+    public int getFmBackStackCount() {
+        return fm.getBackStackEntryCount();
+    }
+
+    @Override
     public void onEventCreated() {
-        closeFragment();
+        openMainActivity(null);
+        viewPager.setCurrentItem(1);
     }
 
 
@@ -568,7 +602,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
         bundle.putString("clanName", clanName);
-        bundle.putInt("type", MyNewProfileFragment.TYPE_USER);
+        bundle.putInt("type", MyNewProfileFragment.TYPE_MENU);
 
         prepareFragmentHolder(fragment, child, bundle, "profile");
         return true;
@@ -645,7 +679,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         //Log.w(TAG, "Clan Cursor: " + DatabaseUtils.dumpCursorToString(data));
 
-        if (data.moveToFirst() && data != null){
+        if (data != null && data.moveToFirst()){
             switch (loader.getId()){
                 case URL_LOADER_CLAN:
                     clanId = data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BUNGIE_ID));

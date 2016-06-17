@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import com.destiny.event.scheduler.BuildConfig;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.EntryTable;
@@ -36,7 +37,6 @@ import java.util.Random;
 
 public class BungieService extends IntentService {
 
-    private static final String API_KEY = "4788fecc8fc04393984ff76619b7501f";
     private static final String BASE_URL = "https://www.bungie.net/Platform/";
     private static final String BASE_IMAGE_URL = "http://www.bungie.net";
 
@@ -305,7 +305,7 @@ public class BungieService extends IntentService {
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                urlConnection.setRequestProperty(KEY_HEADER, API_KEY);
+                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
                 urlConnection.setRequestProperty(XCSRF_HEADER, xcsrf);
                 urlConnection.setRequestProperty(COOKIE_HEADER, cookie);
                 urlConnection.setRequestMethod(GET_METHOD);
@@ -495,7 +495,7 @@ public class BungieService extends IntentService {
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                urlConnection.setRequestProperty(KEY_HEADER, API_KEY);
+                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
                 urlConnection.setRequestMethod(GET_METHOD);
 
                 int statusCode = urlConnection.getResponseCode();
@@ -595,7 +595,7 @@ public class BungieService extends IntentService {
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                urlConnection.setRequestProperty(KEY_HEADER, API_KEY);
+                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
                 urlConnection.setRequestMethod(GET_METHOD);
 
                 int statusCode = urlConnection.getResponseCode();

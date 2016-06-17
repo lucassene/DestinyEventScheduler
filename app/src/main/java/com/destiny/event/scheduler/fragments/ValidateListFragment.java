@@ -52,6 +52,7 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
@@ -204,10 +205,12 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
                         data.moveToNext();
                     }
 
+                    callback.onValidateGames(true);
+
                     break;
             }
         } else {
-            callback.onSelectedFragment(0);
+            callback.onValidateGames(false);
         }
 
         callback.onDataLoaded();

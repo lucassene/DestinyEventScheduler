@@ -14,6 +14,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:paddingRight="@dimen/global_padding"
-        android:scrollbarStyle="outsideOverlay"/>
+        android:scrollbarStyle="outsideOverlay"
+        android:footerDividersEnabled="false"/>
 
 </LinearLayout>

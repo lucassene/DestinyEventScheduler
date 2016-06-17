@@ -75,11 +75,12 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         eventIdList = getContext().getResources().getIntArray(R.array.event_type_ids);
 
         callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
         gamesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                callback.onGameSelected(String.valueOf(id), TAG, null, null);
+                callback.onGameSelected(String.valueOf(id), TAG, null, GameTable.STATUS_NEW);
             }
         });
 

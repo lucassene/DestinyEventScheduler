@@ -18,7 +18,8 @@ public interface ToActivityListener {
     public void onLoadingData();
     public void onDataLoaded();
     public void onGameSelected(String id, String tag, String creator, String status);
-    public void onNoScheduledGames();
+    public void onScheduledGames(boolean status);
+    public void onValidateGames(boolean status);
     public void setClanOrderBy(String orderBy);
     public void registerRefreshListener(Fragment fragment);
     public void deleteRefreshListener(Fragment fragment);
@@ -30,4 +31,5 @@ public interface ToActivityListener {
     public int getSpinnerSelection(String tag);
     public void onSelectedFragment(int id);
     public void setFragmentType(int type);
+    public int getFmBackStackCount();
 }

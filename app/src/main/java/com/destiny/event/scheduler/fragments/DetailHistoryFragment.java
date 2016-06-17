@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.HistoryAdapter;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EvaluationTable;
@@ -69,6 +70,7 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
         setRetainInstance(true);
 
         callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
 
     }
 
@@ -99,6 +101,9 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
 
         bungieIdList = new ArrayList<>();
 
+        callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
+
         return v;
     }
 
@@ -125,12 +130,7 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
 
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
-        if (bungieId.equals(callback.getBungieId())) {
-            bundle.putInt("type", MyNewProfileFragment.TYPE_USER);
-        } else {
-            bundle.putInt("type", MyNewProfileFragment.TYPE_MEMBER);
-        }
-        bundle.putString("clanName", callback.getClanName());
+        bundle.putInt("type", MyNewProfileFragment.TYPE_DETAIL);
 
         callback.loadNewFragment(fragment, bundle, "profile");
     }
@@ -144,7 +144,6 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
         adapter = new HistoryAdapter(getContext(), R.layout.history_member_item, null, from, to, 0);
         setListAdapter(adapter);
 
-        callback.onLoadingData();
         prepareStrings();
         getLoaderManager().initLoader(LOADER_HISTORY, null, this);
     }
@@ -196,6 +195,8 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        callback.onLoadingData();
 
         String sumDislikes = "SUM(CASE WHEN " + EvaluationTable.COLUMN_EVALUATION + "=-1 THEN 1 ELSE 0 END) AS dislikes";
         String sumLikes = "SUM(CASE WHEN " + EvaluationTable.COLUMN_EVALUATION + "=1 THEN 1 ELSE 0 END) AS likes";
@@ -252,8 +253,8 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
                     //Log.w(TAG, "Entry Cursor: " + DatabaseUtils.dumpCursorToString(data));
                     break;
             }
-            callback.onDataLoaded();
         }
+        callback.onDataLoaded();
 
     }
 

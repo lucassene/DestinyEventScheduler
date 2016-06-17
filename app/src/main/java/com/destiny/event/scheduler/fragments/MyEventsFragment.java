@@ -91,6 +91,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         if (savedInstanceState != null) gameCreatorList = savedInstanceState.getStringArrayList("gameCreatorList");
 
         callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
         gameList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

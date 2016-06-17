@@ -53,8 +53,8 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
     private static final int LOADER_PROFILE = 75;
     private static final int LOADER_FAVORITE = 76;
 
-    public static final int TYPE_USER = 1;
-    public static final int TYPE_MEMBER = 2;
+    public static final int TYPE_MENU = 1;
+    public static final int TYPE_DETAIL = 2;
 
     private int type;
 
@@ -111,7 +111,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
         }
 
         callback = (ToActivityListener) getActivity();
-        if (type == TYPE_USER) {
+        if (type == TYPE_MENU) {
             callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         } else callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
         setHasOptionsMenu(true);
@@ -193,7 +193,6 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
     private void getMemberData() {
 
-        callback.onLoadingData();
         getLoaderManager().initLoader(LOADER_MEMBER, null, this);
         getLoaderManager().initLoader(LOADER_PROFILE, null, this);
         getLoaderManager().initLoader(LOADER_FAVORITE, null, this);
@@ -207,6 +206,8 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        callback.onLoadingData();
 
         switch (id){
             case LOADER_MEMBER:
@@ -369,9 +370,10 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                         favLayout.setVisibility(View.GONE);
                     }
 
-                    callback.onDataLoaded();
                     break;
             }
+
+        callback.onDataLoaded();
         //}
     }
 
@@ -416,7 +418,6 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
     }
 
-
     private void setLikesChart(int likes, int dislikes) {
         int total = 0;
         ArrayList<String> labels = new ArrayList<>();
@@ -446,10 +447,8 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
             dataSet.setColors(ColorTemplate.LIBERTY_COLORS);
 
             PieData data = new PieData(labels, dataSet);
-            //data.setValueFormatter(new PercentFormatter());
-            //data.setValueTextSize(13f);
             data.setDrawValues(false);
-            Highlight h = new Highlight(getBigger(likes, dislikes),0);
+            Highlight h = new Highlight(getBiggest(likes, dislikes),0);
             likesChart.highlightValues(new Highlight[] {h});
             likesChart.setData(data);
             likesChart.invalidate();
@@ -528,7 +527,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
             PieData data = new PieData(labels, dataSet);
             data.setDrawValues(false);
-            Highlight h = new Highlight(getBigger(created, played),0);
+            Highlight h = new Highlight(getBiggest(created, played),0);
             eventsChart.highlightValues(new Highlight[] {h});
             eventsChart.setData(data);
             eventsChart.invalidate();
@@ -552,7 +551,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
 
     }
 
-    public int getBigger(int value1, int value2){
+    public int getBiggest(int value1, int value2){
         if (value1 >= value2){
             return 0;
         } else return 1;
