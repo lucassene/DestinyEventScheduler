@@ -404,6 +404,21 @@
     <string name="developers">Developers</string>
     <string name="application">Application</string>
     <string name="empty_validate_event">You don\'t have any event to evaluate or validate.</string>
+    <string name="error_bungie_auth">Error with Bungie autentication. Please finish the app and try again</string>
+    <string name="allies">Looking for allies</string>
+    <string name="back_desc">Back</string>
+    <string name="creating_db">Creating fake database</string>
+    <string name="default_username">username</string>
+    <string name="menu_new_event">New event</string>
+    <string name="network">Establishing networking</string>
+    <string name="new_tab_header">NEW</string>
+    <string name="pictures">Analyzing images</string>
+    <string name="prior_entries">Verifying previous entries</string>
+    <string name="scheduled_tab_header">SCHEDULED</string>
+    <string name="validate_tab_header">VALIDATE</string>
+    <string name="vanguard_data">Obtaining Vanguard data</string>
+    <string name="no_evaluation">No guardian was evaluated, confirm?</string>
+    <string name="confirm_evaluation">Confirm evaluation?</string>
 
 
 </resources>

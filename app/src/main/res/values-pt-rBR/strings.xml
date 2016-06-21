@@ -352,5 +352,14 @@
     <string name="client_side">Cliente</string>
     <string name="developers">Desenvolvedores</string>
     <string name="server_side">Servidor</string>
+    <string name="creating_db">Criando banco de dados de teste</string>
+    <string name="network">Estabelecendo rede de contatos</string>
+    <string name="allies">Procurando por aliados</string>
+    <string name="pictures">Analisando imagens</string>
+    <string name="prior_entries">Verificando entradas anteriores</string>
+    <string name="vanguard_data">Obtendo dados da Vanguarda</string>
+    <string name="error_bungie_auth">Erro na autenticação na Bungie. Por favor encerre o app e tente novamente.</string>
+    <string name="confirm_evaluation">Confirmar avaliação?</string>
+    <string name="no_evaluation">Nenhum guardião foi avaliado, confirmar?</string>
 
 </resources>

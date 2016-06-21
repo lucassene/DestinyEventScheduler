@@ -1,6 +1,7 @@
 package com.destiny.event.scheduler.utils;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.webkit.CookieManager;
 
 public final class CookiesUtils {
@@ -13,6 +14,7 @@ public final class CookiesUtils {
 
     public static String getCookies(String siteUrl){
         CookieManager cookieManager = CookieManager.getInstance();
+        Log.w("CookieUtils", "Cookie: " + cookieManager.getCookie(siteUrl));
         return cookieManager.getCookie(siteUrl);
     }
 

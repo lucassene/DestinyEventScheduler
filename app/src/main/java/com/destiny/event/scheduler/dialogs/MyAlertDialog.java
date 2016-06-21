@@ -5,7 +5,10 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
@@ -121,5 +124,16 @@ public class MyAlertDialog extends DialogFragment {
 
         return dialog;
 
+    }
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        try {
+            FragmentTransaction ft = manager.beginTransaction();
+            ft.add(this, tag);
+            ft.commit();
+        } catch (IllegalStateException e){
+            Log.e(TAG, "State loss Exception");
+        }
     }
 }

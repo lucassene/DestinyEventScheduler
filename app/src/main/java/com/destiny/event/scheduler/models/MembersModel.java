@@ -8,6 +8,7 @@ public class MembersModel {
     private String clanId;
     private String iconPath;
     private String platformId;
+    private String title;
     private int likes;
     private int dislikes;
     private int gamesCreated;
@@ -130,5 +131,13 @@ public class MembersModel {
         this.platformId = platformId;
     }
 
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
 }

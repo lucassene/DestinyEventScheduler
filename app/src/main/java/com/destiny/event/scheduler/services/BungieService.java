@@ -75,6 +75,7 @@ public class BungieService extends IntentService {
     private static final String XCSRF_HEADER = "x-csrf";
 
     public static final String ERROR_TAG = "error";
+    public static final int NO_ERROR = 0;
     public static final int ERROR_NO_CONNECTION = 100;
     public static final int ERROR_HTTP_REQUEST = 110;
     public static final int ERROR_NO_ICON = 120;
@@ -91,7 +92,6 @@ public class BungieService extends IntentService {
     private String membershipType;
     private String membershipId;
     private String platformId;
-    private String approvalDate;
 
     private String clanId;
     private String clanName;
@@ -110,6 +110,8 @@ public class BungieService extends IntentService {
     private String cookie;
     private String request;
     private String xcsrf;
+
+    private String getCurrentBungieAccountResponse;
 
     public BungieService() {
         super(BungieService.class.getName());
@@ -132,24 +134,399 @@ public class BungieService extends IntentService {
 
         switch (request) {
             case GET_CURRENT_ACCOUNT:
-                getBungieAccount(receiver);
-                if (error == 0){
-                    insertLoggedUser();
-                    insertClan();
-                    insertClanMembers();
-                    insertFakeEvents(receiver);
+                receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+                error = getBungieAccount(receiver);
+                Log.w(TAG, "getBungieAccount error: " + error);
+                if (error != NO_ERROR){
+                    sendError(receiver);
                 } else {
-                    Log.w(TAG,"Algum problema ocorreu, avisando o usuário");
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(ERROR_TAG, error);
-                    receiver.send(STATUS_ERROR, bundle);
-                    this.stopSelf();
+                    error = parseCurrentBungieAccount(receiver);
+                    Log.w(TAG, "parseCurrentBungieAccount error: " + error);
+                    if (error != NO_ERROR){
+                        sendError(receiver);
+                    } else {
+                        error = getMembersOfClan(receiver, 1);
+                        Log.w(TAG, "getMembersOfClan error: " + error);
+                        if (error != NO_ERROR){
+                            sendError(receiver);
+                        } else {
+                            error = parseBungieAccount(receiver);
+                            Log.w(TAG, "parseBungieAccount error: " + error);
+                            if (error == NO_ERROR){
+                                insertLoggedUser();
+                                insertClan();
+                                insertClanMembers();
+                                insertFakeEvents(receiver);
+                                receiver.send(STATUS_FINISHED, Bundle.EMPTY);
+                            } else {
+                                sendError(receiver);
+                            }
+                        }
+                    }
                 }
                 break;
         }
 
         this.stopSelf();
 
+    }
+
+    private void sendError(ResultReceiver receiver) {
+        Bundle bundle = new Bundle();
+        Log.w(TAG,"Algum problema ocorreu, avisando o usuário");
+        bundle.clear();
+        bundle.putInt(ERROR_TAG, error);
+        receiver.send(STATUS_ERROR, bundle);
+    }
+
+    private int getBungieAccount(ResultReceiver receiver){
+
+        String myURL = BASE_URL + USER_PREFIX + GET_CURRENT_ACCOUNT;
+        receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+
+        try {
+
+            if (NetworkUtils.checkConnection(getApplicationContext())){
+
+                URL url = new URL(myURL);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
+                urlConnection.setRequestProperty(XCSRF_HEADER, xcsrf);
+                urlConnection.setRequestProperty(COOKIE_HEADER, cookie);
+                urlConnection.setRequestMethod(GET_METHOD);
+
+                int statusCode = urlConnection.getResponseCode();
+
+                if (statusCode == 200) {
+                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                    getCurrentBungieAccountResponse = convertInputStreamToString(inputStream);
+                    Log.w(TAG, "API Key: " + BuildConfig.API_KEY);
+                    Log.w(TAG, "X-CSRF: " + xcsrf);
+                    Log.w(TAG, "Cookies: " + cookie);
+                    Log.w(TAG, "getCurrentBungieAccount JSON unparsed: " + getCurrentBungieAccountResponse);
+
+                    if (getCurrentBungieAccountResponse != null) {
+                        return NO_ERROR;
+                    }
+                } else {
+                    Log.w(TAG, "Response Code do JSON diferente de 200");
+                    return ERROR_RESPONSE_CODE;
+                }
+
+            } else {
+                Log.w(TAG, "Sem conexão com a internet");
+                return ERROR_NO_CONNECTION;
+            }
+
+        } catch (Exception e) {
+            Log.w(TAG, "Problema no HTTP Request (getCurrentBungieAccount)");
+            e.printStackTrace();
+            return ERROR_HTTP_REQUEST;
+        }
+
+        return NO_ERROR;
+
+    }
+
+    private int parseCurrentBungieAccount(ResultReceiver receiver) {
+        Bundle bundle = new Bundle();
+        try {
+            JSONObject jObject = new JSONObject(getCurrentBungieAccountResponse);
+
+            JSONObject jResponse = jObject.getJSONObject("Response");
+            JSONArray jDestinyAccounts = jResponse.getJSONArray("destinyAccounts");
+
+            if (jDestinyAccounts.length() > 0) {
+
+                JSONObject obj = jDestinyAccounts.getJSONObject(0);
+                JSONObject userInfo = obj.getJSONObject("userInfo");
+
+                membershipId = userInfo.getString("membershipId");
+                membershipType = userInfo.getString("membershipType");
+                displayName = userInfo.getString("displayName");
+
+                bundle.clear();
+                bundle.putString("bungieId", membershipId);
+                bundle.putString("userName", displayName);
+                receiver.send(STATUS_DOCS, bundle);
+
+                //Verificar se o usuário já tem cadastro no servidor
+                receiver.send(STATUS_VERIFY, null);
+
+                iconPath = "/img/profile/avatars/Destiny04.jpg";
+
+                try {
+                    JSONObject jBungieNetUser = jResponse.getJSONObject("bungieNetUser");
+                    iconPath = jBungieNetUser.getString("profilePicturePath");
+                    receiver.send(STATUS_PICTURE, null);
+                } catch (JSONException e){
+                    //Log.w(TAG, "BungieNetUser TAG not found");
+                    receiver.send(STATUS_PICTURE, null);
+                    e.printStackTrace();
+                }
+
+                try {
+                    JSONArray jClans = jResponse.getJSONArray("clans");
+                    JSONObject clanObj = jClans.getJSONObject(0);
+                    clanId = clanObj.getString("groupId");
+                    //Log.w(TAG,"Clan ID: " + clanId);
+
+                    JSONObject jRelatedGroups = jResponse.getJSONObject("relatedGroups");
+                    JSONObject jGroup = jRelatedGroups.getJSONObject(clanId);
+
+                    clanName = jGroup.getString("name");
+                    motto = jGroup.getString("motto");
+                    clanBanner = jGroup.getString("bannerPath");
+                    clanIcon = jGroup.getString("avatarPath");
+                    receiver.send(STATUS_FRIENDS, null);
+                    return NO_ERROR;
+                } catch (JSONException e){
+                    Log.w(TAG, "Erro no JSON do getGroup");
+                    e.printStackTrace();
+                    return ERROR_NO_CLAN;
+                }
+
+            }
+        } catch (JSONException e) {
+            Log.w(TAG, "Erro no JSON de getCurrentBungieAccount");
+            e.printStackTrace();
+            return ERROR_CURRENT_USER;
+        }
+        return NO_ERROR;
+    }
+
+    private int getMembersOfClan(ResultReceiver receiver, int page){
+
+        String myURL = BASE_URL + GROUP_PREFIX + clanId + "/" + GET_MEMBERS_OF_CLAN + "?" + CURRENT_PAGE + String.valueOf(page) + "&" + MEMBER_TYPE + "-1&" + PLATFORM_TYPE + platformId + "&" + SORT + "0";
+        //Log.w(TAG,myURL);
+
+        try{
+
+            if (NetworkUtils.checkConnection(getApplicationContext())){
+
+                URL url = new URL(myURL);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
+                urlConnection.setRequestMethod(GET_METHOD);
+
+                int statusCode = urlConnection.getResponseCode();
+
+                if (statusCode == 200){
+                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                    String response = convertInputStreamToString(inputStream);
+
+                    if (response != null){
+                        int clanError = parseMembersOfClan(receiver,response);
+                        if (clanError != NO_ERROR) {
+                            return clanError;
+                        } else return NO_ERROR;
+                    }
+
+                } else {
+                    Log.w(TAG, "Response Code do JSON diferente de 200");
+                    return ERROR_RESPONSE_CODE;
+                }
+
+            } else {
+                Log.w(TAG, "Sem conexão com a Internet");
+                return ERROR_NO_CONNECTION;
+            }
+
+        } catch (Exception e) {
+            Log.w(TAG, "Problema no HTTP Request (getMembersOfClan)");
+            e.printStackTrace();
+            return ERROR_HTTP_REQUEST;
+        }
+
+        receiver.send(STATUS_FRIENDS, null);
+        return NO_ERROR;
+    }
+
+    private int parseMembersOfClan(ResultReceiver receiver, String response){
+
+        Log.w(TAG, "getMembersOfClan JSON unparsed :" + response);
+
+        try{
+            JSONObject jObject = new JSONObject(response);
+            JSONObject jResponse = jObject.getJSONObject("Response");
+            JSONArray jResults = jResponse.getJSONArray("results");
+
+            for (int i=0;i<jResults.length();i++){
+                JSONObject memberJSON = jResults.getJSONObject(i);
+                JSONObject bungieInfo = memberJSON.getJSONObject("destinyUserInfo");
+
+                MembersModel member = new MembersModel();
+                member.setMembershipId(bungieInfo.getString("membershipId"));
+                membersModelList.add(i, member);
+            }
+
+            String hasMore = jResponse.getString("hasMore");
+
+            JSONObject jQuery = jResponse.getJSONObject("query");
+            int currentPage = Integer.parseInt(jQuery.getString("currentPage"));
+
+            if (hasMore.equals("true")){
+                currentPage++;
+                getMembersOfClan(receiver, currentPage);
+            }
+
+            return NO_ERROR;
+
+        } catch (JSONException e) {
+            Log.w(TAG, "Erro no JSON de getBungieAccount");
+            e.printStackTrace();
+            return ERROR_MEMBERS_OF_CLAN;
+        }
+
+    }
+
+    private int parseBungieAccount(ResultReceiver receiver) {
+
+        for (int i = 0; i< membersModelList.size(); i++){
+            int clanError = getClanMemberAccount(receiver, membersModelList.get(i).getMembershipId(), platformId, i);
+            if (clanError != NO_ERROR){
+                return clanError;
+            }
+        }
+
+        receiver.send(STATUS_PARTY, null);
+        return NO_ERROR;
+            //bundle.putInt(ERROR_TAG, ERROR_NO_ICON);
+    }
+
+    private int getClanMemberAccount(ResultReceiver receiver, String clanMember, String memberType, int position){
+
+        String myURL = BASE_URL + USER_PREFIX + GET_BUNGIE_ACCOUNT + clanMember + "/" + memberType + "/";
+        //Log.w(TAG, myURL);
+        int notAdd = 0;
+
+        Bundle bundle = new Bundle();
+
+        try {
+
+            if (NetworkUtils.checkConnection(getApplicationContext())){
+
+                URL url = new URL(myURL);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
+                urlConnection.setRequestMethod(GET_METHOD);
+
+                int statusCode = urlConnection.getResponseCode();
+
+                if (statusCode == 200){
+                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                    String response = convertInputStreamToString(inputStream);
+
+                    Log.w(TAG, "getClanMemberAccount JSON unparsed: " + response);
+
+                    if (response != null){
+                        bundle.clear();
+                        bundle = parseClanMember(response);
+                        if (bundle != Bundle.EMPTY){
+                            membersModelList.get(position).setName(bundle.getString(NAME));
+                            membersModelList.get(position).setIconPath(bundle.getString(ICON));
+                            membersModelList.get(position).setPlatformId(platformId);
+                            membersModelList.get(position).setClanId(clanId);
+
+                            if (iconsList.size()==0){
+                                iconsList.add(membersModelList.get(position).getIconPath());
+                            } else {
+                                for (int i=0; i<iconsList.size();i++){
+                                    if (iconsList.get(i) != null && iconsList.get(i).equals(membersModelList.get(position).getIconPath())){
+                                        notAdd = 1;
+                                        //Log.w(TAG, "Number of Images: " + i);
+                                        break;
+                                    } else break;
+                                }
+                                if (notAdd != 1){
+                                    iconsList.add(membersModelList.get(position).getIconPath());
+                                }
+                            }
+
+                            return NO_ERROR;
+
+                        } else{
+                            return ERROR_CLAN_MEMBER;
+                        }
+                    } else {
+                        Log.w(TAG, "Response vazia");
+                        return ERROR_CLAN_MEMBER;
+                    }
+
+                } else {
+                    Log.w(TAG, "Response Code do JSON diferente de 200");
+                    return ERROR_RESPONSE_CODE;
+                }
+            } else {
+                Log.w(TAG, "Sem conexão com a Internet");
+                return ERROR_NO_CONNECTION;
+            }
+
+        }catch (Exception e) {
+            Log.w(TAG, "Problema no HTTP Request (getBungieAccount)");
+            e.printStackTrace();
+            return ERROR_HTTP_REQUEST;
+        }
+
+    }
+
+    private Bundle parseClanMember(String response){
+
+        Bundle bundle = new Bundle();
+
+        String memberDisplayName;
+        String memberIconPath = "/img/profile/avatars/Destiny04.jpg";
+
+        JSONObject jBungieNetUser;
+
+        try {
+            JSONObject jObject = new JSONObject(response);
+
+            JSONObject jResponse = jObject.getJSONObject("Response");
+            JSONArray jDestinyAccounts = jResponse.getJSONArray("destinyAccounts");
+            try{
+                jBungieNetUser = jResponse.getJSONObject("bungieNetUser");
+                memberIconPath = jBungieNetUser.getString("profilePicturePath");
+            } catch (JSONException e){
+                Log.w(TAG, "bungieNetUser TAG not found.");
+            }
+
+            JSONObject jO = jDestinyAccounts.getJSONObject(0);
+            JSONObject jUserInfo = jO.getJSONObject("userInfo");
+            memberDisplayName = jUserInfo.getString("displayName");
+
+            bundle.putString(NAME, memberDisplayName);
+            bundle.putString(ICON, memberIconPath);
+
+        } catch (JSONException e) {
+            Log.w(TAG, "Erro no JSON de getBungieAccount");
+            e.printStackTrace();
+            bundle.clear();
+            return bundle;
+        }
+
+        return bundle;
+
+    }
+
+    private String convertInputStreamToString(InputStream inputStream) throws IOException {
+
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        String result = "";
+
+        while ((line = bufferedReader.readLine()) != null) {
+            result += line;
+        }
+
+        if (null != inputStream) {
+            inputStream.close();
+        }
+
+        return result;
     }
 
     private void insertFakeEvents(ResultReceiver receiver) {
@@ -245,6 +622,8 @@ public class BungieService extends IntentService {
 
         }
 
+        //Quando estiver funcionando com o servidor, tentar fazer o download antes de inserir no BD
+        //Inserir a imagem correta se conseguir fazer o download, ou então inserir a imagem padrão caso falhe.
         for (int x=0;x<iconsList.size();x++){
             ImageUtils.downloadImage(getApplicationContext(), BASE_IMAGE_URL + iconsList.get(x));
         }
@@ -289,438 +668,6 @@ public class BungieService extends IntentService {
 
         //Log.w(TAG, "Logged User criado com sucesso!");
 
-    }
-
-    private void getBungieAccount(ResultReceiver receiver){
-
-        String myURL = BASE_URL + USER_PREFIX + GET_CURRENT_ACCOUNT;
-        receiver.send(STATUS_RUNNING, Bundle.EMPTY);
-
-        Bundle bundle = new Bundle();
-
-        try {
-
-            if (NetworkUtils.checkConnection(getApplicationContext())){
-
-                URL url = new URL(myURL);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
-                urlConnection.setRequestProperty(XCSRF_HEADER, xcsrf);
-                urlConnection.setRequestProperty(COOKIE_HEADER, cookie);
-                urlConnection.setRequestMethod(GET_METHOD);
-
-                int statusCode = urlConnection.getResponseCode();
-
-                if (statusCode == 200) {
-                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-                    String response = convertInputStreamToString(inputStream);
-                    //Log.w(TAG, "X-CSRF: " + xcsrf);
-                    //Log.w(TAG, "Cookies: " + cookie);
-                    //Log.w(TAG, "JSON unparsed: " + response);
-
-                    if (response != null) {
-
-                        bundle.clear();
-                        bundle = parseBungieAccount(receiver,response,STATUS_DOCS);
-                        receiver.send(STATUS_DOCS, bundle);
-
-                        bundle.clear();
-                        bundle = parseBungieAccount(receiver,response,STATUS_VERIFY);
-                        receiver.send(STATUS_VERIFY, Bundle.EMPTY);
-
-                        bundle.clear();
-                        bundle = parseBungieAccount(receiver,response,STATUS_PICTURE);
-                        receiver.send(STATUS_PICTURE, bundle);
-
-                        bundle.clear();
-                        bundle = parseBungieAccount(receiver,response,STATUS_FRIENDS);
-                        receiver.send(STATUS_FRIENDS, bundle);
-
-                        bundle.clear();
-                        bundle = parseBungieAccount(receiver,response,STATUS_PARTY);
-                        receiver.send(STATUS_PARTY, bundle);
-
-                        //receiver.send(STATUS_FINISHED, Bundle.EMPTY);
-
-                    }
-                } else {
-                    Log.w(TAG, "Response Code do JSON diferente de 200");
-                    bundle.putInt(ERROR_TAG, ERROR_RESPONSE_CODE);
-                    receiver.send(STATUS_ERROR, bundle);
-                    error = ERROR_RESPONSE_CODE;
-                    this.stopSelf();
-                }
-
-            } else {
-                Log.w(TAG, "Sem conexão com a internet");
-                bundle.putInt(ERROR_TAG, ERROR_NO_CONNECTION);
-                receiver.send(STATUS_ERROR, bundle);
-                error = ERROR_NO_CONNECTION;
-                this.stopSelf();
-            }
-
-        } catch (Exception e) {
-            Log.w(TAG, "Problema no HTTP Request (getCurrentBungieAccount)");
-            bundle.putInt(ERROR_TAG, ERROR_HTTP_REQUEST);
-            receiver.send(STATUS_ERROR, bundle);
-            e.printStackTrace();
-            error = ERROR_HTTP_REQUEST;
-            this.stopSelf();
-        }
-
-    }
-
-    private Bundle parseBungieAccount(ResultReceiver receiver, String response, int status) {
-
-        Bundle bundle = new Bundle();
-
-        try {
-            JSONObject jObject = new JSONObject(response);
-
-            JSONObject jResponse = jObject.getJSONObject("Response");
-            JSONArray jDestinyAccounts = jResponse.getJSONArray("destinyAccounts");
-
-            if (jDestinyAccounts.length()>0){
-
-                switch (status){
-                    case STATUS_DOCS:
-
-                        JSONObject obj = jDestinyAccounts.getJSONObject(0);
-                        JSONObject userInfo = obj.getJSONObject("userInfo");
-
-                        membershipId = userInfo.getString("membershipId");
-                        membershipType = userInfo.getString("membershipType");
-                        displayName = userInfo.getString("displayName");
-
-                        bundle.putString("bungieId", membershipId);
-                        bundle.putString("userName", displayName);
-
-                        break;
-
-                    case STATUS_VERIFY:
-                        //Verifica se o usuário já tem cadastrado no BD do servidor
-                        break;
-
-                    case STATUS_PICTURE:
-
-                        iconPath = "/img/profile/avatars/Destiny04.jpg";
-
-                        try {
-                            JSONObject jBungieNetUser = jResponse.getJSONObject("bungieNetUser");
-                            iconPath = jBungieNetUser.getString("profilePicturePath");
-                        } catch (JSONException e){
-                            bundle.putInt(ERROR_TAG, ERROR_NO_ICON);
-                            Log.w(TAG, "BungieNetUser TAG not found");
-                            e.printStackTrace();
-                        }
-
-                        break;
-
-                    case STATUS_FRIENDS:
-
-                        try {
-                            JSONArray jClans = jResponse.getJSONArray("clans");
-                            JSONObject clanObj = jClans.getJSONObject(0);
-                            clanId = clanObj.getString("groupId");
-                            //Log.w(TAG,"Clan ID: " + clanId);
-
-                            JSONObject jRelatedGroups = jResponse.getJSONObject("relatedGroups");
-                            JSONObject jGroup = jRelatedGroups.getJSONObject(clanId);
-
-                            clanName = jGroup.getString("name");
-                            motto = jGroup.getString("motto");
-                            clanBanner = jGroup.getString("bannerPath");
-                            clanIcon = jGroup.getString("avatarPath");
-                        } catch (JSONException e){
-                            Log.w(TAG, "Erro no JSON do getGroup");
-                            bundle.putInt(ERROR_TAG, ERROR_NO_CLAN);
-                            receiver.send(STATUS_FRIENDS, bundle);
-                            e.printStackTrace();
-                            this.stopSelf();
-                        }
-
-                        break;
-
-                    case STATUS_PARTY:
-                        getMembersOfClan(receiver, 1);
-
-                        for (int i = 0; i< membersModelList.size(); i++){
-                            getClanMemberAccount(receiver, membersModelList.get(i).getMembershipId(), platformId, i);
-                            if (error!=0) break;
-                             //bundle.putInt(ERROR_TAG, ERROR_NO_ICON);
-                        }
-
-                        break;
-
-                    default:
-                        bundle.clear();
-                        break;
-                }
-
-                return bundle;
-
-            } else {
-                Log.w(TAG, "Erro tentando pegar dados do usuário");
-                bundle.putInt(ERROR_TAG,ERROR_CURRENT_USER);
-                receiver.send(STATUS_DOCS, bundle);
-                error = ERROR_CURRENT_USER;
-                this.stopSelf();
-            }
-
-        } catch (JSONException e) {
-            Log.w(TAG, "Erro no JSON de getCurrentBungieAccount");
-            bundle.putInt(ERROR_TAG, ERROR_CURRENT_USER);
-            receiver.send(STATUS_DOCS, bundle);
-            e.printStackTrace();
-            error = ERROR_CURRENT_USER;
-            this.stopSelf();
-        }
-
-        return bundle;
-    }
-
-    private void getMembersOfClan(ResultReceiver receiver, int page){
-
-        String myURL = BASE_URL + GROUP_PREFIX + clanId + "/" + GET_MEMBERS_OF_CLAN + "?" + CURRENT_PAGE + String.valueOf(page) + "&" + MEMBER_TYPE + "-1&" + PLATFORM_TYPE + platformId + "&" + SORT + "0";
-        //Log.w(TAG,myURL);
-        receiver.send(STATUS_RUNNING, Bundle.EMPTY);
-
-        Bundle bundle = new Bundle();
-
-        try{
-
-            if (NetworkUtils.checkConnection(getApplicationContext())){
-
-                URL url = new URL(myURL);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
-                urlConnection.setRequestMethod(GET_METHOD);
-
-                int statusCode = urlConnection.getResponseCode();
-
-                if (statusCode == 200){
-                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-                    String response = convertInputStreamToString(inputStream);
-
-                    if (response != null){
-                        parseMembersOfClan(receiver,response);
-                    }
-
-                } else {
-                    Log.w(TAG, "Response Code do JSON diferente de 200");
-                    bundle.putInt(ERROR_TAG, ERROR_RESPONSE_CODE);
-                    receiver.send(STATUS_PARTY, bundle);
-                    error = ERROR_RESPONSE_CODE;
-                    this.stopSelf();
-                }
-
-            } else {
-                Log.w(TAG, "Sem conexão com a Internet");
-                bundle.putInt(ERROR_TAG, ERROR_NO_CONNECTION);
-                receiver.send(STATUS_PARTY, bundle);
-                error = ERROR_NO_CONNECTION;
-                this.stopSelf();
-            }
-
-        } catch (Exception e) {
-            Log.w(TAG, "Problema no HTTP Request (getMembersOfClan)");
-            bundle.putInt(ERROR_TAG, ERROR_HTTP_REQUEST);
-            receiver.send(STATUS_PARTY, Bundle.EMPTY);
-            e.printStackTrace();
-            error = ERROR_HTTP_REQUEST;
-            this.stopSelf();
-        }
-    }
-
-    private void parseMembersOfClan(ResultReceiver receiver, String response){
-
-        Bundle bundle = new Bundle();
-
-        try{
-            JSONObject jObject = new JSONObject(response);
-            JSONObject jResponse = jObject.getJSONObject("Response");
-            JSONArray jResults = jResponse.getJSONArray("results");
-
-            for (int i=0;i<jResults.length();i++){
-                JSONObject memberJSON = jResults.getJSONObject(i);
-                JSONObject bungieInfo = memberJSON.getJSONObject("destinyUserInfo");
-
-                MembersModel member = new MembersModel();
-                /*try {
-                    member.setMemberSince(memberJSON.getString("approvalDate"));
-                } catch (JSONException e){
-                    member.setMemberSince("2016-12-30T23:59:59.00Z");
-                    Log.w(TAG, "approvalDate TAG not found.");
-                }*/
-                member.setMembershipId(bungieInfo.getString("membershipId"));
-                membersModelList.add(i, member);
-            }
-
-            String hasMore = jResponse.getString("hasMore");
-
-            JSONObject jQuery = jResponse.getJSONObject("query");
-            int currentPage = Integer.parseInt(jQuery.getString("currentPage"));
-
-            if (hasMore.equals("true")){
-                currentPage++;
-                getMembersOfClan(receiver, currentPage);
-            }
-
-        } catch (JSONException e) {
-            Log.w(TAG, "Erro no JSON de getBungieAccount");
-            bundle.putInt(ERROR_TAG, ERROR_MEMBERS_OF_CLAN);
-            receiver.send(STATUS_PARTY, bundle);
-            e.printStackTrace();
-            error = ERROR_MEMBERS_OF_CLAN;
-            this.stopSelf();
-        }
-    }
-
-    private int getClanMemberAccount(ResultReceiver receiver, String clanMember, String memberType, int position){
-
-        String myURL = BASE_URL + USER_PREFIX + GET_BUNGIE_ACCOUNT + clanMember + "/" + memberType + "/";
-        //Log.w(TAG, myURL);
-        int notAdd = 0;
-
-        Bundle bundle = new Bundle();
-
-        int status = 0;
-
-        try {
-
-            if (NetworkUtils.checkConnection(getApplicationContext())){
-
-                URL url = new URL(myURL);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
-                urlConnection.setRequestMethod(GET_METHOD);
-
-                int statusCode = urlConnection.getResponseCode();
-
-                if (statusCode == 200){
-                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-                    String response = convertInputStreamToString(inputStream);
-
-                    if (response != null){
-                        bundle = parseClanMember(receiver, response);
-                        if (bundle != Bundle.EMPTY){
-                            membersModelList.get(position).setName(bundle.getString(NAME));
-                            membersModelList.get(position).setIconPath(bundle.getString(ICON));
-                            membersModelList.get(position).setPlatformId(platformId);
-                            membersModelList.get(position).setClanId(clanId);
-
-                            if (bundle.getInt(ERROR_TAG) == ERROR_NO_ICON) status = ERROR_NO_ICON;
-
-                            if (iconsList.size()==0){
-                                iconsList.add(membersModelList.get(position).getIconPath());
-                            } else {
-                                for (int i=0; i<iconsList.size();i++){
-                                    if (iconsList.get(i) != null && iconsList.get(i).equals(membersModelList.get(position).getIconPath())){
-                                        notAdd = 1;
-                                        //Log.w(TAG, "Number of Images: " + i);
-                                        break;
-                                    } else break;
-                                }
-                                if (notAdd != 1){
-                                    iconsList.add(membersModelList.get(position).getIconPath());
-                                }
-                            }
-
-                        }
-                    }
-
-                } else {
-                    Log.w(TAG, "Response Code do JSON diferente de 200");
-                    bundle.putInt(ERROR_TAG, ERROR_RESPONSE_CODE);
-                    receiver.send(STATUS_PARTY, bundle);
-                    error = ERROR_RESPONSE_CODE;
-                    this.stopSelf();
-                }
-            } else {
-                Log.w(TAG, "Sem conexão com a Internet");
-                bundle.putInt(ERROR_TAG, ERROR_NO_CONNECTION);
-                receiver.send(STATUS_PARTY, bundle);
-                error = ERROR_NO_CONNECTION;
-                this.stopSelf();
-            }
-
-        }catch (Exception e) {
-            Log.w(TAG, "Problema no HTTP Request (getBungieAccount)");
-            bundle.putInt(ERROR_TAG, ERROR_HTTP_REQUEST);
-            receiver.send(STATUS_PARTY, Bundle.EMPTY);
-            e.printStackTrace();
-            error = ERROR_HTTP_REQUEST;
-            this.stopSelf();
-        }
-
-        return status;
-
-    }
-
-    private Bundle parseClanMember(ResultReceiver receiver, String response){
-
-        Bundle bundle = new Bundle();
-
-        String memberMembershipId;
-        String memberDisplayName;
-        String memberIconPath = "/img/profile/avatars/Destiny04.jpg";
-
-        JSONObject jBungieNetUser;
-
-        try {
-            JSONObject jObject = new JSONObject(response);
-
-            JSONObject jResponse = jObject.getJSONObject("Response");
-            JSONArray jDestinyAccounts = jResponse.getJSONArray("destinyAccounts");
-            try{
-                jBungieNetUser = jResponse.getJSONObject("bungieNetUser");
-                memberIconPath = jBungieNetUser.getString("profilePicturePath");
-            } catch (JSONException e){
-                Log.w(TAG, "bungieNetUser TAG not found.");
-                bundle.putInt(ERROR_TAG, ERROR_NO_ICON);
-            }
-
-            JSONObject jO = jDestinyAccounts.getJSONObject(0);
-            JSONObject jUserInfo = jO.getJSONObject("userInfo");
-            memberDisplayName = jUserInfo.getString("displayName");
-            //memberMembershipId = jBungieNetUser.getString("membershipId");
-
-            //bundle.putString(MEMBER_ID, memberMembershipId);
-            bundle.putString(NAME, memberDisplayName);
-            bundle.putString(ICON, memberIconPath);
-
-        } catch (JSONException e) {
-            Log.w(TAG, "Erro no JSON de getBungieAccount");
-            bundle.putInt(ERROR_TAG, ERROR_CLAN_MEMBER);
-            receiver.send(STATUS_PARTY, bundle);
-            e.printStackTrace();
-            error = ERROR_CLAN_MEMBER;
-            this.stopSelf();
-        }
-
-        return bundle;
-
-    }
-
-
-    private String convertInputStreamToString(InputStream inputStream) throws IOException {
-
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-
-        while ((line = bufferedReader.readLine()) != null) {
-            result += line;
-        }
-
-        if (null != inputStream) {
-            inputStream.close();
-        }
-
-        return result;
     }
 
 }

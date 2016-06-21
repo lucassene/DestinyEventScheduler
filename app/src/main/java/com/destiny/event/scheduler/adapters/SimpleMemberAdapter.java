@@ -20,6 +20,9 @@ public class SimpleMemberAdapter extends BaseAdapter {
 
     private static final String TAG = "SimpleMemberAdapter";
 
+    private static final int TYPE_CREATOR = 0;
+    private static final int TYPE_MEMBER = 1;
+
     private Context context;
     private List<MembersModel> memberList;
     private LayoutInflater inflater;
@@ -46,11 +49,25 @@ public class SimpleMemberAdapter extends BaseAdapter {
     }
 
     @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == 0){
+            return TYPE_CREATOR;
+        } else return TYPE_MEMBER;
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ValidateViewHolder vViewHolder;
 
         if (convertView == null){
-            convertView = inflater.inflate(R.layout.simple_member_item_layout, parent, false);
+            if (getItemViewType(position) == TYPE_CREATOR){
+                convertView = inflater.inflate(R.layout.simple_creator_item_layout, parent, false);
+            } else convertView = inflater.inflate(R.layout.simple_member_item_layout, parent, false);
             vViewHolder = new ValidateViewHolder(convertView);
             convertView.setTag(vViewHolder);
         } else {
@@ -60,6 +77,7 @@ public class SimpleMemberAdapter extends BaseAdapter {
         MembersModel currentMember = getItem(position);
 
         vViewHolder.memberName.setText(currentMember.getName());
+        vViewHolder.memberTitle.setText(currentMember.getTitle());
         try {
             vViewHolder.memberIcon.setImageBitmap(ImageUtils.loadImage(context, currentMember.getIconPath()));
         } catch (IOException e) {
@@ -115,8 +133,10 @@ public class SimpleMemberAdapter extends BaseAdapter {
         ImageView memberIcon;
         boolean memberChecked;
         ImageView memberRating;
+        TextView memberTitle;
 
         public ValidateViewHolder(View item){
+            memberTitle = (TextView) item.findViewById(R.id.secondary_text);
             memberName = (TextView) item.findViewById(R.id.primary_text);
             memberIcon = (ImageView) item.findViewById(R.id.profile_pic);
             memberRating = (ImageView) item.findViewById(R.id.rate_img);

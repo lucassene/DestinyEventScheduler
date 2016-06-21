@@ -176,6 +176,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         spinnerSelections.putInt(TAG_MY_EVENTS, 0);
         spinnerSelections.putInt(TAG_SEARCH_EVENTS, 0);
 
+        if (savedInstanceState != null){
+            openedFragmentType = savedInstanceState.getInt("fragType");
+            fragmentTag = savedInstanceState.getString("fragTag");
+            openedFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+            //Toast.makeText(this, "FragmentType: " + openedFragmentType + " FragmentTag: " + fragmentTag, Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void getLoggedUserData() {
@@ -230,7 +237,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             //Toast.makeText(this, "Back Count: " + fm.getBackStackEntryCount(), Toast.LENGTH_SHORT).show();
@@ -283,7 +290,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("fragment", fragmentTag);
+        outState.putString("fragTag", fragmentTag);
+        outState.putInt("fragType", openedFragmentType);
     }
 
     private void prepareFragmentHolder(Fragment fragment, View child, Bundle bundle, String tag){
@@ -398,6 +406,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     bundle.putString("gameId",id);
                     bundle.putString("creator", creator);
                     bundle.putString("status", status);
+                    bundle.putString("origin", gameOrigin);
                     //Toast.makeText(this, "Backstack count: " + fm.getBackStackEntryCount(), Toast.LENGTH_SHORT).show();
                     isNewScheduledOrValidated = GameTable.STATUS_VALIDATED;
                     fragment = new DetailValidationFragment();
@@ -694,8 +703,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
                         userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
                     }
-                    for (int i=0; i<userDataListener.size();i++){
-                        userDataListener.get(i).onUserDataLoaded();
+                    if (userDataListener != null){
+                        for (int i=0; i<userDataListener.size();i++){
+                            userDataListener.get(i).onUserDataLoaded();
+                        }
                     }
                     break;
             }

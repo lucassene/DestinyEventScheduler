@@ -35,7 +35,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="99/99/9999"
-            android:textSize="@dimen/secondaryTextSize"/>
+            android:textSize="@dimen/secondaryTextSize"
+            android:alpha="0.75"/>
 
     </LinearLayout>
 

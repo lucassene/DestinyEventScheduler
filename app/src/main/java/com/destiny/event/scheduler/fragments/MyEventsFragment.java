@@ -2,14 +2,12 @@ package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -116,6 +114,20 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
     }
 
+    private void initEntryLoader(){
+        if (getLoaderManager().getLoader(LOADER_ENTRY) != null){
+            getLoaderManager().destroyLoader(LOADER_ENTRY);
+        }
+        getLoaderManager().restartLoader(LOADER_ENTRY, null, this);
+    }
+
+    private void initGameLoader(){
+        if (getLoaderManager().getLoader(LOADER_GAME) != null){
+            getLoaderManager().destroyLoader(LOADER_GAME);
+        }
+        getLoaderManager().restartLoader(LOADER_GAME, null, this);
+    }
+
     private void getGamesData() {
 
         prepareStrings();
@@ -123,21 +135,21 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         switch (filterSpinner.getSelectedItemPosition()){
             case 0:
                 where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
-                getLoaderManager().initLoader(LOADER_ENTRY, null, this);
+                initEntryLoader();
                 break;
             case 1:
                 where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING;
-                getLoaderManager().initLoader(LOADER_ENTRY, null, this);
+                initEntryLoader();
                 break;
             case 2:
                 where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED;
                 prepareGameStrings();
-                getLoaderManager().initLoader(LOADER_GAME, null, this);
+                initGameLoader();
                 break;
             case 3:
                 where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED;
                 prepareGameStrings();
-                getLoaderManager().initLoader(LOADER_GAME, null, this);
+                initGameLoader();
                 break;
         }
 
@@ -219,25 +231,25 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
                 where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
                 prepareStrings();
                 getLoaderManager().destroyLoader(LOADER_GAME);
-                getLoaderManager().restartLoader(LOADER_ENTRY, null, this);
+                initEntryLoader();
                 break;
             case 1:
                 where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING;
                 prepareStrings();
                 getLoaderManager().destroyLoader(LOADER_GAME);
-                getLoaderManager().restartLoader(LOADER_ENTRY, null, this);
+                initEntryLoader();
                 break;
             case 2:
                 where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED;
                 prepareGameStrings();
                 getLoaderManager().destroyLoader(LOADER_ENTRY);
-                getLoaderManager().restartLoader(LOADER_GAME, null, this);
+                initGameLoader();
                 break;
             case 3:
                 where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED;
                 prepareGameStrings();
                 getLoaderManager().destroyLoader(LOADER_ENTRY);
-                getLoaderManager().restartLoader(LOADER_GAME, null, this);
+                initGameLoader();
                 break;
         }
 
@@ -282,7 +294,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
+        //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
 
         if (data != null && data.moveToFirst()){
 

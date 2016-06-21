@@ -120,7 +120,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
     private void getScheduledEvents() {
         prepareStrings();
-        getLoaderManager().initLoader(LOADER_ENTRY, null, this);
+        getLoaderManager().restartLoader(LOADER_ENTRY, null, this);
         adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_ENTRY);
 
         if (headerView != null){

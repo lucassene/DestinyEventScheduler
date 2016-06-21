@@ -118,12 +118,19 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
 
         prepareStrings();
 
-        getLoaderManager().initLoader(LOADER_GAME, null, this);
+        initGameLoader();
 
         adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_GAME);
 
         gamesList.setAdapter(adapter);
 
+    }
+
+    private void initGameLoader(){
+        if (getLoaderManager().getLoader(LOADER_GAME) != null){
+            getLoaderManager().destroyLoader(LOADER_GAME);
+        }
+        getLoaderManager().restartLoader(LOADER_GAME, null, this);
     }
 
     private void prepareStrings() {
@@ -169,11 +176,8 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
         eventId = eventIdList[position];
-        filterSpinner.setSelection(position);
-        getLoaderManager().restartLoader(LOADER_GAME, null, this);
-
+        initGameLoader();
     }
 
     @Override

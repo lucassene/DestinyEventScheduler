@@ -8,7 +8,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +67,7 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
         callback = (ToActivityListener) getActivity();
         callback.registerRefreshListener(this);
         callback.registerUserDataListener(this);
-        Log.w(TAG, "NewEventsListFragment attached!");
+        //Log.w(TAG, "NewEventsListFragment attached!");
     }
 
 
@@ -99,6 +98,7 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
         if (bungieId != null){
             getNewEvents();
         }
+
     }
 
     @Override
@@ -119,7 +119,7 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
 
     private void getNewEvents() {
         prepareStrings();
-        getLoaderManager().initLoader(URL_LOADER_GAME, null, this);
+        getLoaderManager().restartLoader(URL_LOADER_GAME, null, this);
         adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, URL_LOADER_GAME);
 
         if (headerView != null){

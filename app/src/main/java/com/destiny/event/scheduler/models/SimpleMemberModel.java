@@ -9,6 +9,7 @@ public class SimpleMemberModel {
     private int rating;
     private String icon;
     private int entryId;
+    private String title;
 
     public boolean isChecked() {
         return isChecked;
@@ -56,5 +57,13 @@ public class SimpleMemberModel {
 
     public void setEntryId(int entryId) {
         this.entryId = entryId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

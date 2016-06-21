@@ -50,8 +50,10 @@ public class HistoryAdapter extends SimpleCursorAdapter {
         TextView likesText = (TextView) view.findViewById(R.id.txt_likes);
         TextView dislikesText = (TextView) view.findViewById(R.id.txt_dislikes);
         TextView xpText = (TextView) view.findViewById(R.id.txt_xp);
+        TextView titleText = (TextView) view.findViewById(R.id.secondary_text);
 
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
+        titleText.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
 
         try {
             profile.setImageBitmap(ImageUtils.loadImage(context, cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_ICON))));

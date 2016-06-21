@@ -59,8 +59,8 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
 
     private String[] gameProjection;
 
-    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, "likes", "dislikes", "likes", "dislikes"}; //Atualizar com os campos que serão exibidos
-    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.txt_xp, R.id.txt_likes, R.id.txt_dislikes};
+    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, "likes", "dislikes", "likes", "dislikes", MemberTable.COLUMN_TITLE}; //Atualizar com os campos que serão exibidos
+    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.txt_xp, R.id.txt_likes, R.id.txt_dislikes, R.id.secondary_text};
 
     HistoryAdapter adapter;
 
@@ -171,7 +171,9 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
         String c14 = "SUM(CASE WHEN " + EvaluationTable.COLUMN_EVALUATION + " = -1 AND " + EvaluationTable.COLUMN_MEMBERSHIP_B + "=" + MemberTable.COLUMN_MEMBERSHIP + " THEN 1 ELSE 0 END) AS dislikes"; // colocar um AND para somar apenas os que são do memberId
         String c15 = "SUM(CASE WHEN " + EvaluationTable.COLUMN_EVALUATION + " = 1 AND " + EvaluationTable.COLUMN_MEMBERSHIP_B + "=" + MemberTable.COLUMN_MEMBERSHIP + " THEN 1 ELSE 0 END) AS likes";
 
-        gameProjection = new String[]{c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15};
+        String c16 = MemberTable.COLUMN_TITLE;
+
+        gameProjection = new String[]{c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16};
 
     }
 

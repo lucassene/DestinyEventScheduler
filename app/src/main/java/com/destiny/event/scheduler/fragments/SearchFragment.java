@@ -2,14 +2,12 @@ package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,13 +102,17 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     private void getGamesData() {
 
         prepareStrings();
-
-        getLoaderManager().initLoader(LOADER_GAME, null, this);
-
+        initGameLoader();
         adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_GAME);
-
         gamesList.setAdapter(adapter);
 
+    }
+
+    private void initGameLoader(){
+        if (getLoaderManager().getLoader(LOADER_GAME) != null){
+            getLoaderManager().destroyLoader(LOADER_GAME);
+        }
+        getLoaderManager().restartLoader(LOADER_GAME, null, this);
     }
 
     private void prepareStrings() {
@@ -151,11 +153,8 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
         eventId = eventIdList[position];
-        filterSpinner.setSelection(position);
-        getLoaderManager().restartLoader(LOADER_GAME, null, this);
-
+        initGameLoader();
     }
 
     @Override
@@ -189,7 +188,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
+        //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
 
         if (data != null && data.moveToFirst()){
             switch (loader.getId()){

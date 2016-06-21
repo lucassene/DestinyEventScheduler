@@ -2,9 +2,11 @@ package com.destiny.event.scheduler.fragments;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -37,6 +39,7 @@ import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.models.MembersModel;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.services.TitleService;
 import com.destiny.event.scheduler.utils.DateUtils;
 
 import java.util.ArrayList;
@@ -46,7 +49,7 @@ import java.util.Random;
 
 public class DetailValidationFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener{
 
-    private static final String TAG = "DetailValidationFragment";
+    private static final String TAG = "DetailValidateFragment";
 
     private static final int LOADER_GAME = 60;
     private static final int LOADER_ENTRY_MEMBERS = 72;
@@ -156,8 +159,6 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
             }
         });
 
-        memberList = new ArrayList<>();
-
         return v;
     }
 
@@ -189,6 +190,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                 joinButton.setEnabled(true);
                 joinButton.setVisibility(View.GONE);
                 checkLayout.setVisibility(View.GONE);
+                checkBox.setChecked(true);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.event_details);
                 status = STATUS_EVALUATED;
                 break;
@@ -246,6 +248,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
             this.getListView().addFooterView(footerView);
         }
 
+        memberList = new ArrayList<>();
         adapter = new SimpleMemberAdapter(getContext(), memberList);
         getListView().setAdapter(adapter);
 
@@ -299,14 +302,25 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                 break;
             case TYPE_NO_EVALUATIONS:
                 bundle.putString(title, getResources().getString(R.string.no_evaluations));
-                bundle.putString(msg, getResources().getString(R.string.no_evaluations_dialog_msg));
-                bundle.putString(posButton, getResources().getString(R.string.validate));
+                if (status == STATUS_WAITING || status == STATUS_WAITING_CREATOR){
+                    bundle.putString(msg, getResources().getString(R.string.no_evaluations_dialog_msg));
+                    bundle.putString(posButton, getResources().getString(R.string.validate));
+                } else if (status == STATUS_VALIDATED){
+                    bundle.putString(msg, getString(R.string.no_evaluation));
+                    bundle.putString(posButton, getString(R.string.evaluate));
+                }
                 bundle.putString(negButton, getResources().getString(R.string.nevermind));
                 break;
             case TYPE_OK:
-                bundle.putString(title, getResources().getString(R.string.validate_event_title));
-                bundle.putString(msg, getResources().getString(R.string.validation_dialog_msg));
-                bundle.putString(posButton, getResources().getString(R.string.validate));
+                if (status == STATUS_WAITING || status == STATUS_WAITING_CREATOR){
+                    bundle.putString(title, getResources().getString(R.string.validate_event_title));
+                    bundle.putString(msg, getResources().getString(R.string.validation_dialog_msg));
+                    bundle.putString(posButton, getResources().getString(R.string.validate)); 
+                } else if (status == STATUS_VALIDATED){
+                    bundle.putString(title, getString(R.string.evaluate));
+                    bundle.putString(msg, getString(R.string.confirm_evaluation));
+                    bundle.putString(posButton, getString(R.string.evaluate));
+                }
                 bundle.putString(negButton, getResources().getString(R.string.nevermind));
                 break;
             case TYPE_DELETE:
@@ -336,7 +350,15 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                 break;
             case STATUS_VALIDATED:
                 changeListItem(v, position, status);
+                break;
             case STATUS_EVALUATED:
+                Fragment fragment = new MyNewProfileFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("bungieId", memberList.get(position-1).getMembershipId());
+                bundle.putInt("type", MyNewProfileFragment.TYPE_DETAIL);
+
+                callback.loadNewFragment(fragment, bundle, "profile");
                 break;
         }
 
@@ -398,6 +420,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
 
             memberList.get(newpos).setRating(newRating);
             adapter.setRating(newpos, newRating);
+            adapter.notifyDataSetChanged();
         }
 
     }
@@ -405,7 +428,28 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
     private void getGameData() {
 
         prepareGameStrings();
-        getLoaderManager().initLoader(LOADER_GAME, null, this);
+        initGameLoader();
+    }
+
+    private void initGameLoader(){
+        if (getLoaderManager().getLoader(LOADER_GAME) != null){
+            getLoaderManager().destroyLoader(LOADER_GAME);
+        }
+        getLoaderManager().restartLoader(LOADER_GAME, null, this);
+    }
+
+    private void initEntryLoader() {
+        if (getLoaderManager().getLoader(LOADER_ENTRY_MEMBERS) != null){
+            getLoaderManager().destroyLoader(LOADER_ENTRY_MEMBERS);
+        }
+        getLoaderManager().restartLoader(LOADER_ENTRY_MEMBERS, null, this);
+    }
+
+    private void initEvaluationLoader() {
+        if (getLoaderManager().getLoader(LOADER_EVALUATION) != null){
+            getLoaderManager().destroyLoader(LOADER_EVALUATION);
+        }
+        getLoaderManager().restartLoader(LOADER_EVALUATION, null, this);
     }
 
     private void prepareGameStrings() {
@@ -448,10 +492,11 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
         String c9 = MemberTable.COLUMN_DISLIKES;
         String c10 = MemberTable.COLUMN_CREATED;
         String c11 = MemberTable.COLUMN_PLAYED;
+        String c12 = MemberTable.COLUMN_TITLE;
 
         String c14 = MemberTable.COLUMN_EXP;
 
-        membersProjection = new String[] {c1, c2, c3, c4, c5, c6, c14, c7, c8, c9, c10, c11};
+        membersProjection = new String[] {c1, c2, c3, c4, c5, c6, c14, c7, c8, c9, c10, c11, c12};
 
     }
 
@@ -535,19 +580,17 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                     inscriptions = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
 
                     prepareMemberStrings();
-                    getLoaderManager().initLoader(LOADER_ENTRY_MEMBERS, null, this);
-
-                    if (originStatus.equals(GameTable.STATUS_EVALUATED)) getLoaderManager().initLoader(LOADER_EVALUATION, null, this);
+                    initEntryLoader();
 
                     break;
                 case LOADER_ENTRY_MEMBERS:
-
                     memberList.clear();
                     data.moveToFirst();
                     for (int i=0; i < data.getCount();i++){
                         MembersModel memberModel = new MembersModel();
                         memberModel.setMembershipId(data.getString(data.getColumnIndexOrThrow(EntryTable.COLUMN_MEMBERSHIP)));
                         memberModel.setName(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
+                        memberModel.setTitle(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
                         memberModel.setIconPath(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_ICON)));
                         memberModel.setRating(0);
                         memberModel.setChecked(true);
@@ -556,15 +599,19 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                         memberModel.setDislikes(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES)));
                         memberModel.setGamesCreated(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED)));
                         memberModel.setGamesPlayed(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED)));
-                        memberList.add(memberModel);
+                        if (memberList == null){
+                            memberList = new ArrayList<>();
+                            memberList.add(memberModel);
+                        } else memberList.add(memberModel);
                         data.moveToNext();
                     }
 
-                    adapter.notifyDataSetChanged();
+                    if (originStatus.equals(GameTable.STATUS_EVALUATED)){
+                        initEvaluationLoader();
+                    } else adapter.notifyDataSetChanged();
 
                     break;
                 case LOADER_EVALUATION:
-
                     data.moveToFirst();
                     for (int i=0;i<memberList.size();i++){
                         for (int x=0;x<data.getCount();x++){
@@ -578,13 +625,13 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                         data.moveToFirst();
                     }
                     adapter.notifyDataSetChanged();
+                    break;
             }
         }
 
         callback.onDataLoaded();
 
     }
-
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -767,6 +814,14 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
         String where = MemberTable.COLUMN_MEMBERSHIP + "=" + memberList.get(position).getMembershipId();
         getContext().getContentResolver().update(DataProvider.MEMBER_URI, memberValues, where, null);
         memberValues.clear();
+
+        Intent intent = new Intent(getContext(),TitleService.class);
+        ArrayList<String> memberIdList = new ArrayList<>();
+        for (int i=0;i<memberList.size();i++){
+            memberIdList.add(memberList.get(i).getMembershipId());
+        }
+        intent.putStringArrayListExtra("membershipList",memberIdList);
+        getContext().startService(intent);
 
     }
 
