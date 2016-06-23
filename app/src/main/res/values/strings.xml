@@ -258,7 +258,7 @@
     <string name="cosmodrome">Patrol the Cosmodrome</string>
     <string name="dreadnaught">Patrol the Dreadnaught</string>
     <string name="mars">Patrol Mars</string>
-    <string name="moon">Patro the Moon</string>
+    <string name="moon">Patrol the Moon</string>
     <string name="venus">Patrol Venus</string>
     
     <string name="prison28">Prison of Elders - 28</string>
@@ -419,6 +419,8 @@
     <string name="vanguard_data">Obtaining Vanguard data</string>
     <string name="no_evaluation">No guardian was evaluated, confirm?</string>
     <string name="confirm_evaluation">Confirm evaluation?</string>
+    <string name="no_clan_title">Have you left the clan?</string>
+    <string name="no_clan_login_msg">Please make sure you are still in the clan through bungie.net website.</string>
 
 
 </resources>

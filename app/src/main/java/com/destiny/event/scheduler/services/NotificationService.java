@@ -29,8 +29,6 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.provider.DataProvider;
 
-import java.util.Random;
-
 public class NotificationService extends IntentService {
 
     private static final String TAG = "NotificationService";
@@ -38,6 +36,8 @@ public class NotificationService extends IntentService {
     private int notificationId;
 
     private String gameId;
+
+    private int notificationCount;
 
     public NotificationService() {
         super(NotificationService.class.getName());
@@ -62,8 +62,17 @@ public class NotificationService extends IntentService {
             int iconId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ICON));
             String typeName = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TYPE));
             gameId = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME));
-            makeNotification(title, iconId, typeName);
             cursor.close();
+
+            cursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, NotificationTable.COLUMN_GAME + "=" + gameId, null, NotificationTable.COLUMN_TIME + " ASC");
+            if (cursor != null && cursor.moveToFirst()){
+                notificationCount = cursor.getCount();
+                Log.w(TAG, "Encontrado " + notificationCount + " notificações para o gameId " + gameId);
+                cursor.close();
+            }
+
+            makeNotification(title, iconId, typeName);
+
         } else Log.w(TAG, "Nenhuma Notificação foi encontrada.");
 
     }
@@ -77,7 +86,9 @@ public class NotificationService extends IntentService {
             Intent nIntent = new Intent(getApplicationContext(), DrawerActivity.class);
             nIntent.putExtra("notification",1);
             nIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), 0, nIntent, 0);
+            nIntent.setAction(String.valueOf(notificationId));
+            PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), notificationId, nIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            nIntent.setData(Uri.parse(String.valueOf(notificationId)));
 
             NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(this);
             nBuilder.setSmallIcon(R.drawable.ic_event_validate);
@@ -123,22 +134,14 @@ public class NotificationService extends IntentService {
     }
 
     private void updateGameStatus() {
-        ContentValues values = new ContentValues();
-        //values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING);
-        Random r = new Random();
-        int n = r.nextInt(1);
-
-        //Alterando o status para fins de testes
-        if (n==1){
+        if (notificationCount == 1){
+            ContentValues values = new ContentValues();
             values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING);
-        } else if (n==0){
-            values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_VALIDATED);
+            Uri uri = Uri.parse(DataProvider.GAME_URI + "/" + gameId);
+            getContentResolver().update(uri, values, GameTable.COLUMN_ID + "=" + gameId, null);
+            Log.w(TAG, "Game status from ID: " + gameId + " updated to Waiting for Validation");
+            values.clear();
         }
-
-        Uri uri = Uri.parse(DataProvider.GAME_URI + "/" + gameId);
-        getContentResolver().update(uri, values, GameTable.COLUMN_ID + "=" + gameId, null);
-        Log.w(TAG, "Game status from ID: " + gameId + " updated to Waiting for Validation");
-        values.clear();
     }
 
     private void deleteShowedNotification() {

@@ -1,6 +1,8 @@
 package com.destiny.event.scheduler.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
@@ -20,6 +22,8 @@ import java.util.Calendar;
 public class PrepareActivity extends AppCompatActivity implements RequestResultReceiver.Receiver, FromDialogListener {
 
     private static final String TAG = "PrepareActivity";
+
+    public static final String LEGEND_PREF = "prepareLegend";
 
     ProgressBar progressBar;
     TextView text;
@@ -45,7 +49,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
         String xcsrf = getIntent().getStringExtra("x-csrf");
         String platform = getIntent().getStringExtra("platform");
 
-        if (mReceiver == null){
+        if (mReceiver == null && !isBungieServiceRunning()){
             mReceiver = new RequestResultReceiver(new Handler());
             mReceiver.setReceiver(this);
             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
@@ -55,11 +59,57 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
             intent.putExtra(BungieService.XCSRF_EXTRA, xcsrf);
             intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
             startService(intent);
+            }
+
+        if (savedInstanceState != null){
+            //Log.w(TAG, "SavedInstance != null");
+            msg = savedInstanceState.getString("legend");
+            text.setText(msg);
+        } else {
+            //Log.w(TAG, "SavedInstance is empty!");
+            SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+            msg = sharedPrefs.getString(LEGEND_PREF, getString(R.string.vanguard_data));
+            text.setText(msg);
         }
+    }
 
-        msg = getString(R.string.vanguard_data);
+    public boolean isBungieServiceRunning() {
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        boolean var = sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
+        //Log.w(TAG, "BungieService running? " +  var);
+        return var;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(DrawerActivity.FOREGROUND_PREF, true);
+        editor.apply();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(DrawerActivity.FOREGROUND_PREF, false);
+        editor.putString(LEGEND_PREF,msg);
+        editor.apply();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("legend",msg);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        msg = savedInstanceState.getString("legend");
         text.setText(msg);
-
     }
 
     @Override
@@ -121,7 +171,6 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                 text.setVisibility(View.GONE);
                 break;
         }
-
     }
 
     private void showAlertDialog() {
@@ -170,9 +219,21 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
     }
 
     public void openDrawerActivity(){
-        Intent intent = new Intent(this, DrawerActivity.class);
-        startActivity(intent);
-        finish();
+
+        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor sharedEditor = sharedPrefs.edit();
+        sharedEditor.putBoolean(DrawerActivity.SOUND_PREF, true);
+        sharedEditor.putBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, true);
+        sharedEditor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
+        sharedEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
+        sharedEditor.apply();
+
+       if (sharedPrefs.getBoolean(DrawerActivity.FOREGROUND_PREF, false)){
+           Intent intent = new Intent(this, DrawerActivity.class);
+           startActivity(intent);
+           finish();
+       };
     }
 
     @Override

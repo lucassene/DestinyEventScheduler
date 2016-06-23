@@ -1,25 +1,41 @@
 package com.destiny.event.scheduler.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.data.LoggedUserTable;
+import com.destiny.event.scheduler.dialogs.MyAlertDialog;
+import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.services.BungieService;
+import com.destiny.event.scheduler.services.RequestResultReceiver;
+import com.destiny.event.scheduler.utils.CookiesUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
-public class LoginActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+import java.util.Calendar;
 
+public class LoginActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, RequestResultReceiver.Receiver, FromDialogListener {
+
+    private static final String TAG = "LoginActivity";
     private static final int URL_LOADER_USER = 30;
 
     private static final String PSN_URL = "http://www.bungie.net/en/User/SignIn/Psnid";
@@ -31,11 +47,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     Button psnButton;
     Button liveButton;
     TextView loginTitle;
+    ProgressBar progressBar;
 
     private String bungieId;
     private String userName;
 
     private String selectedPlatform;
+
+    RequestResultReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +66,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         psnButton = (Button) findViewById(R.id.btn_psn);
         liveButton = (Button) findViewById(R.id.btn_live);
         loginTitle = (TextView) findViewById(R.id.login_title);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         loginTitle.setVisibility(View.GONE);
         psnButton.setVisibility(View.GONE);
@@ -54,6 +74,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
         getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isBungieServiceRunning()){
+            Intent intent = new Intent(this, PrepareActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    public boolean isBungieServiceRunning() {
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        boolean var = sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
+        //Log.w(TAG, "BungieService running? " +  var);
+        return var;
     }
 
     public void callWebView(View v) {
@@ -82,7 +119,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 String cookies = data.getStringExtra("cookies");
                 String xcsrf = data.getStringExtra("x-csrf");
                 Intent intent = new Intent(this, PrepareActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("cookies",cookies);
                 intent.putExtra("x-csrf",xcsrf);
                 intent.putExtra("platform",selectedPlatform);
@@ -102,7 +139,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
         switch (id) {
             case URL_LOADER_USER:
-                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_MEMBERSHIP, LoggedUserTable.COLUMN_NAME};
+                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_MEMBERSHIP, LoggedUserTable.COLUMN_NAME, LoggedUserTable.COLUMN_PLATFORM};
                 return new CursorLoader(
                         this,
                         DataProvider.LOGGED_USER_URI,
@@ -124,12 +161,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                     if (data.getCount() > 0) {
                         bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
                         userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
-                        Intent intent = new Intent(this, DrawerActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra("bungieId",bungieId);
-                        intent.putExtra("userName",userName);
-                        startActivity(intent);
-                        finish();
+                        String platform = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
+                        isClanMember(bungieId, platform);
                     }
                     break;
             }
@@ -139,12 +172,95 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
             liveButton.setVisibility(View.VISIBLE);
         }
 
+    }
 
+    private void isClanMember(String bungieId, String platform) {
+
+        if (mReceiver == null){
+            mReceiver = new RequestResultReceiver(new Handler());
+            mReceiver.setReceiver(this);
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
+            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.GET_BUNGIE_ACCOUNT);
+            intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
+            intent.putExtra(BungieService.MEMBERSHIP_EXTRA, bungieId);
+            intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
+            startService(intent);
+        }
 
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        switch (resultCode){
+            case BungieService.STATUS_RUNNING:
+                progressBar.setVisibility(View.VISIBLE);
+                break;
+            case BungieService.STATUS_ERROR:
+                Log.w(TAG, "Erro ao receber dados do getBungieAccount: " + resultData.getInt(BungieService.ERROR_TAG));
+                progressBar.setVisibility(View.GONE);
+                showAlertDialog();
+                break;
+            default:
+                progressBar.setVisibility(View.GONE);
+                Intent intent = new Intent(this, DrawerActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("bungieId",bungieId);
+                intent.putExtra("userName",userName);
+                startActivity(intent);
+                finish();
+                break;
+        }
+    }
+
+    private void showAlertDialog() {
+        DialogFragment dialog = new MyAlertDialog();
+        Bundle bundle = new Bundle();
+        bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
+        bundle.putString("title",getString(R.string.no_clan_title));
+        bundle.putString("msg",getString(R.string.no_clan_login_msg));
+        bundle.putString("posButton", getString(R.string.got_it));
+        dialog.setArguments(bundle);
+        dialog.show(getSupportFragmentManager(),"alert");
+    }
+
+    @Override
+    public void onPositiveClick(String input, int type) {
+        CookiesUtils.clearCookies();
+        DBHelper database = new DBHelper(getApplicationContext());
+        SQLiteDatabase db = database.getWritableDatabase();
+        database.onUpgrade(db, 0, 0);
+        loginTitle.setVisibility(View.VISIBLE);
+        psnButton.setVisibility(View.VISIBLE);
+        liveButton.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDateSent(Calendar date) {
 
     }
+
+    @Override
+    public void onTimeSent(int hour, int minute) {
+
+    }
+
+    @Override
+    public void onLogoff() {
+
+    }
+
+    @Override
+    public void onItemSelected(String entry, int value) {
+
+    }
+
+    @Override
+    public void onMultiItemSelected(boolean[] items) {
+
+    }
+
 }

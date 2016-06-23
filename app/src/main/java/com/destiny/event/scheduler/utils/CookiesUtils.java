@@ -1,10 +1,13 @@
 package com.destiny.event.scheduler.utils;
 
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.webkit.CookieManager;
 
 public final class CookiesUtils {
+
+    private static final String TAG = "CookiesUtils";
 
     public static final String DESTINY_CSRF = "bungled";
 
@@ -14,8 +17,19 @@ public final class CookiesUtils {
 
     public static String getCookies(String siteUrl){
         CookieManager cookieManager = CookieManager.getInstance();
-        Log.w("CookieUtils", "Cookie: " + cookieManager.getCookie(siteUrl));
+        //Log.w("CookieUtils", "Cookie: " + cookieManager.getCookie(siteUrl));
         return cookieManager.getCookie(siteUrl);
+    }
+
+    public static void clearCookies(){
+        Log.w(TAG, "Clearing cookies...");
+        CookieManager cookieManager = CookieManager.getInstance();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            cookieManager.removeAllCookies(null);
+            cookieManager.flush();
+        } else {
+            cookieManager.removeAllCookie();
+        }
     }
 
     @Nullable

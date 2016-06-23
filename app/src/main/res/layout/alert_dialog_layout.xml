@@ -17,7 +17,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:text="Here comes the title!"
             android:textColor="@color/psnColor"/>
 
         <View
@@ -38,7 +37,6 @@
             android:id="@+id/alert_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Here comes the message..."
             android:paddingBottom="24dp"
             android:alpha="0.75"/>
 

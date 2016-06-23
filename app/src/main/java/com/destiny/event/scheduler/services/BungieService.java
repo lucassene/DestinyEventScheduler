@@ -3,13 +3,16 @@ package com.destiny.event.scheduler.services;
 
 import android.app.IntentService;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.destiny.event.scheduler.BuildConfig;
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.GameTable;
@@ -69,6 +72,7 @@ public class BungieService extends IntentService {
     public static final String RECEIVER_EXTRA = "receiver";
     public static final String XCSRF_EXTRA = "x-csrf";
     public static final String PLATFORM_EXTRA = "platform";
+    public static final String MEMBERSHIP_EXTRA = "membershipId";
 
     private static final String KEY_HEADER = "x-api-key";
     private static final String COOKIE_HEADER = "cookie";
@@ -108,10 +112,11 @@ public class BungieService extends IntentService {
     private static final String TAG = "BungieService";
 
     private String cookie;
-    private String request;
     private String xcsrf;
 
     private String getCurrentBungieAccountResponse;
+
+    public static final String RUNNING_SERVICE = "bungieRunning";
 
     public BungieService() {
         super(BungieService.class.getName());
@@ -120,12 +125,13 @@ public class BungieService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        Log.d(TAG, "HTTP Service started!");
+        //Log.d(TAG, "HTTP Service started!");
 
-        cookie = intent.getStringExtra(COOKIE_EXTRA);
-        request = intent.getStringExtra(REQUEST_EXTRA);
-        xcsrf = intent.getStringExtra(XCSRF_EXTRA);
-        platformId = intent.getStringExtra(PLATFORM_EXTRA);
+        String request = intent.getStringExtra(REQUEST_EXTRA);
+        if (intent.hasExtra(COOKIE_EXTRA)) cookie = intent.getStringExtra(COOKIE_EXTRA);
+        if (intent.hasExtra(XCSRF_EXTRA)) xcsrf = intent.getStringExtra(XCSRF_EXTRA);
+        if (intent.hasExtra(PLATFORM_EXTRA)) platformId = intent.getStringExtra(PLATFORM_EXTRA);
+        if (intent.hasExtra(MEMBERSHIP_EXTRA)) membershipId = intent.getStringExtra(MEMBERSHIP_EXTRA);
 
         membersModelList = new ArrayList<>();
         iconsList = new ArrayList<>();
@@ -153,10 +159,10 @@ public class BungieService extends IntentService {
                             error = parseBungieAccount(receiver);
                             Log.w(TAG, "parseBungieAccount error: " + error);
                             if (error == NO_ERROR){
-                                insertLoggedUser();
                                 insertClan();
                                 insertClanMembers();
                                 insertFakeEvents(receiver);
+                                insertLoggedUser();
                                 receiver.send(STATUS_FINISHED, Bundle.EMPTY);
                             } else {
                                 sendError(receiver);
@@ -165,9 +171,96 @@ public class BungieService extends IntentService {
                     }
                 }
                 break;
+            case GET_BUNGIE_ACCOUNT:
+                receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+                error = isClanMember(membershipId, platformId);
+                if (error != NO_ERROR){
+                    sendError(receiver);
+                } else {
+                    receiver.send(STATUS_FINISHED, Bundle.EMPTY);
+                }
         }
 
         this.stopSelf();
+
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(RUNNING_SERVICE, true);
+        editor.apply();
+        Log.w(TAG, "Service running!");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(RUNNING_SERVICE, false);
+        editor.apply();
+        Log.w(TAG, "Service destroyed!");
+    }
+
+    private int isClanMember(String membershipId, String platformId) {
+
+        String myURL = BASE_URL + USER_PREFIX + GET_BUNGIE_ACCOUNT + membershipId + "/" + platformId + "/";
+
+        try {
+
+            if (NetworkUtils.checkConnection(getApplicationContext())){
+
+                URL url = new URL(myURL);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
+                urlConnection.setRequestMethod(GET_METHOD);
+
+                int statusCode = urlConnection.getResponseCode();
+
+                if (statusCode == 200){
+                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                    String response = convertInputStreamToString(inputStream);
+
+                    if (response != null){
+
+                        JSONObject jObject = new JSONObject(response);
+                        JSONObject jResponse = jObject.getJSONObject("Response");
+
+                        try {
+                            JSONArray jClans = jResponse.getJSONArray("clans");
+                            JSONObject clanObj = jClans.getJSONObject(0);
+                            clanId = clanObj.getString("groupId");
+                            //Log.w(TAG,"Clan ID: " + clanId);
+                            return NO_ERROR;
+                        } catch (JSONException e){
+                            Log.w(TAG, "Erro no JSON do getBungieAccount (clans Tag)");
+                            e.printStackTrace();
+                            return ERROR_NO_CLAN;
+                        }
+
+                    } else {
+                        Log.w(TAG, "Response vazia");
+                        return ERROR_CLAN_MEMBER;
+                    }
+
+                } else {
+                    Log.w(TAG, "Response Code do JSON diferente de 200");
+                    return ERROR_RESPONSE_CODE;
+                }
+            } else {
+                Log.w(TAG, "Sem conexão com a Internet");
+                return ERROR_NO_CONNECTION;
+            }
+
+        }catch (Exception e) {
+            Log.w(TAG, "Problema no HTTP Request (getBungieAccount)");
+            e.printStackTrace();
+            return ERROR_HTTP_REQUEST;
+        }
 
     }
 
@@ -201,10 +294,10 @@ public class BungieService extends IntentService {
                 if (statusCode == 200) {
                     InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     getCurrentBungieAccountResponse = convertInputStreamToString(inputStream);
-                    Log.w(TAG, "API Key: " + BuildConfig.API_KEY);
-                    Log.w(TAG, "X-CSRF: " + xcsrf);
-                    Log.w(TAG, "Cookies: " + cookie);
-                    Log.w(TAG, "getCurrentBungieAccount JSON unparsed: " + getCurrentBungieAccountResponse);
+                    //Log.w(TAG, "API Key: " + BuildConfig.API_KEY);
+                    //Log.w(TAG, "X-CSRF: " + xcsrf);
+                    //Log.w(TAG, "Cookies: " + cookie);
+                    //Log.w(TAG, "getCurrentBungieAccount JSON unparsed: " + getCurrentBungieAccountResponse);
 
                     if (getCurrentBungieAccountResponse != null) {
                         return NO_ERROR;
@@ -346,7 +439,7 @@ public class BungieService extends IntentService {
 
     private int parseMembersOfClan(ResultReceiver receiver, String response){
 
-        Log.w(TAG, "getMembersOfClan JSON unparsed :" + response);
+        //Log.w(TAG, "getMembersOfClan JSON unparsed :" + response);
 
         try{
             JSONObject jObject = new JSONObject(response);
@@ -420,7 +513,7 @@ public class BungieService extends IntentService {
                     InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     String response = convertInputStreamToString(inputStream);
 
-                    Log.w(TAG, "getClanMemberAccount JSON unparsed: " + response);
+                    //Log.w(TAG, "getClanMemberAccount JSON unparsed: " + response);
 
                     if (response != null){
                         bundle.clear();
@@ -491,7 +584,7 @@ public class BungieService extends IntentService {
                 jBungieNetUser = jResponse.getJSONObject("bungieNetUser");
                 memberIconPath = jBungieNetUser.getString("profilePicturePath");
             } catch (JSONException e){
-                Log.w(TAG, "bungieNetUser TAG not found.");
+                //Log.w(TAG, "bungieNetUser TAG not found.");
             }
 
             JSONObject jO = jDestinyAccounts.getJSONObject(0);
@@ -575,7 +668,7 @@ public class BungieService extends IntentService {
             memberIdList.add(membersModelList.get(i).getMembershipId());
         }
 
-        Log.w(TAG, "Iniciando TitleService...");
+        //Log.w(TAG, "Iniciando TitleService...");
         Intent intent = new Intent(getApplicationContext(),TitleService.class);
         intent.putStringArrayListExtra("membershipList",memberIdList);
         startService(intent);

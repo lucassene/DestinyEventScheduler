@@ -137,29 +137,29 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             gameStatus = bundle.getString("status");
         }
 
-         if (gameStatus != null) {
-             switch (gameStatus){
-                 case GameTable.STATUS_NEW:
-                     joinButton.setText(R.string.join);
-                     break;
-                 case GameTable.STATUS_SCHEDULED:
-                     if (creator.equals(callback.getBungieId())){
-                         joinButton.setText(R.string.delete);
-                     } else joinButton.setText(getContext().getResources().getString(R.string.leave));
-                     break;
-                 case GameTable.STATUS_WAITING:
-                     if (creator.equals(callback.getBungieId())){
-                         joinButton.setText(R.string.validate);
-                     } else {
-                         joinButton.setText(R.string.waiting_validation);
-                         joinButton.setEnabled(false);
-                     }
-                     break;
-                 case GameTable.STATUS_VALIDATED:
-                     joinButton.setText(R.string.evaluate);
-                     break;
-             };
-         }
+        if (gameStatus != null) {
+            switch (gameStatus){
+                case GameTable.STATUS_NEW:
+                    joinButton.setText(R.string.join);
+                    break;
+                case GameTable.STATUS_SCHEDULED:
+                    if (creator.equals(callback.getBungieId())){
+                        joinButton.setText(R.string.delete);
+                    } else joinButton.setText(getContext().getResources().getString(R.string.leave));
+                    break;
+                case GameTable.STATUS_WAITING:
+                    if (creator.equals(callback.getBungieId())){
+                        joinButton.setText(R.string.validate);
+                    } else {
+                        joinButton.setText(R.string.waiting_validation);
+                        joinButton.setEnabled(false);
+                    }
+                    break;
+                case GameTable.STATUS_VALIDATED:
+                    joinButton.setText(R.string.evaluate);
+                    break;
+            };
+        }
 
         if (origin.equals(SearchFragment.TAG) || origin.equals(MyEventsFragment.TAG) || origin.equals(HistoryListFragment.TAG)){
             callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
@@ -376,8 +376,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                         getContext(),
                         DataProvider.GAME_URI,
                         gameProjection,
-                        GameTable.getQualifiedColumn(GameTable.COLUMN_ID)+ "=?",
-                        selectionArgs,
+                        GameTable.getQualifiedColumn(GameTable.COLUMN_ID)+ "=" + gameId + " AND(" + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_NEW + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED + ")",
+                        null,
                         null
                 );
             case LOADER_ENTRY_MEMBERS:
@@ -407,9 +407,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
+        int onCloseDemanded = 0;
+
         if (data != null && data.moveToFirst()){
             switch (loader.getId()){
                 case LOADER_GAME:
+                    //Log.w(TAG, "LOADER GAME Cursor: " + DatabaseUtils.dumpCursorToString(data));
                     eventIcon.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", getContext().getPackageName() ));
 
                     gameEventName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", getContext().getPackageName()));
@@ -421,7 +424,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
                     String gameTime = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME));
                     eventCalendar = DateUtils.stringToDate(gameTime);
-                    Log.w(TAG, "Game Calendar: " + eventCalendar.getTime());
+                    //Log.w(TAG, "Game Calendar: " + eventCalendar.getTime());
                     date.setText(DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
                     time.setText(DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
                     light.setText(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_LIGHT)));
@@ -446,6 +449,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     //Log.w(TAG, "Entry Cursor: " + DatabaseUtils.dumpCursorToString(data));
                     break;
             }
+        } else {
+            if (loader.getId() == LOADER_GAME){
+                Log.w(TAG, "Closing DetailFragment");
+                onCloseDemanded = 1;
+            }
+            //callback.closeFragment();
         }
 
         if (loader.getId() == LOADER_NOTIFICATION){
@@ -462,21 +471,25 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     break;
                 case DELETE_NOTIFICATION:
                     if (data!= null && data.getCount()>0){
-                        String notificationId = data.getString(data.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
-                        String notificationTime = data.getString(data.getColumnIndexOrThrow(NotificationTable.COLUMN_TIME));
-                        Uri uri = Uri.parse(DataProvider.NOTIFICATION_URI + "/" + notificationId);
-                        int deletedRow = getContext().getContentResolver().delete(uri, null, null);
-                        Log.w(TAG, "NotificationID deleted: " + String.valueOf(deletedRow));
-                        int requestId = Integer.parseInt(notificationId);
-                        callback.cancelAlarmTask(requestId);
+                        for (int i=0;i<data.getCount();i++){
+                            String notificationId = data.getString(data.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
+                            Uri uri = Uri.parse(DataProvider.NOTIFICATION_URI + "/" + notificationId);
+                            int deletedRow = getContext().getContentResolver().delete(uri, null, null);
+                            Log.w(TAG, "NotificationID deleted: " + String.valueOf(deletedRow));
+                            int requestId = Integer.parseInt(notificationId);
+                            callback.cancelAlarmTask(requestId);
+                            data.moveToNext();
+                        }
                     } else Log.w(TAG,"There is no Notification to be deleted!");
                     break;
             }
 
+            onCloseDemanded = 1;
+
         }
 
         callback.onDataLoaded();
-        checkIfCloses(loader.getId());
+        checkIfCloses(onCloseDemanded);
 
     }
 
@@ -491,15 +504,15 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         return notifyTime;
     }
 
-    private void checkIfCloses(int loaderId) {
-        if (loaderId == LOADER_NOTIFICATION){
+    private void checkIfCloses(final int onCloseDemanded) {
+        if (onCloseDemanded == 1){
             Handler handler = new Handler(){
                 @Override
                 public void handleMessage(Message msg){
-                    if (msg.what == LOADER_NOTIFICATION) callback.closeFragment();
+                    if (msg.what == 1) callback.closeFragment();
                 }
             };
-            handler.sendEmptyMessage(LOADER_NOTIFICATION);
+            handler.sendEmptyMessage(onCloseDemanded);
         }
     }
 
@@ -528,21 +541,68 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private void setAlarmNotification(Calendar notifyTime, String gameId, String title, String typeName, int typeIcon) {
 
-        ContentValues values = new ContentValues();
-        values.put(NotificationTable.COLUMN_GAME, gameId);
-        values.put(NotificationTable.COLUMN_EVENT, title);
-        values.put(NotificationTable.COLUMN_TYPE, typeName);
-        values.put(NotificationTable.COLUMN_ICON, typeIcon);
-        values.put(NotificationTable.COLUMN_TIME, notifyTime.getTimeInMillis());
+        Uri firstUri = null;
+        Uri secondUri = null;
 
-        Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+        if (notifyTime.getTimeInMillis() == eventCalendar.getTimeInMillis()){
+            ContentValues values = new ContentValues();
+            values.put(NotificationTable.COLUMN_GAME, gameId);
+            values.put(NotificationTable.COLUMN_EVENT, title);
+            values.put(NotificationTable.COLUMN_TYPE, typeName);
+            values.put(NotificationTable.COLUMN_ICON, typeIcon);
+            values.put(NotificationTable.COLUMN_TIME, notifyTime.getTimeInMillis());
 
-        if (uri == null){
+            firstUri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+            secondUri = firstUri;
+            values.clear();
+        } else {
+            Calendar now = Calendar.getInstance();
+            now.set(Calendar.SECOND, 0);
+            now.set(Calendar.MILLISECOND, 0);
+            //Log.w(TAG, "Now: " + now.getTimeInMillis() + " / notifyTime: " + notifyTime.getTimeInMillis() );
+            if (now.getTimeInMillis() < notifyTime.getTimeInMillis()){
+                //Log.w(TAG, "Agora é antes do tempo de Notificação");
+                ContentValues values = new ContentValues();
+                values.put(NotificationTable.COLUMN_GAME, gameId);
+                values.put(NotificationTable.COLUMN_EVENT, title);
+                values.put(NotificationTable.COLUMN_TYPE, typeName);
+                values.put(NotificationTable.COLUMN_ICON, typeIcon);
+                values.put(NotificationTable.COLUMN_TIME, notifyTime.getTimeInMillis());
+
+                firstUri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+
+                if (firstUri != null) {
+                    values.clear();
+                    values.put(NotificationTable.COLUMN_GAME, gameId);
+                    values.put(NotificationTable.COLUMN_EVENT, title);
+                    values.put(NotificationTable.COLUMN_TYPE, typeName);
+                    values.put(NotificationTable.COLUMN_ICON, typeIcon);
+                    values.put(NotificationTable.COLUMN_TIME, eventCalendar.getTimeInMillis());
+
+                    secondUri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+                    values.clear();
+                }
+            } else {
+                //Log.w(TAG, "Agora é depois do tempo de Notificação");
+                ContentValues values = new ContentValues();
+                values.put(NotificationTable.COLUMN_GAME, gameId);
+                values.put(NotificationTable.COLUMN_EVENT, title);
+                values.put(NotificationTable.COLUMN_TYPE, typeName);
+                values.put(NotificationTable.COLUMN_ICON, typeIcon);
+                values.put(NotificationTable.COLUMN_TIME, eventCalendar.getTimeInMillis());
+
+                secondUri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+                firstUri = secondUri;
+                values.clear();
+            }
+        }
+
+        if (firstUri == null || secondUri == null){
             Log.w(TAG, "Notificação não foi criada");
         } else {
-            int id = Integer.parseInt(uri.getLastPathSegment());
-            values.clear();
-            callback.registerAlarmTask(notifyTime, id);
+            int firstId = Integer.parseInt(firstUri.getLastPathSegment());
+            int secondId = Integer.parseInt(secondUri.getLastPathSegment());
+            callback.registerAlarmTask(notifyTime, firstId, eventCalendar, secondId);
         }
 
     }

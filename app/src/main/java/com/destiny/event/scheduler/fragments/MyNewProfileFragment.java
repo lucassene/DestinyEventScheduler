@@ -28,6 +28,7 @@ import com.destiny.event.scheduler.adapters.ChartLegendAdapter;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
+import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.models.ChartLegendModel;
@@ -224,7 +225,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                         getContext(),
                         DataProvider.ENTRY_PROFILE_URI,
                         getProfileProjection(),
-                        EntryTable.COLUMN_MEMBERSHIP + "=" + memberId,
+                        EntryTable.COLUMN_MEMBERSHIP + "=" + memberId + " AND(" + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED + ")",
                         null,
                         "type_total DESC"
                 );
@@ -233,7 +234,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                         getContext(),
                         DataProvider.ENTRY_FAVORITE_URI,
                         getFavoriteProjection(),
-                        EntryTable.COLUMN_MEMBERSHIP + "=" + memberId,
+                        EntryTable.COLUMN_MEMBERSHIP + "=" + memberId + " AND(" + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED + ")",
                         null,
                         "total DESC"
                 );

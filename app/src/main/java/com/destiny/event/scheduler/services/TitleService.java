@@ -11,6 +11,7 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
+import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.TitleTable;
 import com.destiny.event.scheduler.provider.DataProvider;
@@ -32,7 +33,7 @@ public class TitleService extends IntentService {
         Bundle bundle = intent.getExtras();
         int xp;
         int lvl = 0;
-        int eventId;
+        int eventId = 0;
 
         Log.w(TAG, "Title service started!");
 
@@ -42,20 +43,34 @@ public class TitleService extends IntentService {
             //Log.w(TAG, "membershipList is not null");
             for (int i=0;i<membershipList.size();i++){
 
-                Cursor xpCursor = getContentResolver().query(DataProvider.MEMBER_URI, MemberTable.ALL_COLUMNS, MemberTable.COLUMN_MEMBERSHIP + "=" + membershipList.get(i), null, null);
-                if (xpCursor != null && xpCursor.moveToFirst()){
-                    xp = xpCursor.getInt(xpCursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
-                    lvl = MemberTable.getMemberLevel(xp);
-                    xpCursor.close();
+                Cursor xpCursor = null;
+
+                try{
+                    xpCursor = getContentResolver().query(DataProvider.MEMBER_URI, MemberTable.ALL_COLUMNS, MemberTable.COLUMN_MEMBERSHIP + "=" + membershipList.get(i), null, null);
+                    if (xpCursor != null && xpCursor.moveToFirst()){
+                        xp = xpCursor.getInt(xpCursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
+                        lvl = MemberTable.getMemberLevel(xp);
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                } finally {
+                    if (xpCursor != null) xpCursor.close();
                 }
 
-                Cursor favCursor = getContentResolver().query(DataProvider.ENTRY_FAVORITE_URI, getFavoriteProjection(), EntryTable.COLUMN_MEMBERSHIP + "=" + membershipList.get(i), null, "total DESC");
-                if (favCursor != null && favCursor.moveToFirst()){
-                    if (favCursor.getCount() == 0){
-                        eventId = 999;
-                    } else eventId = favCursor.getInt(favCursor.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_ID)));
-                    favCursor.close();
-                } else eventId = 999;
+                Cursor favCursor = null;
+
+                try{
+                    favCursor = getContentResolver().query(DataProvider.ENTRY_FAVORITE_URI, getFavoriteProjection(), EntryTable.COLUMN_MEMBERSHIP + "=" + membershipList.get(i) + " AND(" + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED + ")", null, "total DESC");
+                    if (favCursor != null && favCursor.moveToFirst()){
+                        if (favCursor.getCount() == 0){
+                            eventId = 999;
+                        } else eventId = favCursor.getInt(favCursor.getColumnIndexOrThrow(EventTable.getQualifiedColumn(EventTable.COLUMN_ID)));
+                    } else eventId = 999;
+                } catch (Exception e){
+                    e.printStackTrace();
+                } finally {
+                    if (favCursor != null) favCursor.close();
+                }
 
                 //Log.w(TAG, memberName + " fav event: " + eventId);
 
@@ -94,11 +109,18 @@ public class TitleService extends IntentService {
         String newTitle = "";
 
         if (eventId != 999){
-            Cursor titleCursor = getContentResolver().query(DataProvider.TITLE_URI, TitleTable.ALL_COLUMNS, TitleTable.COLUMN_EVENT + "=" + eventId, null, null);
-            if (titleCursor != null && titleCursor.moveToFirst()){
-                type = titleCursor.getInt(titleCursor.getColumnIndexOrThrow(TitleTable.COLUMN_ORDER));
-                titleIndex = titleCursor.getInt(titleCursor.getColumnIndexOrThrow(TitleTable.COLUMN_TITLE));
-                titleCursor.close();
+            Cursor titleCursor = null;
+
+            try{
+                titleCursor = getContentResolver().query(DataProvider.TITLE_URI, TitleTable.ALL_COLUMNS, TitleTable.COLUMN_EVENT + "=" + eventId, null, null);
+                if (titleCursor != null && titleCursor.moveToFirst()){
+                    type = titleCursor.getInt(titleCursor.getColumnIndexOrThrow(TitleTable.COLUMN_ORDER));
+                    titleIndex = titleCursor.getInt(titleCursor.getColumnIndexOrThrow(TitleTable.COLUMN_TITLE));
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            } finally {
+                if (titleCursor != null) titleCursor.close();
             }
 
             if (lvl<=25){

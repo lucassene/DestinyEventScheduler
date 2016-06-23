@@ -136,4 +136,6 @@ public class MyAlertDialog extends DialogFragment {
             Log.e(TAG, "State loss Exception");
         }
     }
+
+
 }

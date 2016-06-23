@@ -581,6 +581,10 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void setAlarmNotification(Calendar notifyTime, String gameId, String title, String typeName, int typeIcon) {
 
+        Uri firstUri;
+        Uri secondUri = null;
+
+        if (notifyTime.getTimeInMillis() == insertedDate.getTimeInMillis()){
             ContentValues values = new ContentValues();
             values.put(NotificationTable.COLUMN_GAME, gameId);
             values.put(NotificationTable.COLUMN_EVENT, title);
@@ -588,15 +592,41 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             values.put(NotificationTable.COLUMN_ICON, typeIcon);
             values.put(NotificationTable.COLUMN_TIME, notifyTime.getTimeInMillis());
 
-            Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+            firstUri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+            secondUri = firstUri;
+            values.clear();
+        } else {
 
-            if (uri == null){
-                Log.w(TAG, "Notificação não foi inserida");
-            } else {
-                int id = Integer.parseInt(uri.getLastPathSegment());
+            ContentValues values = new ContentValues();
+            values.put(NotificationTable.COLUMN_GAME, gameId);
+            values.put(NotificationTable.COLUMN_EVENT, title);
+            values.put(NotificationTable.COLUMN_TYPE, typeName);
+            values.put(NotificationTable.COLUMN_ICON, typeIcon);
+            values.put(NotificationTable.COLUMN_TIME, notifyTime.getTimeInMillis());
+
+            firstUri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+
+            if (firstUri != null) {
                 values.clear();
-                callback.registerAlarmTask(notifyTime, id);
+                values.put(NotificationTable.COLUMN_GAME, gameId);
+                values.put(NotificationTable.COLUMN_EVENT, title);
+                values.put(NotificationTable.COLUMN_TYPE, typeName);
+                values.put(NotificationTable.COLUMN_ICON, typeIcon);
+                values.put(NotificationTable.COLUMN_TIME, insertedDate.getTimeInMillis());
+
+                secondUri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+                values.clear();
             }
+
+        }
+
+        if (firstUri == null || secondUri == null){
+            Log.w(TAG, "Notificação não foi criada");
+        } else {
+            int firstId = Integer.parseInt(firstUri.getLastPathSegment());
+            int secondId = Integer.parseInt(secondUri.getLastPathSegment());
+            callback.registerAlarmTask(notifyTime, firstId, insertedDate, secondId);
+        }
 
     }
 

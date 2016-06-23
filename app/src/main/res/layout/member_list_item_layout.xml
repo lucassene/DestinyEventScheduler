@@ -8,7 +8,6 @@
         android:id="@+id/profile_pic"
         android:layout_width="59dp"
         android:layout_height="match_parent"
-        android:src="@drawable/default_profile_img"
         android:scaleType="fitStart"
         android:layout_margin="5dp"
         android:layout_marginLeft="8dp"/>
@@ -26,7 +25,6 @@
             android:id="@+id/primary_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Primary Text"
             android:textStyle="bold"
             android:textAppearance="?android:textAppearanceMedium"/>
 
@@ -34,7 +32,6 @@
             android:id="@+id/secondary_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="99/99/9999"
             android:textSize="@dimen/secondaryTextSize"
             android:alpha="0.75"/>
 
@@ -52,7 +49,6 @@
             android:id="@+id/text_points"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="99"
             android:textSize="46sp"
             android:layout_gravity="center_horizontal"
             android:textColor="@color/colorPrimary"/>

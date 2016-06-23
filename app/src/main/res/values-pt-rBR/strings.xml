@@ -361,5 +361,7 @@
     <string name="error_bungie_auth">Erro na autenticação na Bungie. Por favor encerre o app e tente novamente.</string>
     <string name="confirm_evaluation">Confirmar avaliação?</string>
     <string name="no_evaluation">Nenhum guardião foi avaliado, confirmar?</string>
+    <string name="no_clan_title">Você saiu do clã?</string>
+    <string name="no_clan_login_msg">Por favor verifique se você ainda está no clã através do site da bungie.net.</string>
 
 </resources>

@@ -120,7 +120,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
     private void getScheduledEvents() {
         prepareStrings();
-        getLoaderManager().restartLoader(LOADER_ENTRY, null, this);
+        initEntryLoader();
         adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_ENTRY);
 
         if (headerView != null){
@@ -158,6 +158,13 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
         from = new String[] {c17, c16, c5, c6, c6, c8, c18, c14};
 
+    }
+
+    private void initEntryLoader(){
+        if (getLoaderManager().getLoader(LOADER_ENTRY) != null){
+            getLoaderManager().destroyLoader(LOADER_ENTRY);
+        }
+        getLoaderManager().restartLoader(LOADER_ENTRY, null, this);
     }
 
 
@@ -223,8 +230,8 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
     @Override
     public void onRefreshData() {
-        callback.onLoadingData();
-        getLoaderManager().restartLoader(LOADER_ENTRY, null, this);
+        Log.w(TAG, "Refreshing Scheduled data!");
+        initEntryLoader();
     }
 
     @Override

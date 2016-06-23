@@ -11,7 +11,6 @@
         android:id="@+id/profile_pic"
         android:layout_width="59dp"
         android:layout_height="match_parent"
-        android:src="@drawable/default_profile_img"
         android:scaleType="fitStart"
         android:layout_margin="6dp"
         android:layout_marginLeft="8dp"
@@ -36,7 +35,6 @@
                 android:id="@+id/primary_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Primary Text"
                 android:textStyle="bold"
                 android:textAppearance="?android:textAppearanceMedium" />
 
@@ -44,14 +42,12 @@
                 android:id="@+id/secondary_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="99/99/9999"
                 android:textSize="@dimen/secondaryTextSize"/>
 
             <TextView
                 android:id="@+id/txt_xp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+ 60 XP"
                 android:alpha="0.40"/>
 
         </LinearLayout>
@@ -74,7 +70,6 @@
                     android:id="@+id/txt_likes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="4"
                     android:textSize="16sp"
                     android:padding="4dp"/>
 
@@ -96,7 +91,6 @@
                     android:id="@+id/txt_dislikes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1"
                     android:textSize="16sp"
                     android:padding="4dp"/>
 

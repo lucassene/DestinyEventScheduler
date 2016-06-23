@@ -15,7 +15,6 @@
         android:id="@+id/clan_banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/default_clan_banner"
         android:adjustViewBounds="false"
         android:scaleType="centerCrop"/>
 
@@ -33,7 +32,6 @@
             android:id="@+id/clan_logo"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@drawable/img_default_clan"
             android:adjustViewBounds="true"
             android:layout_gravity="center_vertical" />
 
@@ -50,7 +48,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/def_clan_header"
                 android:textStyle="bold"
                 android:textColor="@color/primary_text_material_light" />
 
@@ -58,7 +55,6 @@
                 android:id="@+id/clan_desc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/def_clan_desc"
                 android:textColor="@color/primary_text_material_light"
  />
 

@@ -8,6 +8,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,7 +110,7 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
     private void getEvents() {
 
         prepareStrings();
-        getLoaderManager().restartLoader(LOADER_GAME, null, this);
+        initGameLoader();
         adapter = new CustomCursorAdapter(getContext(), R.layout.done_game_item, null, from, to, 0, LOADER_GAME);
 
         if (headerView != null){
@@ -118,6 +119,13 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
 
         setListAdapter(adapter);
 
+    }
+
+    private void initGameLoader(){
+        if (getLoaderManager().getLoader(LOADER_GAME) != null){
+            getLoaderManager().destroyLoader(LOADER_GAME);
+        }
+        getLoaderManager().restartLoader(LOADER_GAME, null, this);
     }
 
     @Override
@@ -155,8 +163,8 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
 
     @Override
     public void onRefreshData() {
-        callback.onLoadingData();
-        getLoaderManager().restartLoader(LOADER_GAME, null, this);
+        initGameLoader();
+        Log.w(TAG, "Refreshing Validate data!");
     }
 
     @Override

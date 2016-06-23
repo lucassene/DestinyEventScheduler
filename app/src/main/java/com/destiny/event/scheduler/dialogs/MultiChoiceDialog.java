@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
@@ -77,6 +76,6 @@ public class MultiChoiceDialog extends DialogFragment implements DialogInterface
             } else falses++;
             total++;
         }
-        Toast.makeText(getContext(), "Total: " + total + " True: " + trues + " False: " + falses, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(), "Total: " + total + " True: " + trues + " False: " + falses, Toast.LENGTH_SHORT).show();
     }
 }

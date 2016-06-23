@@ -8,6 +8,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +25,11 @@ import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 
-public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>, RefreshDataListener {
 
     public static final String TAG = "SearchFragment";
 
@@ -59,6 +61,13 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         super.onAttach(context);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+        callback.registerRefreshListener(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        callback.deleteRefreshListener(this);
     }
 
     @Override
@@ -208,5 +217,16 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
+    }
+
+    @Override
+    public void onRefreshData() {
+        initGameLoader();
+        Log.w(TAG, "Refreshing Search Data!");
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this;
     }
 }

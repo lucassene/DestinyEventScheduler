@@ -8,7 +8,6 @@
         android:id="@+id/game_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_nightfall"
         android:scaleType="fitStart"
         android:layout_gravity="center_vertical"
         android:layout_centerVertical="true"
@@ -31,7 +30,6 @@
                 android:id="@+id/primary_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Primary Text"
                 android:textSize="16sp"
                 android:textColor="@color/lineColor"/>
 
@@ -39,7 +37,6 @@
                 android:id="@+id/type_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Event Type"
                 android:textSize="@dimen/secondaryTextSize" />
 
             <TextView
@@ -67,7 +64,8 @@
             android:id="@+id/status_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="8dp"/>
+            android:paddingRight="8dp"
+            android:alpha="0.75"/>
 
     </LinearLayout>
 

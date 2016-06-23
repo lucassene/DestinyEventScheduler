@@ -2,7 +2,9 @@ package com.destiny.event.scheduler.activities;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -60,6 +62,7 @@ import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.AlarmReceiver;
+import com.destiny.event.scheduler.utils.CookiesUtils;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
 import java.util.ArrayList;
@@ -80,6 +83,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String SCHEDULED_TIME_PREF = "notificationTime";
     public static final String SOUND_PREF = "scheduledNotifySound";
     public static final String NEW_NOTIFY_PREF = "allowNewNotify";
+    public static final String FOREGROUND_PREF = "isForeground";
 
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
     public static final int FRAGMENT_TYPE_WITH_BACKSTACK = 1;
@@ -168,11 +172,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             viewPager.setAdapter(null);
         }
 
-        Bundle notifyBundle = getIntent().getExtras();
-        if (notifyBundle != null && notifyBundle.containsKey("notification")){
-            refreshLists();
-        }
-
         spinnerSelections.putInt(TAG_MY_EVENTS, 0);
         spinnerSelections.putInt(TAG_SEARCH_EVENTS, 0);
 
@@ -211,7 +210,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private void refreshLists() {
 
-        if (openedFragment == null){
+        if (openedFragment == null || openedFragment instanceof SearchFragment){
             for (int i=0; i<refreshDataListenerList.size(); i++){
                 if (refreshDataListenerList.get(i).getFragment().isAdded()){
                     refreshDataListenerList.get(i).onRefreshData();
@@ -233,6 +232,35 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         //drawerToggle.syncState();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //Log.w(TAG, "Application Paused!");
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(DrawerActivity.FOREGROUND_PREF, false);
+        editor.apply();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Log.w(TAG, "Application Resumed!");
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(DrawerActivity.FOREGROUND_PREF, true);
+        editor.apply();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        //Log.w(TAG, "Método onNewIntent chamado");
+        if (refreshDataListenerList != null) {
+            refreshLists();
+        } else Log.w(TAG, "refreshDataListenerList é vazio");
     }
 
     @Override
@@ -367,7 +395,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void closeFragment() {
-        ft = fm.beginTransaction();
+        /*ft = fm.beginTransaction();
         ft.remove(openedFragment);
         ft.commit();
         fm.popBackStack();
@@ -377,7 +405,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         } else {
             openedFragment = fm.findFragmentById(R.id.content_frame);
             fragmentTag = openedFragment.getTag();
-        }
+        }*/
+        openMainActivity(null);
     }
 
     @Override
@@ -479,14 +508,27 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void registerAlarmTask(Calendar time, int requestId) {
+    public void registerAlarmTask(Calendar firstNotification, int firstId, Calendar secondNotification, int secondId) {
 
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarm.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), pIntent);
-        Log.w(TAG, "Notification scheduled to: " + time.getTime());
-        Log.w(TAG, "requestId:" + requestId);
+
+        if (firstNotification.getTimeInMillis() == secondNotification.getTimeInMillis()){
+            //Setting first Notification
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            PendingIntent pIntent = PendingIntent.getBroadcast(this, firstId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            alarm.set(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
+        } else {
+            //Setting first Notification
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            PendingIntent pIntent = PendingIntent.getBroadcast(this, firstId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            alarm.set(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
+
+            //Setting second Notification
+            Intent sIntent = new Intent(this, AlarmReceiver.class);
+            PendingIntent psIntent = PendingIntent.getBroadcast(this, secondId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
+        }
+
     }
 
     @Override
@@ -618,7 +660,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openConfigFragment(View child){
-       if (openedFragment instanceof MainSettingsFragment){
+        if (openedFragment instanceof MainSettingsFragment){
             drawerLayout.closeDrawers();
             return false;
         }
@@ -886,6 +928,16 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         DBHelper database = new DBHelper(getApplicationContext());
         SQLiteDatabase db = database.getWritableDatabase();
         database.onUpgrade(db, 0, 0);
+        db.close();
+        database.close();
+
+        CookiesUtils.clearCookies();
+
+        SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString(PrepareActivity.LEGEND_PREF,getString(R.string.vanguard_data));
+        editor.apply();
+
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();

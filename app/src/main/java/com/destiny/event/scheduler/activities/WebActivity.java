@@ -53,6 +53,8 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
         String locale = Locale.getDefault().getLanguage();
 
         destinyWebView = (DestinyWebView) findViewById(R.id.webview);
+        destinyWebView.clearUserCookies();
+        destinyWebView.clearCache(true);
         destinyWebView.setHorizontalScrollBarEnabled(true);
         destinyWebView.setListener(this);
         destinyWebView.loadLoginUrl(url);
