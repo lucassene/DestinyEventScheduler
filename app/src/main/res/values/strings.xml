@@ -421,6 +421,9 @@
     <string name="confirm_evaluation">Confirm evaluation?</string>
     <string name="no_clan_title">Have you left the clan?</string>
     <string name="no_clan_login_msg">Please make sure you are still in the clan through bungie.net website.</string>
+    <string name="match_begin">Your match will begin...</string>
+    <string name="event_begin_in">"Your event will begin in "</string>
+    <string name="minutes">" minutes"</string>
 
 
 </resources>

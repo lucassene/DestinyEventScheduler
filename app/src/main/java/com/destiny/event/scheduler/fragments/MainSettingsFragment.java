@@ -1,6 +1,7 @@
 package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
@@ -23,6 +25,7 @@ import com.destiny.event.scheduler.dialogs.MultiChoiceDialog;
 import com.destiny.event.scheduler.dialogs.SingleChoiceDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
+import com.destiny.event.scheduler.services.UpdateNotificationsService;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -50,6 +53,11 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     private boolean[] checkedItems;
 
     private int switchType;
+
+    private int previousScheduleTime;
+    private int newScheduleTime;
+
+    private boolean checkChanged;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -124,11 +132,53 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         });
 
         sharedPrefs = getActivity().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        previousScheduleTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
+        newScheduleTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
 
+        checkChanged = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
         setCheckedItems();
         updateViews();
 
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.w(TAG, "MainSettings resumed");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.w(TAG, "MainSettings destroyed");
+        updateNotifications();
+        checkChanged = false;
+    }
+
+    private void updateNotifications() {
+        Log.w(TAG, "checkChanged: " + checkChanged);
+        Log.w(TAG, "previousTime: " + previousScheduleTime + " / newTime: " + newScheduleTime);
+        if (newScheduleTime != previousScheduleTime || checkChanged != scheduledSwitch.isChecked()){
+            prefsEditor = sharedPrefs.edit();
+            prefsEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, newScheduleTime);
+            prefsEditor.apply();
+
+            if (!sharedPrefs.getBoolean(UpdateNotificationsService.NOTIFY_RUNNING,false)){
+                Log.w(TAG, "Calling UpdateNotificationService");
+                Intent intent = new Intent(getContext(), UpdateNotificationsService.class);
+                intent.putExtra("previous",previousScheduleTime);
+                getContext().startService(intent);
+            } else{
+                Toast.makeText(getContext(), "Atualizando notificações ainda, por favor aguarde!", Toast.LENGTH_SHORT).show();
+            }
+        } else Log.w(TAG, "New notifyTime equals to previsous notifyTime. No need to change");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.w(TAG, "MainSettings paused");
     }
 
     private void setCheckedItems() {
@@ -145,8 +195,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     }
 
     private int getSelectedTime() {
-        int selected = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0);
-        switch (selected){
+        switch (newScheduleTime){
             case 0:
                 return 4;
             case 5:
@@ -158,7 +207,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             case 30:
                 return 0;
             default:
-                return 0;
+                return 1;
         }
     }
 
@@ -316,15 +365,13 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     @Override
     public void onItemSelected(String entry, int value) {
-        prefsEditor = sharedPrefs.edit();
         String text;
         if (value == 0){
             text = getResources().getString(R.string.on_time);
         } else {
             text = value + " " + getResources().getString(R.string.minutes_before);
         }
-        prefsEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, value);
-        prefsEditor.apply();
+        newScheduleTime = value;
         timeText.setText(text);
     }
 

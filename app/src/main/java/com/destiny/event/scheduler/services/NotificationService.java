@@ -94,8 +94,10 @@ public class NotificationService extends IntentService {
             nBuilder.setSmallIcon(R.drawable.ic_event_validate);
             nBuilder.setLargeIcon(getLargeIcon(iconId));
             nBuilder.setContentTitle(title);
-            nBuilder.setContentText(getString(R.string.your_match_of) + typeName + getString(R.string.will_begin_soon));
-            nBuilder.setTicker("Your match will begin...");
+            if (notificationCount > 1) {
+                nBuilder.setContentText(getString(R.string.event_begin_in) + sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15) + getString(R.string.minutes));
+            } else nBuilder.setContentText(getString(R.string.your_match_of) + typeName + getString(R.string.will_begin_soon));
+            nBuilder.setTicker(getString(R.string.match_begin));
             setPriority(nBuilder);
             nBuilder.setContentIntent(pIntent);
 

@@ -211,10 +211,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private void refreshLists() {
 
         if (openedFragment == null || openedFragment instanceof SearchFragment){
-            for (int i=0; i<refreshDataListenerList.size(); i++){
-                if (refreshDataListenerList.get(i).getFragment().isAdded()){
-                    refreshDataListenerList.get(i).onRefreshData();
-                } else Log.w(TAG, "Fragment " + refreshDataListenerList.get(i).getFragment().getClass().getName() + " não está atachado ainda!");
+            if (refreshDataListenerList != null){
+                for (int i=0; i<refreshDataListenerList.size(); i++){
+                    if (refreshDataListenerList.get(i).getFragment().isAdded()){
+                        refreshDataListenerList.get(i).onRefreshData();
+                    } else Log.w(TAG, "Fragment " + refreshDataListenerList.get(i).getFragment().getClass().getName() + " não está atachado ainda!");
+                }
             }
         }
 
@@ -512,23 +514,27 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-        if (firstNotification.getTimeInMillis() == secondNotification.getTimeInMillis()){
-            //Setting first Notification
+        if (firstId != 0){
             Intent intent = new Intent(this, AlarmReceiver.class);
             PendingIntent pIntent = PendingIntent.getBroadcast(this, firstId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             alarm.set(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
-        } else {
-            //Setting first Notification
-            Intent intent = new Intent(this, AlarmReceiver.class);
-            PendingIntent pIntent = PendingIntent.getBroadcast(this, firstId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            alarm.set(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
+        }
 
-            //Setting second Notification
+        if (secondId != 0){
             Intent sIntent = new Intent(this, AlarmReceiver.class);
             PendingIntent psIntent = PendingIntent.getBroadcast(this, secondId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
         }
 
+    }
+
+    @Override
+    public void cancelAlarmTask(int requestId) {
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarm.cancel(pIntent);
+        Log.w(TAG, "requestId canceled: " + requestId);
     }
 
     @Override
@@ -542,15 +548,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void deleteUserDataListener(Fragment fragment) {
         userDataListener.remove(fragment);
-    }
-
-    @Override
-    public void cancelAlarmTask(int requestId) {
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarm.cancel(pIntent);
-        Log.w(TAG, "requestId canceled: " + requestId);
     }
 
     @Override

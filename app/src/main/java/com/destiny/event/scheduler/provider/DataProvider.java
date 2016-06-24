@@ -51,6 +51,7 @@ public class DataProvider extends ContentProvider {
     private static final int ENTRY_ALL = 79;
     private static final int NOTIFICATION = 80;
     private static final int NOTIFICATION_ID = 81;
+    private static final int NOTIFICATION_GAMES = 82;
     private static final int EVALUATION = 90;
     private static final int EVALUATION_ID = 91;
     private static final int EVALUATION_HISTORY = 92;
@@ -83,6 +84,8 @@ public class DataProvider extends ContentProvider {
     public static final Uri ENTRY_FAVORITE_URI = Uri.parse("content://" + AUTHORITY + "/" + ENTRY_FAVORITE_PATH);
     private static final String NOTIFICATION_PATH = "notifyscheduled";
     public static final Uri NOTIFICATION_URI = Uri.parse("content://" + AUTHORITY + "/" + NOTIFICATION_PATH);
+    private static final String NOTIFICATION_GAMES_PATH = "notifygames";
+    public static final Uri NOTIFICATION_GAMES_URI = Uri.parse("content://" + AUTHORITY + "/" + NOTIFICATION_GAMES_PATH);
     private static final String ALL_GAMES_PATH = "allgames";
     public static final Uri ALL_GAME_URI = Uri.parse("content://" + AUTHORITY + "/" + ALL_GAMES_PATH);
     private static final String ALL_ENTRIES_PATH = "allentries";
@@ -117,6 +120,7 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, ENTRY_FAVORITE_PATH, ENTRY_FAVORITE);
         uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH, NOTIFICATION);
         uriMatcher.addURI(AUTHORITY, NOTIFICATION_PATH + "/#", NOTIFICATION_ID);
+        uriMatcher.addURI(AUTHORITY, NOTIFICATION_GAMES_PATH, NOTIFICATION_GAMES);
         uriMatcher.addURI(AUTHORITY, ALL_GAMES_PATH, GAME_ALL);
         uriMatcher.addURI(AUTHORITY, ALL_ENTRIES_PATH, ENTRY_ALL);
         uriMatcher.addURI(AUTHORITY, EVALUATION_PATH, EVALUATION);
@@ -352,6 +356,17 @@ public class DataProvider extends ContentProvider {
             case NOTIFICATION_ID:
                 queryBuilder.setTables(NotificationTable.TABLE_NAME);
                 queryBuilder.appendWhere(NotificationTable.COLUMN_ID + "=" + uri.getLastPathSegment() );
+                break;
+            case NOTIFICATION_GAMES:
+                StringBuilder sbNotification = new StringBuilder();
+                sbNotification.append(NotificationTable.TABLE_NAME);
+                sbNotification.append(" JOIN ");
+                sbNotification.append(GameTable.TABLE_NAME);
+                sbNotification.append(" ON ");
+                sbNotification.append(NotificationTable.COLUMN_GAME);
+                sbNotification.append(" = ");
+                sbNotification.append(GameTable.getQualifiedColumn(GameTable.COLUMN_ID));
+                queryBuilder.setTables(sbNotification.toString());
                 break;
             case GAME_ALL:
                 queryBuilder.setTables(GameTable.TABLE_NAME);
@@ -634,6 +649,9 @@ public class DataProvider extends ContentProvider {
                 } else {
                     rowUpdated = sqlDB.update(EntryTable.TABLE_NAME, values, EntryTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
                 }
+                break;
+            case NOTIFICATION:
+                rowUpdated = sqlDB.update(NotificationTable.TABLE_NAME, values, selection, selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);

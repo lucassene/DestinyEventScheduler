@@ -57,6 +57,11 @@
             android:exported="false"
             android:enabled="true">
         </service>
+
+        <service android:name=".services.UpdateNotificationsService"
+            android:exported="false"
+            android:enabled="true">
+        </service>
         
         <receiver android:name=".services.AlarmReceiver">
             <intent-filter>

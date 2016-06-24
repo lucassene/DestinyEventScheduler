@@ -44,4 +44,12 @@ public class NotificationTable {
         onCreate(db);
     }
 
+    public static String getQualifiedColumn(String column){
+        return TABLE_NAME + "." + column;
+    }
+
+    public static String getAliasColumn(String column){
+        return TABLE_NAME + "_" + column;
+    }
+
 }

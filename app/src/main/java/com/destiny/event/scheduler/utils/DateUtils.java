@@ -172,5 +172,27 @@ public class DateUtils {
         return c;
     }
 
+    public static String calendarToString(Calendar calendar){
+        int year = calendar.get(Calendar.YEAR);
+        String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
+        if (Integer.parseInt(month)<10){
+            month = "0" + month;
+        }
+        String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+        if (Integer.parseInt(day)<10){
+            day = "0" + day;
+        }
+        String hour = String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
+        if (Integer.parseInt(hour)<10){
+            hour = "0" + hour;
+        }
+        String minute = String.valueOf(calendar.get(Calendar.MINUTE));
+        if (Integer.parseInt(minute)<10){
+            minute = "0" + minute;
+        }
+
+        return year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00";
+    }
+
 
 }

@@ -363,5 +363,8 @@
     <string name="no_evaluation">Nenhum guardião foi avaliado, confirmar?</string>
     <string name="no_clan_title">Você saiu do clã?</string>
     <string name="no_clan_login_msg">Por favor verifique se você ainda está no clã através do site da bungie.net.</string>
+    <string name="event_begin_in">"Seu evento irá começar em "</string>
+    <string name="match_begin">O evento irá começar...</string>
+    <string name="minutes">" minutos"</string>
 
 </resources>
