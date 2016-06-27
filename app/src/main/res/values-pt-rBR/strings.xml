@@ -26,9 +26,9 @@
     </string-array>
 
     <string-array name="menu_item">
-        <item>Nova Partida</item>
-        <item>Procurar Partida</item>
-        <item>Minhas Partidas</item>
+        <item>Novo Evento</item>
+        <item>Procurar Evento</item>
+        <item>Meus Eventos</item>
         <item>Histórico</item>
         <item>Meu Clã</item>
         <item>Meu Perfil</item>
@@ -70,10 +70,10 @@
     </integer-array>
 
     <string-array name="game_status">
-        <item>Agendadas</item>
+        <item>Agendados</item>
         <item>Esperando por Validação</item>
-        <item>Validadas</item>
-        <item>Avaliadas</item>
+        <item>Validados</item>
+        <item>Avaliados</item>
     </string-array>
 
     <string-array name="pref_time_list_entries">

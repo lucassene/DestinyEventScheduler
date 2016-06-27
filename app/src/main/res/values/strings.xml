@@ -18,9 +18,9 @@
     </string-array>
 
     <string-array name="menu_item">
-        <item>New Match</item>
-        <item>Search Matches</item>
-        <item>My Matches</item>
+        <item>New Event</item>
+        <item>Search Events</item>
+        <item>My Events</item>
         <item>History</item>
         <item>My Clan</item>
         <item>My Stats</item>

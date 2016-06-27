@@ -58,6 +58,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     private int newScheduleTime;
 
     private boolean checkChanged;
+    private boolean previousCheck;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -136,6 +137,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         newScheduleTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
 
         checkChanged = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
+        previousCheck = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
         setCheckedItems();
         updateViews();
 
@@ -167,7 +169,9 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             if (!sharedPrefs.getBoolean(UpdateNotificationsService.NOTIFY_RUNNING,false)){
                 Log.w(TAG, "Calling UpdateNotificationService");
                 Intent intent = new Intent(getContext(), UpdateNotificationsService.class);
-                intent.putExtra("previous",previousScheduleTime);
+                intent.putExtra("previousTime",previousScheduleTime);
+                intent.putExtra("previousCheck", previousCheck);
+                Log.w(TAG, "previousCheck: " + previousCheck);
                 getContext().startService(intent);
             } else{
                 Toast.makeText(getContext(), "Atualizando notificações ainda, por favor aguarde!", Toast.LENGTH_SHORT).show();

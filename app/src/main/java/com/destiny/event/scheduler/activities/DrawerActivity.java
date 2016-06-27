@@ -32,7 +32,6 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.DrawerAdapter;
@@ -220,7 +219,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             }
         }
 
-        Toast.makeText(this, R.string.data_refreshed, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, R.string.data_refreshed, Toast.LENGTH_SHORT).show();
 
     }
 

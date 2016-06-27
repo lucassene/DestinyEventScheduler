@@ -30,6 +30,7 @@ public class UpdateNotificationsService extends IntentService {
     private ArrayList<NotificationModel> notificationList;
 
     private int previousTime;
+    private boolean previousCheck;
 
     public UpdateNotificationsService(){
         super(UpdateNotificationsService.class.getName());
@@ -41,7 +42,9 @@ public class UpdateNotificationsService extends IntentService {
         Cursor cursor = null;
         notificationList = new ArrayList<>();
 
-        previousTime = intent.getIntExtra("previous",15);
+        previousTime = intent.getIntExtra("previousTime",15);
+        previousCheck = intent.getBooleanExtra("previousCheck",true);
+        Log.w(TAG, "previousCheck: " + previousCheck);
 
         String[] projection = {NotificationTable.getQualifiedColumn(NotificationTable.COLUMN_ID), NotificationTable.COLUMN_GAME, NotificationTable.COLUMN_TIME, NotificationTable.COLUMN_TYPE, NotificationTable.COLUMN_EVENT, NotificationTable.COLUMN_ICON, GameTable.COLUMN_TIME};
 
@@ -85,11 +88,15 @@ public class UpdateNotificationsService extends IntentService {
         boolean isAllowed = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
 
         if (!isAllowed){
-            getContentResolver().delete(DataProvider.NOTIFICATION_URI, null, null);
             for (int i=0;i<notificationList.size();i++){
-                cancelAlarmTask(notificationList.get(i).getNotificationId());
+                if (!notificationList.get(i).getGameTime().equals(notificationList.get(i).getNotificationTime())){
+                    int deleted = getContentResolver().delete(DataProvider.NOTIFICATION_URI,NotificationTable.COLUMN_ID + "=" + notificationList.get(i).getNotificationId(),null);
+                    cancelAlarmTask(notificationList.get(i).getNotificationId());
+                    if (deleted != 0){
+                        Log.w(TAG, "Notification deleted with success");
+                    } else Log.w(TAG, "No notification deleted");
+                }
             }
-            Log.w(TAG, "All notifications deleted");
         } else {
             Calendar now = Calendar.getInstance();
             for (int i=0;i<notificationList.size();i++){
@@ -122,7 +129,7 @@ public class UpdateNotificationsService extends IntentService {
                             } else Log.w(TAG, "No notification deleted");
                         }
                     }
-                } else if (previousTime == 0){
+                } else if (previousTime == 0 || !previousCheck){
                     Calendar c = DateUtils.stringToDate(notificationList.get(i).getGameTime());
                     c.add(Calendar.MINUTE,-sharedTime);
                     ContentValues values = new ContentValues();
