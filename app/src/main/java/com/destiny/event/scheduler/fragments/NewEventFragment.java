@@ -511,6 +511,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 gameValues.put(GameTable.COLUMN_LIGHT, minLight);
                 gameValues.put(GameTable.COLUMN_INSCRIPTIONS, 4);
                 gameValues.put(GameTable.COLUMN_STATUS, GameTable.STATUS_SCHEDULED); //Inserir STATUS_NEW no Servidor
+                gameValues.put(GameTable.COLUMN_PLATFORM, callback.getPlatform());
 
                 Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
                 if (result != null) {

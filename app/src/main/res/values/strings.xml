@@ -310,7 +310,7 @@
     <string name="participation_points">Participation Points:</string>
     <string name="final_equation">The final equation that involves all this previous stats.</string>
     <string name="leaving">Are you leaving guardian?</string>
-    <string name="oblivion">Be aware that all your data will be deleted, and you\'ll be forgot in the oblivion.</string>
+    <string name="oblivion">Be aware that all your data will be deleted.</string>
     <string name="leave">Leave</string>
     <string name="nevermind">Cancel</string>
     <string name="event_details">Event details</string>
@@ -331,7 +331,7 @@
     <string name="delete_dialog_msg">Deleting this event is irreversible, it won\'t be available to no one after this.</string>
     <string name="join_dialog_title">Join, yes?</string>
     <string name="join_dialog_msg">You will be added to this event and a notification will be created according to your preference settings.</string>
-    <string name="join_full_dialog_msg">This event is already full, you will be added to the waiting list. A notification will be created anyway, according to your preference settings.</string>
+    <string name="join_full_dialog_msg">This event is already full, you will be added to the waiting list. </string>
     <string name="wait_list">Wait List</string>
     <string name="data_refreshed">All data refreshed!</string>
     <string name="notification_match_begin">The event will begin soon...</string>
@@ -389,7 +389,7 @@
     <string name="no_icon_msg">For security reasons, some guardians choose not to show their face. For these, we will use a default photo, okay?</string>
     <string name="got_it">Got it</string>
     <string name="error">Error</string>
-    <string name="some_problem_msg">Some problem occurred. Please try again later.</string>
+    <string name="some_problem_msg">Some problem occurred. Please check bungie.net website and try again later.</string>
     <string name="no_connection_msg">No connection found. Please connect to the internet or try again later.</string>
     <string name="bungie_net_error_msg">Incorrect response from Bungie.net. Please try again later.</string>
     <string name="no_clan_msg">Sorry guardian, but is needed that you join a clan to use this app.</string>

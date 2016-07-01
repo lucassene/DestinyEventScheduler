@@ -159,6 +159,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
             }
         });
 
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         return v;
     }
 
@@ -347,21 +348,26 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                 changeListItem(v, position, status);
                 break;
             case STATUS_WAITING:
+                callProfileFragment(position);
                 break;
             case STATUS_VALIDATED:
                 changeListItem(v, position, status);
                 break;
             case STATUS_EVALUATED:
-                Fragment fragment = new MyNewProfileFragment();
-
-                Bundle bundle = new Bundle();
-                bundle.putString("bungieId", memberList.get(position-1).getMembershipId());
-                bundle.putInt("type", MyNewProfileFragment.TYPE_DETAIL);
-
-                callback.loadNewFragment(fragment, bundle, "profile");
+                callProfileFragment(position);
                 break;
         }
 
+    }
+
+    private void callProfileFragment(int position) {
+        Fragment fragment = new MyNewProfileFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("bungieId", memberList.get(position-1).getMembershipId());
+        bundle.putInt("type", MyNewProfileFragment.TYPE_DETAIL);
+
+        callback.loadNewFragment(fragment, bundle, "profile");
     }
 
     private void changeListItem(View v, int position, int status) {
@@ -504,6 +510,8 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        callback = (ToActivityListener) getActivity();
+        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         setHasOptionsMenu(true);
     }
 

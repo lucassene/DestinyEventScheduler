@@ -111,6 +111,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
             type = bundle.getInt("type");
         }
 
+        Log.w(TAG, "Menu (1) and Detail (2) | Type: " + type);
         callback = (ToActivityListener) getActivity();
         if (type == TYPE_MENU) {
             callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);

@@ -22,8 +22,8 @@ public class ImageUtils {
 
     public static Bitmap downloadImage(Context context, String imageURL){
 
-        HttpURLConnection urlConnection = null;
-        InputStream is = null;
+        HttpURLConnection urlConnection;
+        InputStream is;
         Bitmap image = null;
 
         try{
@@ -68,7 +68,7 @@ public class ImageUtils {
             fos = new FileOutputStream(imagePath);
             image.compress(Bitmap.CompressFormat.JPEG, 100, fos);
         } finally {
-            fos.close();
+            if (fos != null) fos.close();
         }
 
     }

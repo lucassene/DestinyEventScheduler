@@ -12,6 +12,7 @@ public interface ToActivityListener {
     public void onEventGameSelected(String id);
     public String getBungieId();
     public String getUserName();
+    public int getPlatform();
     public String getClanName();
     public String getOrderBy();
     public void closeFragment();

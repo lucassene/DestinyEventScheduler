@@ -13,6 +13,7 @@ public class MembersModel {
     private int dislikes;
     private int gamesCreated;
     private int gamesPlayed;
+    private boolean hasBungieTag = false;
 
     public int getEntryId() {
         return entryId;
@@ -140,4 +141,11 @@ public class MembersModel {
         this.title = title;
     }
 
+    public boolean hasBungieTag() {
+        return hasBungieTag;
+    }
+
+    public void setHasBungieTag(boolean hasBungieTag) {
+        this.hasBungieTag = hasBungieTag;
+    }
 }

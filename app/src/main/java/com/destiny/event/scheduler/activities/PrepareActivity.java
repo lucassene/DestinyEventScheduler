@@ -148,10 +148,6 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                 text.setText(msg);
                 break;
             case BungieService.STATUS_VERIFY:
-                msg = getString(R.string.pictures);
-                text.setText(msg);
-                break;
-            case BungieService.STATUS_PICTURE:
                 msg = getString(R.string.allies);
                 text.setText(msg);
                 break;

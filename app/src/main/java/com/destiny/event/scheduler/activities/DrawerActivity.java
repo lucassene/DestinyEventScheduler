@@ -113,12 +113,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private String bungieId;
     private String userName;
+    private int platformId;
 
     private String clanOrderBy;
 
     private String isNewScheduledOrValidated = GameTable.STATUS_NEW;
     private boolean hasScheduledGames = true;
-    private boolean hasvalidateGames = true;
+    private boolean hasValidatedGames = true;
 
     ViewPager viewPager;
     ViewPageAdapter viewPageAdapter;
@@ -285,7 +286,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         } else viewPager.setCurrentItem(0);
                         break;
                     case GameTable.STATUS_VALIDATED:
-                        if (hasvalidateGames){
+                        if (hasValidatedGames){
                             viewPager.setCurrentItem(2);
                         } else viewPager.setCurrentItem(0);
                         break;
@@ -382,6 +383,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public String getUserName() {
         return userName;
+    }
+
+    @Override
+    public int getPlatform() {
+        return platformId;
     }
 
     @Override
@@ -487,7 +493,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onValidateGames(boolean status) {
         onDataLoaded();
-        hasvalidateGames = status;
+        hasValidatedGames = status;
     }
 
     @Override
@@ -707,7 +713,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         null
                 );
             case URL_LOADER_USER:
-                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_MEMBERSHIP, LoggedUserTable.COLUMN_NAME};
+                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_MEMBERSHIP, LoggedUserTable.COLUMN_NAME, LoggedUserTable.COLUMN_PLATFORM};
                 return new CursorLoader(
                         this,
                         DataProvider.LOGGED_USER_URI,
@@ -740,6 +746,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     if (data.getCount() > 0) {
                         bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
                         userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
+                        platformId = data.getInt(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
                     }
                     if (userDataListener != null){
                         for (int i=0; i<userDataListener.size();i++){

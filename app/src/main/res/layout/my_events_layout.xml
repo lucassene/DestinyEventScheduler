@@ -61,10 +61,11 @@
                 <ListView
                     android:id="@+id/my_events_list"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:scrollbarStyle="outsideOverlay"
-                    android:paddingRight="@dimen/global_padding"/>
+                    android:paddingRight="@dimen/global_padding"
+                    android:footerDividersEnabled="false"/>
 
                 <TextView
                     android:id="@+id/empty_label"

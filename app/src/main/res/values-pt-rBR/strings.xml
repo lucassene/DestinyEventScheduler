@@ -263,7 +263,7 @@
     <string name="scheduled_games">Eventos agendados</string>
     <string name="leave">Sair</string>
     <string name="leaving">Você está saindo guardião?</string>
-    <string name="oblivion">Esteja ciente de que todas suas informações serão apagadas e você será esquecido para sempre.</string>
+    <string name="oblivion">Esteja ciente de que todas suas informações serão apagadas.</string>
     <string name="nevermind">Cancelar</string>
     <string name="event_details">Detalhes do evento</string>
     <string name="of">de</string>
@@ -283,7 +283,7 @@
     <string name="join_dialog_msg">Você será adicionado à este evento e uma notificação será criada de acordo com as suas configurações de preferência.</string>
     <string name="leave_dialog_msg">Você não estará mais participando desse evento depois disso.</string>
     <string name="leave_game_title">Deixar evento?</string>
-    <string name="join_full_dialog_msg">Esse evento já está cheia, você será adicionado à lista de espera. Uma notificação será criada mesmo assim, de acordo com suas configurações de preferência.</string>
+    <string name="join_full_dialog_msg">Esse evento já está cheio, você será adicionado à lista de espera;</string>
     <string name="data_refreshed">Dados atualizados!</string>
     <string name="game_label">Jogo</string>
     <string name="notification_match_begin">O evento irá começar em instantes...</string>
@@ -296,7 +296,7 @@
     <string name="no_evaluations">Nenhuma avaliação?</string>
     <string name="no_evaluations_dialog_msg">Nenhum guardião foi avaliado, validar mesmo assim?</string>
     <string name="no_guardians">Sem outros guardiões</string>
-    <string name="no_guardians_dialog_msg">Há apenas você nesse evento, ele será excluída se você continuar.</string>
+    <string name="no_guardians_dialog_msg">Há apenas você nesse evento, ele será excluído se você continuar.</string>
     <string name="uncheck_match_not_happened">Desmarque se esse evento não aconteceu</string>
     <string name="validation">Validação</string>
     <string name="validation_dialog_msg">Depois da validação, esse evento estará disponível para outros guardiões se avaliarem.</string>
@@ -343,7 +343,7 @@
     <string name="no_connection_msg">Nenhuma conexão encontrada. Por favor conecte-se à internet ou tente novamente mais tarde.</string>
     <string name="no_icon_msg">Por motivo de segurança, alguns guardiões optam por não mostrar seus rosto. Para esses, usaremos uma foto padrão, ok?</string>
     <string name="problem_bungie_net">Problema ao conectar com Bungie.net</string>
-    <string name="some_problem_msg">Algum problema ocorreu. Por favor, tente novamente mais tarde.</string>
+    <string name="some_problem_msg">Algum problema ocorreu. Por favor, verifique o site bungie.net e tente novamente mais tarde.</string>
     <string name="no_clan_msg">Desculpe guardião, mas é necessário que você esteja em um clã para usar este aplicativo.</string>
     <string name="no_events_played">Nenhum evento jogado</string>
     <string name="times">vezes</string>
