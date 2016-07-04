@@ -20,11 +20,14 @@ public class ImageUtils {
 
     private static final String TAG = "ImageUtils";
 
-    public static Bitmap downloadImage(Context context, String imageURL){
+    public static final int NO_ERROR = 0;
+    public static final int DOWNLOAD_ERROR = 100;
+
+    public static int downloadImage(Context context, String imageURL){
 
         HttpURLConnection urlConnection;
         InputStream is;
-        Bitmap image = null;
+        Bitmap image;
 
         try{
 
@@ -41,19 +44,21 @@ public class ImageUtils {
                 image = BitmapFactory.decodeStream(is);
                 String imageName = imageURL.substring(imageURL.lastIndexOf("/")+1, imageURL.length());
                 saveImage(context, image, imageName);
+                return NO_ERROR;
             } else {
                 Log.w(TAG, "HTTP Request is not OK");
+                return DOWNLOAD_ERROR;
             }
 
         } catch (MalformedURLException e){
             Log.w(TAG, "URL malformed");
             e.printStackTrace();
+            return DOWNLOAD_ERROR;
         } catch (IOException e){
             Log.w(TAG, "IO Exception");
             e.printStackTrace();
+            return DOWNLOAD_ERROR;
         }
-
-        return image;
 
     }
 

@@ -366,5 +366,6 @@
     <string name="event_begin_in">"Seu evento irá começar em "</string>
     <string name="match_begin">O evento irá começar...</string>
     <string name="minutes">" minutos"</string>
+    <string name="check_connection">Por favor cheque sua conexao com a internet.</string>
 
 </resources>

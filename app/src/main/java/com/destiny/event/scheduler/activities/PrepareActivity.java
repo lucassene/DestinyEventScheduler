@@ -183,7 +183,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
             case BungieService.ERROR_NO_CONNECTION:
                 bundle.putString("title",getString(R.string.error));
                 bundle.putString("msg",getString(R.string.no_connection_msg));
-                bundle.putString("posButon",getString(R.string.got_it));
+                bundle.putString("posButton",getString(R.string.got_it));
                 break;
             case BungieService.ERROR_HTTP_REQUEST:
             case BungieService.ERROR_RESPONSE_CODE:

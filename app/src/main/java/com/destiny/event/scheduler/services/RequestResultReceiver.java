@@ -9,7 +9,6 @@ import android.os.ResultReceiver;
 public class RequestResultReceiver extends ResultReceiver {
 
     private Receiver mReceiver;
-    private int lastResultCode;
 
     public RequestResultReceiver(Handler handler){
         super(handler);
@@ -19,19 +18,14 @@ public class RequestResultReceiver extends ResultReceiver {
         mReceiver = receiver;
     }
 
-    public int getLastResultCode(){
-        return lastResultCode;
-    }
-
     public interface Receiver{
-        public void onReceiveResult(int resultCode, Bundle resultData);
+        void onReceiveResult(int resultCode, Bundle resultData);
     }
 
     @Override
     protected void onReceiveResult(int resultCode, Bundle resultData) {
         if (mReceiver != null){
             //Log.w("ResultReceiver", "ResultReceiver Bundle: " + resultData.toString());
-            lastResultCode = resultCode;
             mReceiver.onReceiveResult(resultCode, resultData);
         }
     }

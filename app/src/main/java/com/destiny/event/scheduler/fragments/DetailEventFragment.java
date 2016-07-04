@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
@@ -38,6 +39,7 @@ import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
+import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -169,22 +171,27 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             @Override
             public void onClick(View v) {
 
-                switch (origin){
-                    case NewEventsListFragment.TAG:
-                        showAlertDialog(MyAlertDialog.JOIN_DIALOG);
-                        break;
-                    case ScheduledListFragment.TAG:
-                        if (creator.equals(callback.getBungieId())){
-                            showAlertDialog(MyAlertDialog.DELETE_DIALOG);
-                        } else showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
-                        break;
-                    case SearchFragment.TAG:
-                        showAlertDialog(MyAlertDialog.JOIN_DIALOG);
-                        break;
-                    case MyEventsFragment.TAG:
-                        showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
-                        break;
+                if (NetworkUtils.checkConnection(getContext())){
+                    switch (origin){
+                        case NewEventsListFragment.TAG:
+                            showAlertDialog(MyAlertDialog.JOIN_DIALOG);
+                            break;
+                        case ScheduledListFragment.TAG:
+                            if (creator.equals(callback.getBungieId())){
+                                showAlertDialog(MyAlertDialog.DELETE_DIALOG);
+                            } else showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
+                            break;
+                        case SearchFragment.TAG:
+                            showAlertDialog(MyAlertDialog.JOIN_DIALOG);
+                            break;
+                        case MyEventsFragment.TAG:
+                            showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
+                            break;
+                    }
+                } else {
+                    Toast.makeText(getContext(), getString(R.string.check_connection), Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
 

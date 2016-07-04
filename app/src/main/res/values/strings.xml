@@ -424,6 +424,7 @@
     <string name="match_begin">Your match will begin...</string>
     <string name="event_begin_in">"Your event will begin in "</string>
     <string name="minutes">" minutes"</string>
+    <string name="check_connection">Please check your internet connection.</string>
 
 
 </resources>

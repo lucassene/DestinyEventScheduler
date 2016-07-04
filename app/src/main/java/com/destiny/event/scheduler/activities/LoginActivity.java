@@ -56,6 +56,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
     RequestResultReceiver mReceiver;
 
+    private int errorCode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -200,6 +202,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 progressBar.setVisibility(View.VISIBLE);
                 break;
             case BungieService.STATUS_ERROR:
+                switch (resultData.getInt(BungieService.ERROR_TAG)){
+                    case BungieService.ERROR_NO_CONNECTION:
+                        errorCode = BungieService.ERROR_NO_CONNECTION;
+                        break;
+                    case BungieService.ERROR_HTTP_REQUEST:
+                    case BungieService.ERROR_RESPONSE_CODE:
+                    case BungieService.ERROR_CLAN_MEMBER:
+                        errorCode = BungieService.ERROR_HTTP_REQUEST;
+                        break;
+                    case BungieService.ERROR_NO_CLAN:
+                        errorCode = BungieService.ERROR_NO_CLAN;
+                        break;
+                }
                 Log.w(TAG, "Erro ao receber dados do getBungieAccount: " + resultData.getInt(BungieService.ERROR_TAG));
                 progressBar.setVisibility(View.GONE);
                 showAlertDialog();
@@ -220,22 +235,43 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         DialogFragment dialog = new MyAlertDialog();
         Bundle bundle = new Bundle();
         bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
-        bundle.putString("title",getString(R.string.no_clan_title));
-        bundle.putString("msg",getString(R.string.no_clan_login_msg));
-        bundle.putString("posButton", getString(R.string.got_it));
+        switch (errorCode){
+            case BungieService.ERROR_HTTP_REQUEST:
+                bundle.putString("title",getString(R.string.error));
+                bundle.putString("msg",getString(R.string.bungie_net_error_msg));
+                bundle.putString("posButton",getString(R.string.got_it));
+                break;
+            case BungieService.ERROR_NO_CLAN:
+                bundle.putString("title",getString(R.string.no_clan_title));
+                bundle.putString("msg",getString(R.string.no_clan_login_msg));
+                bundle.putString("posButton", getString(R.string.got_it));
+                break;
+            case BungieService.ERROR_NO_CONNECTION:
+                bundle.putString("title",getString(R.string.error));
+                bundle.putString("msg",getString(R.string.no_connection_msg));
+                bundle.putString("posButton",getString(R.string.got_it));
+                break;
+        }
         dialog.setArguments(bundle);
         dialog.show(getSupportFragmentManager(),"alert");
     }
 
     @Override
     public void onPositiveClick(String input, int type) {
-        CookiesUtils.clearCookies();
-        DBHelper database = new DBHelper(getApplicationContext());
-        SQLiteDatabase db = database.getWritableDatabase();
-        database.onUpgrade(db, 0, 0);
-        loginTitle.setVisibility(View.VISIBLE);
-        psnButton.setVisibility(View.VISIBLE);
-        liveButton.setVisibility(View.VISIBLE);
+        switch (errorCode){
+            case BungieService.ERROR_NO_CLAN:
+                CookiesUtils.clearCookies();
+                DBHelper database = new DBHelper(getApplicationContext());
+                SQLiteDatabase db = database.getWritableDatabase();
+                database.onUpgrade(db, 0, 0);
+                loginTitle.setVisibility(View.VISIBLE);
+                psnButton.setVisibility(View.VISIBLE);
+                liveButton.setVisibility(View.VISIBLE);
+                break;
+            default:
+                finish();
+                break;
+        }
     }
 
     @Override

@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
@@ -41,6 +42,7 @@ import com.destiny.event.scheduler.models.MembersModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.TitleService;
 import com.destiny.event.scheduler.utils.DateUtils;
+import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -144,11 +146,13 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getCheckedMembers()==1){
-                    showAlertDialog(TYPE_ONLY_CREATOR);
-                } else if (getEvaluatedMembers()==0){
-                    showAlertDialog(TYPE_NO_EVALUATIONS);
-                } else showAlertDialog(TYPE_OK);
+                if (NetworkUtils.checkConnection(getContext())){
+                    if (getCheckedMembers()==1){
+                        showAlertDialog(TYPE_ONLY_CREATOR);
+                    } else if (getEvaluatedMembers()==0){
+                        showAlertDialog(TYPE_NO_EVALUATIONS);
+                    } else showAlertDialog(TYPE_OK);
+                } else Toast.makeText(getContext(), getString(R.string.check_connection), Toast.LENGTH_SHORT).show();
             }
         });
 

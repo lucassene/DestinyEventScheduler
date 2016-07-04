@@ -83,6 +83,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String SOUND_PREF = "scheduledNotifySound";
     public static final String NEW_NOTIFY_PREF = "allowNewNotify";
     public static final String FOREGROUND_PREF = "isForeground";
+    public static final String DOWNLOAD_PREF = "downloadList";
 
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
     public static final int FRAGMENT_TYPE_WITH_BACKSTACK = 1;
@@ -338,6 +339,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         openedFragment = null;
         viewPager.setAdapter(viewPageAdapter);
         tabLayout.setViewPager(viewPager);
+        rAdapter.notifyDataSetChanged();
         //viewPager.setCurrentItem(1);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.home_title);
@@ -356,6 +358,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         fragmentTag = tag;
         //Toast.makeText(this, "openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
         openedFragment = fragment;
+        rAdapter.notifyDataSetChanged();
         invalidateOptionsMenu();
     }
 

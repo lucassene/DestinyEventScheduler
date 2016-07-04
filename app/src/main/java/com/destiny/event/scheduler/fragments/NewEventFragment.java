@@ -42,6 +42,7 @@ import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
+import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -188,7 +189,11 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createNewEvent();
+                if (NetworkUtils.checkConnection(getContext())){
+                    createNewEvent();
+                } else {
+                    Toast.makeText(getContext(), getString(R.string.check_connection), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -499,7 +504,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 gameTime = getBungieTime(date, time);
 
                 int minLight = Integer.parseInt(lightText.getText().toString());
-                int insc = 1;
                 String bungieId = callback.getBungieId();
                 String userName = callback.getUserName();
 

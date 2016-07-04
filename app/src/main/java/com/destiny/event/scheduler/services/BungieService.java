@@ -35,7 +35,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 public class BungieService extends IntentService {
 
@@ -55,7 +57,7 @@ public class BungieService extends IntentService {
     public static final String GET_BUNGIE_ACCOUNT = "GetBungieAccount/";
 
     private static final String GET_METHOD = "GET";
-    private static final String POST_METHOD = "POST";
+    //private static final String POST_METHOD = "POST";
 
     public static final int STATUS_RUNNING = 0;
     public static final int STATUS_FINISHED = 10;
@@ -391,21 +393,26 @@ public class BungieService extends IntentService {
                         int clanError = parseMembersOfClan(receiver,response);
                         if (clanError != NO_ERROR) {
                             return clanError;
-                        } else return NO_ERROR;
+                        } else if (error == NO_ERROR){
+                            return NO_ERROR;
+                        } else return error;
                     }
                 } else {
                     Log.w(TAG, "Response Code do JSON diferente de 200");
+                    error = ERROR_RESPONSE_CODE;
                     return ERROR_RESPONSE_CODE;
                 }
 
             } else {
                 Log.w(TAG, "Sem conexão com a Internet");
+                error = ERROR_NO_CONNECTION;
                 return ERROR_NO_CONNECTION;
             }
 
         } catch (Exception e) {
             Log.w(TAG, "Problema no HTTP Request (getMembersOfClan)");
             e.printStackTrace();
+            error = ERROR_HTTP_REQUEST;
             return ERROR_HTTP_REQUEST;
         }
 
@@ -478,6 +485,8 @@ public class BungieService extends IntentService {
                 }
             }
         }
+        iconsList.add(clanIcon);
+        iconsList.add(clanBanner);
     }
 
     private String convertInputStreamToString(InputStream inputStream) throws IOException {
@@ -564,9 +573,6 @@ public class BungieService extends IntentService {
 
             String imageSubURL = membersModelList.get(i).getIconPath();
             //Log.w(TAG, "Total of icons: " + iconsList.size());
-
-            //ImageUtils.downloadImage(getApplicationContext(), imagePath);
-
             String imageName = imageSubURL.substring(imageSubURL.lastIndexOf("/")+1, imageSubURL.length());
             //Log.w(TAG, "Image Name: " + imageName);
 
@@ -581,9 +587,6 @@ public class BungieService extends IntentService {
             values.put(MemberTable.COLUMN_DISLIKES, dislikes);
             values.put(MemberTable.COLUMN_CREATED, created);
             values.put(MemberTable.COLUMN_PLAYED, played);
-            //String dateBefore = membersModelList.get(i).getMemberSince();
-            //String dateAfter = dateBefore.substring(0,dateBefore.length()-1);
-            //values.put(MemberTable.COLUMN_SINCE, dateAfter);
             getContentResolver().insert(DataProvider.MEMBER_URI, values);
 
             //Log.w(TAG, membersModelList.get(i).getName() + ": Likes: " + likes + ", Dislikes: " + dislikes + ", Created: " + created + ", Played: " + played);
@@ -592,13 +595,30 @@ public class BungieService extends IntentService {
 
         //Quando estiver funcionando com o servidor, tentar fazer o download antes de inserir no BD
         //Inserir a imagem correta se conseguir fazer o download, ou então inserir a imagem padrão caso falhe.
-        for (int x=0;x<iconsList.size();x++){
-            ImageUtils.downloadImage(getApplicationContext(), BASE_IMAGE_URL + iconsList.get(x));
-        }
-
+        downloadImages();
         //Log.w(TAG, "Icon images downloaded succesfully");
 
     }
+
+    private void downloadImages(){
+        ArrayList<String> notDownloaded = new ArrayList<>();
+
+        for (int x=0;x<iconsList.size();x++){
+            int error = ImageUtils.downloadImage(getApplicationContext(), BASE_IMAGE_URL + iconsList.get(x));
+            if (error == ImageUtils.DOWNLOAD_ERROR){
+                notDownloaded.add(BASE_IMAGE_URL + iconsList.get(x));
+            }
+        }
+        if (notDownloaded.size() > 0){
+            SharedPreferences prefs = getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            Set<String> set = new HashSet<>();
+            set.addAll(notDownloaded);
+            editor.putStringSet(DrawerActivity.DOWNLOAD_PREF, set);
+            editor.apply();
+        }
+    }
+
 
     private void insertClan() {
         Log.w(TAG, "Inserting clan data");
@@ -607,11 +627,11 @@ public class BungieService extends IntentService {
         values.put(ClanTable.COLUMN_BUNGIE_ID, clanId);
         values.put(ClanTable.COLUMN_NAME, clanName);
 
-        String iconURL = BASE_IMAGE_URL + clanIcon;
-        ImageUtils.downloadImage(getApplicationContext(), iconURL);
+        //String iconURL = BASE_IMAGE_URL + clanIcon;
+        //ImageUtils.downloadImage(getApplicationContext(), iconURL);
 
-        String bannerURL = BASE_IMAGE_URL + clanBanner;
-        ImageUtils.downloadImage(getApplicationContext(), bannerURL);
+        //String bannerURL = BASE_IMAGE_URL + clanBanner;
+        //ImageUtils.downloadImage(getApplicationContext(), bannerURL);
 
         String iconName = clanIcon.substring(clanIcon.lastIndexOf("/")+1, clanIcon.length());
         String bannerName = clanBanner.substring(clanBanner.lastIndexOf("/")+1, clanBanner.length());

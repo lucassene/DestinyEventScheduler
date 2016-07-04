@@ -3,6 +3,7 @@ package com.destiny.event.scheduler.dialogs;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,8 +24,6 @@ public class MyAlertDialog extends DialogFragment {
     public static final int ALERT_DIALOG = 13;
     public static final int CONFIRM_DIALOG = 14;
 
-    private Dialog dialog;
-
     private FromDialogListener listener;
     private FromDialogListener fragmentListener;
 
@@ -35,6 +34,7 @@ public class MyAlertDialog extends DialogFragment {
         super.onCreate(savedInstanceState);
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity(), R.style.DestinyApp_AlertDialog);
@@ -120,10 +120,33 @@ public class MyAlertDialog extends DialogFragment {
                     });
                 }
 
-        dialog = dialogBuilder.create();
+        return dialogBuilder.create();
 
-        return dialog;
+    }
 
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        switch (dialogType){
+            case 0:
+                listener.onLogoff();
+                break;
+            case JOIN_DIALOG:
+                fragmentListener.onPositiveClick(null, dialogType);
+                break;
+            case DELETE_DIALOG:
+                fragmentListener.onPositiveClick(null, dialogType);
+                break;
+            case LEAVE_DIALOG:
+                fragmentListener.onPositiveClick(null, dialogType);
+                break;
+            case ALERT_DIALOG:
+                listener.onPositiveClick(null, dialogType);
+                break;
+            case CONFIRM_DIALOG:
+                fragmentListener.onPositiveClick(null, dialogType);
+                break;
+        }
+        super.onDismiss(dialog);
     }
 
     @Override
