@@ -127,23 +127,8 @@ public class MyAlertDialog extends DialogFragment {
     @Override
     public void onDismiss(DialogInterface dialog) {
         switch (dialogType){
-            case 0:
-                listener.onLogoff();
-                break;
-            case JOIN_DIALOG:
-                fragmentListener.onPositiveClick(null, dialogType);
-                break;
-            case DELETE_DIALOG:
-                fragmentListener.onPositiveClick(null, dialogType);
-                break;
-            case LEAVE_DIALOG:
-                fragmentListener.onPositiveClick(null, dialogType);
-                break;
             case ALERT_DIALOG:
                 listener.onPositiveClick(null, dialogType);
-                break;
-            case CONFIRM_DIALOG:
-                fragmentListener.onPositiveClick(null, dialogType);
                 break;
         }
         super.onDismiss(dialog);

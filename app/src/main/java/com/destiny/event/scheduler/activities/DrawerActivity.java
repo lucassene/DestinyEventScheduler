@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -32,6 +33,7 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.DrawerAdapter;
@@ -127,6 +129,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     SlidingTabLayout tabLayout;
     private int selectedTabFragment;
 
+    TextView toolbarTitle;
+
     private Bundle spinnerSelections = new Bundle();
 
     @Override
@@ -143,9 +147,14 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(R.string.home_title);
+            getSupportActionBar().setTitle("");
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        Typeface font = Typeface.createFromAsset(getAssets(), "d.ttf");
+        toolbarTitle = (TextView) toolbar.findViewById(R.id.title);
+        toolbarTitle.setTypeface(font);
+        toolbarTitle.setText(R.string.home_title);
 
         String titles[] = getResources().getStringArray(R.array.tab_titles);
         int numOfTabs = titles.length;
@@ -342,9 +351,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         rAdapter.notifyDataSetChanged();
         //viewPager.setCurrentItem(1);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(R.string.home_title);
+            getSupportActionBar().setTitle("");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
+        toolbarTitle.setText(R.string.home_title);
     }
 
     @Override
@@ -581,6 +592,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public int getFmBackStackCount() {
         return fm.getBackStackEntryCount();
+    }
+
+    @Override
+    public void setToolbarTitle(String title) {
+        toolbarTitle.setText(title);
     }
 
     @Override

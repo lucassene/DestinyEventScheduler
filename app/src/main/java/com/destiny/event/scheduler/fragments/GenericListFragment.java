@@ -104,6 +104,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
     @Override

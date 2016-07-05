@@ -2,7 +2,15 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/listItemHeight">
+    android:layout_height="@dimen/listItemHeight"
+    android:background="@drawable/border_background">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/tabIndicatorColor"
+        android:alpha=".05">
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/profile_pic"
@@ -51,7 +59,8 @@
             android:layout_height="wrap_content"
             android:textSize="46sp"
             android:layout_gravity="center_horizontal"
-            android:textColor="@color/colorPrimary"/>
+            android:textColor="@android:color/white"
+            android:alpha=".5"/>
 
     </LinearLayout>
 

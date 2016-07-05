@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -62,6 +61,7 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         setHasOptionsMenu(true);
@@ -71,11 +71,12 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+        callback.setToolbarTitle(getString(R.string.history));
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.history);
         View v = inflater.inflate(R.layout.search_event_layout, container, false);
 
         filterSpinner = (Spinner) v.findViewById(R.id.search_spinner);

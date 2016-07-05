@@ -74,8 +74,6 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.my_clan);
-
         View v = inflater.inflate(R.layout.my_clan_layout, container, false);
 
         headerView = inflater.inflate(R.layout.my_clan_header_layout, null);
@@ -152,6 +150,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         setHasOptionsMenu(true);
@@ -161,6 +160,8 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+        callback.setToolbarTitle(getString(R.string.my_clan));
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
     @Override

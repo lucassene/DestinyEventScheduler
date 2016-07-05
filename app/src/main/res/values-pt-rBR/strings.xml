@@ -14,7 +14,7 @@
     <string name="new_tab_header">NOVOS</string>
     <string name="scheduled_tab_header">AGENDADO</string>
     <string name="validate_tab_header">VALIDAR</string>
-    <string name="home_title">Principal</string>
+    <string name="home_title">PRINCIPAL</string>
     <string name="empty_scheduled_list">Você não agendou nenhum evento.</string>
     <string name="empty_new_events">Parece que não tem muita gente jogando né?</string>
     <string name="empty_validate_event">Você não tem nenhum evento para avaliar ou validar.</string>
@@ -38,8 +38,8 @@
     </string-array>
 
     <string-array name="menu_section">
-        <item>Dados</item>
-        <item>Outros</item>
+        <item>D A D O S</item>
+        <item>O U T R O S</item>
     </string-array>
 
     <string-array name="clan_order_by">
@@ -125,13 +125,13 @@
     <string name="game_type_label">Tipo de jogo</string>
     <string name="max_guardians_label">Mínimo de guardiões</string>
     <string name="min_light_label">Luz mínima</string>
-    <string name="new_event_button">Criar evento</string>
-    <string name="new_event_title">Novo evento</string>
+    <string name="new_event_button">CRIAR EVENTO</string>
+    <string name="new_event_title">NOVO EVENTO</string>
     <string name="date_label">Data</string>
     <string name="time_label">Horário</string>
     <string name="event_confirmation">O evento aconteceu?</string>
-    <string name="validate_event_title">Validar partida</string>
-    <string name="search_title">Procurar evento</string>
+    <string name="validate_event_title">VALIDAÇÃO</string>
+    <string name="search_title">BUSCA</string>
     <string name="created_by">Criado por</string>
     <string name="date">Data</string>
     <string name="date_time_section">Dia e horário</string>
@@ -147,14 +147,12 @@
     <string name="members">Membros</string>
     <string name="order_by">Ordenar por</string>
     <string name="games_played">Eventos jogados</string>
-    <string name="history">Histórico</string>
-    <string name="my_clan">Meu clã</string>
+    <string name="my_clan">MEU CLÃ</string>
     <string name="sort_by">Classificar por</string>
     <string name="crucible">Crisol</string>
     <string name="events_created">Eventos criados:</string>
     <string name="joined_events">Eventos jogados:</string>
     <string name="member_since">Membro desde:</string>
-    <string name="my_profile">Perfil</string>
     <string name="patrol">Patrulha</string>
     <string name="prison">Prisão dos Anciões</string>
     <string name="raid">Incursão</string>
@@ -265,7 +263,7 @@
     <string name="leaving">Você está saindo guardião?</string>
     <string name="oblivion">Esteja ciente de que todas suas informações serão apagadas.</string>
     <string name="nevermind">Cancelar</string>
-    <string name="event_details">Detalhes do evento</string>
+    <string name="event_details">DETALHES</string>
     <string name="of">de</string>
     <string name="empty_game">Oops! Será que esse evento está vazio?</string>
     <string name="search_empty_list">Parece que ninguém quer jogar esse tipo de jogo...</string>
@@ -275,7 +273,7 @@
     <string name="validate">Validar</string>
     <string name="waiting_validation">Esperando validação</string>
     <string name="game_status">Estado de evento</string>
-    <string name="my_events">Meus eventos</string>
+    <string name="my_events">MEUS EVENTOS</string>
     <string name="no_games_status">Sem eventos nesse estado.</string>
     <string name="delete_dialog_msg">Excluir esse evento é irreversível, ela não ficará mais disponível para ninguém depois disso.</string>
     <string name="delete_dialog_title">Excluir esse evento?</string>
@@ -303,7 +301,7 @@
     <string name="at">" às "</string>
     <string name="evaluate_match">Avaliar evento</string>
     <string name="matches_played">Eventos disputados</string>
-    <string name="about">Sobre</string>
+    <string name="about">SOBRE</string>
     <string name="contact">Contato</string>
     <string name="creator">Criador</string>
     <string name="minutes_before">minutos antes</string>
@@ -319,7 +317,6 @@
     <string name="scheduled_notify_text">Notifica eventos agendados</string>
     <string name="sounds">Som</string>
     <string name="version">Versão</string>
-    <string name="settings">Configurações</string>
     <string name="on_time">Na hora</string>
     <string name="games_selected">itens selecionados</string>
     <string name="none">Nenhum</string>
@@ -367,5 +364,9 @@
     <string name="match_begin">O evento irá começar...</string>
     <string name="minutes">" minutos"</string>
     <string name="check_connection">Por favor cheque sua conexao com a internet.</string>
+    <string name="history">HISTÓRICO</string>
+    <string name="my_profile">PERFIL</string>
+    <string name="settings">CONFIGURAÇÕES</string>
+    <string name="waiting_data">ESPERANDO DADOS</string>
 
 </resources>

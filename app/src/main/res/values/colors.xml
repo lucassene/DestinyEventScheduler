@@ -16,5 +16,6 @@
     <color name="colorToolbarTitle">#FFFFFF</color>
     <color name="colorTextButton">#FFFFFF</color>
     <color name="primary_text_material_light">#ffffff</color>
-    <color name="toolbarBackground">#616161</color>
+    <color name="toolbarBackground">#757575</color>
+    <color name="colorButtonEnabled">#9900bd4e</color>
 </resources>

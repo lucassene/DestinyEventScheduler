@@ -362,6 +362,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+        callback.setToolbarTitle(getString(R.string.event_details));
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
     @Override

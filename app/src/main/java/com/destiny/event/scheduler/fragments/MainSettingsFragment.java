@@ -336,6 +336,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         setHasOptionsMenu(true);
@@ -345,6 +346,8 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+        callback.setToolbarTitle(getString(R.string.settings));
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
     @Override

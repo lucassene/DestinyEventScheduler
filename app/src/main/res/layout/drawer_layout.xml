@@ -4,8 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/drawer_layout"
-    android:elevation="7dp"
-    android:background="@drawable/gradient_background">
+    android:elevation="7dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/bg"
+            android:scaleType="centerCrop"
+            android:alpha=".7"/>
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,6 +25,7 @@
         android:orientation="vertical">
 
     <include layout="@layout/toolbar_layout" android:id="@+id/toolbar"/>
+        <include layout="@layout/toolbar_line"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -65,7 +78,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:scrollbars="vertical"
-        android:background="@color/navigationBarColor"
-/>
+        android:background="@color/toolbarBackground" />
 
 </android.support.v4.widget.DrawerLayout>

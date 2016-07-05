@@ -180,6 +180,7 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        callback = (ToActivityListener) getActivity();
         setHasOptionsMenu(true);
     }
 
@@ -187,6 +188,8 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+        callback.setToolbarTitle(getString(R.string.event_details));
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
     @Override

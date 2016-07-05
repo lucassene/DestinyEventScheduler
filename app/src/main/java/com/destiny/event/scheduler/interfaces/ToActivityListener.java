@@ -33,4 +33,5 @@ public interface ToActivityListener {
     public void onSelectedFragment(int id);
     public void setFragmentType(int type);
     public int getFmBackStackCount();
+    public void setToolbarTitle(String title);
 }

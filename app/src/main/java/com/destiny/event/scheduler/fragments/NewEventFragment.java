@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -90,6 +89,9 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private Calendar insertedDate;
     private int minimumIntTime;
 
+    private boolean hasDate = false;
+    private boolean hasTime = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,8 +168,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.new_event_title);
-
         View v = inflater.inflate(R.layout.new_event_layout, container, false);
 
         iconType = (ImageView) v.findViewById(R.id.type_icon);
@@ -278,6 +278,9 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         fillTypeData();
         fillgameData();
 
+        createButton.setEnabled(false);
+        createButton.setText(R.string.waiting_data);
+
         return v;
     }
 
@@ -301,10 +304,22 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().initLoader(LOADER_TYPE, null, this);
     }
 
+    private void checkIfIsOk(){
+        if (hasDate && hasTime){
+            createButton.setEnabled(true);
+            createButton.setText(R.string.new_event_button);
+        } else {
+            createButton.setEnabled(false);
+            createButton.setText(R.string.waiting_data);
+        }
+    }
+
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+        callback.setToolbarTitle(getString(R.string.new_event_title));
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
     @Override
@@ -411,6 +426,9 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", getResources().getConfiguration().locale);
         String finalDate = sdf.format(date.getTime());
         dateText.setText(finalDate);
+        hasDate = true;
+        checkIfIsOk();
+
     }
 
     @Override
@@ -440,6 +458,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         if (min.length() == 1) min = "0" + min;
         String time = hourOfTheDay + " : " + min;
         timeText.setText(time);
+        hasTime = true;
+        checkIfIsOk();
 
     }
 
@@ -470,6 +490,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onEventGameSent(String id) {
         selectedEvent = id;
+        checkIfIsOk();
         getLoaderManager().restartLoader(LOADER_EVENT, null, this);
     }
 

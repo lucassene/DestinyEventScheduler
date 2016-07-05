@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -26,7 +25,6 @@ public class AboutSettingsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.about);
         View v = inflater.inflate(R.layout.about_settings_layout, container, false);
 
         return v;
@@ -49,6 +47,8 @@ public class AboutSettingsFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+        callback.setToolbarTitle(getString(R.string.about));
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
 }

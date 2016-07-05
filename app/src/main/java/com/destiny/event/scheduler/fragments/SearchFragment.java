@@ -7,9 +7,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -59,6 +59,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         callback.registerRefreshListener(this);
@@ -71,8 +72,15 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.clear();
+        callback.setToolbarTitle(getString(R.string.search_title));
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.search_title);
         View v = inflater.inflate(R.layout.search_event_layout, container, false);
 
         filterSpinner = (Spinner) v.findViewById(R.id.search_spinner);

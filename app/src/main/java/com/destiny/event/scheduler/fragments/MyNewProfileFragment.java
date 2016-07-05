@@ -103,6 +103,7 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        setHasOptionsMenu(true);
 
         Bundle bundle = getArguments();
 
@@ -569,6 +570,8 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+        callback.setToolbarTitle(getString(R.string.my_profile));
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
 }

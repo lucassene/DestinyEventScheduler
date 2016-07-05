@@ -10,7 +10,7 @@
         android:id="@+id/btn_join"
         android:layout_marginTop="@dimen/settingsMargin"
         android:text="@string/join"
-        android:background="@color/colorButtonNormal"
-        android:layout_gravity="center_horizontal"/>
+        android:background="@drawable/button_style"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

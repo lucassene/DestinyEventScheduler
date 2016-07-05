@@ -135,7 +135,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                 holder.descView.setText(clanDesc);
                 break;
             case 2:
-                if (position == 6) {
+                if (position == 5) {
                     holder.sectionView.setText(sections[0]);
                 } else {
                     holder.sectionView.setText(sections[1]);

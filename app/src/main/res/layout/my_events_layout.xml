@@ -65,7 +65,9 @@
                     android:layout_gravity="center_horizontal"
                     android:scrollbarStyle="outsideOverlay"
                     android:paddingRight="@dimen/global_padding"
-                    android:footerDividersEnabled="false"/>
+                    android:footerDividersEnabled="false"
+                    android:divider="@android:color/transparent"
+                    android:dividerHeight="8dp"/>
 
                 <TextView
                     android:id="@+id/empty_label"

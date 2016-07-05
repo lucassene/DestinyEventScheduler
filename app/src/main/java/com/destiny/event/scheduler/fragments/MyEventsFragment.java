@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -64,6 +63,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         setHasOptionsMenu(true);
@@ -73,11 +73,12 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+        callback.setToolbarTitle(getString(R.string.my_events));
+        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.my_events);
         View v = inflater.inflate(R.layout.my_events_layout, container, false);
 
         filterSpinner = (Spinner) v.findViewById(R.id.my_events_spinner);
