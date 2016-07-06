@@ -12,7 +12,7 @@
         android:id="@+id/drawer_section_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="16sp"
         android:layout_marginLeft="@dimen/global_padding"
         android:layout_marginStart="@dimen/global_padding"
         android:layout_marginTop="3dp"
@@ -21,6 +21,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@android:color/white" />
+        android:background="@android:color/white"
+        android:layout_marginTop="4dp"/>
 
 </LinearLayout>

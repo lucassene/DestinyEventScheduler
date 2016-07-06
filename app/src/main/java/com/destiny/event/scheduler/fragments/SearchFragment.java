@@ -185,7 +185,10 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         //String where = GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS) + "=" + GameTable.STATUS_NEW + " AND " + EventTypeTable.getAliasColumn(EventTypeTable.COLUMN_ID) + "=" + eventId;
-        String where = GameTable.getQualifiedColumn(GameTable.COLUMN_ID) + " NOT IN (SELECT game._id FROM game JOIN entry ON game._id = entry.entry_game_id WHERE entry.entry_membership = " + callback.getBungieId() + ") AND " + EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID) + "=" + eventId;;
+        String where = GameTable.getQualifiedColumn(GameTable.COLUMN_ID) + " NOT IN (SELECT game._id FROM game JOIN entry ON game._id = entry.entry_game_id WHERE entry.entry_membership = " + callback.getBungieId() + ")";
+        if (eventId >0){
+            where = where + " AND " + EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID) + "=" + eventId;
+        }
 
         callback.onLoadingData();
 

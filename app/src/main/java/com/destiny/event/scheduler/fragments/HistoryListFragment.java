@@ -190,7 +190,10 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         //String where = GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS) + "=" + GameTable.STATUS_NEW + " AND " + EventTypeTable.getAliasColumn(EventTypeTable.COLUMN_ID) + "=" + eventId;
-        String where = "(" + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED + ") AND " + EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID + "=" + eventId);
+        String where = "(" + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED + ")";
+        if (eventId >0){
+            where = where + " AND " + EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID + "=" + eventId);
+        }
 
         callback.onLoadingData();
 

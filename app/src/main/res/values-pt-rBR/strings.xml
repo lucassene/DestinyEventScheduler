@@ -20,18 +20,19 @@
     <string name="empty_validate_event">Você não tem nenhum evento para avaliar ou validar.</string>
 
     <string-array name="tab_titles">
-        <item>NOVOS</item>
-        <item>AGENDADOS</item>
-        <item>CONCLUÍDOS</item>
+        <item>recentes</item>
+        <item>agendados</item>
+        <item>concluídos</item>
     </string-array>
 
     <string-array name="menu_item">
-        <item>Novo Evento</item>
-        <item>Procurar Evento</item>
-        <item>Meus Eventos</item>
+        <item>Principal</item>
+        <item>Criar evento</item>
+        <item>Procurar evento</item>
+        <item>Meus eventos</item>
         <item>Histórico</item>
-        <item>Meu Clã</item>
-        <item>Meu Perfil</item>
+        <item>Meu clã</item>
+        <item>Meu perfil</item>
         <item>Configurações</item>
         <item>Sobre</item>
         <item>Sair</item>
@@ -48,6 +49,7 @@
     </string-array>
 
     <string-array name="event_types">
+        <item>Todos</item>
         <item>Assalto</item>
         <item>Corte de Oryx</item>
         <item>Crisol</item>
@@ -59,6 +61,7 @@
     </string-array>
 
     <integer-array name="event_type_ids">
+        <item>0</item>
         <item>7</item>
         <item>1</item>
         <item>2</item>
@@ -70,6 +73,7 @@
     </integer-array>
 
     <string-array name="game_status">
+        <item>Todos</item>
         <item>Agendados</item>
         <item>Esperando por Validação</item>
         <item>Validados</item>
@@ -126,7 +130,7 @@
     <string name="max_guardians_label">Mínimo de guardiões</string>
     <string name="min_light_label">Luz mínima</string>
     <string name="new_event_button">CRIAR EVENTO</string>
-    <string name="new_event_title">NOVO EVENTO</string>
+    <string name="new_event_title">CRIAR EVENTO</string>
     <string name="date_label">Data</string>
     <string name="time_label">Horário</string>
     <string name="event_confirmation">O evento aconteceu?</string>
@@ -239,7 +243,7 @@
     <string name="prepare_label6">Feito! </string>
     <string name="connection_needed_login">Conexão com a internet necessária para o login.</string>
     <string name="prepare_msg1">Você se importa de esperar um pouco? Acontece que temos muitos guardiões neste universo...</string>
-    <string name="prepare_msg2">Não se preocupe, é só na primeira vez!</string>
+    <string name="prepare_msg2">\tNão se preocupe, só demora um pouco mais no primeiro login.</string>
     <string name="prepare_title">Preparando sua chegada</string>
     <string name="date_you_join">O dia em que você entrou no</string>
     <string name="dislikes">Não curti</string>
@@ -368,5 +372,6 @@
     <string name="my_profile">PERFIL</string>
     <string name="settings">CONFIGURAÇÕES</string>
     <string name="waiting_data">ESPERANDO DADOS</string>
+    <string name="event_happened">Parece que esse evento já aconteceu, mal minha Guardião.</string>
 
 </resources>

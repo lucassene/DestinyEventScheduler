@@ -1,7 +1,5 @@
 package com.destiny.event.scheduler.utils;
 
-import android.util.Log;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -120,35 +118,35 @@ public class DateUtils {
     public static String getYear(String time){
         String date = time.substring(0,time.lastIndexOf("T"));
         String year = date.substring(0,date.indexOf("-"));
-        Log.w(TAG, "Year: " + year);
+        //Log.w(TAG, "Year: " + year);
         return year;
     }
 
     public static String getMonth(String time){
         String date = time.substring(0,time.lastIndexOf("T"));
         String month = date.substring(date.indexOf("-")+1,date.lastIndexOf("-"));
-        Log.w(TAG, "Month: " + month);
+        //Log.w(TAG, "Month: " + month);
         return month;
     }
 
     public static String getDay(String time){
         String date = time.substring(0,time.lastIndexOf("T"));
         String day = date.substring(time.lastIndexOf("-")+1,date.length());
-        Log.w(TAG, "Day: " + day);
+        //Log.w(TAG, "Day: " + day);
         return day;
     }
 
     public static String getHour(String time){
         String t = time.substring(time.indexOf("T")+1,time.length());
         String hour = t.substring(0,2);
-        Log.w(TAG, "Hour: " + hour);
+        //Log.w(TAG, "Hour: " + hour);
         return hour;
     }
 
     public static String getMinute(String time){
         String t = time.substring(time.indexOf("T")+1,time.length());
         String minute = t.substring(3,5);
-        Log.w(TAG, "Minute: " + minute);
+        //Log.w(TAG, "Minute: " + minute);
         return minute;
 
     }

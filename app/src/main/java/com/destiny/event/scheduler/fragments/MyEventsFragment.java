@@ -52,6 +52,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
     private String gameStatus;
     private ArrayList<String> gameCreatorList;
+    private ArrayList<String> gameStatusList;
 
     private String where;
 
@@ -86,8 +87,12 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         emptyView = (TextView) v.findViewById(R.id.empty_label);
 
         gameCreatorList = new ArrayList<>();
+        gameStatusList = new ArrayList<>();
 
-        if (savedInstanceState != null) gameCreatorList = savedInstanceState.getStringArrayList("gameCreatorList");
+        if (savedInstanceState != null) {
+            gameCreatorList = savedInstanceState.getStringArrayList("gameCreatorList");
+            gameStatusList = savedInstanceState.getStringArrayList("gameStatusList");
+        }
 
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
@@ -95,7 +100,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         gameList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                callback.onGameSelected(String.valueOf(id), TAG, gameCreatorList.get(position), gameStatus);
+                callback.onGameSelected(String.valueOf(id), TAG, gameCreatorList.get(position), gameStatusList.get(position));
             }
         });
 
@@ -135,19 +140,23 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
         switch (filterSpinner.getSelectedItemPosition()){
             case 0:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
+                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
                 initEntryLoader();
                 break;
             case 1:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING;
+                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
                 initEntryLoader();
                 break;
             case 2:
+                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING;
+                initEntryLoader();
+                break;
+            case 3:
                 where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED;
                 prepareGameStrings();
                 initGameLoader();
                 break;
-            case 3:
+            case 4:
                 where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED;
                 prepareGameStrings();
                 initGameLoader();
@@ -229,24 +238,30 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
         switch (position){
             case 0:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
+                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
                 prepareStrings();
                 getLoaderManager().destroyLoader(LOADER_GAME);
                 initEntryLoader();
                 break;
             case 1:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING;
+                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
                 prepareStrings();
                 getLoaderManager().destroyLoader(LOADER_GAME);
                 initEntryLoader();
                 break;
             case 2:
+                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING;
+                prepareStrings();
+                getLoaderManager().destroyLoader(LOADER_GAME);
+                initEntryLoader();
+                break;
+            case 3:
                 where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED;
                 prepareGameStrings();
                 getLoaderManager().destroyLoader(LOADER_ENTRY);
                 initGameLoader();
                 break;
-            case 3:
+            case 4:
                 where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED;
                 prepareGameStrings();
                 getLoaderManager().destroyLoader(LOADER_ENTRY);
@@ -310,6 +325,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
             for (int i=0; i < data.getCount(); i++){
                 gameCreatorList.add(i, data.getString(data.getColumnIndex(GameTable.COLUMN_CREATOR)));
+                gameStatusList.add(i, data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_STATUS)));
                 data.moveToNext();
             }
 
@@ -331,6 +347,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putStringArrayList("gameCreatorList", gameCreatorList);
+        outState.putStringArrayList("gameStatusList", gameStatusList);
         outState.putString("status",gameStatus);
         super.onSaveInstanceState(outState);
     }

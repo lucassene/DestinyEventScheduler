@@ -3,15 +3,21 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/global_padding">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg"
+        android:scaleType="centerCrop"
+        android:alpha=".7"/>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:background="@drawable/gradient_background">
+        android:padding="@dimen/global_padding">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -37,7 +43,7 @@
             android:text="@string/psn"
             android:gravity="left|center"
             android:drawableLeft="@drawable/ic_psn"
-            android:background="@color/psnColor"
+            android:background="@drawable/psn_button_bg"
             android:onClick="callWebView"/>
 
         <Button
@@ -47,7 +53,7 @@
             android:text="@string/live"
             android:gravity="left|center"
             android:drawableLeft="@drawable/ic_live"
-            android:background="@color/liveColor"
+            android:background="@drawable/live_button_bg"
             android:onClick="callWebView"/>
 
     </LinearLayout>

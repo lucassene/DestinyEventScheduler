@@ -3,15 +3,19 @@ package com.destiny.event.scheduler.adapters;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
@@ -23,6 +27,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
     private static final int TYPE_SECTION = 2;
+    private static final int TYPE_SELECTED = 3;
 
     private String items[];
     private TypedArray icons;
@@ -35,6 +40,8 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
 
     private Context context;
 
+    private ToActivityListener callback;
+
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
         int holderId;
@@ -45,6 +52,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
         TextView descView;
         ImageView bannerView;
         ImageView logoView;
+        FrameLayout itemLayout;
 
         public ViewHolder(View itemView, int ViewType){
             super(itemView);
@@ -66,12 +74,19 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                     sectionView = (TextView) itemView.findViewById(R.id.drawer_section_text);
                     holderId = 2;
                     break;
+                case TYPE_SELECTED:
+                    itemLayout = (FrameLayout) itemView.findViewById(R.id.item_layout);
+                    this.itemView = (TextView) itemView.findViewById(R.id.drawer_text);
+                    iconView = (ImageView ) itemView.findViewById(R.id.drawer_icon);
+                    holderId = 3;
+                    break;
             }
 
         }
     }
 
     public DrawerAdapter(Context context, String header, String[] sections, TypedArray icons, String[] items, String clanIcon, String clanName, String clanDesc, String clanBanner) {
+        callback = (ToActivityListener) context;
         this.context = context;
         this.sections = sections;
         this.header = header;
@@ -88,8 +103,6 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
         LayoutInflater layoutInflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         switch (viewType){
             case TYPE_ITEM:
-                //parent.setLayoutParams(new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.MATCH_PARENT, DrawerLayout.LayoutParams.WRAP_CONTENT));
-                //View vItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_item_layout, parent, false);
                 View vItem = layoutInflater.inflate(R.layout.drawer_item_layout, parent, false);
                 ViewHolder vhItem = new ViewHolder(vItem, viewType);
                 return vhItem;
@@ -101,6 +114,10 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                 View vSection = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_section_layout, parent, false);
                 ViewHolder vhSection = new ViewHolder(vSection, viewType);
                 return vhSection;
+            case TYPE_SELECTED:
+                View vSelected = layoutInflater.inflate(R.layout.drawer_item_layout, parent, false);
+                ViewHolder vhSelected = new ViewHolder(vSelected, viewType);
+                return vhSelected;
         }
         return null;
     }
@@ -108,11 +125,11 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         switch (holder.holderId){
-            case 1:
-                if (position <=4){
+            case TYPE_ITEM:
+                if (position <=5){
                     holder.iconView.setImageResource(icons.getResourceId(position-1,0));
                     holder.itemView.setText(items[position-1]);
-                } else if(position <=7){
+                } else if(position <=8){
                     holder.itemView.setText(items[position -2]);
                     holder.iconView.setImageResource(icons.getResourceId(position-2,0));
                 } else {
@@ -120,12 +137,9 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                     holder.iconView.setImageResource(icons.getResourceId(position-3,0));
                 }
                 break;
-            case 0:
-                //Log.w(TAG, "Clan Name: " + clanName);
+            case TYPE_HEADER:
                 holder.headerView.setText(clanName);
                 try {
-                    //Log.w(TAG, "Clan Icon: " + clanIcon);
-                    //Log.w(TAG, "Clan Banner: " + clanBanner);
                     holder.logoView.setImageBitmap(ImageUtils.loadImage(context,clanIcon));
                     holder.bannerView.setImageBitmap(ImageUtils.loadImage(context,clanBanner));
                 } catch (IOException e) {
@@ -134,12 +148,31 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                 }
                 holder.descView.setText(clanDesc);
                 break;
-            case 2:
-                if (position == 5) {
+            case TYPE_SECTION:
+                if (position == 6) {
                     holder.sectionView.setText(sections[0]);
                 } else {
                     holder.sectionView.setText(sections[1]);
                 }
+                break;
+            case TYPE_SELECTED:
+                if (position <=5){
+                    holder.iconView.setImageResource(icons.getResourceId(position-1,0));
+                    holder.itemView.setText(items[position-1]);
+                } else if(position <=8){
+                    holder.itemView.setText(items[position -2]);
+                    holder.iconView.setImageResource(icons.getResourceId(position-2,0));
+                } else {
+                    holder.itemView.setText(items[position -3]);
+                    holder.iconView.setImageResource(icons.getResourceId(position-3,0));
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+                    holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_bg));
+                } else {
+                    holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.selected_bg));
+                }
+
+                break;
         }
     }
 
@@ -155,7 +188,9 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
         } else if (isPositionSection(position)){
             return TYPE_SECTION;
         } else {
-            return TYPE_ITEM;
+            if (callback.getSelectedItem() == position){
+                return TYPE_SELECTED;
+            } else return TYPE_ITEM;
         }
     }
 
@@ -164,6 +199,6 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
     }
 
     private boolean isPositionSection(int position){
-        return position == 5 || position == 8;
+        return position == 6 || position == 9;
     }
 }

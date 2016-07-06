@@ -11,7 +11,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -66,6 +65,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
     private String creator;
     private int selectedType;
     private int inscriptions;
+    private String origin;
 
     private List<MembersModel> memberList;
 
@@ -139,6 +139,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
             gameId = bundle.getString("gameId");
             creator = bundle.getString("creator");
             originStatus = bundle.getString("status");
+            origin = bundle.getString("origin");
         }
 
         prepareViews();
@@ -163,7 +164,9 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
             }
         });
 
-        callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+        if (origin.equals(SearchFragment.TAG) || origin.equals(MyEventsFragment.TAG)){
+            callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
+        } else callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         return v;
     }
 
@@ -181,14 +184,14 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                     joinButton.setEnabled(false);
                     status = STATUS_WAITING;
                 }
-                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.validate_event_title);
+                callback.setToolbarTitle(getString(R.string.validate_event_title));
                 break;
             case GameTable.STATUS_VALIDATED:
                 joinButton.setEnabled(true);
                 joinButton.setText(R.string.evaluate);
                 joinButton.setVisibility(View.VISIBLE);
                 checkLayout.setVisibility(View.GONE);
-                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.evaluate_match);
+                callback.setToolbarTitle(getString(R.string.evaluate_match));
                 status = STATUS_VALIDATED;
                 break;
             case GameTable.STATUS_EVALUATED:
@@ -196,7 +199,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                 joinButton.setVisibility(View.GONE);
                 checkLayout.setVisibility(View.GONE);
                 checkBox.setChecked(true);
-                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.event_details);
+                callback.setToolbarTitle(getString(R.string.event_details));
                 status = STATUS_EVALUATED;
                 break;
         }

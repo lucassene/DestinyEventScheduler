@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.fragments.DetailEventFragment;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 
 public class MyAlertDialog extends DialogFragment {
@@ -70,12 +71,11 @@ public class MyAlertDialog extends DialogFragment {
             }
 
             dialogType = bundle.getInt("type");
-
         }
 
         listener = (FromDialogListener) getActivity();
 
-        Fragment fragment = getFragmentManager().findFragmentById(R.id.content_frame);
+        final Fragment fragment = getFragmentManager().findFragmentById(R.id.content_frame);
 
         if (fragment instanceof FromDialogListener){
             fragmentListener = (FromDialogListener) getFragmentManager().findFragmentById(R.id.content_frame);
@@ -101,7 +101,9 @@ public class MyAlertDialog extends DialogFragment {
                                 fragmentListener.onPositiveClick(null, dialogType);
                                 break;
                             case ALERT_DIALOG:
-                                listener.onPositiveClick(null, dialogType);
+                                if (fragment instanceof DetailEventFragment){
+                                    fragmentListener.onPositiveClick(null, dialogType);
+                                } else listener.onPositiveClick(null, dialogType);
                                 break;
                             case CONFIRM_DIALOG:
                                 fragmentListener.onPositiveClick(null, dialogType);

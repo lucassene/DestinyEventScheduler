@@ -19,7 +19,8 @@
         android:scaleType="fitStart"
         android:layout_gravity="center_vertical"
         android:layout_centerVertical="true"
-        android:layout_marginRight="8dp"/>
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"/>
 
     <LinearLayout
         android:id="@+id/names_layout"

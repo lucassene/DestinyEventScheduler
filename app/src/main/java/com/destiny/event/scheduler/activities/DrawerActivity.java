@@ -133,6 +133,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private Bundle spinnerSelections = new Bundle();
 
+    private int selectedDrawerItem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,7 +154,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         Typeface font = Typeface.createFromAsset(getAssets(), "d.ttf");
-        toolbarTitle = (TextView) toolbar.findViewById(R.id.title);
+        if (toolbar != null) toolbarTitle = (TextView) toolbar.findViewById(R.id.title);
         toolbarTitle.setTypeface(font);
         toolbarTitle.setText(R.string.home_title);
 
@@ -348,6 +350,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         openedFragment = null;
         viewPager.setAdapter(viewPageAdapter);
         tabLayout.setViewPager(viewPager);
+        selectedDrawerItem = 1;
         rAdapter.notifyDataSetChanged();
         //viewPager.setCurrentItem(1);
         if (getSupportActionBar() != null) {
@@ -488,6 +491,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     bundle.putString("creator", creator);
                     bundle.putString("status", status);
                     fragment = new DetailEventFragment();
+                    isNewScheduledOrValidated = GameTable.STATUS_NEW;
                     break;
             }
 
@@ -597,6 +601,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void setToolbarTitle(String title) {
         toolbarTitle.setText(title);
+    }
+
+    @Override
+    public int getSelectedItem() {
+        return selectedDrawerItem;
     }
 
     @Override
@@ -791,8 +800,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         String header = getResources().getString(R.string.def_clan_header);
         String[] sections = getResources().getStringArray(R.array.menu_section);
 
+        selectedDrawerItem = 1;
         rView = (RecyclerView) findViewById(R.id.drawer_view);
-        rAdapter = new DrawerAdapter(getApplicationContext(), header, sections, icons, items, clanIcon, clanName, clanDesc, clanBanner);
+        rAdapter = new DrawerAdapter(this, header, sections, icons, items, clanIcon, clanName, clanDesc, clanBanner);
         rView.setAdapter(rAdapter);
         rLayoutManager = new LinearLayoutManager(this);
         rView.setLayoutManager(rLayoutManager);
@@ -813,37 +823,51 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 if (child!=null){
                     switch (rView.getChildAdapterPosition(child)){
                         case 0:
+                            selectedDrawerItem = 1;
                             openMainActivity(child);
                             break;
                         case 1:
-                            openNewEventFragment(child);
+                            selectedDrawerItem = 1;
+                            openMainActivity(child);
                             break;
                         case 2:
-                            openSearchEventFragment(child);
+                            selectedDrawerItem = 2;
+                            openNewEventFragment(child);
                             break;
                         case 3:
-                            openMyEventsFragment(child);
+                            selectedDrawerItem = 3;
+                            openSearchEventFragment(child);
                             break;
                         case 4:
-                            openHistoryFragment(child);
+                            selectedDrawerItem = 4;
+                            openMyEventsFragment(child);
                             break;
                         case 5:
+                            selectedDrawerItem = 5;
+                            openHistoryFragment(child);
                             break;
                         case 6:
-                            openMyClanFragment(child);
                             break;
                         case 7:
-                            openMyProfileFragment(child);
+                            selectedDrawerItem = 7;
+                            openMyClanFragment(child);
                             break;
                         case 8:
+                            selectedDrawerItem = 8;
+                            openMyProfileFragment(child);
                             break;
                         case 9:
-                            openConfigFragment(child);
                             break;
                         case 10:
-                            openDBViewerFragment(child);
+                            selectedDrawerItem = 10;
+                            openConfigFragment(child);
                             break;
                         case 11:
+                            selectedDrawerItem = 11;
+                            openDBViewerFragment(child);
+                            break;
+                        case 12:
+                            selectedDrawerItem = 12;
                             showLogOffDialog(child);
                             break;
                     }
@@ -860,28 +884,41 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 if (child!=null && gestureDetector.onTouchEvent(e)){
                     switch (rView.getChildAdapterPosition(child)){
                         case 0:
+                            selectedDrawerItem = 1;
                             return openMainActivity(child);
                         case 1:
-                            return openNewEventFragment(child);
+                            selectedDrawerItem = 1;
+                            return openMainActivity(child);
                         case 2:
-                            return openSearchEventFragment(child);
+                            selectedDrawerItem = 2;
+                            return openNewEventFragment(child);
                         case 3:
-                            return openMyEventsFragment(child);
+                            selectedDrawerItem = 3;
+                            return openSearchEventFragment(child);
                         case 4:
-                            return openHistoryFragment(child);
+                            selectedDrawerItem = 4;
+                            return openMyEventsFragment(child);
                         case 5:
-                            return false;
+                            selectedDrawerItem = 5;
+                            return openHistoryFragment(child);
                         case 6:
-                            return openMyClanFragment(child);
-                        case 7:
-                            return openMyProfileFragment(child);
-                        case 8:
                             return false;
+                        case 7:
+                            selectedDrawerItem = 7;
+                            return openMyClanFragment(child);
+                        case 8:
+                            selectedDrawerItem = 8;
+                            return openMyProfileFragment(child);
                         case 9:
-                            return openConfigFragment(child);
+                            return false;
                         case 10:
-                            return openAboutFragment(child);
+                            selectedDrawerItem = 10;
+                            return openConfigFragment(child);
                         case 11:
+                            selectedDrawerItem = 11;
+                            return openAboutFragment(child);
+                        case 12:
+                            selectedDrawerItem = 12;
                             return showLogOffDialog(child);
                     }
                     return true;

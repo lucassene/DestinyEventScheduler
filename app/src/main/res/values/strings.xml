@@ -11,24 +11,26 @@
     <string name="tx_login">Welcome Guardian! What is the secret code?</string>
 
     <string-array name="tab_titles">
-        <item>NEW</item>
-        <item>SCHEDULED</item>
-        <item>FINISHED</item>
+        <item>recent</item>
+        <item>scheduled</item>
+        <item>finished</item>
     </string-array>
 
     <string-array name="menu_item">
-        <item>New Event</item>
-        <item>Search Events</item>
-        <item>My Events</item>
+        <item>Main</item>
+        <item>Create event</item>
+        <item>Search events</item>
+        <item>My events</item>
         <item>History</item>
-        <item>My Clan</item>
-        <item>My Stats</item>
+        <item>My elan</item>
+        <item>My stats</item>
         <item>Settings</item>
         <item>About</item>
         <item>Logout</item>
     </string-array>
 
     <array name="menu_icons">
+        <item>@drawable/ic_home</item>
         <item>@drawable/ic_event_new</item>
         <item>@drawable/ic_event_search</item>
         <item>@drawable/ic_my_events</item>
@@ -105,6 +107,7 @@
     <string name="strike_list">Strike List</string>
 
     <string-array name="event_types">
+        <item>All</item>
         <item>Court of Oryx</item>
         <item>Crucible</item>
         <item>Patrol</item>
@@ -116,6 +119,7 @@
     </string-array>
 
     <integer-array name="event_type_ids">
+        <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -127,6 +131,7 @@
     </integer-array>
 
     <string-array name="game_status">
+        <item>All</item>
         <item>Scheduled</item>
         <item>Waiting for Validation</item>
         <item>Validated</item>
@@ -287,7 +292,7 @@
     <string name="connection_needed_login">Internet connection needed for log in.</string>
     <string name="prepare_title">Preparing your arrival</string>
     <string name="prepare_msg1">Can you wait just a little please? Turns out there is too many Guardians in this universe…</string>
-    <string name="prepare_msg2">Don\'t worry, it\'s just in the first time!</string>
+    <string name="prepare_msg2">\tDon\'t worry, it only takes a bit longer on the first login.</string>
     <string name="my_clan_empty">Oops! Did we forget to invite some guardians?</string>
     <string name="date_you_join">The day you joined</string>
     <string name="date_member_join1">The day</string>
@@ -422,10 +427,12 @@
     <string name="minutes">" minutes"</string>
     <string name="check_connection">Please check your internet connection.</string>
     <string name="home_title">MAIN</string>
-    <string name="new_event_title">NEW EVENT</string>
+    <string name="new_event_title">CREATE EVENT</string>
     <string name="history">HISTORY</string>
     <string name="my_clan">MY CLAN</string>
     <string name="waiting_data">WAITING DATA</string>
+    <string name="oops" translatable="false">Oops!</string>
+    <string name="event_happened">Looks like this event already happen, my bad Guardian.</string>
 
 
 </resources>

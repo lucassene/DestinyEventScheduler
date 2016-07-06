@@ -8,7 +8,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,7 +38,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     private static final int LOADER_MEMBERS = 50;
 
     //private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE + " ASC";
-    private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME + " ASC";
+    private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME + " COLLATE NOCASE ASC";
     private static final String POINTS_ORDER_BY = MemberTable.COLUMN_EXP + " DESC";
     private String orderBy;
 

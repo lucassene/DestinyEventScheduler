@@ -78,6 +78,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:scrollbars="vertical"
-        android:background="@color/toolbarBackground" />
+        android:background="@drawable/drawer_background" />
 
 </android.support.v4.widget.DrawerLayout>

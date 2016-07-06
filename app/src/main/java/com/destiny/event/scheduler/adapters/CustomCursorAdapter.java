@@ -2,7 +2,6 @@ package com.destiny.event.scheduler.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -136,10 +135,6 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
         gameMax.setText(maxS);
         int insc = cursor.getInt(cursor.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
         gameInsc.setText(String.valueOf(insc));
-
-        if (insc > max) {
-            gameInsc.setTextColor(ContextCompat.getColor(context, R.color.redFilter));
-        }
 
     }
 

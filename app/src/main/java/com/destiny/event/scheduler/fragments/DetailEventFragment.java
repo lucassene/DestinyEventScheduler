@@ -234,6 +234,11 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     bundle.putString(msg, getContext().getResources().getString(R.string.join_full_dialog_msg));
                 } else bundle.putString(msg, getContext().getResources().getString(R.string.join_dialog_msg));
                 break;
+            case MyAlertDialog.ALERT_DIALOG:
+                bundle.putString(title, getString(R.string.oops));
+                bundle.putString(msg, getString(R.string.event_happened));
+                bundle.putString(posButton, getString(R.string.got_it));
+                break;
         }
 
         bundle.putInt("type", dialogType);
@@ -244,12 +249,33 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     }
 
+    private void initGameLoader(){
+        if (getLoaderManager().getLoader(LOADER_GAME) != null){
+            getLoaderManager().destroyLoader(LOADER_GAME);
+        }
+        getLoaderManager().restartLoader(LOADER_GAME, null, this);
+    }
+
+    private void initEntryLoader(){
+        if (getLoaderManager().getLoader(LOADER_ENTRY_MEMBERS) != null){
+            getLoaderManager().destroyLoader(LOADER_ENTRY_MEMBERS);
+        }
+        getLoaderManager().restartLoader(LOADER_ENTRY_MEMBERS, null, this);
+    }
+
+    private void initNotificationLoader(){
+        if (getLoaderManager().getLoader(LOADER_NOTIFICATION) != null){
+            getLoaderManager().destroyLoader(LOADER_NOTIFICATION);
+        }
+        getLoaderManager().restartLoader(LOADER_NOTIFICATION, null, this);
+    }
+
     private void deleteGame(Uri uri) {
         getContext().getContentResolver().delete(uri,null,null);
         String selection = EntryTable.COLUMN_GAME + "=" + gameId;
         getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
         notificationMethod = DELETE_NOTIFICATION;
-        getLoaderManager().initLoader(LOADER_NOTIFICATION, null, this);
+        initNotificationLoader();
     }
 
     private void leaveGame(ContentValues values, Uri uri) {
@@ -260,7 +286,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         String selection = EntryTable.COLUMN_GAME + "=" + gameId + " AND " + EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
         getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
         notificationMethod = DELETE_NOTIFICATION;
-        getLoaderManager().initLoader(LOADER_NOTIFICATION, null, this);
+        initNotificationLoader();
 
     }
 
@@ -278,10 +304,20 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         values.clear();
 
         notificationMethod = CREATE_NOTIFICATION;
-        getLoaderManager().initLoader(LOADER_NOTIFICATION, null, this);
+        initNotificationLoader();
 
     }
 
+    private void updateGame(ContentValues values, Uri uri) {
+
+        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING);
+        getContext().getContentResolver().update(uri, values, null, null);
+        values.clear();
+
+        notificationMethod = DELETE_NOTIFICATION;
+        initNotificationLoader();
+
+    }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
@@ -299,7 +335,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private void getGameData() {
 
         prepareGameStrings();
-        getLoaderManager().initLoader(LOADER_GAME, null, this);
+        initGameLoader();
     }
 
     private void prepareGameStrings() {
@@ -311,6 +347,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         String c10 = GameTable.COLUMN_LIGHT;
         String c12 = GameTable.COLUMN_INSCRIPTIONS;
         String c14 = GameTable.COLUMN_CREATOR_NAME;
+        String c3 = GameTable.COLUMN_STATUS;
 
         String c4 = EventTable.COLUMN_ICON;
         String c5 = EventTable.COLUMN_NAME;
@@ -323,7 +360,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         String c16 = EventTypeTable.COLUMN_ICON;
         String c17 = EventTypeTable.COLUMN_NAME;
 
-        gameProjection = new String[] {c1, c2, c4, c5, c6, c7, c8, c9, c10, c11, c12,  c14, c15, c16, c17};
+        gameProjection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c14, c15, c16, c17};
 
     }
 
@@ -442,10 +479,17 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     inscriptions = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
                     String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
                     guardians.setText(sg);
+                    String gS = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_STATUS));
                     //Log.w(TAG, "Game Cursor: " + DatabaseUtils.dumpCursorToString(data));
                     setAdapter(maxGuardians);
-                    prepareMemberStrings();
-                    getLoaderManager().initLoader(LOADER_ENTRY_MEMBERS, null, this);
+
+                    Calendar now = Calendar.getInstance();
+                    if (now.getTimeInMillis() > eventCalendar.getTimeInMillis() && gS.equals(GameTable.STATUS_SCHEDULED)){
+                        dialogThread();
+                    } else {
+                        prepareMemberStrings();
+                        initEntryLoader();
+                    }
                     break;
                 case LOADER_ENTRY_MEMBERS:
                     adapter.swapCursor(data);
@@ -468,7 +512,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
         if (loader.getId() == LOADER_NOTIFICATION){
 
-            //Log.w(TAG, "onLoaderFinished alcançado com ID LOADER_NOTIFICATION");
+            Log.w(TAG, "onLoaderFinished alcançado com ID LOADER_NOTIFICATION");
 
             switch (notificationMethod){
                 case CREATE_NOTIFICATION:
@@ -500,6 +544,17 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         callback.onDataLoaded();
         checkIfCloses(onCloseDemanded);
 
+    }
+
+    private void dialogThread() {
+        Handler handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if (msg.what == MyAlertDialog.ALERT_DIALOG) showAlertDialog(MyAlertDialog.ALERT_DIALOG);
+            }
+        };
+        handler.sendEmptyMessage(MyAlertDialog.ALERT_DIALOG);
     }
 
     private Calendar getNotifyTime() {
@@ -629,9 +684,13 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             case MyAlertDialog.DELETE_DIALOG:
                 deleteGame(uri);
                 break;
+            case MyAlertDialog.ALERT_DIALOG:
+                updateGame(values, uri);
+                break;
         }
 
     }
+
 
     @Override
     public void onDateSent(Calendar date) {
