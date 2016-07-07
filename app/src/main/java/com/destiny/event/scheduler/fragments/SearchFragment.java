@@ -87,7 +87,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         gamesList = (ListView) v.findViewById(R.id.search_list);
         emptyView = (TextView) v.findViewById(R.id.empty_label);
 
-        eventIdList = getContext().getResources().getIntArray(R.array.event_type_ids);
+        eventIdList = getContext().getResources().getIntArray(R.array.type_ids);
 
         gamesList.setFooterDividersEnabled(false);
 
@@ -107,7 +107,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getContext().getResources().getStringArray(R.array.event_types));
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getContext().getResources().getStringArray(R.array.spinner_types));
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterSpinner.setOnItemSelectedListener(this);
         filterSpinner.setAdapter(spinnerAdapter);

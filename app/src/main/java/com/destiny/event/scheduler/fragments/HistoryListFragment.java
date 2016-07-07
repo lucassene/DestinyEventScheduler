@@ -86,7 +86,7 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
 
         sectionTitle.setText(R.string.matches_played);
 
-        eventIdList = getContext().getResources().getIntArray(R.array.event_type_ids);
+        eventIdList = getContext().getResources().getIntArray(R.array.type_ids);
 
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
@@ -104,7 +104,7 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getContext().getResources().getStringArray(R.array.event_types));
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getContext().getResources().getStringArray(R.array.spinner_types));
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterSpinner.setOnItemSelectedListener(this);
         filterSpinner.setAdapter(spinnerAdapter);

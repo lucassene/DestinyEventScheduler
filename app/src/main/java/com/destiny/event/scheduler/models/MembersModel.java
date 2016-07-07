@@ -13,7 +13,10 @@ public class MembersModel {
     private int dislikes;
     private int gamesCreated;
     private int gamesPlayed;
-    private boolean hasBungieTag = false;
+    private boolean isChecked;
+    private int rating;
+    private int entryId;
+    private int xp;
 
     public int getEntryId() {
         return entryId;
@@ -38,11 +41,6 @@ public class MembersModel {
     public void setRating(int rating) {
         this.rating = rating;
     }
-
-    private boolean isChecked;
-    private int rating;
-    private int entryId;
-    //private String memberSince;
 
     public String getClanId() {
         return clanId;
@@ -108,14 +106,6 @@ public class MembersModel {
         this.membershipId = membershipId;
     }
 
-    //public String getMemberSince() {
-       // return memberSince;
-    //}
-
-    //public void setMemberSince(String memberSince) {
-        //this.memberSince = memberSince;
-    //}
-
     public String getName() {
         return name;
     }
@@ -132,7 +122,6 @@ public class MembersModel {
         this.platformId = platformId;
     }
 
-
     public String getTitle() {
         return title;
     }
@@ -141,11 +130,11 @@ public class MembersModel {
         this.title = title;
     }
 
-    public boolean hasBungieTag() {
-        return hasBungieTag;
+    public int getXp() {
+        return xp;
     }
 
-    public void setHasBungieTag(boolean hasBungieTag) {
-        this.hasBungieTag = hasBungieTag;
+    public void setXp(int xp) {
+        this.xp = xp;
     }
 }

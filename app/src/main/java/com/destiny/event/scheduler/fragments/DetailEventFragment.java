@@ -562,7 +562,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         notifyTime.setTime(eventCalendar.getTime());
 
         SharedPreferences sharedPrefs = getActivity().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 10)*-1;
+        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0)*-1;
         notifyTime.add(Calendar.MINUTE,alarmTime);
 
         return notifyTime;

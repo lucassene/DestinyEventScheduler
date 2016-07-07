@@ -83,7 +83,7 @@ public class UpdateNotificationsService extends IntentService {
     private void updateNotifications() {
 
         SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int sharedTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF,15);
+        int sharedTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF,0);
         Log.w(TAG, "actualSharedTime: " + sharedTime + " previousSharedTime: " + previousTime);
         boolean isAllowed = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
 

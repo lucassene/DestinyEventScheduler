@@ -31,6 +31,7 @@ import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
+import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyDatePickerDialog;
 import com.destiny.event.scheduler.dialogs.MyTimePickerDialog;
@@ -44,7 +45,9 @@ import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Random;
 
 
 public class NewEventFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener, FromActivityListener {
@@ -54,6 +57,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int LOADER_TYPE = 10;
     private static final int LOADER_EVENT = 20;
     private static final int LOADER_NOTIFICATION = 80;
+    private static final int LOADER_MEMBERS = 50;
 
     private String selectedType;
     private String selectedEvent;
@@ -91,6 +95,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     private boolean hasDate = false;
     private boolean hasTime = false;
+
+    private ArrayList<String> membershipIdList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -278,6 +284,9 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         fillTypeData();
         fillgameData();
 
+        //Loader apenas para testes
+        initMemberLoader();
+
         createButton.setEnabled(false);
         createButton.setText(R.string.waiting_data);
 
@@ -285,7 +294,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void callEventList(){
-        Log.w(TAG, "Method calEventList() called!");
+        //Log.w(TAG, "Method callEventList() called!");
         Fragment fragment = new GenericListFragment();
         Bundle bundle = new Bundle();
         bundle.putString("title", getContext().getResources().getString(R.string.choose_game));
@@ -367,6 +376,16 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                         null,
                         null
                 );
+            //Loader apenas para testes
+            case LOADER_MEMBERS:
+                return new CursorLoader(
+                        getContext(),
+                        DataProvider.MEMBER_URI,
+                        new String[] {MemberTable.COLUMN_MEMBERSHIP},
+                        null,
+                        null,
+                        null
+                );
             default:
                 return null;
         }
@@ -392,6 +411,18 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 eventName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 textGame.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 break;
+            //Loader apenas para testes
+            case LOADER_MEMBERS:
+                //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
+                data.moveToFirst();
+                for (int i=0;i<data.getCount();i++){
+                    if (membershipIdList == null){
+                        membershipIdList = new ArrayList<>();
+                    }
+                    membershipIdList.add(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP)));
+                    data.moveToNext();
+                }
+                break;
         }
         callback.onDataLoaded();
 
@@ -399,7 +430,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.w("NewEvent Loader: ", "O Loader entrou no método onLoaderReset");
+        //Log.w("NewEvent Loader: ", "O Loader entrou no método onLoaderReset");
     }
 
     @Override
@@ -421,7 +452,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
         insertedDate = date;
 
-        Log.w(TAG, "Entrada de Date: " + insertedDate.get(Calendar.DAY_OF_MONTH) + "/" + insertedDate.get(Calendar.MONTH) + "/" + insertedDate.get(Calendar.YEAR));
+        //Log.w(TAG, "Entrada de Date: " + insertedDate.get(Calendar.DAY_OF_MONTH) + "/" + insertedDate.get(Calendar.MONTH) + "/" + insertedDate.get(Calendar.YEAR));
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", getResources().getConfiguration().locale);
         String finalDate = sdf.format(date.getTime());
@@ -450,7 +481,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             insertedDate.set(Calendar.SECOND, 0);
         }
 
-        Log.w(TAG, "Entrada de Time: " + insertedDate.get(Calendar.HOUR_OF_DAY) + ":" + insertedDate.get(Calendar.MINUTE) + ":00");
+        //Log.w(TAG, "Entrada de Time: " + insertedDate.get(Calendar.HOUR_OF_DAY) + ":" + insertedDate.get(Calendar.MINUTE) + ":00");
 
         String hourOfTheDay = String.valueOf(hour);
         String min = String.valueOf(minute);
@@ -515,8 +546,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             minimumTime.setTime(notifyTime.getTime());
             minimumTime.add(Calendar.MINUTE, -10);
 
-            Log.w(TAG, "MinimumTime: " + minimumTime.get(Calendar.HOUR_OF_DAY) + ":" + minimumTime.get(Calendar.MINUTE) + ":00");
-            Log.w(TAG, "NotifyTime: " + notifyTime.get(Calendar.HOUR_OF_DAY) + ":" + notifyTime.get(Calendar.MINUTE) + ":00");
+            //Log.w(TAG, "MinimumTime: " + minimumTime.get(Calendar.HOUR_OF_DAY) + ":" + minimumTime.get(Calendar.MINUTE) + ":00");
+            //Log.w(TAG, "NotifyTime: " + notifyTime.get(Calendar.HOUR_OF_DAY) + ":" + notifyTime.get(Calendar.MINUTE) + ":00");
 
             if (now.getTimeInMillis() <= minimumTime.getTimeInMillis()){
 
@@ -549,6 +580,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 entryValues.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
                 getContext().getContentResolver().insert(DataProvider.ENTRY_URI, entryValues);
 
+                //Apenas para testes
                 createFakeEntries();
 
                 setAlarmNotification(notifyTime, gameId, eventName, eventTypeName, eventIcon);
@@ -567,12 +599,20 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
+    //Loader apenas para testes
+    private void initMemberLoader() {
+        if (getLoaderManager().getLoader(LOADER_MEMBERS) != null){
+            getLoaderManager().destroyLoader(LOADER_MEMBERS);
+        }
+        getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
+    }
+
     private Calendar getNotifyTime() {
         Calendar notifyTime = Calendar.getInstance();
         notifyTime.setTime(insertedDate.getTime());
 
         SharedPreferences sharedPrefs = getActivity().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 10)*-1;
+        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0)*-1;
         notifyTime.add(Calendar.MINUTE,alarmTime);
         minimumIntTime = (alarmTime*-1) + 10;
 
@@ -582,24 +622,40 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     //Inserindo entries falsas apenas para testes
     private void createFakeEntries() {
 
+        Random random = new Random();
+
+        Calendar newDate = insertedDate;
+        newDate.add(Calendar.MINUTE, -(random.nextInt(3)+1));
+        int mId;
+
         ContentValues values = new ContentValues();
-        values.put(EntryTable.COLUMN_MEMBERSHIP,"4611686018446566077");
+        mId = random.nextInt(membershipIdList.size());
+        values.put(EntryTable.COLUMN_MEMBERSHIP, membershipIdList.get(mId));
+        membershipIdList.remove(mId);
         values.put(EntryTable.COLUMN_GAME, gameId);
-        values.put(EntryTable.COLUMN_TIME,"2016-10-30T16:43:00");
+        values.put(EntryTable.COLUMN_TIME,DateUtils.calendarToString(newDate));
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
         values.clear();
 
         values = new ContentValues();
-        values.put(EntryTable.COLUMN_MEMBERSHIP,"4611686018434509539");
+        mId = random.nextInt(membershipIdList.size());
+        values.put(EntryTable.COLUMN_MEMBERSHIP, membershipIdList.get(mId));
+        membershipIdList.remove(mId);
         values.put(EntryTable.COLUMN_GAME, gameId);
-        values.put(EntryTable.COLUMN_TIME,"2016-10-30T16:43:00");
+        newDate = insertedDate;
+        newDate.add(Calendar.MINUTE, -(random.nextInt(3)+1));
+        values.put(EntryTable.COLUMN_TIME,DateUtils.calendarToString(newDate));
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
         values.clear();
 
         values = new ContentValues();
-        values.put(EntryTable.COLUMN_MEMBERSHIP,"4611686018444413912");
+        mId = random.nextInt(membershipIdList.size());
+        values.put(EntryTable.COLUMN_MEMBERSHIP, membershipIdList.get(mId));
+        membershipIdList.remove(mId);
         values.put(EntryTable.COLUMN_GAME, gameId);
-        values.put(EntryTable.COLUMN_TIME,"2016-10-30T16:43:00");
+        newDate = insertedDate;
+        newDate.add(Calendar.MINUTE, -(random.nextInt(3)+1));
+        values.put(EntryTable.COLUMN_TIME,DateUtils.calendarToString(newDate));
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
         values.clear();
 
@@ -618,7 +674,9 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             values.put(NotificationTable.COLUMN_ICON, typeIcon);
             values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(notifyTime));
             Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
-            if (uri != null) firstId = Integer.parseInt(uri.getLastPathSegment());
+            if (uri != null) {
+                firstId = Integer.parseInt(uri.getLastPathSegment());
+            } else Log.w(TAG, "Notification cannot be created");
             values.clear();
         } else {
             ContentValues values = new ContentValues();
@@ -628,7 +686,9 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             values.put(NotificationTable.COLUMN_ICON, typeIcon);
             values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(notifyTime));
             Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
-            if (uri != null) firstId = Integer.parseInt(uri.getLastPathSegment());
+            if (uri != null) {
+                firstId = Integer.parseInt(uri.getLastPathSegment());
+            } else Log.w(TAG, "Notification cannot be created");
             values.clear();
 
             values = new ContentValues();
@@ -638,7 +698,9 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             values.put(NotificationTable.COLUMN_ICON, typeIcon);
             values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(insertedDate));
             uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
-            if (uri != null) secondId = Integer.parseInt(uri.getLastPathSegment());
+            if (uri != null) {
+                secondId = Integer.parseInt(uri.getLastPathSegment());
+            } else Log.w(TAG, "Notification cannot be created");
             values.clear();
         }
 

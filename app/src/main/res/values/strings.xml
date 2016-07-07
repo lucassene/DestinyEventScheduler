@@ -107,7 +107,6 @@
     <string name="strike_list">Strike List</string>
 
     <string-array name="event_types">
-        <item>All</item>
         <item>Court of Oryx</item>
         <item>Crucible</item>
         <item>Patrol</item>
@@ -119,6 +118,29 @@
     </string-array>
 
     <integer-array name="event_type_ids">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </integer-array>
+
+    <string-array name="spinner_types">
+        <item>All</item>
+        <item>Court of Oryx</item>
+        <item>Crucible</item>
+        <item>Patrol</item>
+        <item>Prison of Elders</item>
+        <item>Raid</item>
+        <item>Story</item>
+        <item>Strike</item>
+        <item>Strike List</item>
+    </string-array>
+
+    <integer-array name="type_ids">
         <item>0</item>
         <item>1</item>
         <item>2</item>
@@ -405,7 +427,7 @@
     <string name="developers">Developers</string>
     <string name="application">Application</string>
     <string name="empty_validate_event">You don\'t have any event to evaluate or validate.</string>
-    <string name="error_bungie_auth">Error with Bungie autentication. Please finish the app and try again</string>
+    <string name="error_bungie_auth">Error with Bungie autentication. Please check bungie.net and try again later.</string>
     <string name="allies">Looking for allies</string>
     <string name="back_desc">Back</string>
     <string name="creating_db">Creating fake database</string>

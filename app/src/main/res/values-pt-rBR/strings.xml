@@ -49,7 +49,6 @@
     </string-array>
 
     <string-array name="event_types">
-        <item>Todos</item>
         <item>Assalto</item>
         <item>Corte de Oryx</item>
         <item>Crisol</item>
@@ -61,6 +60,29 @@
     </string-array>
 
     <integer-array name="event_type_ids">
+        <item>7</item>
+        <item>1</item>
+        <item>2</item>
+        <item>6</item>
+        <item>5</item>
+        <item>8</item>
+        <item>3</item>
+        <item>4</item>
+    </integer-array>
+
+    <string-array name="spinner_types">
+        <item>Todos</item>
+        <item>Assalto</item>
+        <item>Corte de Oryx</item>
+        <item>Crisol</item>
+        <item>História</item>
+        <item>Incursão</item>
+        <item>Lista de Assalto</item>
+        <item>Patrulha</item>
+        <item>Prisão dos Anciões</item>
+    </string-array>
+
+    <integer-array name="type_ids">
         <item>0</item>
         <item>7</item>
         <item>1</item>
@@ -359,7 +381,7 @@
     <string name="pictures">Analisando imagens</string>
     <string name="prior_entries">Verificando entradas anteriores</string>
     <string name="vanguard_data">Obtendo dados da Vanguarda</string>
-    <string name="error_bungie_auth">Erro na autenticação na Bungie. Por favor encerre o app e tente novamente.</string>
+    <string name="error_bungie_auth">Erro na autenticação na Bungie. Por favor cheque o site bungie.net e tente novamente mais tarde.</string>
     <string name="confirm_evaluation">Confirmar avaliação?</string>
     <string name="no_evaluation">Nenhum guardião foi avaliado, confirmar?</string>
     <string name="no_clan_title">Você saiu do clã?</string>

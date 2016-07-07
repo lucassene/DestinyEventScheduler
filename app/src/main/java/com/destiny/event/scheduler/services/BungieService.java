@@ -317,6 +317,7 @@ public class BungieService extends IntentService {
         Bundle bundle = new Bundle();
         try {
             JSONObject jObject = new JSONObject(getCurrentBungieAccountResponse);
+            Log.w(TAG, getCurrentBungieAccountResponse);
 
             JSONObject jResponse = jObject.getJSONObject("Response");
             JSONArray jDestinyAccounts = jResponse.getJSONArray("destinyAccounts");
@@ -341,7 +342,7 @@ public class BungieService extends IntentService {
                     JSONArray jClans = jResponse.getJSONArray("clans");
                     JSONObject clanObj = jClans.getJSONObject(0);
                     clanId = clanObj.getString("groupId");
-                    //Log.w(TAG,"Clan ID: " + clanId);
+                    Log.w(TAG,"Clan ID: " + clanId);
 
                     JSONObject jRelatedGroups = jResponse.getJSONObject("relatedGroups");
                     JSONObject jGroup = jRelatedGroups.getJSONObject(clanId);
@@ -358,13 +359,15 @@ public class BungieService extends IntentService {
                     return ERROR_NO_CLAN;
                 }
 
+            } else {
+                Log.w(TAG, "destinyAccount tag not found");
+                return ERROR_CURRENT_USER;
             }
         } catch (JSONException e) {
             Log.w(TAG, "Erro no JSON de getCurrentBungieAccount");
             e.printStackTrace();
             return ERROR_CURRENT_USER;
         }
-        return NO_ERROR;
     }
 
     private int getMembersOfClan(ResultReceiver receiver, int page){
@@ -461,7 +464,8 @@ public class BungieService extends IntentService {
             return NO_ERROR;
 
         } catch (JSONException e) {
-            Log.w(TAG, "Erro no JSON de getBungieAccount");
+            Log.w(TAG, response);
+            Log.w(TAG, "Erro no JSON de getMembersOfClan");
             e.printStackTrace();
             return ERROR_MEMBERS_OF_CLAN;
         }
