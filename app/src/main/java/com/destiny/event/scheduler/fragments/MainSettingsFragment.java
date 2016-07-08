@@ -147,20 +147,20 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     @Override
     public void onResume() {
         super.onResume();
-        Log.w(TAG, "MainSettings resumed");
+        //Log.w(TAG, "MainSettings resumed");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.w(TAG, "MainSettings destroyed");
+        //Log.w(TAG, "MainSettings destroyed");
         updateNotifications();
         checkChanged = false;
     }
 
     private void updateNotifications() {
-        Log.w(TAG, "checkChanged: " + checkChanged);
-        Log.w(TAG, "previousTime: " + previousScheduleTime + " / newTime: " + newScheduleTime);
+        //Log.w(TAG, "checkChanged: " + checkChanged);
+        //Log.w(TAG, "previousTime: " + previousScheduleTime + " / newTime: " + newScheduleTime);
         if (newScheduleTime != previousScheduleTime || checkChanged != scheduledSwitch.isChecked()){
             prefsEditor = sharedPrefs.edit();
             prefsEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, newScheduleTime);
@@ -171,7 +171,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
                 Intent intent = new Intent(getContext(), UpdateNotificationsService.class);
                 intent.putExtra("previousTime",previousScheduleTime);
                 intent.putExtra("previousCheck", previousCheck);
-                Log.w(TAG, "previousCheck: " + previousCheck);
+                //Log.w(TAG, "previousCheck: " + previousCheck);
                 getContext().startService(intent);
             } else{
                 Toast.makeText(getContext(), "Atualizando notificações ainda, por favor aguarde!", Toast.LENGTH_SHORT).show();
@@ -182,7 +182,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     @Override
     public void onPause() {
         super.onPause();
-        Log.w(TAG, "MainSettings paused");
+        //Log.w(TAG, "MainSettings paused");
     }
 
     private void setCheckedItems() {

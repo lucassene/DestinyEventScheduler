@@ -415,11 +415,14 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             case LOADER_MEMBERS:
                 //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
                 data.moveToFirst();
+                if (membershipIdList == null){
+                    membershipIdList = new ArrayList<>();
+                }
                 for (int i=0;i<data.getCount();i++){
-                    if (membershipIdList == null){
-                        membershipIdList = new ArrayList<>();
+                    String id = data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP));
+                    if (!id.equals(callback.getBungieId())){
+                        membershipIdList.add(id);
                     }
-                    membershipIdList.add(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP)));
                     data.moveToNext();
                 }
                 break;
@@ -624,7 +627,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
         Random random = new Random();
 
-        Calendar newDate = insertedDate;
+        Calendar newDate = Calendar.getInstance();
+        newDate.setTime(insertedDate.getTime());
         newDate.add(Calendar.MINUTE, -(random.nextInt(3)+1));
         int mId;
 
@@ -642,7 +646,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         values.put(EntryTable.COLUMN_MEMBERSHIP, membershipIdList.get(mId));
         membershipIdList.remove(mId);
         values.put(EntryTable.COLUMN_GAME, gameId);
-        newDate = insertedDate;
+        newDate = Calendar.getInstance();
+        newDate.setTime(insertedDate.getTime());
         newDate.add(Calendar.MINUTE, -(random.nextInt(3)+1));
         values.put(EntryTable.COLUMN_TIME,DateUtils.calendarToString(newDate));
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
@@ -653,7 +658,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         values.put(EntryTable.COLUMN_MEMBERSHIP, membershipIdList.get(mId));
         membershipIdList.remove(mId);
         values.put(EntryTable.COLUMN_GAME, gameId);
-        newDate = insertedDate;
+        newDate = Calendar.getInstance();
+        newDate.setTime(insertedDate.getTime());
         newDate.add(Calendar.MINUTE, -(random.nextInt(3)+1));
         values.put(EntryTable.COLUMN_TIME,DateUtils.calendarToString(newDate));
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);

@@ -98,6 +98,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
     int status;
 
     int actualUserLevel;
+    String actualTitle;
 
     private static final int STATUS_WAITING_CREATOR = 1;
     private static final int STATUS_WAITING = 0;
@@ -326,7 +327,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                 break;
             case TYPE_OK:
                 if (status == STATUS_WAITING || status == STATUS_WAITING_CREATOR){
-                    bundle.putString(title, getResources().getString(R.string.validate_event_title));
+                    bundle.putString(title, getResources().getString(R.string.validation));
                     bundle.putString(msg, getResources().getString(R.string.validation_dialog_msg));
                     bundle.putString(posButton, getResources().getString(R.string.validate)); 
                 } else if (status == STATUS_VALIDATED){
@@ -629,6 +630,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                         if (memberModel.getMembershipId().equals(callback.getBungieId())){
                             int xp = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
                             actualUserLevel = MemberTable.getMemberLevel(xp);
+                            actualTitle = data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE));
                         } else evalMemberList.add(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP)));
                         data.moveToNext();
                     }
@@ -828,7 +830,8 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
         getContext().startService(intent);
 
         Intent levelIntent = new Intent(getContext(), LevelCheckService.class);
-        intent.putExtra("level", actualUserLevel);
+        levelIntent.putExtra("level", actualUserLevel);
+        levelIntent.putExtra("title", actualTitle);
         getContext().startService(levelIntent);
 
         values.clear();

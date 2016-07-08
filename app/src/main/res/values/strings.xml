@@ -189,10 +189,16 @@
     </string-array>
 
     <string-array name="level_title">
+        <item>Beginner</item>
         <item>Apprentice</item>
+        <item>Explorer</item>
         <item>Adventurer</item>
+        <item>Recruit</item>
+        <item>Guardian</item>
+        <item>Veteran</item>
         <item>Master</item>
-        <item>Champion</item>
+        <item>Lord</item>
+        <item>Legend</item>
     </string-array>
 
     <string-array name="event_title">
@@ -201,10 +207,10 @@
         <item>of Olds</item>
         <item>Control</item>
         <item>of the Brotherhood</item>
-        <item>Assassin</item>
+        <item>of Death</item>
         <item>from Hell</item>
         <item>Iron</item>
-        <item>Madman</item>
+        <item>of Mayhem</item>
         <item>Rift</item>
         <item>of Relics</item>
         <item>Battle</item>

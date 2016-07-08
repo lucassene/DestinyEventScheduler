@@ -28,6 +28,8 @@ public class MyAlertDialog extends DialogFragment {
     private FromDialogListener listener;
     private FromDialogListener fragmentListener;
 
+    private Fragment fragment;
+
     int dialogType;
 
     @Override
@@ -75,7 +77,7 @@ public class MyAlertDialog extends DialogFragment {
 
         listener = (FromDialogListener) getActivity();
 
-        final Fragment fragment = getFragmentManager().findFragmentById(R.id.content_frame);
+        fragment = getFragmentManager().findFragmentById(R.id.content_frame);
 
         if (fragment instanceof FromDialogListener){
             fragmentListener = (FromDialogListener) getFragmentManager().findFragmentById(R.id.content_frame);
@@ -130,7 +132,9 @@ public class MyAlertDialog extends DialogFragment {
     public void onDismiss(DialogInterface dialog) {
         switch (dialogType){
             case ALERT_DIALOG:
-                listener.onPositiveClick(null, dialogType);
+                if (fragment instanceof DetailEventFragment){
+                    fragmentListener.onPositiveClick(null, dialogType);
+                } else listener.onPositiveClick(null, dialogType);
                 break;
         }
         super.onDismiss(dialog);

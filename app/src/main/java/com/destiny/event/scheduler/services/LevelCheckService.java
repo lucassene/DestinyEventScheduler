@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
 
 import com.destiny.event.scheduler.activities.DrawerActivity;
@@ -26,7 +28,8 @@ public class LevelCheckService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         Bundle bundle = intent.getExtras();
-        int actualLevel = bundle.getInt("level");
+        final int actualLevel = bundle.getInt("level");
+        final String actualTitle = bundle.getString("title");
         String userMembership = "";
         int newLevel;
 
@@ -37,15 +40,28 @@ public class LevelCheckService extends IntentService {
         }
 
         if (!userMembership.equals("")){
-            Cursor xpCursor = getContentResolver().query(DataProvider.MEMBER_URI, new String[] {MemberTable.COLUMN_EXP}, MemberTable.COLUMN_MEMBERSHIP + "=" + userMembership, null, null);
-            if (xpCursor != null && xpCursor.moveToFirst()){
-                int xp = xpCursor.getInt(xpCursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
+            Cursor mCursor = getContentResolver().query(DataProvider.MEMBER_URI, new String[] {MemberTable.COLUMN_EXP, MemberTable.COLUMN_TITLE}, MemberTable.COLUMN_MEMBERSHIP + "=" + userMembership, null, null);
+            if (mCursor != null && mCursor.moveToFirst()){
+                int xp = mCursor.getInt(mCursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
+                final String newTitle = mCursor.getString(mCursor.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE));
                 newLevel = MemberTable.getMemberLevel(xp);
-                xpCursor.close();
+                mCursor.close();
 
                 if (newLevel > actualLevel && getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getBoolean(DrawerActivity.FOREGROUND_PREF, false)){
-                    Toast.makeText(getApplicationContext(), "Level Up!", Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getApplicationContext(), "You achieved level " + StringUtils.parseString(newLevel) + "!", Toast.LENGTH_SHORT).show();
+
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    final String levelString = StringUtils.parseString(newLevel);
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LevelCheckService.this, "Level Up!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LevelCheckService.this, "You achieved level " + levelString + "!", Toast.LENGTH_SHORT).show();
+                            if (actualTitle != null && !actualTitle.equals(newTitle)){
+                                Toast.makeText(LevelCheckService.this, "And become " + newTitle + "!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
                 }
             }
         }

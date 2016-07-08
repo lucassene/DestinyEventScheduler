@@ -551,7 +551,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
-                if (msg.what == MyAlertDialog.ALERT_DIALOG) showAlertDialog(MyAlertDialog.ALERT_DIALOG);
+                if (msg.what == MyAlertDialog.ALERT_DIALOG && isAdded()) showAlertDialog(MyAlertDialog.ALERT_DIALOG);
             }
         };
         handler.sendEmptyMessage(MyAlertDialog.ALERT_DIALOG);

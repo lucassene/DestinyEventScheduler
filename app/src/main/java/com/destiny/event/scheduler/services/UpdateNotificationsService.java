@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.util.Log;
 
@@ -51,7 +52,7 @@ public class UpdateNotificationsService extends IntentService {
         try {
             cursor = getContentResolver().query(DataProvider.NOTIFICATION_GAMES_URI, projection, null, null, NotificationTable.COLUMN_TIME + " ASC");
             if (cursor != null && cursor.moveToFirst()){
-                //Log.w(TAG, DatabaseUtils.dumpCursorToString(cursor));
+                Log.w(TAG, DatabaseUtils.dumpCursorToString(cursor));
                 for (int i=0;i<cursor.getCount();i++){
                     int nId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
                     int gId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME));

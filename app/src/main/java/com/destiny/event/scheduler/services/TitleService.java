@@ -123,13 +123,25 @@ public class TitleService extends IntentService {
                 if (titleCursor != null) titleCursor.close();
             }
 
-            if (lvl<=25){
+            if (lvl<=10){
                 newTitle = levelTitles[0];
-            } else if (lvl<=50){
+            } else if (lvl<=20){
                 newTitle = levelTitles[1];
-            } else if (lvl<=75){
+            } else if (lvl<=30){
                 newTitle = levelTitles[2];
-            } else newTitle = levelTitles[3];
+            } else if (lvl<=40){
+                newTitle = levelTitles[3];
+            } else if (lvl<=50){
+                newTitle = levelTitles[4];
+            } else if (lvl<=60){
+                newTitle = levelTitles[5];
+            } else if (lvl<=70){
+                newTitle = levelTitles[6];
+            } else if (lvl<=80){
+                newTitle = levelTitles[7];
+            } else if (lvl<=90){
+                newTitle = levelTitles[8];
+            } else newTitle = levelTitles[9];
         }
 
         if (eventId == 999){

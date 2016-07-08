@@ -111,10 +111,16 @@
     </string-array>
 
     <string-array name="level_title">
+        <item>Novato</item>
         <item>Aprendiz</item>
+        <item>Explorador</item>
         <item>Aventureiro</item>
+        <item>Recruta</item>
+        <item>Guardião</item>
+        <item>Veterano</item>
         <item>Mestre</item>
-        <item>Campeão</item>
+        <item>Lorde</item>
+        <item>Lenda</item>
     </string-array>
 
     <string-array name="event_title">
@@ -123,10 +129,10 @@
         <item>das Antigas</item>
         <item>do Controle</item>
         <item>da Irmandade</item>
-        <item>Assassino</item>
+        <item>da Morte</item>
         <item>do Inferno</item>
         <item>de Ferro</item>
-        <item>Louco</item>
+        <item>do Caos</item>
         <item>da Fissura</item>
         <item>das Relíquias</item>
         <item>da Batalha</item>

@@ -45,11 +45,11 @@ public class TitleTable {
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 7, 25, 0);"); //classic rumble
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 8, 3, 0);"); //control
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 9, 4, 1);"); //doubles
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 10, 5, 0);"); //elimination
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 10, 5, 1);"); //elimination
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 11, 6, 1);"); //inferno3x3
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 12, 6, 1);"); //inferno6x6
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 13, 7, 0);"); //iron banner
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 14, 8, 0);"); //mayhem clash
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 14, 8, 1);"); //mayhem clash
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 15, 9, 0);"); //Rift
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 16, 10, 1);"); //salvage
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 17, 11, 0);"); //skirmish
