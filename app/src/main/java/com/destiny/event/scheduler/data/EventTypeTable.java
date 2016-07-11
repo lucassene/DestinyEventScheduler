@@ -36,6 +36,7 @@ public class EventTypeTable {
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'story', 'ic_story');"); //6
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'strike', 'ic_strike');"); //7
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'strike_list', 'ic_strike');"); //8
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'srl', 'ic_srl');"); //9
     }
 
     public static void onUpdate(SQLiteDatabase db, int oldVersion, int newVersion){

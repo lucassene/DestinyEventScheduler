@@ -21,5 +21,6 @@
         android:layout_height="match_parent"
         android:text="@string/empty_new_events"
         android:layout_gravity="center"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:paddingRight="@dimen/global_padding"/>
 </LinearLayout>

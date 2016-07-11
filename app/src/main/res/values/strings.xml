@@ -105,6 +105,7 @@
     <string name="story">Story</string>
     <string name="strike">Strike</string>
     <string name="strike_list">Strike List</string>
+    <string name="srl" translatable="false">SRL</string>
 
     <string-array name="event_types">
         <item>Court of Oryx</item>
@@ -115,6 +116,7 @@
         <item>Story</item>
         <item>Strike</item>
         <item>Strike List</item>
+        <item>SRL</item>
     </string-array>
 
     <integer-array name="event_type_ids">
@@ -126,6 +128,7 @@
         <item>6</item>
         <item>7</item>
         <item>8</item>
+        <item>9</item>
     </integer-array>
 
     <string-array name="spinner_types">
@@ -138,6 +141,7 @@
         <item>Story</item>
         <item>Strike</item>
         <item>Strike List</item>
+        <item>SRL</item>
     </string-array>
 
     <integer-array name="type_ids">
@@ -150,6 +154,7 @@
         <item>6</item>
         <item>7</item>
         <item>8</item>
+        <item>9</item>
     </integer-array>
 
     <string-array name="game_status">
@@ -229,6 +234,7 @@
         <item>of Dawn</item>
         <item>Lone</item>
         <item>Galaxy</item>
+        <item>Swift</item>
     </string-array>
 
     <string name="default_title">New Apprentice</string>
@@ -255,6 +261,7 @@
     <string name="skirmish">Skirmish</string>
     <string name="trials">Trials of Osiris</string>
     <string name="zone_control">Zone Control</string>
+    <string name="srl_race">SRL Race</string>
     
     <string name="malok">Blighted Chalice</string>
     <string name="valus">Cerberus Vae III</string>
@@ -461,6 +468,9 @@
     <string name="waiting_data">WAITING DATA</string>
     <string name="oops" translatable="false">Oops!</string>
     <string name="event_happened">Looks like this event already happen, my bad Guardian.</string>
+    <string name="level_up">Level up!</string>
+    <string name="level_msg_1">"You achieved level "</string>
+    <string name="title_msg">"And become "</string>
 
 
 </resources>

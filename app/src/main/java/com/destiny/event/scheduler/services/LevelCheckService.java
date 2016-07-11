@@ -7,8 +7,10 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
@@ -26,6 +28,8 @@ public class LevelCheckService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
+        Log.w(TAG, "LevelCheckService started!");
 
         Bundle bundle = intent.getExtras();
         final int actualLevel = bundle.getInt("level");
@@ -55,10 +59,11 @@ public class LevelCheckService extends IntentService {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(LevelCheckService.this, "Level Up!", Toast.LENGTH_SHORT).show();
-                            Toast.makeText(LevelCheckService.this, "You achieved level " + levelString + "!", Toast.LENGTH_SHORT).show();
+                            //Log.w(TAG, "actualTitle: " + actualTitle + " / newTitle: " + newTitle);
+                            Toast.makeText(LevelCheckService.this, R.string.level_up, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LevelCheckService.this, getString(R.string.level_msg_1) + levelString + "!", Toast.LENGTH_SHORT).show();
                             if (actualTitle != null && !actualTitle.equals(newTitle)){
-                                Toast.makeText(LevelCheckService.this, "And become " + newTitle + "!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LevelCheckService.this, getString(R.string.title_msg) + newTitle + "!", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

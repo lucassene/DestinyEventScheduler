@@ -105,6 +105,9 @@ public class TitleTable {
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 55, 23, 0);"); //heroic
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 56, 23, 0);"); //vanguard
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 57, 23, 0);"); //legacy
+
+        //SRL
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EVENT + ", " + COLUMN_TITLE + ", " + COLUMN_ORDER + ")" + " VALUES " + "(null, 58, 27, 0);"); //swift
     }
 
     public static void onUpdate(SQLiteDatabase db, int oldVersion, int newVersion){

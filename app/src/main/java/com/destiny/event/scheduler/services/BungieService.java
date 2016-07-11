@@ -236,22 +236,22 @@ public class BungieService extends IntentService {
 
                     } else {
                         Log.w(TAG, "Response vazia");
-                        return ERROR_CLAN_MEMBER;
+                        return NO_ERROR;
                     }
 
                 } else {
                     Log.w(TAG, "Response Code do JSON diferente de 200");
-                    return ERROR_RESPONSE_CODE;
+                    return NO_ERROR;
                 }
             } else {
                 Log.w(TAG, "Sem conexão com a Internet");
-                return ERROR_NO_CONNECTION;
+                return NO_ERROR;
             }
 
         }catch (Exception e) {
             Log.w(TAG, "Problema no HTTP Request (getBungieAccount)");
             e.printStackTrace();
-            return ERROR_HTTP_REQUEST;
+            return NO_ERROR;
         }
     }
 
@@ -516,7 +516,7 @@ public class BungieService extends IntentService {
         for (int i=0; i<10; i++){
             int member = random.nextInt(membersModelList.size()-1);
             String id = membersModelList.get(member).getMembershipId();
-            int event = random.nextInt(56);
+            int event = random.nextInt(57)+1;
             int insc = random.nextInt(5)+1;
 
             ContentValues values = new ContentValues();

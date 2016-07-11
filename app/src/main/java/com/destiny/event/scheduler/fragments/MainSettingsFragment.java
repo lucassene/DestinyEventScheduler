@@ -186,7 +186,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     }
 
     private void setCheckedItems() {
-        checkedItems = new boolean[] {false, false, false, false, false, false, false, false};
+        checkedItems = new boolean[] {false, false, false, false, false, false, false, false, false};
         HashMap<Integer, Boolean> map = new HashMap<>();
         int[] ids = getResources().getIntArray(R.array.event_type_ids);
         for (int id : ids) {

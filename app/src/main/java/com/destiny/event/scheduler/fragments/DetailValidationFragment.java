@@ -11,7 +11,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -830,6 +829,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
         getContext().startService(intent);
 
         Intent levelIntent = new Intent(getContext(), LevelCheckService.class);
+        //Log.w(TAG, "actualTitle: " + actualTitle);
         levelIntent.putExtra("level", actualUserLevel);
         levelIntent.putExtra("title", actualTitle);
         getContext().startService(levelIntent);
@@ -846,23 +846,23 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
             case -1:
                 int newValue = memberList.get(position).getDislikes() + 1;
                 memberValues.put(MemberTable.COLUMN_DISLIKES,newValue);
-                Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Dislikes atualizado de " + memberList.get(position).getDislikes() + " para " + newValue);
+                //Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Dislikes atualizado de " + memberList.get(position).getDislikes() + " para " + newValue);
                 break;
             case 1:
                 newValue = memberList.get(position).getLikes() + 1;
                 memberValues.put(MemberTable.COLUMN_LIKES,newValue);
-                Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Likes atualizado de " + memberList.get(position).getLikes() + " para " + newValue);
+                //Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Likes atualizado de " + memberList.get(position).getLikes() + " para " + newValue);
                 break;
         }
 
         if (memberList.get(position).getMembershipId().equals(callback.getBungieId())){
             int newValue = memberList.get(position).getGamesCreated() + 1;
             memberValues.put(MemberTable.COLUMN_CREATED,newValue);
-            Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Created atualizado de " + memberList.get(position).getGamesCreated() + " para " + newValue);
+            //Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Created atualizado de " + memberList.get(position).getGamesCreated() + " para " + newValue);
         } else {
             int newValue = memberList.get(position).getGamesPlayed() + 1;
             memberValues.put(MemberTable.COLUMN_PLAYED, newValue);
-            Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Played atualizado de " + memberList.get(position).getGamesPlayed() + " para " + newValue);
+            //Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Played atualizado de " + memberList.get(position).getGamesPlayed() + " para " + newValue);
         }
 
         String where = MemberTable.COLUMN_MEMBERSHIP + "=" + memberList.get(position).getMembershipId();

@@ -57,6 +57,7 @@
         <item>Lista de Assaltos</item>
         <item>Patrulha</item>
         <item>Prisão do Anciões</item>
+        <item>SRL</item>
     </string-array>
 
     <integer-array name="event_type_ids">
@@ -68,6 +69,7 @@
         <item>8</item>
         <item>3</item>
         <item>4</item>
+        <item>9</item>
     </integer-array>
 
     <string-array name="spinner_types">
@@ -80,6 +82,7 @@
         <item>Lista de Assalto</item>
         <item>Patrulha</item>
         <item>Prisão dos Anciões</item>
+        <item>SRL</item>
     </string-array>
 
     <integer-array name="type_ids">
@@ -92,6 +95,7 @@
         <item>8</item>
         <item>3</item>
         <item>4</item>
+        <item>9</item>
     </integer-array>
 
     <string-array name="game_status">
@@ -151,6 +155,7 @@
         <item>do Alvorecer</item>
         <item>Solitário</item>
         <item>da Galáxia</item>
+        <item>Ligeiro</item>
     </string-array>
 
     <string name="refresh_lists">Atualizar listas</string>
@@ -401,5 +406,9 @@
     <string name="settings">CONFIGURAÇÕES</string>
     <string name="waiting_data">ESPERANDO DADOS</string>
     <string name="event_happened">Parece que esse evento já aconteceu, mal minha Guardião.</string>
+    <string name="level_msg_1">"Você chegou ao nível "</string>
+    <string name="level_up">Subiu de nível!</string>
+    <string name="title_msg">"E se tornou "</string>
+    <string name="srl_race">Corrida SRL</string>
 
 </resources>
