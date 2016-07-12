@@ -4,6 +4,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/colorButtonNormal</item>
         <item name="android:alertDialogTheme">@style/DestinyApp.AlertDialog</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
     </style>
 
     <style name="DestinyApp.AlertDialog" parent="Theme.AppCompat.Dialog.Alert">

@@ -199,7 +199,7 @@
     <string name="clash">Enfrentamento</string>
     <string name="classic1">Briga Clássica</string>
     <string name="classic3">Clássico 3v3</string>
-    <string name="classic6">Clássic 6v6</string>
+    <string name="classic6">Clássico 6v6</string>
     <string name="control">Controle</string>
     <string name="doubles">Duplas</string>
     <string name="elimination">Eliminação</string>
@@ -254,7 +254,7 @@
     <string name="game_info">Informações de Jogo</string>
     <string name="choose_game">Escolha o modo de jogo:</string>
     <string name="inferno3">Inferno 3v3</string>
-    <string name="inferno6">Inferno 3v3</string>
+    <string name="inferno6">Inferno 6v6</string>
     <string name="and320">" e 335"</string>
     <string name="cancel">Cancelar</string>
     <string name="save">Salvar</string>
@@ -381,7 +381,7 @@
     <string name="no_clan_msg">Desculpe guardião, mas é necessário que você esteja em um clã para usar este aplicativo.</string>
     <string name="no_events_played">Nenhum evento jogado</string>
     <string name="times">vezes</string>
-    <string name="new_guardian">Novo Guardião</string>
+    <string name="new_guardian">Novo no pedaço</string>
     <string name="application">Aplicativo</string>
     <string name="client_side">Cliente</string>
     <string name="developers">Desenvolvedores</string>
