@@ -32,7 +32,8 @@
                     <Spinner
                         android:id="@+id/my_events_spinner"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:popupBackground="@color/colorPrimaryDark"/>
 
                 </LinearLayout>
 

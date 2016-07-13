@@ -410,5 +410,9 @@
     <string name="level_up">Subiu de nível!</string>
     <string name="title_msg">"E se tornou "</string>
     <string name="srl_race">Corrida SRL</string>
+    <string name="no_event">Você não jogou nenhum evento desse tipo.</string>
+    <string name="no_event_all">Você não jogou nenhum evento ainda guardião.</string>
+    <string name="more_times">vezes</string>
+    <string name="one_time">vez</string>
 
 </resources>

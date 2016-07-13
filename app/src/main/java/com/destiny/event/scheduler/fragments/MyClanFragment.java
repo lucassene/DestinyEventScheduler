@@ -46,14 +46,11 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points, R.id.secondary_text};
 
     private ArrayList<String> bungieIdList;
-    private String bungieId;
 
     TextView clanNameTxt;
     TextView clanDesc;
     ImageView clanLogo;
     ImageView clanBanner;
-
-    private String clanName;
 
     Spinner orderSpinner;
 
@@ -126,7 +123,6 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         Bundle bundle = getArguments();
 
         clanNameTxt.setText(bundle.getString("clanName"));
-        clanName = bundle.getString("clanName");
         clanDesc.setText(bundle.getString("clanDesc"));
         try {
             clanLogo.setImageBitmap(ImageUtils.loadImage(getContext(),bundle.getString("clanIcon")));
@@ -136,7 +132,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
             e.printStackTrace();
         }
 
-        getLoaderManager().initLoader(LOADER_MEMBERS, null, this);
+        initMemberLoader();
         adapter = new CustomCursorAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, LOADER_MEMBERS);
 
         if (headerView != null){
@@ -144,6 +140,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         }
 
         setListAdapter(adapter);
+
     }
 
     @Override
@@ -152,7 +149,6 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -160,7 +156,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         super.onPrepareOptionsMenu(menu);
         menu.clear();
         callback.setToolbarTitle(getString(R.string.my_clan));
-        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
+        getActivity().getMenuInflater().inflate(R.menu.home_menu, menu);
     }
 
     @Override
@@ -172,7 +168,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
-        bungieId = bungieIdList.get(position-1);
+        String bungieId = bungieIdList.get(position - 1);
 
         Fragment fragment = new MyNewProfileFragment();
 
@@ -199,7 +195,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         switch (id){
             case LOADER_MEMBERS:
-                projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, MemberTable.COLUMN_EXP, MemberTable.COLUMN_TITLE};
+                projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, MemberTable.COLUMN_EXP, MemberTable.COLUMN_TITLE, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_PLATFORM};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.MEMBER_URI,
@@ -220,6 +216,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         switch (loader.getId()){
             case LOADER_MEMBERS:
+                adapter.notifyDataSetChanged();
                 adapter.swapCursor(data);
                 totalMembers.setText(String.valueOf(data.getCount()));
                 for (int i=0; i<data.getCount(); i++){
@@ -228,14 +225,12 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
                 }
                 break;
         }
-
-        callback.onDataLoaded();
-
+            callback.onDataLoaded();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+        //adapter.swapCursor(null);
         Log.w("MyClan Loader: ", "O Loader entrou no método onLoaderReset");
 
     }
@@ -262,5 +257,21 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     }
 
+    private void initMemberLoader(){
+        callback.onLoadingData();
+        Log.w(TAG, "Inicializing MemberLoader...");
+        if (getLoaderManager().getLoader(LOADER_MEMBERS) != null){
+            getLoaderManager().destroyLoader(LOADER_MEMBERS);
+        }
+        getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
+    }
+
+    public ArrayList<String> getBungieIdList(){
+        return bungieIdList;
+    }
+
+    public void refreshData(){
+        initMemberLoader();
+    }
 
 }

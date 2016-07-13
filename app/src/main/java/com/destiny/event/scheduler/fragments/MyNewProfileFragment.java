@@ -290,12 +290,6 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
             switch (loader.getId()){
                 case LOADER_MEMBER:
                     if (data != null && data.moveToFirst()){
-                        emptyEval.setVisibility(View.GONE);
-                        emptyEvents.setVisibility(View.GONE);
-                        eventsChart.setVisibility(View.VISIBLE);
-                        likesChart.setVisibility(View.VISIBLE);
-                        likeHeaderLayout.setVisibility(View.VISIBLE);
-                        eventHeaderLayout.setVisibility(View.VISIBLE);
                         try {
                             profilePic.setImageBitmap(ImageUtils.loadImage(getContext(), data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_ICON))));
                         } catch (IOException e) {
@@ -316,13 +310,32 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                         int created = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED));
                         int played = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED));
                         //Log.w(TAG, "Created: " + created + "; Played: " + played);
-
                         int likes = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES));
                         int dislikes = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES));
                         //Log.w(TAG, "Likes: " + likes + "; Dislikes: " + dislikes);
 
-                        setEventChart(created, played);
-                        setLikesChart(likes, dislikes);
+                        if (likes != 0 && dislikes != 0){
+                            emptyEval.setVisibility(View.GONE);
+                            likesChart.setVisibility(View.VISIBLE);
+                            likeHeaderLayout.setVisibility(View.VISIBLE);
+                            setLikesChart(likes, dislikes);
+                        } else {
+                            emptyEval.setVisibility(View.VISIBLE);
+                            likesChart.setVisibility(View.GONE);
+                            likeHeaderLayout.setVisibility(View.GONE);
+                        }
+
+                        if (created != 0 && played != 0){
+                            emptyEvents.setVisibility(View.GONE);
+                            eventsChart.setVisibility(View.VISIBLE);
+                            eventHeaderLayout.setVisibility(View.VISIBLE);
+                            setEventChart(created, played);
+                        } else {
+                            emptyEvents.setVisibility(View.VISIBLE);
+                            eventsChart.setVisibility(View.GONE);
+                            eventHeaderLayout.setVisibility(View.GONE);
+                        }
+
                     } else {
                         emptyEval.setVisibility(View.VISIBLE);
                         emptyEvents.setVisibility(View.VISIBLE);
@@ -366,8 +379,12 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                         favTitle.setText(title);
                         title = getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName());
                         favType.setText(title);
-                        String count = " " + StringUtils.parseString(data.getInt(data.getColumnIndexOrThrow("total"))) + " ";
-                        favCount.setText(count);
+                        int count = data.getInt(data.getColumnIndexOrThrow("total"));
+                        String countText;
+                        if (count == 1){
+                            countText = StringUtils.parseString(count) + " " + getString(R.string.one_time);
+                        } else countText = StringUtils.parseString(count) + " " + getString(R.string.more_times);
+                        favCount.setText(countText);
                     } else {
                         favEmpty.setVisibility(View.VISIBLE);
                         favLayout.setVisibility(View.GONE);

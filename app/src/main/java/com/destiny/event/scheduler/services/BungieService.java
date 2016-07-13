@@ -32,6 +32,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,20 +45,23 @@ public class BungieService extends IntentService {
     private static final String BASE_URL = "https://www.bungie.net/Platform/";
     private static final String BASE_IMAGE_URL = "http://www.bungie.net";
 
-    private static final String USER_PREFIX = "User/";
-    private static final String GROUP_PREFIX = "Group/";
+    private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/";
+    private static final String LOGIN_ENDPOINT = "login";
+    private static final String CLAN_ENDPOINT = "clan";
+    private static final String MEMBERS_ENDPOINT = "members";
+    private static final String MEMBERLIST_ENDPOINT = "member/list";
 
-    private static final String CURRENT_PAGE = "currentPage=";
-    private static final String MEMBER_TYPE = "memberType=";
-    private static final String PLATFORM_TYPE = "platformType=";
-    private static final String SORT = "sort=";
+    private static final String SERVER_MEMBER_HEADER = "membership";
+    private static final String SERVER_PLATFORM_HEADER = "platform";
+
+    private static final String USER_PREFIX = "User/";
 
     public static final String GET_CURRENT_ACCOUNT = "GetCurrentBungieAccount/";
-    public static final String GET_MEMBERS_OF_CLAN = "ClanMembers/";
     public static final String GET_BUNGIE_ACCOUNT = "GetBungieAccount/";
+    public static final String GET_CLAN_MEMBERS = "GetClanMembers/";
 
     private static final String GET_METHOD = "GET";
-    //private static final String POST_METHOD = "POST";
+    private static final String POST_METHOD = "POST";
 
     public static final int STATUS_RUNNING = 0;
     public static final int STATUS_FINISHED = 10;
@@ -103,6 +107,11 @@ public class BungieService extends IntentService {
     private String clanIcon = "";
     private String clanBanner = "";
 
+    private int userCreated;
+    private int userPlayed;
+    private int userLikes;
+    private int userDislikes;
+
     private ArrayList<MembersModel> membersModelList;
     private ArrayList<String> iconsList;
 
@@ -112,6 +121,9 @@ public class BungieService extends IntentService {
     private String xcsrf;
 
     private String getCurrentBungieAccountResponse;
+
+    private ArrayList<String> actualMemberList;
+    private String userMembership;
 
     public static final String RUNNING_SERVICE = "bungieRunning";
 
@@ -148,16 +160,32 @@ public class BungieService extends IntentService {
                     if (error != NO_ERROR){
                         sendError(receiver);
                     } else {
-                        error = getMembersOfClan(receiver, 1);
-                        getIconList();
+                        error = getMembersOfClan(receiver);
+                        getIconList(true);
                         Log.w(TAG, "getMembersOfClan error: " + error);
                         if (error != NO_ERROR){
                             sendError(receiver);
                         } else {
                             insertClan();
-                            insertClanMembers();
-                            insertFakeEvents(receiver);
+                            downloadImages();
+                            Log.w(TAG, "Inserting clanMembers data");
+                            for (int i=0;i<membersModelList.size();i++){
+                                insertClanMember(membersModelList.get(i));
+                            }
+                            //insertFakeEvents(receiver);
                             insertLoggedUser();
+
+                            ArrayList<String> memberIdList = new ArrayList<>();
+
+                            for (int i=0;i<membersModelList.size();i++){
+                                memberIdList.add(membersModelList.get(i).getMembershipId());
+                            }
+
+                            //Log.w(TAG, "Iniciando TitleService...");
+                            Intent titleIntent = new Intent(getApplicationContext(),TitleService.class);
+                            titleIntent.putStringArrayListExtra("membershipList",memberIdList);
+                            startService(titleIntent);
+
                             receiver.send(STATUS_FINISHED, Bundle.EMPTY);
                         }
                     }
@@ -166,6 +194,19 @@ public class BungieService extends IntentService {
             case GET_BUNGIE_ACCOUNT:
                 receiver.send(STATUS_RUNNING, Bundle.EMPTY);
                 error = isClanMember(membershipId, platformId);
+                if (error != NO_ERROR){
+                    sendError(receiver);
+                } else {
+                    receiver.send(STATUS_FINISHED, Bundle.EMPTY);
+                }
+                break;
+            case GET_CLAN_MEMBERS:
+                receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+                clanId = intent.getStringExtra("clanId");
+                actualMemberList = intent.getStringArrayListExtra("memberList");
+                membershipId = intent.getStringExtra("userMembership");
+                platformId = intent.getStringExtra("platformId");
+                error = getMembersOfClan(receiver);
                 if (error != NO_ERROR){
                     sendError(receiver);
                 } else {
@@ -317,7 +358,7 @@ public class BungieService extends IntentService {
         Bundle bundle = new Bundle();
         try {
             JSONObject jObject = new JSONObject(getCurrentBungieAccountResponse);
-            Log.w(TAG, getCurrentBungieAccountResponse);
+            //Log.w(TAG, getCurrentBungieAccountResponse);
 
             JSONObject jResponse = jObject.getJSONObject("Response");
             JSONArray jDestinyAccounts = jResponse.getJSONArray("destinyAccounts");
@@ -335,8 +376,16 @@ public class BungieService extends IntentService {
                 bundle.putString("userName", displayName);
                 receiver.send(STATUS_DOCS, bundle);
 
-                //Verificar se o usuário já tem cadastro no servidor
-                receiver.send(STATUS_VERIFY, null);
+                String userIconPath;
+                try {
+                    JSONObject jBungie = jResponse.getJSONObject("bungieNetUser");
+                    userIconPath = jBungie.getString("profilePicturePath");
+                } catch (JSONException e){
+                    Log.w(TAG, "User has no bungie picture available");
+                    userIconPath = DEFAULT_ICON;
+                }
+
+                checkInServer(receiver);
 
                 try {
                     JSONArray jClans = jResponse.getJSONArray("clans");
@@ -351,6 +400,20 @@ public class BungieService extends IntentService {
                     motto = jGroup.getString("motto");
                     clanBanner = jGroup.getString("bannerPath");
                     clanIcon = jGroup.getString("avatarPath");
+
+                    MembersModel user = new MembersModel();
+                    user.setName(displayName);
+                    user.setMembershipId(membershipId);
+                    user.setClanId(clanId);
+                    user.setIconPath(userIconPath);
+                    user.setPlatformId(platformId);
+                    user.setLikes(userLikes);
+                    user.setDislikes(userDislikes);
+                    user.setGamesCreated(userCreated);
+                    user.setGamesPlayed(userPlayed);
+                    user.setInsert(true);
+
+                    membersModelList.add(user);
                     receiver.send(STATUS_FRIENDS, null);
                     return NO_ERROR;
                 } catch (JSONException e){
@@ -370,9 +433,54 @@ public class BungieService extends IntentService {
         }
     }
 
-    private int getMembersOfClan(ResultReceiver receiver, int page){
+    private void checkInServer(ResultReceiver receiver) {
+        String myURL = SERVER_BASE_URL + LOGIN_ENDPOINT;
+        receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 
-        String myURL = BASE_URL + GROUP_PREFIX + clanId + "/" + GET_MEMBERS_OF_CLAN + "?" + CURRENT_PAGE + String.valueOf(page) + "&" + MEMBER_TYPE + "-1&" + PLATFORM_TYPE + platformId + "&" + SORT + "0";
+        try {
+
+            if (NetworkUtils.checkConnection(getApplicationContext())){
+
+                URL url = new URL(myURL);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
+                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, platformId);
+                urlConnection.setRequestMethod(POST_METHOD);
+
+                int statusCode = urlConnection.getResponseCode();
+
+                if (statusCode == 200) {
+                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                    String response = convertInputStreamToString(inputStream);
+
+                    if (response != null) {
+                        JSONObject jObject = new JSONObject(response);
+                        //Log.w(TAG, "JSON uparsed do Server: " + response);
+                        userLikes = jObject.getInt("likes");
+                        userDislikes = jObject.getInt("dislikes");
+                        userCreated = jObject.getInt("gamesCreated");
+                        userPlayed = jObject.getInt("gamesPlayed");
+                        receiver.send(STATUS_VERIFY, Bundle.EMPTY);
+                    }
+                } else {
+                    Log.w(TAG, "Response Code do JSON diferente de 200");
+                }
+
+            } else {
+                Log.w(TAG, "Sem conexão com a internet");
+            }
+
+        } catch (Exception e) {
+            Log.w(TAG, "Problema no HTTP Request (getCurrentBungieAccount)");
+            e.printStackTrace();
+        }
+    }
+
+    private int getMembersOfClan(ResultReceiver receiver){
+
+        //String myURL = BASE_URL + GROUP_PREFIX + clanId + "/" + GET_MEMBERS_OF_CLAN + "?" + CURRENT_PAGE + String.valueOf(page) + "&" + MEMBER_TYPE + "-1&" + PLATFORM_TYPE + platformId + "&" + SORT + "0";
+        String myURL = SERVER_BASE_URL + CLAN_ENDPOINT + "/" + clanId + "/" + MEMBERS_ENDPOINT;
         //Log.w(TAG,myURL);
 
         try{
@@ -382,7 +490,9 @@ public class BungieService extends IntentService {
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
+                //urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
+                urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
+                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, platformId);
                 urlConnection.setRequestMethod(GET_METHOD);
 
                 int statusCode = urlConnection.getResponseCode();
@@ -393,15 +503,29 @@ public class BungieService extends IntentService {
                     //Log.w(TAG, "getMembersOfClan: " + response);
 
                     if (response != null){
-                        int clanError = parseMembersOfClan(receiver,response);
-                        if (clanError != NO_ERROR) {
-                            return clanError;
-                        } else if (error == NO_ERROR){
+                        ArrayList<String> memberList = new ArrayList<>();
+                        JSONArray jArray = new JSONArray(response);
+                        for (int i=0;i<jArray.length();i++){
+                            memberList.add(jArray.getString(i));
+                            Log.w(TAG, "added member: " + jArray.getString(i));
+                        }
+                        int error = NO_ERROR;
+                        if (actualMemberList != null){
+                            memberList.add(membershipId);
+                            Log.w(TAG, "added member: " + membershipId);
+                            error = parseNewMembers(memberList);
+                        } else error = parseMembersOfClan(memberList);
+                        if (error == NO_ERROR){
+                            receiver.send(STATUS_PARTY, Bundle.EMPTY);
                             return NO_ERROR;
                         } else return error;
+                    } else {
+                        Log.w(TAG, "Null response from getClanMembers");
+                        error = ERROR_RESPONSE_CODE;
+                        return ERROR_RESPONSE_CODE;
                     }
                 } else {
-                    Log.w(TAG, "Response Code do JSON diferente de 200");
+                    Log.w(TAG, "Response Code do JSON diferente de 200 (...clan/" + clanId + "/members)");
                     error = ERROR_RESPONSE_CODE;
                     return ERROR_RESPONSE_CODE;
                 }
@@ -418,12 +542,110 @@ public class BungieService extends IntentService {
             error = ERROR_HTTP_REQUEST;
             return ERROR_HTTP_REQUEST;
         }
-
-        receiver.send(STATUS_FRIENDS, null);
-        return NO_ERROR;
     }
 
-    private int parseMembersOfClan(ResultReceiver receiver, String response) {
+    private int parseNewMembers(ArrayList<String> memberList) {
+
+        int error = parseMembersOfClan(memberList);
+        if (error != NO_ERROR){
+            return error;
+        } else {
+            for (int i=0;i<membersModelList.size();i++){
+                for (int x=0;x<actualMemberList.size();x++){
+                    Log.w(TAG, "Is " + membersModelList.get(i).getMembershipId() + " equal to " + actualMemberList.get(x) + " ?");
+                    if (actualMemberList.get(x).equals(membersModelList.get(i).getMembershipId())){
+                        membersModelList.get(i).setInsert(false);
+                        Log.w(TAG, "True");
+                        break;
+                    } else Log.w(TAG, "False");
+                }
+                insertClanMember(membersModelList.get(i));
+            }
+            return NO_ERROR;
+        }
+
+    }
+
+    private int parseMembersOfClan(ArrayList<String> memberList) {
+
+        String myURL = SERVER_BASE_URL + MEMBERLIST_ENDPOINT;
+
+        try {
+            if (NetworkUtils.checkConnection(getApplicationContext())){
+
+                URL url = new URL(myURL);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
+                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, platformId);
+                urlConnection.setDoOutput(true);
+                JSONArray jsonList = createJSONMemberList(memberList);
+                urlConnection.setRequestMethod(POST_METHOD);
+                urlConnection.setRequestProperty("Content-Type", "application/json");
+                urlConnection.setRequestProperty("Accept", "application/json");
+
+                OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+                writer.write(jsonList.toString());
+                writer.flush();
+
+                int statusCode = urlConnection.getResponseCode();
+
+                if (statusCode == 200) {
+                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                    String response = convertInputStreamToString(inputStream);
+
+                    if (response != null){
+                        Log.w(TAG, "getMemberList response: " + response);
+                        JSONArray jResponse = new JSONArray(response);
+                        for (int i=0;i<jResponse.length();i++){
+                            JSONObject jMember = jResponse.getJSONObject(i);
+                            MembersModel member = new MembersModel();
+                            member.setMembershipId(jMember.getString("membership"));
+                            member.setName(jMember.getString("name"));
+                            member.setIconPath(jMember.getString("icon"));
+                            member.setPlatformId(jMember.getString("platform"));
+                            member.setLikes(jMember.getInt("likes"));
+                            member.setDislikes(jMember.getInt("dislikes"));
+                            member.setGamesCreated(jMember.getInt("gamesCreated"));
+                            member.setGamesPlayed(jMember.getInt("gamesPlayed"));
+                            member.setInsert(true);
+                            membersModelList.add(member);
+                        }
+                        return NO_ERROR;
+                    } else {
+                        Log.w(TAG, "Null response from getMemberList");
+                        error = ERROR_RESPONSE_CODE;
+                        return ERROR_RESPONSE_CODE;
+                    }
+                } else {
+                    Log.w(TAG, "Response Code do JSON diferente de 200");
+                    error = ERROR_RESPONSE_CODE;
+                    return ERROR_RESPONSE_CODE;
+                }
+            } else {
+                Log.w(TAG, "Sem conexão com a Internet");
+                error = ERROR_NO_CONNECTION;
+                return ERROR_NO_CONNECTION;
+            }
+        } catch (Exception e) {
+                    Log.w(TAG, "Problema no HTTP Request (getMembersOfClan)");
+                    e.printStackTrace();
+                    error = ERROR_HTTP_REQUEST;
+                    return ERROR_HTTP_REQUEST;
+        }
+
+    }
+
+    private JSONArray createJSONMemberList(ArrayList<String> memberList) {
+        JSONArray json = new JSONArray();
+        for (int i=0;i<memberList.size();i++){
+            json.put(memberList.get(i));
+        }
+        Log.w(TAG, "jsonMemberList: " + json.toString());
+        return json;
+    }
+
+    /*private int parseMembersOfClan(ResultReceiver receiver, String response) {
 
         //Log.w(TAG, "getMembersOfClan JSON unparsed :" + response);
 
@@ -469,9 +691,9 @@ public class BungieService extends IntentService {
             e.printStackTrace();
             return ERROR_MEMBERS_OF_CLAN;
         }
-    }
+    }*/
 
-    private void getIconList() {
+    private void getIconList(boolean withClan) {
         int notAdd = 0;
         for(int x=0;x<membersModelList.size();x++){
             if (iconsList.size()==0){
@@ -489,8 +711,10 @@ public class BungieService extends IntentService {
                 }
             }
         }
-        iconsList.add(clanIcon);
-        iconsList.add(clanBanner);
+        if (withClan){
+            iconsList.add(clanIcon);
+            iconsList.add(clanBanner);
+        }
     }
 
     private String convertInputStreamToString(InputStream inputStream) throws IOException {
@@ -565,44 +789,34 @@ public class BungieService extends IntentService {
 
     }
 
-    private void insertClanMembers() {
-        Log.w(TAG, "Inserting clanMembers data");
-        Random random = new Random();
+    private void insertClanMember(MembersModel member) {
 
-        for (int i=0; i<membersModelList.size();i++){
-            ContentValues values = new ContentValues();
-            values.put(MemberTable.COLUMN_NAME, membersModelList.get(i).getName());
-            values.put(MemberTable.COLUMN_MEMBERSHIP, membersModelList.get(i).getMembershipId());
-            values.put(MemberTable.COLUMN_CLAN, clanId);
+        ContentValues values = new ContentValues();
+        values.put(MemberTable.COLUMN_NAME, member.getName());
+        values.put(MemberTable.COLUMN_MEMBERSHIP, member.getMembershipId());
+        values.put(MemberTable.COLUMN_CLAN, clanId);
 
-            String imageSubURL = membersModelList.get(i).getIconPath();
-            //Log.w(TAG, "Total of icons: " + iconsList.size());
-            String imageName = imageSubURL.substring(imageSubURL.lastIndexOf("/")+1, imageSubURL.length());
-            //Log.w(TAG, "Image Name: " + imageName);
+        String imageSubURL = member.getIconPath();
+        //Log.w(TAG, "Total of icons: " + iconsList.size());
+        String imageName = imageSubURL.substring(imageSubURL.lastIndexOf("/")+1, imageSubURL.length());
+        //Log.w(TAG, "Image Name: " + imageName);
 
-            values.put(MemberTable.COLUMN_ICON, imageName);
-            values.put(MemberTable.COLUMN_PLATFORM, platformId);
-            values.put(MemberTable.COLUMN_TITLE, getResources().getString(R.string.default_title));
-            int created = (random.nextInt(5));
-            int played = (random.nextInt(10)+1);
-            int likes = (random.nextInt(created+played));
-            int dislikes = (created+played)-likes;
-            values.put(MemberTable.COLUMN_LIKES, likes);
-            values.put(MemberTable.COLUMN_DISLIKES, dislikes);
-            values.put(MemberTable.COLUMN_CREATED, created);
-            values.put(MemberTable.COLUMN_PLAYED, played);
+        values.put(MemberTable.COLUMN_ICON, imageName);
+        values.put(MemberTable.COLUMN_PLATFORM, member.getPlatformId());
+        values.put(MemberTable.COLUMN_TITLE, getResources().getString(R.string.default_title));
+        values.put(MemberTable.COLUMN_LIKES, member.getLikes());
+        values.put(MemberTable.COLUMN_DISLIKES, member.getDislikes());
+        values.put(MemberTable.COLUMN_CREATED, member.getGamesCreated());
+        values.put(MemberTable.COLUMN_PLAYED, member.getGamesPlayed());
+        if (member.isInsert()){
+            Log.w(TAG, "Inserting member " + member.getMembershipId() + " ...");
             getContentResolver().insert(DataProvider.MEMBER_URI, values);
-
-            //Log.w(TAG, membersModelList.get(i).getName() + ": Likes: " + likes + ", Dislikes: " + dislikes + ", Created: " + created + ", Played: " + played);
-
+        } else {
+            Log.w(TAG, "Updating member " + member.getMembershipId() + " ...");
+            getContentResolver().update(DataProvider.MEMBER_URI, values,MemberTable.COLUMN_MEMBERSHIP + "=" + member.getMembershipId(),null);
         }
 
-        //Quando estiver funcionando com o servidor, tentar fazer o download antes de inserir no BD
-        //Inserir a imagem correta se conseguir fazer o download, ou então inserir a imagem padrão caso falhe.
-        downloadImages();
-        //Log.w(TAG, "Icon images downloaded succesfully");
-
-    }
+}
 
     private void downloadImages(){
         ArrayList<String> notDownloaded = new ArrayList<>();

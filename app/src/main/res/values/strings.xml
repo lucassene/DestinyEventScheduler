@@ -471,6 +471,11 @@
     <string name="level_up">Level up!</string>
     <string name="level_msg_1">"You achieved level "</string>
     <string name="title_msg">"And become "</string>
+    <string name="no_event">You have not played any event of this type.</string>
+    <string name="no_event_all">You have not played any event yet guardian.</string>
+    <string name="one_time">time</string>
+    <string name="more_times">times</string>
+    <string name="clan_updated">Clan data updated!</string>
 
 
 </resources>

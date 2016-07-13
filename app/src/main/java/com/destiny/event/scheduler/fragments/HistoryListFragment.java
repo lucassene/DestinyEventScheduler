@@ -38,6 +38,7 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
     ListView gamesList;
     TextView emptyView;
     TextView sectionTitle;
+    TextView emptyText;
 
     CustomCursorAdapter adapter;
 
@@ -83,8 +84,10 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
         gamesList = (ListView) v.findViewById(R.id.search_list);
         emptyView = (TextView) v.findViewById(R.id.empty_label);
         sectionTitle = (TextView) v.findViewById(R.id.section_title);
+        emptyText = (TextView) v.findViewById(R.id.empty_label);
 
         sectionTitle.setText(R.string.matches_played);
+        emptyText.setText(R.string.no_event_all);
 
         eventIdList = getContext().getResources().getIntArray(R.array.type_ids);
 
@@ -178,6 +181,9 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         eventId = eventIdList[position];
+        if (position == 0){
+            emptyText.setText(R.string.no_event_all);
+        } else emptyText.setText(R.string.no_event);
         initGameLoader();
     }
 

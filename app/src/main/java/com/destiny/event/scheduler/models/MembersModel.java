@@ -17,6 +17,7 @@ public class MembersModel {
     private int rating;
     private int entryId;
     private int xp;
+    private boolean isInsert;
 
     public int getEntryId() {
         return entryId;
@@ -136,5 +137,13 @@ public class MembersModel {
 
     public void setXp(int xp) {
         this.xp = xp;
+    }
+
+    public boolean isInsert() {
+        return isInsert;
+    }
+
+    public void setInsert(boolean insert) {
+        isInsert = insert;
     }
 }

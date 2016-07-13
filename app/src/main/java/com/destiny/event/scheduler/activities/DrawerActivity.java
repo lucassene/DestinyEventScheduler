@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -34,6 +35,7 @@ import android.view.SoundEffectConstants;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.DrawerAdapter;
@@ -63,13 +65,16 @@ import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.AlarmReceiver;
+import com.destiny.event.scheduler.services.BungieService;
+import com.destiny.event.scheduler.services.RequestResultReceiver;
 import com.destiny.event.scheduler.utils.CookiesUtils;
+import com.destiny.event.scheduler.utils.NetworkUtils;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>, OnEventCreatedListener, FromDialogListener{
+public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>, OnEventCreatedListener, FromDialogListener, RequestResultReceiver.Receiver{
 
     private static final String TAG = "DrawerActivity";
 
@@ -134,6 +139,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private Bundle spinnerSelections = new Bundle();
 
     private int selectedDrawerItem;
+
+    RequestResultReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,7 +222,29 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.menu_refresh:
-                refreshLists();
+                if (openedFragment instanceof MyClanFragment){
+                    MyClanFragment frag = (MyClanFragment) openedFragment;
+                    ArrayList<String> idList = frag.getBungieIdList();
+                    if (idList != null){
+                        if (mReceiver == null){
+                            mReceiver = new RequestResultReceiver(new Handler());
+                            mReceiver.setReceiver(this);
+                        }
+                        if (!isBungieServiceRunning() && NetworkUtils.checkConnection(this)){
+                            onLoadingData();
+                            mReceiver = new RequestResultReceiver(new Handler());
+                            mReceiver.setReceiver(this);
+                            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
+                            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.GET_CLAN_MEMBERS);
+                            intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
+                            intent.putExtra("memberList", idList);
+                            intent.putExtra("clanId", clanId);
+                            intent.putExtra("platformId", String.valueOf(platformId));
+                            intent.putExtra("userMembership", bungieId);
+                            startService(intent);
+                        }
+                    } else Log.w(TAG, "bungieIdList is empty!");
+                } else refreshLists();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -1012,6 +1041,32 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     }
 
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        switch (resultCode){
+            case BungieService.STATUS_RUNNING:
+                onLoadingData();
+                break;
+            case BungieService.STATUS_FINISHED:
+                if (openedFragment instanceof MyClanFragment){
+                    MyClanFragment frag = (MyClanFragment) openedFragment;
+                    frag.refreshData();
+                }
+                Toast.makeText(this, R.string.clan_updated, Toast.LENGTH_SHORT).show();
+                onDataLoaded();
+                break;
+            case BungieService.STATUS_ERROR:
+                Log.w(TAG, "Error on BungieService");
+                break;
+        }
+    }
+
+    public boolean isBungieServiceRunning() {
+        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        boolean var = sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
+        //Log.w(TAG, "BungieService running? " +  var);
+        return var;
+    }
 }
 
 
