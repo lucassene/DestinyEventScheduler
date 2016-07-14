@@ -161,6 +161,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
     }
 
     private void initEntryLoader(){
+        callback.onLoadingData();
         if (getLoaderManager().getLoader(LOADER_ENTRY) != null){
             getLoaderManager().destroyLoader(LOADER_ENTRY);
         }
@@ -170,7 +171,6 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        callback.onLoadingData();
 
         String where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
 
@@ -214,6 +214,7 @@ public class ScheduledListFragment extends ListFragment implements LoaderManager
             }
 
         } else {
+            callback.onDataLoaded();
             callback.onScheduledGames(false);
             callback.onSelectedFragment(0);
         }

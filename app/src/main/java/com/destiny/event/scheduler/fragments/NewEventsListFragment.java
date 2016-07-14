@@ -202,10 +202,9 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
                     }
 
             }
-            callback.onDataLoaded();
         }
 
-
+        callback.onDataLoaded();
 
     }
 

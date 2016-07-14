@@ -31,6 +31,7 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.NotificationTable;
+import com.destiny.event.scheduler.data.SavedImagesTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 
@@ -47,6 +48,7 @@ public class DBViewerFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int ENTRY = 70;
     private static final int NOTIFICATION = 80;
     private static final int EVALUATION = 90;
+    private static final int SAVED_IMAGES = 110;
 
     private DBViewerCursorAdapter adapter;
 
@@ -192,6 +194,13 @@ public class DBViewerFragment extends Fragment implements LoaderManager.LoaderCa
                 selectedUri = DataProvider.EVALUATION_URI;
                 to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5};
                 projection = EvaluationTable.ALL_COLUMNS;
+                break;
+            case 9:
+                selectedTable = SavedImagesTable.TABLE_NAME;
+                selectedLoader = SAVED_IMAGES;
+                selectedUri = DataProvider.SAVED_IMAGES_URI;
+                to = new int[] {R.id.txt1, R.id.txt2};
+                projection = SavedImagesTable.ALL_COLUMNS;
                 break;
         }
 

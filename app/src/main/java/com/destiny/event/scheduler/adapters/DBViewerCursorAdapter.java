@@ -19,6 +19,7 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.NotificationTable;
+import com.destiny.event.scheduler.data.SavedImagesTable;
 
 public class DBViewerCursorAdapter extends SimpleCursorAdapter {
 
@@ -305,6 +306,30 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 txt4.setText(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TYPE)));
                 txt5.setText(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ICON)));
                 txt6.setText(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TIME)));
+                txt7.setVisibility(View.GONE);
+                txt8.setVisibility(View.GONE);
+                txt9.setVisibility(View.GONE);
+                txt10.setVisibility(View.GONE);
+                txt11.setVisibility(View.GONE);
+                break;
+            case SavedImagesTable.TABLE_NAME:
+                lbl1.setText(SavedImagesTable.COLUMN_ID);
+                lbl2.setText(SavedImagesTable.COLUMN_PATH);
+                lbl3.setVisibility(View.GONE);
+                lbl4.setVisibility(View.GONE);
+                lbl5.setVisibility(View.GONE);
+                lbl6.setVisibility(View.GONE);
+                lbl7.setVisibility(View.GONE);
+                lbl8.setVisibility(View.GONE);
+                lbl9.setVisibility(View.GONE);
+                lbl10.setVisibility(View.GONE);
+                lbl11.setVisibility(View.GONE);
+                txt1.setText(cursor.getString(cursor.getColumnIndexOrThrow(SavedImagesTable.COLUMN_ID)));
+                txt2.setText(cursor.getString(cursor.getColumnIndexOrThrow(SavedImagesTable.COLUMN_PATH)));
+                txt3.setVisibility(View.GONE);
+                txt4.setVisibility(View.GONE);
+                txt5.setVisibility(View.GONE);
+                txt6.setVisibility(View.GONE);
                 txt7.setVisibility(View.GONE);
                 txt8.setVisibility(View.GONE);
                 txt9.setVisibility(View.GONE);

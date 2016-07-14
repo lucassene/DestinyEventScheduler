@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -47,19 +48,19 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
 
         String cookies = getIntent().getStringExtra("cookies");
         String xcsrf = getIntent().getStringExtra("x-csrf");
-        String platform = getIntent().getStringExtra("platform");
+        int platform = getIntent().getIntExtra("platform",0);
 
         if (mReceiver == null && !isBungieServiceRunning()){
             mReceiver = new RequestResultReceiver(new Handler());
             mReceiver.setReceiver(this);
             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
-            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.GET_CURRENT_ACCOUNT);
+            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_LOGIN);
             intent.putExtra(BungieService.COOKIE_EXTRA, cookies);
             intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
             intent.putExtra(BungieService.XCSRF_EXTRA, xcsrf);
             intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
             startService(intent);
-            }
+        }
 
         if (savedInstanceState != null){
             //Log.w(TAG, "SavedInstance != null");
@@ -135,6 +136,10 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                         break;
                     case (BungieService.ERROR_NO_CLAN):
                         errorCode = BungieService.ERROR_NO_CLAN;
+                        break;
+                    case BungieService.ERROR_INCORRECT_REQUEST:
+                        errorCode = BungieService.ERROR_INCORRECT_REQUEST;
+                        Log.w(TAG, "Incorrect request to BungieService");
                         break;
                 }
                 showAlertDialog();

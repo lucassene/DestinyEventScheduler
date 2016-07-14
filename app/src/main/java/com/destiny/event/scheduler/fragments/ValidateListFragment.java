@@ -218,6 +218,7 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
                     break;
             }
         } else {
+            callback.onDataLoaded();
             callback.onValidateGames(false);
         }
 

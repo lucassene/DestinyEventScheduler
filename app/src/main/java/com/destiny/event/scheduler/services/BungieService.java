@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
@@ -17,6 +18,7 @@ import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.data.SavedImagesTable;
 import com.destiny.event.scheduler.models.MembersModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
@@ -55,10 +57,16 @@ public class BungieService extends IntentService {
     private static final String SERVER_PLATFORM_HEADER = "platform";
 
     private static final String USER_PREFIX = "User/";
+    private static final String GROUP_PREFIX = "Group/";
 
     public static final String GET_CURRENT_ACCOUNT = "GetCurrentBungieAccount/";
     public static final String GET_BUNGIE_ACCOUNT = "GetBungieAccount/";
     public static final String GET_CLAN_MEMBERS = "GetClanMembers/";
+
+    public static final int TYPE_LOGIN = 100;
+    public static final int TYPE_UPDATE_CLAN = 110;
+    public static final int TYPE_VERIFY_MEMBER = 120;
+    public static final int TYPE_RELOGIN = 130;
 
     private static final String GET_METHOD = "GET";
     private static final String POST_METHOD = "POST";
@@ -84,6 +92,7 @@ public class BungieService extends IntentService {
 
     public static final String ERROR_TAG = "error";
     public static final int NO_ERROR = 0;
+    public static final int ERROR_INCORRECT_REQUEST = 99;
     public static final int ERROR_NO_CONNECTION = 100;
     public static final int ERROR_HTTP_REQUEST = 110;
     public static final int ERROR_NO_ICON = 120;
@@ -92,6 +101,7 @@ public class BungieService extends IntentService {
     public static final int ERROR_NO_CLAN = 150;
     public static final int ERROR_MEMBERS_OF_CLAN = 160;
     public static final int ERROR_CLAN_MEMBER = 170;
+    public static final int ERROR_AUTH = 180;
 
     private static final String DEFAULT_ICON = "/img/profile/avatars/Destiny26.jpg";
 
@@ -99,7 +109,7 @@ public class BungieService extends IntentService {
 
     private String displayName = "";
     private String membershipId = "";
-    private String platformId;
+    private int platformId;
 
     private String clanId = "";
     private String clanName = "";
@@ -136,10 +146,10 @@ public class BungieService extends IntentService {
 
         //Log.d(TAG, "HTTP Service started!");
 
-        String request = intent.getStringExtra(REQUEST_EXTRA);
+        int request = intent.getIntExtra(REQUEST_EXTRA, 0);
         if (intent.hasExtra(COOKIE_EXTRA)) cookie = intent.getStringExtra(COOKIE_EXTRA);
         if (intent.hasExtra(XCSRF_EXTRA)) xcsrf = intent.getStringExtra(XCSRF_EXTRA);
-        if (intent.hasExtra(PLATFORM_EXTRA)) platformId = intent.getStringExtra(PLATFORM_EXTRA);
+        if (intent.hasExtra(PLATFORM_EXTRA)) platformId = intent.getIntExtra(PLATFORM_EXTRA, 0);
         if (intent.hasExtra(MEMBERSHIP_EXTRA)) membershipId = intent.getStringExtra(MEMBERSHIP_EXTRA);
 
         membersModelList = new ArrayList<>();
@@ -148,7 +158,7 @@ public class BungieService extends IntentService {
         final ResultReceiver receiver = intent.getParcelableExtra(RECEIVER_EXTRA);
 
         switch (request) {
-            case GET_CURRENT_ACCOUNT:
+            case TYPE_LOGIN:
                 receiver.send(STATUS_RUNNING, Bundle.EMPTY);
                 error = getBungieAccount(receiver);
                 Log.w(TAG, "getBungieAccount error: " + error);
@@ -191,31 +201,137 @@ public class BungieService extends IntentService {
                     }
                 }
                 break;
-            case GET_BUNGIE_ACCOUNT:
+            case TYPE_VERIFY_MEMBER:
+            case TYPE_RELOGIN:
+                cookie = intent.getStringExtra(COOKIE_EXTRA);
+                xcsrf = intent.getStringExtra(XCSRF_EXTRA);
                 receiver.send(STATUS_RUNNING, Bundle.EMPTY);
-                error = isClanMember(membershipId, platformId);
+                error = getBungieAccount(receiver);
                 if (error != NO_ERROR){
                     sendError(receiver);
                 } else {
                     receiver.send(STATUS_FINISHED, Bundle.EMPTY);
                 }
                 break;
-            case GET_CLAN_MEMBERS:
+            case TYPE_UPDATE_CLAN:
                 receiver.send(STATUS_RUNNING, Bundle.EMPTY);
                 clanId = intent.getStringExtra("clanId");
                 actualMemberList = intent.getStringArrayListExtra("memberList");
                 membershipId = intent.getStringExtra("userMembership");
-                platformId = intent.getStringExtra("platformId");
+                platformId = intent.getIntExtra("platformId",0);
                 error = getMembersOfClan(receiver);
                 if (error != NO_ERROR){
                     sendError(receiver);
                 } else {
-                    receiver.send(STATUS_FINISHED, Bundle.EMPTY);
+                    error = updateClan(receiver);
+                    if (error != NO_ERROR){
+                        sendError(receiver);
+                    } else {
+                        receiver.send(STATUS_FINISHED, Bundle.EMPTY);
+                    }
                 }
+                break;
+            default:
+                error = ERROR_INCORRECT_REQUEST;
+                sendError(receiver);
         }
 
         this.stopSelf();
 
+    }
+
+    private int updateClan(ResultReceiver receiver) {
+
+        String myURL = BASE_URL + GROUP_PREFIX + clanId + "/";
+        Log.w(TAG, myURL);
+        receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+
+        try {
+
+            if (NetworkUtils.checkConnection(getApplicationContext())) {
+
+                URL url = new URL(myURL);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
+                urlConnection.setRequestMethod(GET_METHOD);
+
+                int statusCode = urlConnection.getResponseCode();
+
+                if (statusCode == 200) {
+                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                    String response = convertInputStreamToString(inputStream);
+
+                    if (response != null){
+                        try {
+                            JSONObject jO = new JSONObject(response);
+                            JSONObject jResponse = jO.getJSONObject("Response");
+                            JSONObject jDetail = jResponse.getJSONObject("detail");
+                            clanId = jDetail.getString("groupId");
+                            clanName = jDetail.getString("name");
+                            motto = jDetail.getString("motto");
+                            clanBanner = jDetail.getString("bannerPath");
+                            clanIcon = jDetail.getString("avatarPath");
+
+                            Cursor cursor = null;
+                            try {
+                                cursor = getContentResolver().query(DataProvider.CLAN_URI,ClanTable.ALL_COLUMNS,null, null, null);
+                                if (cursor != null && cursor.moveToFirst()){
+                                    String actualName = cursor.getString(cursor.getColumnIndexOrThrow(ClanTable.COLUMN_NAME));
+                                    String actualMotto = cursor.getString(cursor.getColumnIndexOrThrow(ClanTable.COLUMN_DESC));
+                                    String actualBanner = cursor.getString(cursor.getColumnIndexOrThrow(ClanTable.COLUMN_BACKGROUND));
+                                    String actualIcon = cursor.getString(cursor.getColumnIndexOrThrow(ClanTable.COLUMN_ID));
+
+                                    ContentValues values = new ContentValues();
+                                    if (!clanName.equals(actualName)){
+                                        values.put(ClanTable.COLUMN_NAME, clanName);
+                                    }
+                                    if (!clanBanner.equals(actualBanner)){
+                                        String imageName = clanBanner.substring(clanBanner.lastIndexOf("/")+1, clanBanner.length());
+                                        values.put(ClanTable.COLUMN_BACKGROUND, imageName);
+                                        ImageUtils.downloadImage(getApplicationContext(), BASE_IMAGE_URL + clanBanner);
+                                    }
+                                    if (!clanIcon.equals(actualIcon)){
+                                        String imageName = clanIcon.substring(clanIcon.lastIndexOf("/")+1, clanIcon.length());
+                                        values.put(ClanTable.COLUMN_ICON, imageName);
+                                        ImageUtils.downloadImage(getApplicationContext(), BASE_IMAGE_URL + clanIcon);
+                                    }
+                                    if (!motto.equals(actualMotto)){
+                                        values.put(ClanTable.COLUMN_DESC, motto);
+                                    }
+                                    getContentResolver().update(DataProvider.CLAN_URI,values,ClanTable.COLUMN_BUNGIE_ID + "=" + clanId,null);
+                                    values.clear();
+                                    return NO_ERROR;
+                                }
+                            } catch (Exception e){
+                                e.printStackTrace();
+                            } finally {
+                                if (cursor != null) cursor.close();
+                            }
+
+                            return 0;
+                        } catch (JSONException jE){
+                            Log.w(TAG, "Erro no JSON de GetGroup");
+                            jE.printStackTrace();
+                            return ERROR_RESPONSE_CODE;
+                        }
+                    } else {
+                        Log.w(TAG, "Response is null");
+                        return ERROR_RESPONSE_CODE;
+                    }
+                } else {
+                    Log.w(TAG, "Response Code do JSON diferente de 200 (GetGroup)");
+                    return ERROR_RESPONSE_CODE;
+                }
+            } else {
+                Log.w(TAG, "Sem conexão com a internet");
+                return ERROR_NO_CONNECTION;
+            }
+        } catch (Exception e){
+            Log.w(TAG, "Problema no HTTP Request (getCurrentBungieAccount)");
+            e.printStackTrace();
+            return ERROR_HTTP_REQUEST;
+        }
     }
 
     @Override
@@ -236,64 +352,6 @@ public class BungieService extends IntentService {
         editor.putBoolean(RUNNING_SERVICE, false);
         editor.apply();
         Log.w(TAG, "Service destroyed!");
-    }
-
-    private int isClanMember(String membershipId, String platformId) {
-
-        String myURL = BASE_URL + USER_PREFIX + GET_BUNGIE_ACCOUNT + membershipId + "/" + platformId + "/";
-
-        try {
-
-            if (NetworkUtils.checkConnection(getApplicationContext())){
-
-                URL url = new URL(myURL);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
-                urlConnection.setRequestMethod(GET_METHOD);
-
-                int statusCode = urlConnection.getResponseCode();
-
-                if (statusCode == 200){
-                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-                    String response = convertInputStreamToString(inputStream);
-
-                    if (response != null){
-
-                        JSONObject jObject = new JSONObject(response);
-                        JSONObject jResponse = jObject.getJSONObject("Response");
-
-                        try {
-                            JSONArray jClans = jResponse.getJSONArray("clans");
-                            JSONObject clanObj = jClans.getJSONObject(0);
-                            clanId = clanObj.getString("groupId");
-                            //Log.w(TAG,"Clan ID: " + clanId);
-                            return NO_ERROR;
-                        } catch (JSONException e){
-                            Log.w(TAG, "Erro no JSON do getBungieAccount (clans Tag)");
-                            e.printStackTrace();
-                            return ERROR_NO_CLAN;
-                        }
-
-                    } else {
-                        Log.w(TAG, "Response vazia");
-                        return NO_ERROR;
-                    }
-
-                } else {
-                    Log.w(TAG, "Response Code do JSON diferente de 200");
-                    return NO_ERROR;
-                }
-            } else {
-                Log.w(TAG, "Sem conexão com a Internet");
-                return NO_ERROR;
-            }
-
-        }catch (Exception e) {
-            Log.w(TAG, "Problema no HTTP Request (getBungieAccount)");
-            e.printStackTrace();
-            return NO_ERROR;
-        }
     }
 
     private void sendError(ResultReceiver receiver) {
@@ -406,7 +464,7 @@ public class BungieService extends IntentService {
                     user.setMembershipId(membershipId);
                     user.setClanId(clanId);
                     user.setIconPath(userIconPath);
-                    user.setPlatformId(platformId);
+                    user.setPlatformId(String.valueOf(platformId));
                     user.setLikes(userLikes);
                     user.setDislikes(userDislikes);
                     user.setGamesCreated(userCreated);
@@ -427,10 +485,22 @@ public class BungieService extends IntentService {
                 return ERROR_CURRENT_USER;
             }
         } catch (JSONException e) {
-            Log.w(TAG, "Erro no JSON de getCurrentBungieAccount");
-            e.printStackTrace();
-            return ERROR_CURRENT_USER;
+
+            try {
+                JSONObject jObject = new JSONObject(getCurrentBungieAccountResponse);
+                String errorCode = jObject.getString("ErrorCode");
+                if (errorCode.equals("99")){
+                    return ERROR_AUTH;
+                } else return ERROR_CURRENT_USER;
+
+            } catch (JSONException jE){
+                Log.w(TAG, "Erro no JSON de getCurrentBungieAccount");
+                jE.printStackTrace();
+                return ERROR_CURRENT_USER;
+            }
+
         }
+
     }
 
     private void checkInServer(ResultReceiver receiver) {
@@ -445,7 +515,7 @@ public class BungieService extends IntentService {
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
-                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, platformId);
+                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
                 urlConnection.setRequestMethod(POST_METHOD);
 
                 int statusCode = urlConnection.getResponseCode();
@@ -492,7 +562,7 @@ public class BungieService extends IntentService {
 
                 //urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
                 urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
-                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, platformId);
+                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
                 urlConnection.setRequestMethod(GET_METHOD);
 
                 int statusCode = urlConnection.getResponseCode();
@@ -561,6 +631,31 @@ public class BungieService extends IntentService {
                 }
                 insertClanMember(membersModelList.get(i));
             }
+
+            Cursor iCursor = null;
+            ArrayList<String> savedIcons = new ArrayList<>();
+            try {
+                iCursor = getContentResolver().query(DataProvider.SAVED_IMAGES_URI,SavedImagesTable.ALL_COLUMNS,null,null,null);
+                if (iCursor != null && iCursor.moveToFirst()){
+                    for (int i=0;i<iCursor.getCount();i++){
+                        savedIcons.add(iCursor.getString(iCursor.getColumnIndexOrThrow(SavedImagesTable.COLUMN_PATH)));
+                        iCursor.moveToNext();
+                    }
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            } finally {
+                if (iCursor != null) iCursor.close();
+            }
+
+            getIconList(false);
+            iconsList.removeAll(savedIcons);
+            downloadImages();
+
+            //Log.w(TAG, "Iniciando TitleService...");
+            Intent titleIntent = new Intent(getApplicationContext(),TitleService.class);
+            titleIntent.putStringArrayListExtra("membershipList",memberList);
+            startService(titleIntent);
             return NO_ERROR;
         }
 
@@ -577,7 +672,7 @@ public class BungieService extends IntentService {
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
-                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, platformId);
+                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
                 urlConnection.setDoOutput(true);
                 JSONArray jsonList = createJSONMemberList(memberList);
                 urlConnection.setRequestMethod(POST_METHOD);
@@ -795,12 +890,7 @@ public class BungieService extends IntentService {
         values.put(MemberTable.COLUMN_NAME, member.getName());
         values.put(MemberTable.COLUMN_MEMBERSHIP, member.getMembershipId());
         values.put(MemberTable.COLUMN_CLAN, clanId);
-
-        String imageSubURL = member.getIconPath();
-        //Log.w(TAG, "Total of icons: " + iconsList.size());
-        String imageName = imageSubURL.substring(imageSubURL.lastIndexOf("/")+1, imageSubURL.length());
-        //Log.w(TAG, "Image Name: " + imageName);
-
+        String imageName = member.getIconPath().substring(member.getIconPath().lastIndexOf("/")+1, member.getIconPath().length());
         values.put(MemberTable.COLUMN_ICON, imageName);
         values.put(MemberTable.COLUMN_PLATFORM, member.getPlatformId());
         values.put(MemberTable.COLUMN_TITLE, getResources().getString(R.string.default_title));
@@ -821,11 +911,16 @@ public class BungieService extends IntentService {
     private void downloadImages(){
         ArrayList<String> notDownloaded = new ArrayList<>();
 
+        ContentValues values = new ContentValues();
         for (int x=0;x<iconsList.size();x++){
             int error = ImageUtils.downloadImage(getApplicationContext(), BASE_IMAGE_URL + iconsList.get(x));
             if (error == ImageUtils.DOWNLOAD_ERROR){
                 notDownloaded.add(BASE_IMAGE_URL + iconsList.get(x));
+            } else {
+                values.put(SavedImagesTable.COLUMN_PATH, iconsList.get(x));
+                getContentResolver().insert(DataProvider.SAVED_IMAGES_URI, values);
             }
+            values.clear();
         }
         if (notDownloaded.size() > 0){
             SharedPreferences prefs = getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE);
@@ -844,17 +939,9 @@ public class BungieService extends IntentService {
         ContentValues values = new ContentValues();
         values.put(ClanTable.COLUMN_BUNGIE_ID, clanId);
         values.put(ClanTable.COLUMN_NAME, clanName);
-
-        //String iconURL = BASE_IMAGE_URL + clanIcon;
-        //ImageUtils.downloadImage(getApplicationContext(), iconURL);
-
-        //String bannerURL = BASE_IMAGE_URL + clanBanner;
-        //ImageUtils.downloadImage(getApplicationContext(), bannerURL);
-
         String iconName = clanIcon.substring(clanIcon.lastIndexOf("/")+1, clanIcon.length());
-        String bannerName = clanBanner.substring(clanBanner.lastIndexOf("/")+1, clanBanner.length());
-
         values.put(ClanTable.COLUMN_ICON, iconName);
+        String bannerName = clanBanner.substring(clanBanner.lastIndexOf("/")+1, clanBanner.length());
         values.put(ClanTable.COLUMN_BACKGROUND, bannerName);
         values.put(ClanTable.COLUMN_DESC, motto);
 

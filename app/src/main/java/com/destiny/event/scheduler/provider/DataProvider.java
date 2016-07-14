@@ -20,6 +20,7 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.NotificationTable;
+import com.destiny.event.scheduler.data.SavedImagesTable;
 import com.destiny.event.scheduler.data.TitleTable;
 
 public class DataProvider extends ContentProvider {
@@ -57,6 +58,7 @@ public class DataProvider extends ContentProvider {
     private static final int EVALUATION_HISTORY = 92;
     private static final int TITLE = 100;
     private static final int TITLE_ID = 101;
+    private static final int SAVED_IMAGES = 110;
 
     private static final String AUTHORITY = "com.destiny.event.scheduler.provider";
 
@@ -96,6 +98,8 @@ public class DataProvider extends ContentProvider {
     public static final Uri EVALUATION_HISTORY_URI = Uri.parse("content://" + AUTHORITY + "/" + EVALUATION_HISTORY_PATH);
     private static final String TITLE_PATH = "titles";
     public static final Uri TITLE_URI = Uri.parse("content://" + AUTHORITY + "/" + TITLE_PATH);
+    private static final String SAVED_IMAGES_PATH = "savedimages";
+    public static final Uri SAVED_IMAGES_URI = Uri.parse("content://" + AUTHORITY + "/" + SAVED_IMAGES_PATH);
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
@@ -128,6 +132,7 @@ public class DataProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, EVALUATION_HISTORY_PATH, EVALUATION_HISTORY);
         uriMatcher.addURI(AUTHORITY, TITLE_PATH, TITLE);
         uriMatcher.addURI(AUTHORITY, TITLE_PATH + "/#", TITLE_ID);
+        uriMatcher.addURI(AUTHORITY, SAVED_IMAGES_PATH, SAVED_IMAGES);
     }
 
     @Override
@@ -394,6 +399,9 @@ public class DataProvider extends ContentProvider {
                 queryBuilder.setTables(TitleTable.TABLE_NAME);
                 queryBuilder.appendWhere(TitleTable.COLUMN_ID + "=" + uri.getLastPathSegment());
                 break;
+            case SAVED_IMAGES:
+                queryBuilder.setTables(SavedImagesTable.TABLE_NAME);
+                break;
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }
@@ -455,6 +463,10 @@ public class DataProvider extends ContentProvider {
                 id = sqlDB.insert(EvaluationTable.TABLE_NAME, null, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return Uri.parse(EVALUATION_PATH + "/" + id);
+            case SAVED_IMAGES:
+                id = sqlDB.insert(SavedImagesTable.TABLE_NAME, null, values);
+                getContext().getContentResolver().notifyChange(uri, null);
+                return Uri.parse(SAVED_IMAGES_PATH + "/" + id);
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);
         }
@@ -556,6 +568,9 @@ public class DataProvider extends ContentProvider {
                 } else {
                     rowsDeleted = sqlDB.delete(NotificationTable.TABLE_NAME, NotificationTable.COLUMN_ID + "=" + id + " AND " + selection, selectionArgs);
                 }
+                break;
+            case SAVED_IMAGES:
+                rowsDeleted = sqlDB.delete(SavedImagesTable.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unknow URI: " + uri);

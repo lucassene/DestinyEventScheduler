@@ -40,8 +40,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
     private static final String PSN_URL = "http://www.bungie.net/en/User/SignIn/Psnid";
     private static final String LIVE_URL = "http://www.bungie.net/en/User/SignIn/Xuid";
-    private static final String PSN = "2";
-    private static final String LIVE = "1";
+    private static final int PSN = 2;
+    private static final int LIVE = 1;
     private static final int LOGIN = 1;
 
     Button psnButton;
@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     private String bungieId;
     private String userName;
 
-    private String selectedPlatform;
+    private int selectedPlatform;
 
     RequestResultReceiver mReceiver;
 
@@ -89,7 +89,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
     public boolean isBungieServiceRunning() {
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         boolean var = sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
         //Log.w(TAG, "BungieService running? " +  var);
         return var;
@@ -111,7 +111,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         } else {
             Toast.makeText(this, R.string.connection_needed_login, Toast.LENGTH_SHORT).show();
         }
-
     }
 
     @Override
@@ -120,17 +119,31 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
             if (resultCode == Activity.RESULT_OK){
                 String cookies = data.getStringExtra("cookies");
                 String xcsrf = data.getStringExtra("x-csrf");
-                Intent intent = new Intent(this, PrepareActivity.class);
-                //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("cookies",cookies);
-                intent.putExtra("x-csrf",xcsrf);
-                intent.putExtra("platform",selectedPlatform);
-                startActivity(intent);
-                finish();
+
+                SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                editor.putString(DrawerActivity.COOKIES_PREF, cookies);
+                editor.putString(DrawerActivity.XCSRF_PREF, xcsrf);
+                editor.apply();
+
+                if (errorCode != BungieService.ERROR_AUTH){
+                    Intent intent = new Intent(this, PrepareActivity.class);
+                    //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("cookies",cookies);
+                    intent.putExtra("x-csrf",xcsrf);
+                    intent.putExtra("platform",selectedPlatform);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                    Intent intent = new Intent(this, DrawerActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("bungieId",bungieId);
+                    intent.putExtra("userName",userName);
+                    startActivity(intent);
+                    finish();
+                }
                 //Toast.makeText(this, "Dados do result: " + result, Toast.LENGTH_SHORT).show();
-            }
-            if (resultCode == Activity.RESULT_CANCELED){
-                //Toast.makeText(this, "Result falhou ou vazio.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -163,7 +176,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                     if (data.getCount() > 0) {
                         bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
                         userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
-                        String platform = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
+                        int platform = data.getInt(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
                         isClanMember(bungieId, platform);
                     }
                     break;
@@ -176,17 +189,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
     }
 
-    private void isClanMember(String bungieId, String platform) {
+    private void isClanMember(String bungieId, int platform) {
 
         if (mReceiver == null){
             mReceiver = new RequestResultReceiver(new Handler());
             mReceiver.setReceiver(this);
             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
-            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.GET_BUNGIE_ACCOUNT);
+            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_VERIFY_MEMBER);
             intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
             intent.putExtra(BungieService.MEMBERSHIP_EXTRA, bungieId);
             intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
-            startService(intent);
+
+            SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+            String cookies = sharedPrefs.getString(DrawerActivity.COOKIES_PREF, null);
+            String xcsrf = sharedPrefs.getString(DrawerActivity.XCSRF_PREF, null);
+
+            if (cookies != null && xcsrf != null){
+                intent.putExtra(BungieService.COOKIE_EXTRA, cookies);
+                intent.putExtra(BungieService.XCSRF_EXTRA, xcsrf);
+                startService(intent);
+            } else Log.w(TAG, "Cookies or X-CSRF are null");
         }
 
     }
@@ -213,6 +235,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                         break;
                     case BungieService.ERROR_NO_CLAN:
                         errorCode = BungieService.ERROR_NO_CLAN;
+                        break;
+                    case BungieService.ERROR_INCORRECT_REQUEST:
+                        errorCode = BungieService.ERROR_INCORRECT_REQUEST;
+                        Log.w(TAG, "Incorrect Request to BungieService");
+                        break;
+                    case BungieService.ERROR_AUTH:
+                        errorCode = BungieService.ERROR_AUTH;
                         break;
                 }
                 Log.w(TAG, "Erro ao receber dados do getBungieAccount: " + resultData.getInt(BungieService.ERROR_TAG));
@@ -251,6 +280,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 bundle.putString("msg",getString(R.string.no_connection_msg));
                 bundle.putString("posButton",getString(R.string.got_it));
                 break;
+            case BungieService.ERROR_AUTH:
+                bundle.putString("title",getString(R.string.error));
+                bundle.putString("msg", getString(R.string.credentials_expired));
+                bundle.putString("posButton",getString(R.string.got_it));
+                break;
         }
         dialog.setArguments(bundle);
         dialog.show(getSupportFragmentManager(),"alert");
@@ -268,8 +302,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 psnButton.setVisibility(View.VISIBLE);
                 liveButton.setVisibility(View.VISIBLE);
                 break;
-            default:
-                finish();
+            case BungieService.ERROR_AUTH:
+                CookiesUtils.clearCookies();
+                loginTitle.setVisibility(View.VISIBLE);
+                psnButton.setVisibility(View.VISIBLE);
+                liveButton.setVisibility(View.VISIBLE);
                 break;
         }
     }

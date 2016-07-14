@@ -175,6 +175,7 @@
         <item>Member</item>
         <item>Notification</item>
         <item>Evaluation</item>
+        <item>SavedImages</item>
     </string-array>
 
     <string-array name="pref_time_list_entries">
@@ -237,7 +238,7 @@
         <item>Swift</item>
     </string-array>
 
-    <string name="default_title">New Apprentice</string>
+    <string name="default_title">New on the block</string>
 
     <string name="tier1">Reciprocate Rune</string>
     <string name="tier2">Stolen Rune</string>
@@ -476,6 +477,8 @@
     <string name="one_time">time</string>
     <string name="more_times">times</string>
     <string name="clan_updated">Clan data updated!</string>
+    <string name="credentials_expired">Your credentials have expired. Please login again to continue.</string>
+    <string name="unable_update_clan">Unable to update clan data now. Please try again later.</string>
 
 
 </resources>

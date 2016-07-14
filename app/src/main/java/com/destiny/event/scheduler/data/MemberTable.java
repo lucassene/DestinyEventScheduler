@@ -94,7 +94,9 @@ public class MemberTable {
     public static int getExpNeeded(int xp){
         int lvl = getMemberLevel(xp);
         double result = MemberTable.EXP_CONSTANT * Math.pow((double)lvl,(double)MemberTable.EXP_FACTOR);
-        return (int) Math.round(result);
+        if (result <= 0){
+            return 8;
+        } else return (int) Math.round(result);
     }
 
 }

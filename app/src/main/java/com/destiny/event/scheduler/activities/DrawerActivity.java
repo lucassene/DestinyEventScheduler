@@ -91,6 +91,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String NEW_NOTIFY_PREF = "allowNewNotify";
     public static final String FOREGROUND_PREF = "isForeground";
     public static final String DOWNLOAD_PREF = "downloadList";
+    public static final String COOKIES_PREF = "cookies";
+    public static final String XCSRF_PREF = "xcsrf";
 
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
     public static final int FRAGMENT_TYPE_WITH_BACKSTACK = 1;
@@ -200,7 +202,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             openedFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
             //Toast.makeText(this, "FragmentType: " + openedFragmentType + " FragmentTag: " + fragmentTag, Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void getLoggedUserData() {
@@ -235,11 +236,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             mReceiver = new RequestResultReceiver(new Handler());
                             mReceiver.setReceiver(this);
                             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
-                            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.GET_CLAN_MEMBERS);
+                            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_UPDATE_CLAN);
                             intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
                             intent.putExtra("memberList", idList);
                             intent.putExtra("clanId", clanId);
-                            intent.putExtra("platformId", String.valueOf(platformId));
+                            intent.putExtra("platformId", platformId);
                             intent.putExtra("userMembership", bungieId);
                             startService(intent);
                         }
@@ -448,17 +449,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void closeFragment() {
-        /*ft = fm.beginTransaction();
-        ft.remove(openedFragment);
-        ft.commit();
-        fm.popBackStack();
-        fragmentTag = null;
-        if (fm.getBackStackEntryCount() == 1){
-            updateViewPager();
-        } else {
-            openedFragment = fm.findFragmentById(R.id.content_frame);
-            fragmentTag = openedFragment.getTag();
-        }*/
         openMainActivity(null);
     }
 
@@ -1057,6 +1047,17 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 break;
             case BungieService.STATUS_ERROR:
                 Log.w(TAG, "Error on BungieService");
+                progress.setVisibility(View.GONE);
+
+                DialogFragment dialog = new MyAlertDialog();
+                Bundle bundle = new Bundle();
+                bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
+                bundle.putString("title",getString(R.string.error));
+                bundle.putString("msg",getString(R.string.unable_update_clan));
+                bundle.putString("posButton",getString(R.string.got_it));
+                dialog.setArguments(bundle);
+                dialog.show(getSupportFragmentManager(),"alert");
+
                 break;
         }
     }
