@@ -224,7 +224,7 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 lbl6.setText(GameTable.COLUMN_LIGHT);
                 lbl7.setText(GameTable.COLUMN_INSCRIPTIONS);
                 lbl8.setText(GameTable.COLUMN_STATUS);
-                lbl9.setVisibility(View.GONE);
+                lbl9.setText(GameTable.COLUMN_SERVER);
                 lbl10.setVisibility(View.GONE);
                 lbl11.setVisibility(View.GONE);
                 txt1.setText(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_ID)));
@@ -235,7 +235,7 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 txt6.setText(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_LIGHT)));
                 txt7.setText(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS)));
                 txt8.setText(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_STATUS)));
-                txt9.setVisibility(View.GONE);
+                txt9.setText(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_SERVER)));
                 txt10.setVisibility(View.GONE);
                 txt11.setVisibility(View.GONE);
                 break;

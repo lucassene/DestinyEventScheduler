@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
+import com.destiny.event.scheduler.adapters.GameAdapter;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
@@ -24,9 +25,11 @@ import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
+import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NewEventsListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, RefreshDataListener, UserDataListener {
 
@@ -96,10 +99,11 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
 
         String bungieId = callback.getBungieId();
 
-        if (bungieId != null){
+/*        if (bungieId != null){
             getNewEvents();
-        }
+        }*/
 
+        //getServerEvents(callback.getNewGameList());
     }
 
     @Override
@@ -116,6 +120,14 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
             callback.onGameSelected(String.valueOf(id), TAG, creatorList.get(newPos), GameTable.STATUS_NEW);
         }
 
+    }
+
+    public void getServerEvents(List<GameModel> gameList){
+        GameAdapter gameAdapter = new GameAdapter(getActivity(), gameList);
+        if (headerView != null){
+            this.getListView().addHeaderView(headerView);
+        }
+        setListAdapter(gameAdapter);
     }
 
     private void getNewEvents() {

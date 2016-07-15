@@ -41,6 +41,7 @@ import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
@@ -534,14 +535,12 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
 
-    public void createNewEvent() {
+    private void createNewEvent() {
 
         String date = dateText.getText().toString();
         String time = timeText.getText().toString();
 
-
         if(!date.isEmpty() || !time.isEmpty()){
-
             Calendar now = Calendar.getInstance();
 
             Calendar minimumTime = Calendar.getInstance();
@@ -549,56 +548,69 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             minimumTime.setTime(notifyTime.getTime());
             minimumTime.add(Calendar.MINUTE, -10);
 
+            gameTime = getBungieTime(date, time);
+
             //Log.w(TAG, "MinimumTime: " + minimumTime.get(Calendar.HOUR_OF_DAY) + ":" + minimumTime.get(Calendar.MINUTE) + ":00");
             //Log.w(TAG, "NotifyTime: " + notifyTime.get(Calendar.HOUR_OF_DAY) + ":" + notifyTime.get(Calendar.MINUTE) + ":00");
 
-            if (now.getTimeInMillis() <= minimumTime.getTimeInMillis()){
+            if (now.getTimeInMillis() <= minimumTime.getTimeInMillis()) {
+                Bundle bundle = new Bundle();
+                bundle.putInt(ServerService.RESQUEST_TAG, ServerService.TYPE_CREATE_GAME);
+                bundle.putInt(ServerService.EVENT_TAG, Integer.parseInt(selectedEvent));
+                bundle.putString(ServerService.TIME_TAG, gameTime);
+                bundle.putInt(ServerService.LIGHT_TAG, minLight);
+                callback.runServerService(bundle);
+            } else Toast.makeText(getContext(), getResources().getString(R.string.match_must_created) + " " + minimumIntTime + " " + getResources().getString(R.string.minutes_advance), Toast.LENGTH_SHORT).show();
 
-                timeText.setText(time);
+        } else Toast.makeText(getContext(), R.string.when_play, Toast.LENGTH_SHORT).show();
 
-                gameTime = getBungieTime(date, time);
+    }
 
-                int minLight = Integer.parseInt(lightText.getText().toString());
-                String bungieId = callback.getBungieId();
-                String userName = callback.getUserName();
+    public void createLocalEvent(int serverId){
 
-                ContentValues gameValues = new ContentValues();
-                gameValues.put(GameTable.COLUMN_CREATOR, bungieId);
-                gameValues.put(GameTable.COLUMN_CREATOR_NAME,userName);
-                gameValues.put(GameTable.COLUMN_EVENT_ID, selectedEvent);
-                gameValues.put(GameTable.COLUMN_TIME, gameTime);
-                gameValues.put(GameTable.COLUMN_LIGHT, minLight);
-                gameValues.put(GameTable.COLUMN_INSCRIPTIONS, 4);
-                gameValues.put(GameTable.COLUMN_STATUS, GameTable.STATUS_SCHEDULED); //Inserir STATUS_NEW no Servidor
-                gameValues.put(GameTable.COLUMN_PLATFORM, callback.getPlatform());
+        String date = dateText.getText().toString();
+        String time = timeText.getText().toString();
 
-                Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
-                if (result != null) {
-                    gameId = result.getLastPathSegment();
-                }
+        Calendar notifyTime = getNotifyTime();
 
-                ContentValues entryValues = new ContentValues();
-                entryValues.put(EntryTable.COLUMN_MEMBERSHIP, bungieId);
-                entryValues.put(EntryTable.COLUMN_GAME, gameId);
-                entryValues.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
-                getContext().getContentResolver().insert(DataProvider.ENTRY_URI, entryValues);
+        timeText.setText(time);
+        gameTime = getBungieTime(date, time);
 
-                //Apenas para testes
-                createFakeEntries();
+        int minLight = Integer.parseInt(lightText.getText().toString());
+        String bungieId = callback.getBungieId();
+        String userName = callback.getUserName();
 
-                setAlarmNotification(notifyTime, gameId, eventName, eventTypeName, eventIcon);
+        ContentValues gameValues = new ContentValues();
+        gameValues.put(GameTable.COLUMN_SERVER, serverId);
+        gameValues.put(GameTable.COLUMN_CREATOR, bungieId);
+        gameValues.put(GameTable.COLUMN_CREATOR_NAME,userName);
+        gameValues.put(GameTable.COLUMN_EVENT_ID, selectedEvent);
+        gameValues.put(GameTable.COLUMN_TIME, gameTime);
+        gameValues.put(GameTable.COLUMN_LIGHT, minLight);
+        gameValues.put(GameTable.COLUMN_INSCRIPTIONS, 1);
+        gameValues.put(GameTable.COLUMN_STATUS, GameTable.STATUS_SCHEDULED); //Inserir STATUS_NEW no Servidor
+        gameValues.put(GameTable.COLUMN_PLATFORM, callback.getPlatform());
 
-                Toast.makeText(getContext(), R.string.create_match_success, Toast.LENGTH_SHORT).show();
-
-                eventCallback.onEventCreated();
-
-            } else {
-                Toast.makeText(getContext(), getResources().getString(R.string.match_must_created) + " " + minimumIntTime + " " + getResources().getString(R.string.minutes_advance), Toast.LENGTH_SHORT).show();
-            }
-
-        } else{
-            Toast.makeText(getContext(), R.string.when_play, Toast.LENGTH_SHORT).show();
+        Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
+        if (result != null) {
+            gameId = result.getLastPathSegment();
         }
+
+        ContentValues entryValues = new ContentValues();
+        entryValues.put(EntryTable.COLUMN_MEMBERSHIP, bungieId);
+        entryValues.put(EntryTable.COLUMN_GAME, gameId);
+        entryValues.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
+        getContext().getContentResolver().insert(DataProvider.ENTRY_URI, entryValues);
+
+        //Apenas para testes
+        //createFakeEntries();
+
+        setAlarmNotification(notifyTime, gameId, eventName, eventTypeName, eventIcon);
+
+        callback.onDataLoaded();
+        Toast.makeText(getContext(), R.string.create_match_success, Toast.LENGTH_SHORT).show();
+
+        eventCallback.onEventCreated();
 
     }
 

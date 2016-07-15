@@ -7,7 +7,7 @@ public class GameTable {
 
     public static final String TABLE_NAME = "game";
     public static final String COLUMN_ID = "_id";
-    //public static final String COLUMN_SERVER = "game_server_id";
+    public static final String COLUMN_SERVER = "game_server_id";
     public static final String COLUMN_CREATOR = "game_creator";
     public static final String COLUMN_CREATOR_NAME = "game_name";
     public static final String COLUMN_EVENT_ID = "game_event_id";
@@ -23,13 +23,15 @@ public class GameTable {
     public static final String STATUS_EVALUATED = "3";
     public static final String STATUS_SCHEDULED = "9";
 
-    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_CREATOR, COLUMN_CREATOR_NAME, COLUMN_EVENT_ID, COLUMN_TIME, COLUMN_LIGHT, COLUMN_INSCRIPTIONS, COLUMN_STATUS, COLUMN_PLATFORM};
+    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_SERVER, COLUMN_CREATOR, COLUMN_CREATOR_NAME, COLUMN_EVENT_ID, COLUMN_TIME, COLUMN_LIGHT, COLUMN_INSCRIPTIONS, COLUMN_STATUS, COLUMN_PLATFORM};
 
     public static final String CREATE_TABLE = "CREATE TABLE "
             + TABLE_NAME
             + " ("
             + COLUMN_ID
             + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_SERVER
+            + " INTEGER NOT NULL, "
             + COLUMN_CREATOR
             + " TEXT NOT NULL, "
             + COLUMN_CREATOR_NAME

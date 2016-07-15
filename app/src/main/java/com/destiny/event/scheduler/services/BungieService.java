@@ -72,12 +72,12 @@ public class BungieService extends IntentService {
     private static final String POST_METHOD = "POST";
 
     public static final int STATUS_RUNNING = 0;
-    public static final int STATUS_FINISHED = 10;
-    public static final int STATUS_ERROR = 404;
-    public static final int STATUS_DOCS = 1;
-    public static final int STATUS_VERIFY = 2;
-    public static final int STATUS_FRIENDS = 4;
-    public static final int STATUS_PARTY = 5;
+    public static final int STATUS_FINISHED = 110;
+    public static final int STATUS_ERROR = 1404;
+    public static final int STATUS_DOCS = 11;
+    public static final int STATUS_VERIFY = 12;
+    public static final int STATUS_FRIENDS = 14;
+    public static final int STATUS_PARTY = 15;
 
     public static final String COOKIE_EXTRA = "cookies";
     public static final String REQUEST_EXTRA = "request";
@@ -184,18 +184,7 @@ public class BungieService extends IntentService {
                             }
                             //insertFakeEvents(receiver);
                             insertLoggedUser();
-
-                            ArrayList<String> memberIdList = new ArrayList<>();
-
-                            for (int i=0;i<membersModelList.size();i++){
-                                memberIdList.add(membersModelList.get(i).getMembershipId());
-                            }
-
-                            //Log.w(TAG, "Iniciando TitleService...");
-                            Intent titleIntent = new Intent(getApplicationContext(),TitleService.class);
-                            titleIntent.putStringArrayListExtra("membershipList",memberIdList);
-                            startService(titleIntent);
-
+                            callTitleService();
                             receiver.send(STATUS_FINISHED, Bundle.EMPTY);
                         }
                     }
@@ -223,6 +212,7 @@ public class BungieService extends IntentService {
                 if (error != NO_ERROR){
                     sendError(receiver);
                 } else {
+                    callTitleService();
                     error = updateClan(receiver);
                     if (error != NO_ERROR){
                         sendError(receiver);
@@ -238,6 +228,19 @@ public class BungieService extends IntentService {
 
         this.stopSelf();
 
+    }
+
+    private void callTitleService(){
+        ArrayList<String> memberIdList = new ArrayList<>();
+
+        for (int i=0;i<membersModelList.size();i++){
+            memberIdList.add(membersModelList.get(i).getMembershipId());
+        }
+
+        //Log.w(TAG, "Iniciando TitleService...");
+        Intent titleIntent = new Intent(getApplicationContext(),TitleService.class);
+        titleIntent.putStringArrayListExtra("membershipList",memberIdList);
+        startService(titleIntent);
     }
 
     private int updateClan(ResultReceiver receiver) {

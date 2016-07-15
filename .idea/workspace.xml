@@ -100,13 +100,13 @@
     </layouts>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="BungieService" />
     <option name="TOOL_WINDOW_LOG_LEVEL" value="WARN" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0ac15dfa-6286-4dda-bd4f-02e1d21add61" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/SavedImagesTable.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/ServerService.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/NewEventAdapter.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/cache.properties.lock" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/cache.properties.lock" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileHashes.bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileSnapshots.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileSnapshots.bin" />
@@ -117,22 +117,16 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/tasks/_app_compileDebugJavaWithJavac/localJarClasspathSnapshot/localJarClasspathSnapshot.lock" afterPath="$PROJECT_DIR$/.gradle/2.10/tasks/_app_compileDebugJavaWithJavac/localJarClasspathSnapshot/localJarClasspathSnapshot.lock" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/DrawerActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/DrawerActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/LoginActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/LoginActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/PrepareActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/PrepareActivity.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/DBViewerCursorAdapter.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/DBViewerCursorAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/DBHelper.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/DBHelper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/MemberTable.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/MemberTable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/GameTable.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/GameTable.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/DBViewerFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/DBViewerFragment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/MyNewProfileFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/MyNewProfileFragment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventFragment.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventsListFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventsListFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/ScheduledListFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/ScheduledListFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/ValidateListFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/ValidateListFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/provider/DataProvider.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/provider/DataProvider.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/interfaces/ToActivityListener.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/interfaces/ToActivityListener.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/BungieService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/BungieService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/DownloadService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/DownloadService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/utils/ImageUtils.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/utils/ImageUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/values-pt-rBR/strings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values-pt-rBR/strings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
     </list>
     <ignored path="DestinyEventScheduler.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -175,36 +169,50 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="BungieService.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/BungieService.java">
+      <file leaf-file-name="ServerService.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/ServerService.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="258" column="65" selection-start-line="258" selection-start-column="65" selection-end-line="258" selection-end-column="65" />
+              <caret line="136" column="0" selection-start-line="136" selection-start-column="0" selection-end-line="136" selection-end-column="0" />
               <folding>
-                <element signature="e#38544#38592#0" expanded="true" />
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GameTable.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/GameTable.java">
+      <file leaf-file-name="NewEventsListFragment.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventsListFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.27101448">
-              <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="105" column="10" selection-start-line="105" selection-start-column="10" selection-end-line="105" selection-end-column="10" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DrawerActivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/DrawerActivity.java">
+      <file leaf-file-name="GameAdapter.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/GameAdapter.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="241" column="57" selection-start-line="241" selection-start-column="57" selection-end-line="241" selection-end-column="57" />
+              <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#39360#39398#0" expanded="true" />
+                <element signature="e#1136#1137#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DrawerActivity.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/DrawerActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.4188406">
+              <caret line="1133" column="35" selection-start-line="1133" selection-start-column="35" selection-end-line="1133" selection-end-column="35" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#25830#25831#0" expanded="true" />
+                <element signature="e#25864#25865#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -1891,19 +1899,12 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/utils/DateUtils.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/MyEventsFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/drawable/selected_bg.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/drawer_item_layout.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/game_list_item_layout.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/prepare_layout.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout-land/prepare_layout.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/SearchFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/DetailEventFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/dialogs/MyAlertDialog.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/UpdateNotificationsService.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/TitleService.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/DetailValidationFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/LevelCheckService.java" />
@@ -1921,27 +1922,34 @@
         <option value="$PROJECT_DIR$/app/src/main/res/layout/search_event_layout.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/my_events_layout.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/my_clan_header_layout.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/MyNewProfileFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/interfaces/ToActivityListener.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/models/MembersModel.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/MyClanFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/MemberTable.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/ScheduledListFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventsListFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/ValidateListFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/utils/ImageUtils.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/SavedImagesTable.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/DBHelper.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/provider/DataProvider.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/values-pt-rBR/strings.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/DrawerActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/DownloadService.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/PrepareActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/DBViewerFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/DBViewerCursorAdapter.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/LoginActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/GameTable.java" />
+        <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/MyNewProfileFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/BungieService.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/DBViewerCursorAdapter.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/DBViewerFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/models/GameModel.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/interfaces/OnEventCreatedListener.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/ServerService.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/GameAdapter.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/interfaces/ToActivityListener.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventsListFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/DrawerActivity.java" />
       </list>
     </option>
   </component>
@@ -1995,9 +2003,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scratches" />
-      <pane id="Scope" />
       <pane id="AndroidView">
         <subPane>
           <PATH>
@@ -2008,6 +2013,9 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -2166,7 +2174,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="data" />
+              <option name="myItemId" value="interfaces" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2513,19 +2521,18 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.4974293" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32969153" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44428968" sideWeight="0.46915168" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44428968" sideWeight="0.466581" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3983287" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44428968" sideWeight="0.5308483" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44428968" sideWeight="0.533419" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -2541,6 +2548,7 @@
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32455012" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -2588,149 +2596,39 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="23" />
+      <option name="time" value="25" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/new_list_layout.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6425197">
-          <caret line="24" column="52" selection-start-line="24" selection-start-column="52" selection-end-line="24" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/ic_classic.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/ic_clash.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/styles.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.2075472">
-          <caret line="12" column="62" selection-start-line="12" selection-start-column="62" selection-end-line="12" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="android-dummy://C:/Users/Escritorio/Documents/Lucas/Android/DestinyEventScheduler//Theme Editor">
-      <provider selected="true" editor-type-id="themeEditor">
-        <state theme-name="DestinyApp" module-name="app" proportion="0.67" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/colors.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.07680723">
-          <caret line="3" column="42" selection-start-line="3" selection-start-column="42" selection-end-line="3" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/img_destiny_symbol_white.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/img_destiny_symbol_white.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/login_layout.xml">
-      <provider selected="true" editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-13.730769">
-          <caret line="21" column="8" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="8" />
-          <folding>
-            <element signature="e#669#692#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="408" column="21" selection-start-line="408" selection-start-column="21" selection-end-line="408" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="android-dummy://C:/Users/Escritorio/Documents/Lucas/Android/DestinyEventScheduler/app/Translations Editor">
-      <provider selected="true" editor-type-id="string-resource-editor">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/drawer_background.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/search_event_layout.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.43937007">
-          <caret line="36" column="20" selection-start-line="36" selection-start-column="20" selection-end-line="36" selection-end-column="69" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/my_events_layout.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8125984">
-          <caret line="35" column="73" selection-start-line="35" selection-start-column="73" selection-end-line="35" selection-end-column="73" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/my_clan_layout.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/my_clan_header_layout.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.5448819">
           <caret line="24" column="65" selection-start-line="24" selection-start-column="65" selection-end-line="24" selection-end-column="65" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/my_new_profile_layout.xml">
       <provider editor-type-id="android-designer">
         <state />
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/my_new_profile_layout.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33228347">
           <caret line="124" column="16" selection-start-line="124" selection-start-column="16" selection-end-line="124" selection-end-column="16" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/RequestResultReceiver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.44347826">
-          <caret line="25" column="71" selection-start-line="25" selection-start-column="71" selection-end-line="25" selection-end-column="71" />
-          <folding />
-        </state>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/HistoryListFragment.java">
@@ -2750,14 +2648,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/interfaces/ToActivityListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8130435">
-          <caret line="36" column="33" selection-start-line="36" selection-start-column="33" selection-end-line="36" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/MyClanFragment.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.6684636">
@@ -2769,34 +2659,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/MembersAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.09855072">
-          <caret line="19" column="13" selection-start-line="19" selection-start-column="13" selection-end-line="19" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/MemberTable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.7289855">
           <caret line="97" column="21" selection-start-line="97" selection-start-column="21" selection-end-line="97" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/MyNewProfileFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4188406">
-          <caret line="303" column="73" selection-start-line="303" selection-start-column="73" selection-end-line="303" selection-end-column="73" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventsListFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.87061995">
-          <caret line="207" column="8" selection-start-line="207" selection-start-column="8" selection-end-line="207" selection-end-column="8" />
           <folding />
         </state>
       </provider>
@@ -2825,38 +2691,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/TitleTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35849056">
-          <caret line="109" column="166" selection-start-line="109" selection-start-column="166" selection-end-line="109" selection-end-column="166" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/values-pt-rBR/strings.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.0">
-          <caret line="371" column="27" selection-start-line="371" selection-start-column="27" selection-end-line="371" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/models/MembersModel.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33333334">
           <caret line="77" column="18" selection-start-line="77" selection-start-column="18" selection-end-line="77" selection-end-column="18" />
-          <folding>
-            <element signature="e#1593#1594#0" expanded="true" />
-            <element signature="e#1624#1625#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/TitleService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.65507245">
-          <caret line="116" column="35" selection-start-line="116" selection-start-column="35" selection-end-line="116" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2864,7 +2702,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33333334">
           <caret line="1352" column="21" selection-start-line="1352" selection-start-column="21" selection-end-line="1352" selection-end-column="21" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2872,15 +2709,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.14782609">
           <caret line="28" column="50" selection-start-line="28" selection-start-column="50" selection-end-line="28" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/strings.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.62794346">
-          <caret line="177" column="25" selection-start-line="177" selection-start-column="25" selection-end-line="177" selection-end-column="25" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2892,37 +2720,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/DBViewerFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="203" column="22" selection-start-line="203" selection-start-column="22" selection-end-line="203" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/DBViewerCursorAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="7.8347826">
-          <caret line="337" column="22" selection-start-line="337" selection-start-column="22" selection-end-line="337" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/PrepareActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.19710144">
-          <caret line="50" column="59" selection-start-line="50" selection-start-column="59" selection-end-line="50" selection-end-column="59" />
-          <folding>
-            <element signature="e#8640#8665#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/SavedImagesTable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.615942">
           <caret line="27" column="57" selection-start-line="27" selection-start-column="57" selection-end-line="27" selection-end-column="57" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2947,16 +2748,8 @@
         <state vertical-scroll-proportion="1.1403508">
           <caret line="309" column="22" selection-start-line="309" selection-start-column="22" selection-end-line="309" selection-end-column="22" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/CustomCursorAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="149" column="0" selection-start-line="149" selection-start-column="0" selection-end-line="149" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2964,18 +2757,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.5072464">
           <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/DrawerActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="241" column="57" selection-start-line="241" selection-start-column="57" selection-end-line="241" selection-end-column="57" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#39360#39398#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2987,10 +2768,97 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/TitleTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5072464">
+          <caret line="109" column="166" selection-start-line="109" selection-start-column="166" selection-end-line="109" selection-end-column="166" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/UpdateNotificationsService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="24" column="13" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/values-pt-rBR/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="6.711146">
+          <caret line="371" column="27" selection-start-line="371" selection-start-column="27" selection-end-line="371" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/TitleService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.9956522">
+          <caret line="100" column="51" selection-start-line="100" selection-start-column="51" selection-end-line="100" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.35843372">
+          <caret line="47" column="37" selection-start-line="47" selection-start-column="37" selection-end-line="47" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/EventTable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.1826087">
+        <state vertical-scroll-proportion="0.95072466">
           <caret line="49" column="232" selection-start-line="49" selection-start-column="232" selection-end-line="49" selection-end-column="232" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/MyNewProfileFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.088405795">
+          <caret line="371" column="37" selection-start-line="371" selection-start-column="37" selection-end-line="371" selection-end-column="37" />
+          <folding>
+            <element signature="e#17117#17145#0" expanded="false" />
+            <element signature="e#17235#17265#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/RequestResultReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.123188406">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/GameTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7884058">
+          <caret line="33" column="35" selection-start-line="33" selection-start-column="35" selection-end-line="33" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/DBViewerCursorAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="4.252174">
+          <caret line="237" column="98" selection-start-line="237" selection-start-column="98" selection-end-line="237" selection-end-column="98" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/DBViewerFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.38405797">
+          <caret line="163" column="53" selection-start-line="163" selection-start-column="53" selection-end-line="163" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/PrepareActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.30144927">
+          <caret line="42" column="0" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -2998,18 +2866,158 @@
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/BungieService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="258" column="65" selection-start-line="258" selection-start-column="65" selection-end-line="258" selection-end-column="65" />
+          <caret line="157" column="22" selection-start-line="157" selection-start-column="22" selection-end-line="157" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/models/GameModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="4" column="46" selection-start-line="4" selection-start-column="34" selection-end-line="4" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/DetailEventFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.09855072">
+          <caret line="46" column="13" selection-start-line="46" selection-start-column="13" selection-end-line="46" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/MembersAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.09855072">
+          <caret line="19" column="13" selection-start-line="19" selection-start-column="13" selection-end-line="19" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/HistoryAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.09855072">
+          <caret line="19" column="13" selection-start-line="19" selection-start-column="13" selection-end-line="19" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/SpinnerAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.09855072">
+          <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/ChartLegendAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.67536235">
+          <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/DrawerAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.123188406">
+          <caret line="22" column="83" selection-start-line="22" selection-start-column="83" selection-end-line="22" selection-end-column="83" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3610675">
+          <caret line="74" column="18" selection-start-line="74" selection-start-column="18" selection-end-line="74" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/game_list_item_layout.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6">
+          <caret line="55" column="49" selection-start-line="55" selection-start-column="49" selection-end-line="55" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/CustomCursorAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5811594">
+          <caret line="130" column="40" selection-start-line="130" selection-start-column="40" selection-end-line="130" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/SimpleMemberAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="122" column="23" selection-start-line="122" selection-start-column="23" selection-end-line="122" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/interfaces/OnEventCreatedListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.09855072">
+          <caret line="4" column="33" selection-start-line="4" selection-start-column="33" selection-end-line="4" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.70289856">
+          <caret line="558" column="0" selection-start-line="558" selection-start-column="0" selection-end-line="558" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/services/ServerService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="136" column="0" selection-start-line="136" selection-start-column="0" selection-end-line="136" selection-end-column="0" />
           <folding>
-            <element signature="e#38544#38592#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/data/GameTable.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/interfaces/ToActivityListener.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.27101448">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="41" column="25" selection-start-line="41" selection-start-column="25" selection-end-line="41" selection-end-column="25" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/adapters/GameAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1136#1137#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/fragments/NewEventsListFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="105" column="10" selection-start-line="105" selection-start-column="10" selection-end-line="105" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/destiny/event/scheduler/activities/DrawerActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4188406">
+          <caret line="1133" column="35" selection-start-line="1133" selection-start-column="35" selection-end-line="1133" selection-end-column="35" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#25830#25831#0" expanded="true" />
+            <element signature="e#25864#25865#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

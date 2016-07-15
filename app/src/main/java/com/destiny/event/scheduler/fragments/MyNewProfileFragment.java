@@ -382,8 +382,8 @@ public class MyNewProfileFragment extends Fragment implements LoaderManager.Load
                         int count = data.getInt(data.getColumnIndexOrThrow("total"));
                         String countText;
                         if (count == 1){
-                            countText = StringUtils.parseString(count) + " " + getString(R.string.one_time);
-                        } else countText = StringUtils.parseString(count) + " " + getString(R.string.more_times);
+                            countText = " " + StringUtils.parseString(count) + " " + getString(R.string.one_time);
+                        } else countText = " " + StringUtils.parseString(count) + " " + getString(R.string.more_times);
                         favCount.setText(countText);
                     } else {
                         favEmpty.setVisibility(View.VISIBLE);

@@ -3,7 +3,10 @@ package com.destiny.event.scheduler.interfaces;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
+import com.destiny.event.scheduler.models.GameModel;
+
 import java.util.Calendar;
+import java.util.List;
 
 public interface ToActivityListener {
     public void updateViewPager();
@@ -35,4 +38,6 @@ public interface ToActivityListener {
     public int getFmBackStackCount();
     public void setToolbarTitle(String title);
     public int getSelectedItem();
+    public void runServerService(Bundle bundle);
+    public List<GameModel> getNewGameList();
 }

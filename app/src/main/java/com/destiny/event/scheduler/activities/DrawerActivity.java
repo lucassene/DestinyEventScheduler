@@ -63,16 +63,19 @@ import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
+import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.AlarmReceiver;
 import com.destiny.event.scheduler.services.BungieService;
 import com.destiny.event.scheduler.services.RequestResultReceiver;
+import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.CookiesUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>, OnEventCreatedListener, FromDialogListener, RequestResultReceiver.Receiver{
 
@@ -143,6 +146,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private int selectedDrawerItem;
 
     RequestResultReceiver mReceiver;
+
+    ArrayList<GameModel> newGameList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -231,19 +236,21 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             mReceiver = new RequestResultReceiver(new Handler());
                             mReceiver.setReceiver(this);
                         }
-                        if (!isBungieServiceRunning() && NetworkUtils.checkConnection(this)){
-                            onLoadingData();
-                            mReceiver = new RequestResultReceiver(new Handler());
-                            mReceiver.setReceiver(this);
-                            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
-                            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_UPDATE_CLAN);
-                            intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
-                            intent.putExtra("memberList", idList);
-                            intent.putExtra("clanId", clanId);
-                            intent.putExtra("platformId", platformId);
-                            intent.putExtra("userMembership", bungieId);
-                            startService(intent);
-                        }
+                        if (NetworkUtils.checkConnection(this)){
+                            if (!isBungieServiceRunning()){
+                                onLoadingData();
+                                mReceiver = new RequestResultReceiver(new Handler());
+                                mReceiver.setReceiver(this);
+                                Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
+                                intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_UPDATE_CLAN);
+                                intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
+                                intent.putExtra("memberList", idList);
+                                intent.putExtra("clanId", clanId);
+                                intent.putExtra("platformId", platformId);
+                                intent.putExtra("userMembership", bungieId);
+                                startService(intent);
+                            }
+                        } else Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
                     } else Log.w(TAG, "bungieIdList is empty!");
                 } else refreshLists();
         }
@@ -633,6 +640,33 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         viewPager.setCurrentItem(1);
     }
 
+    @Override
+    public void runServerService(Bundle bundle) {
+        if (NetworkUtils.checkConnection(this)){
+            if (!isServerServiceRunning()){
+                onLoadingData();
+                mReceiver = new RequestResultReceiver(new Handler());
+                mReceiver.setReceiver(this);
+                Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ServerService.class);
+                intent.putExtra(ServerService.RESQUEST_TAG, bundle.getInt(ServerService.RESQUEST_TAG));
+                intent.putExtra(ServerService.RECEIVER_TAG, mReceiver);
+                intent.putExtra(ServerService.MEMBER_TAG, bungieId);
+                intent.putExtra(ServerService.PLATFORM_TAG, platformId);
+
+                if (bundle.containsKey(ServerService.EVENT_TAG)) intent.putExtra(ServerService.EVENT_TAG, bundle.getInt(ServerService.EVENT_TAG));
+                if (bundle.containsKey(ServerService.TIME_TAG)) intent.putExtra(ServerService.TIME_TAG, bundle.getString(ServerService.TIME_TAG));
+                if (bundle.containsKey(ServerService.LIGHT_TAG)) intent.putExtra(ServerService.LIGHT_TAG, bundle.getInt(ServerService.LIGHT_TAG));
+
+                startService(intent);
+            }
+        } else Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public List<GameModel> getNewGameList() {
+        return newGameList;
+    }
+
 
     public boolean openNewEventFragment(View child){
         if (openedFragment instanceof NewEventFragment){
@@ -800,10 +834,17 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             userDataListener.get(i).onUserDataLoaded();
                         }
                     }
+                    getNewGames();
                     break;
             }
             onDataLoaded();
         }
+    }
+
+    private void getNewGames() {
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.RESQUEST_TAG,ServerService.TYPE_NEW_GAMES);
+        runServerService(bundle);
     }
 
     @Override
@@ -1048,26 +1089,72 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             case BungieService.STATUS_ERROR:
                 Log.w(TAG, "Error on BungieService");
                 progress.setVisibility(View.GONE);
-
-                DialogFragment dialog = new MyAlertDialog();
                 Bundle bundle = new Bundle();
                 bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
                 bundle.putString("title",getString(R.string.error));
                 bundle.putString("msg",getString(R.string.unable_update_clan));
                 bundle.putString("posButton",getString(R.string.got_it));
-                dialog.setArguments(bundle);
-                dialog.show(getSupportFragmentManager(),"alert");
-
+                showAlertDialog(bundle);
+                break;
+            case ServerService.STATUS_ERROR:
+                progress.setVisibility(View.GONE);
+                int error = resultData.getInt(ServerService.ERROR_TAG);
+                Log.w(TAG, "Error on ServerService");
+                switch (error) {
+                    case ServerService.ERROR_NO_CONNECTION:
+                        progress.setVisibility(View.GONE);
+                        Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
+                        break;
+                    case ServerService.ERROR_HTTP_REQUEST:
+                    case ServerService.ERROR_INCORRECT_REQUEST:
+                    case ServerService.ERROR_INCORRECT_RESPONSE:
+                    case ServerService.ERROR_NULL_RESPONSE:
+                    case ServerService.ERROR_RESPONSE_CODE:
+                        progress.setVisibility(View.GONE);
+                        Bundle dialogBundle = new Bundle();
+                        dialogBundle.putInt("type", MyAlertDialog.ALERT_DIALOG);
+                        dialogBundle.putString("title",getString(R.string.error));
+                        dialogBundle.putString("msg","This game can not be created. Please try again later.");
+                        dialogBundle.putString("posButton",getString(R.string.got_it));
+                        showAlertDialog(dialogBundle);
+                        break;
+                }
+                break;
+            case ServerService.STATUS_FINISHED:
+                if (openedFragment instanceof NewEventFragment){
+                    NewEventFragment frag = (NewEventFragment) openedFragment;
+                    int gameId = resultData.getInt(ServerService.INT_TAG);
+                    frag.createLocalEvent(gameId);
+                }
+                if (openedFragment == null){
+                    newGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
+                    for (int i=0;i<newGameList.size();i++){
+                        Log.w(TAG, "gameId: " + newGameList.get(i).getGameId());
+                    }
+                    onDataLoaded();
+                }
                 break;
         }
+    }
+
+    private void showAlertDialog(Bundle dialogBundle) {
+        DialogFragment dialog = new MyAlertDialog();
+        dialog.setArguments(dialogBundle);
+        dialog.show(getSupportFragmentManager(),"alert");
     }
 
     public boolean isBungieServiceRunning() {
         SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         boolean var = sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
-        //Log.w(TAG, "BungieService running? " +  var);
         return var;
     }
+
+    public boolean isServerServiceRunning() {
+        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        boolean var = sharedPrefs.getBoolean(ServerService.RUNNING_SERVICE, false);
+        return var;
+    }
+
 }
 
 

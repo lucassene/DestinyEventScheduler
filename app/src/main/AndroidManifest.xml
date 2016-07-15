@@ -43,6 +43,10 @@
         <service android:name=".services.BungieService"
             android:exported="false">
         </service>
+
+        <service android:name=".services.ServerService"
+            android:exported="false">
+        </service>
         
         <service android:name=".services.NotificationService"
             android:enabled="true">

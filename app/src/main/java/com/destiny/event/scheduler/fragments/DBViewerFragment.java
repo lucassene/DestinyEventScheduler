@@ -164,7 +164,7 @@ public class DBViewerFragment extends Fragment implements LoaderManager.LoaderCa
                 selectedTable = GameTable.TABLE_NAME;
                 selectedLoader = GAME;
                 selectedUri = DataProvider.ALL_GAME_URI;
-                to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5, R.id.txt6, R.id.txt7, R.id.txt8};
+                to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5, R.id.txt6, R.id.txt7, R.id.txt8, R.id.txt9};
                 projection = GameTable.ALL_COLUMNS;
                 break;
             case 5:
