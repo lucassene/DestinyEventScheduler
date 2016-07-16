@@ -27,6 +27,7 @@ import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.services.ServerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,7 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
     private static final int[] to = {R.id.primary_text, R.id.game_image, R.id.secondary_text, R.id.game_date, R.id.game_time, R.id.game_actual, R.id.game_max, R.id.type_text};
 
     CustomCursorAdapter adapter;
+    GameAdapter gameAdapter;
 
     View headerView;
 
@@ -103,6 +105,9 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
             getNewEvents();
         }*/
 
+        if (callback.getNewGameList() != null){
+            onNewGamesLoaded(callback.getNewGameList());
+        }
         //getServerEvents(callback.getNewGameList());
     }
 
@@ -120,14 +125,6 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
             callback.onGameSelected(String.valueOf(id), TAG, creatorList.get(newPos), GameTable.STATUS_NEW);
         }
 
-    }
-
-    public void getServerEvents(List<GameModel> gameList){
-        GameAdapter gameAdapter = new GameAdapter(getActivity(), gameList);
-        if (headerView != null){
-            this.getListView().addHeaderView(headerView);
-        }
-        setListAdapter(gameAdapter);
     }
 
     private void getNewEvents() {
@@ -222,12 +219,15 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+        //adapter.swapCursor(null);
     }
 
     @Override
     public void onRefreshData() {
-        initGameLoader();
+        //initGameLoader();
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.RESQUEST_TAG,ServerService.TYPE_NEW_GAMES);
+        callback.runServerService(bundle);
         Log.w(TAG, "Refreshing New Events data!");
     }
 
@@ -238,6 +238,27 @@ public class NewEventsListFragment extends ListFragment implements LoaderManager
 
     @Override
     public void onUserDataLoaded() {
-        getNewEvents();
     }
+
+    @Override
+    public void onNewGamesLoaded(List<GameModel> gameList) {
+        Log.w(TAG, "onNewGamesLoaded called!");
+        if (gameAdapter == null) {
+            Log.w(TAG, "adapter estava null");
+            if (gameList != null){
+                gameAdapter = new GameAdapter(getActivity(), gameList);
+                setListAdapter(gameAdapter);
+                if (headerView != null){
+                    this.getListView().addHeaderView(headerView);
+                }
+            } else Log.w(TAG, "gameList null ou size 0");
+        } else {
+            Log.w(TAG, "adapter já existia");
+            if (gameList!=null){
+                gameAdapter.setGameList(gameList);
+                gameAdapter.notifyDataSetChanged();
+            } else Log.w(TAG, "gameList null");
+        }
+    }
+
 }

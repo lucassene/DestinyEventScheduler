@@ -3,6 +3,8 @@ package com.destiny.event.scheduler.fragments;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -211,26 +213,24 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        data.moveToFirst();
-
-        switch (loader.getId()){
-            case LOADER_MEMBERS:
-                adapter.notifyDataSetChanged();
-                adapter.swapCursor(data);
-                totalMembers.setText(String.valueOf(data.getCount()));
-                for (int i=0; i<data.getCount(); i++){
-                    bungieIdList.add(i,data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP)));
-                    data.moveToNext();
-                }
-                break;
+        if (data != null && data.moveToFirst()){
+            switch (loader.getId()){
+                case LOADER_MEMBERS:
+                    totalMembers.setText(String.valueOf(data.getCount()));
+                    for (int i=0; i<data.getCount(); i++){
+                        bungieIdList.add(i,data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP)));
+                        data.moveToNext();
+                    }
+                    adapter.swapCursor(data);
+                    break;
+            }
         }
-            callback.onDataLoaded();
+        callback.onDataLoaded();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //adapter.swapCursor(null);
+        adapter.swapCursor(null);
         Log.w("MyClan Loader: ", "O Loader entrou no método onLoaderReset");
 
     }
@@ -271,7 +271,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     }
 
     public void refreshData(){
-        initMemberLoader();
+        adapter.notifyDataSetChanged();
     }
 
 }

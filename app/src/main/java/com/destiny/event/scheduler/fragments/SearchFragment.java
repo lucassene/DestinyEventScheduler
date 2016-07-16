@@ -76,7 +76,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         super.onPrepareOptionsMenu(menu);
         menu.clear();
         callback.setToolbarTitle(getString(R.string.search_title));
-        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
+        getActivity().getMenuInflater().inflate(R.menu.home_menu, menu);
     }
 
     @Override

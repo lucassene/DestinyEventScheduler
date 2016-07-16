@@ -24,9 +24,11 @@ import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
+import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ValidateListFragment extends ListFragment implements RefreshDataListener, UserDataListener, LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -175,6 +177,11 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
     @Override
     public void onUserDataLoaded() {
         getEvents();
+    }
+
+    @Override
+    public void onNewGamesLoaded(List<GameModel> gameList) {
+
     }
 
     @Override

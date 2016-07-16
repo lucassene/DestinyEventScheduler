@@ -1,6 +1,7 @@
 package com.destiny.event.scheduler.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,7 @@ public class GameAdapter extends BaseAdapter {
 
     public void setGameList(List<GameModel> gameList){
         this.gameList = gameList;
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
     @Override
@@ -70,7 +71,7 @@ public class GameAdapter extends BaseAdapter {
         viewHolder.creatorName.setText(creatorName);
         String insc = currentGame.getInscriptions() + "/";
         viewHolder.inscriptions.setText(insc);
-        viewHolder.maxGuardians.setText(currentGame.getMaxGuardians());
+        viewHolder.maxGuardians.setText(String.valueOf(currentGame.getMaxGuardians()));
         viewHolder.time.setText(DateUtils.getTime(currentGame.getTime()));
         viewHolder.date.setText(DateUtils.onBungieDate(currentGame.getTime()));
 

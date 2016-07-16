@@ -56,6 +56,7 @@ import com.destiny.event.scheduler.fragments.MyClanFragment;
 import com.destiny.event.scheduler.fragments.MyEventsFragment;
 import com.destiny.event.scheduler.fragments.MyNewProfileFragment;
 import com.destiny.event.scheduler.fragments.NewEventFragment;
+import com.destiny.event.scheduler.fragments.NewEventsListFragment;
 import com.destiny.event.scheduler.fragments.SearchFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
@@ -643,7 +644,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void runServerService(Bundle bundle) {
         if (NetworkUtils.checkConnection(this)){
-            if (!isServerServiceRunning()){
+            //if (!isServerServiceRunning()){
                 onLoadingData();
                 mReceiver = new RequestResultReceiver(new Handler());
                 mReceiver.setReceiver(this);
@@ -658,7 +659,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 if (bundle.containsKey(ServerService.LIGHT_TAG)) intent.putExtra(ServerService.LIGHT_TAG, bundle.getInt(ServerService.LIGHT_TAG));
 
                 startService(intent);
-            }
+            //}
         } else Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
     }
 
@@ -1128,9 +1129,14 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 }
                 if (openedFragment == null){
                     newGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
-                    for (int i=0;i<newGameList.size();i++){
-                        Log.w(TAG, "gameId: " + newGameList.get(i).getGameId());
-                    }
+                    if (newGameList != null){
+                        for (int i=0;i<userDataListener.size();i++){
+                            if (userDataListener.get(i) instanceof NewEventsListFragment){
+                                userDataListener.get(i).onNewGamesLoaded(newGameList);
+                                break;
+                            }
+                        }
+                    } else Log.w(TAG, "gameList null");
                     onDataLoaded();
                 }
                 break;
@@ -1143,7 +1149,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         dialog.show(getSupportFragmentManager(),"alert");
     }
 
-    public boolean isBungieServiceRunning() {
+    private boolean isBungieServiceRunning() {
         SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         boolean var = sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
         return var;

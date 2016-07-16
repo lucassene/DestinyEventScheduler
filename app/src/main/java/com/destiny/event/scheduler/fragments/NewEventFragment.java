@@ -105,7 +105,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         setRetainInstance(true);
 
         selectedType = "2";
-        selectedEvent = "7";
+        selectedEvent = "4";
 
         Bundle bundle = getArguments();
         if (bundle != null){
@@ -127,6 +127,12 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+        if(!dateText.getText().toString().equals("")){
+            hasDate = true;
+        }
+        if (!timeText.getText().toString().equals("")){
+            hasTime = true;
+        }
     }
 
     private void checkGame(String selectedType) {
