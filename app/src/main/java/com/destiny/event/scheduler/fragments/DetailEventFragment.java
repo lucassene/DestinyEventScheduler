@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
+import com.destiny.event.scheduler.adapters.DetailEventAdapter;
 import com.destiny.event.scheduler.adapters.MembersAdapter;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
@@ -37,12 +38,15 @@ import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
+import com.destiny.event.scheduler.models.EntryModel;
+import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class DetailEventFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener{
 
@@ -59,7 +63,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private String gameId;
     private String origin;
-    private String gameStatus;
+    private int gameStatus;
     private String creator;
     private int inscriptions;
     private int maxGuardians;
@@ -93,8 +97,11 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points, R.id.secondary_text};
 
     MembersAdapter adapter;
+    DetailEventAdapter detailAdapter;
 
     MyAlertDialog dialog;
+
+    GameModel game;
 
     @Override
     public void onDestroyView() {
@@ -133,14 +140,14 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
         Bundle bundle = getArguments();
         if (bundle != null){
-            gameId = bundle.getString("gameId");
+            //gameId = bundle.getString("gameId");
             origin = bundle.getString("origin");
-            creator = bundle.getString("creator");
-            gameStatus = bundle.getString("status");
+            //creator = bundle.getString("creator");
+            game = (GameModel) bundle.getSerializable("game");
         }
 
-        if (gameStatus != null) {
-            switch (gameStatus){
+        if (game != null){
+            switch (game.getStatus()){
                 case GameTable.STATUS_NEW:
                     joinButton.setText(R.string.join);
                     break;
@@ -160,7 +167,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                 case GameTable.STATUS_VALIDATED:
                     joinButton.setText(R.string.evaluate);
                     break;
-            };
+            }
         }
 
         if (origin.equals(SearchFragment.TAG) || origin.equals(MyEventsFragment.TAG) || origin.equals(HistoryListFragment.TAG)){
@@ -334,8 +341,42 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private void getGameData() {
 
-        prepareGameStrings();
-        initGameLoader();
+        eventIcon.setImageResource(getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
+        eventName.setText(getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
+        eventType.setText(getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
+
+        String gameTime = game.getTime();
+        eventCalendar = DateUtils.stringToDate(gameTime);
+        date.setText(DateUtils.onBungieDate(gameTime));
+        time.setText(DateUtils.getTime(gameTime));
+        light.setText(String.valueOf(game.getMinLight()));
+
+        maxGuardians = game.getMaxGuardians();
+        inscriptions = game.getInscriptions();
+        String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
+        guardians.setText(sg);
+        int gS = game.getStatus();
+
+        Calendar now = Calendar.getInstance();
+        if (now.getTimeInMillis() > eventCalendar.getTimeInMillis() && gS == GameTable.STATUS_SCHEDULED){
+            dialogThread();
+        } else {
+            getMembers(game.getGameId());
+        }
+
+
+
+        //prepareGameStrings();
+        //initGameLoader();
+    }
+
+    private void getMembers(int gameId) {
+        callback.getGameEntries(gameId);
+    }
+
+    public void onEntriesLoaded(List<EntryModel> entryList){
+        Log.w(TAG, "entryList size: " + entryList.size());
+        setAdapter(entryList, maxGuardians);
     }
 
     private void prepareGameStrings() {
@@ -481,7 +522,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     guardians.setText(sg);
                     String gS = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_STATUS));
                     //Log.w(TAG, "Game Cursor: " + DatabaseUtils.dumpCursorToString(data));
-                    setAdapter(maxGuardians);
 
                     Calendar now = Calendar.getInstance();
                     if (now.getTimeInMillis() > eventCalendar.getTimeInMillis() && gS.equals(GameTable.STATUS_SCHEDULED)){
@@ -591,16 +631,17 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     }
 
-    private void setAdapter(int max) {
+    private void setAdapter(List<EntryModel> entries, int max) {
         setListAdapter(null);
-        adapter = new MembersAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, max);
+        //adapter = new MembersAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, max);
+        detailAdapter = new DetailEventAdapter(getContext(),entries, max);
 
         if (headerView != null && footerView != null){
             this.getListView().addHeaderView(headerView, null, false);
             this.getListView().addFooterView(footerView);
         }
 
-        setListAdapter(adapter);
+        setListAdapter(detailAdapter);
     }
 
     private void setAlarmNotification(Calendar notifyTime, String gameId, String title, String typeName, int typeIcon) {

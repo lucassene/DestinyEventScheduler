@@ -97,7 +97,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         gamesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                callback.onGameSelected(String.valueOf(id), TAG, null, GameTable.STATUS_NEW);
+                //callback.onGameSelected(String.valueOf(id), TAG, null, GameTable.STATUS_NEW);
             }
         });
 

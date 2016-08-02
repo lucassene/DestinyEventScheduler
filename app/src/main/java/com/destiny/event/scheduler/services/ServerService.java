@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
+import com.destiny.event.scheduler.models.EntryModel;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
@@ -33,6 +35,7 @@ public class ServerService extends IntentService {
 
     private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/";
     private static final String GAME_ENDPOINT = "game";
+    private static final String ENTRIES_ENDPOINT = "/entries";
 
     private static final String MEMBER_HEADER = "membership";
     private static final String PLATFORM_HEADER = "platform";
@@ -51,13 +54,16 @@ public class ServerService extends IntentService {
     public static final String INT_TAG = "intData";
     public static final String STRING_TAG = "stringData";
     public static final String GAME_TAG = "gameList";
+    public static final String GAMEID_TAG = "gameId";
+    public static final String ENTRY_TAG = "entries";
 
     public static final int STATUS_RUNNING = 0;
     public static final int STATUS_FINISHED = 210;
     public static final int STATUS_ERROR = 2404;
 
-    public static final int TYPE_NEW_GAMES = 1;
+    public static final int TYPE_ALL_GAMES = 1;
     public static final int TYPE_CREATE_GAME = 2;
+    public static final int TYPE_GAME_ENTRIES = 3;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -67,6 +73,7 @@ public class ServerService extends IntentService {
     public static final int ERROR_NULL_RESPONSE = 50;
     public static final int ERROR_INCORRECT_RESPONSE = 60;
     public static final int ERROR_JSON = 70;
+    public static final int ERROR_INCORRECT_GAMEID = 80;
 
     public static final String RUNNING_SERVICE = "serverRunning";
 
@@ -74,6 +81,7 @@ public class ServerService extends IntentService {
     private String memberId;
     private int platformId;
     private ArrayList<GameModel> gameList;
+    private ArrayList<EntryModel> memberList;
 
     public ServerService() {
         super(ServerService.class.getName());
@@ -125,19 +133,35 @@ public class ServerService extends IntentService {
                     sendError(receiver, error);
                 } else sendIntData(receiver, gameId);
                 break;
-            case TYPE_NEW_GAMES:
+            case TYPE_ALL_GAMES:
                 url = SERVER_BASE_URL + GAME_ENDPOINT;
                 error = requestServer(receiver, type, url, null);
                 if (error != NO_ERROR) {
                     sendError(receiver, error);
-                } else sendSerializableData(receiver, gameList);
+                } else sendGameData(receiver, gameList);
                 break;
+            case TYPE_GAME_ENTRIES:
+                if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
+                    url = SERVER_BASE_URL + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1) + ENTRIES_ENDPOINT;
+                    bundle.clear();
+                    bundle.putInt(GAMEID_TAG, intent.getIntExtra(GAMEID_TAG, -1));
+                    error = requestServer(receiver, type, url, bundle);
+                    if (error != NO_ERROR){
+                        sendError(receiver, error);
+                    } else sendEntryData(receiver, memberList);
+                } else sendError(receiver, ERROR_INCORRECT_GAMEID);
         }
         this.stopSelf();
 
     }
 
-    private void sendSerializableData(ResultReceiver receiver, ArrayList<GameModel> gameList) {
+    private void sendEntryData(ResultReceiver receiver, ArrayList<EntryModel> memberList) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ENTRY_TAG, memberList);
+        receiver.send(STATUS_FINISHED, bundle);
+    }
+
+    private void sendGameData(ResultReceiver receiver, ArrayList<GameModel> gameList) {
         Bundle bundle = new Bundle();
         bundle.putSerializable(GAME_TAG, gameList);
         receiver.send(STATUS_FINISHED, bundle);
@@ -167,7 +191,7 @@ public class ServerService extends IntentService {
                     case TYPE_CREATE_GAME:
                         urlConnection = setCreateGameCall(urlConnection, bundle);
                         break;
-                    case TYPE_NEW_GAMES:
+                    case TYPE_ALL_GAMES:
                         urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
                         break;
                 }
@@ -175,6 +199,7 @@ public class ServerService extends IntentService {
                 int statusCode = urlConnection.getResponseCode();
 
                 if (statusCode == 200) {
+                    int error = NO_ERROR;
                     InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     String response = convertInputStreamToString(inputStream);
                     if (response != null){
@@ -183,11 +208,13 @@ public class ServerService extends IntentService {
                                 case TYPE_CREATE_GAME:
                                     gameId = Integer.parseInt(response);
                                     return NO_ERROR;
-                                case TYPE_NEW_GAMES:
-                                    int error = parseNewGames(response);
+                                case TYPE_ALL_GAMES:
+                                    error = parseNewGames(response);
                                     if (error != NO_ERROR){
                                         return error;
                                     } else return NO_ERROR;
+                                case TYPE_GAME_ENTRIES:
+                                    error = parseEntries(response);
                                 default:
                                     return NO_ERROR;
                             }
@@ -213,6 +240,32 @@ public class ServerService extends IntentService {
         }
     }
 
+    private int parseEntries(String response) {
+        Log.w(TAG, "GetEntries response: " + response);
+        JSONArray jResponse;
+        memberList = new ArrayList<>();
+        try {
+            jResponse = new JSONArray(response);
+            for (int i=0;i<jResponse.length();i++){
+                JSONObject jEntry = jResponse.getJSONObject(i);
+                JSONObject jMember = jEntry.getJSONObject("member");
+                EntryModel member = new EntryModel();
+                member.setId(jMember.getString("membership"));
+                member.setName(jMember.getString("name"));
+                member.setIconPath(jMember.getString("icon"));
+                member.setPlatformId(jMember.getInt("platform"));
+                member.setLvl(jMember.getInt("likes"),jMember.getInt("dislikes"),jMember.getInt("gamesPlayed"),jMember.getInt("gamesCreated"));
+                member.setEntryTime(jEntry.getString("time"));
+                member.setTitle(getString(R.string.default_title));
+                memberList.add(member);
+            }
+        } catch (JSONException e){
+            e.printStackTrace();
+            return ERROR_JSON;
+        }
+        return NO_ERROR;
+    }
+
     private int parseNewGames(String response){
         Log.w(TAG, "GetNewGames response: " + response);
         JSONArray jResponse;
@@ -235,6 +288,8 @@ public class ServerService extends IntentService {
                 game.setTime(jGame.getString("time"));
                 game.setMinLight(jGame.getInt("light"));
                 game.setInscriptions(jGame.getInt("inscriptions"));
+                game.setStatus(jGame.getInt("status"));
+                game.setJoined(getBoolean(jGame.getString("joined")));
                 gameList.add(game);
             }
         } catch (JSONException e) {
@@ -242,6 +297,10 @@ public class ServerService extends IntentService {
             return ERROR_JSON;
         }
         return NO_ERROR;
+    }
+
+    private boolean getBoolean(String joined) {
+        return joined.equals("true");
     }
 
     private HttpURLConnection setCreateGameCall(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {

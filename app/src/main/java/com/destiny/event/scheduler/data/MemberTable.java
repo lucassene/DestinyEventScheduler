@@ -4,6 +4,8 @@ package com.destiny.event.scheduler.data;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.destiny.event.scheduler.utils.StringUtils;
+
 public class MemberTable {
 
     private static final String TAG = "MemberTable";
@@ -97,6 +99,15 @@ public class MemberTable {
         if (result <= 0){
             return 8;
         } else return (int) Math.round(result);
+    }
+
+    public static String getMemberXP(int likes, int dislikes, int gamesPlayed, int gamesCreated){
+        int likesFator = ( likes * Integer.parseInt(LIKE_MODIFIER));
+        int createdFator = ( gamesCreated * Integer.parseInt(CREATOR_MODIFIER));
+        int playedFator = ( gamesPlayed * Integer.parseInt(PLAYED_MODIFIER));
+        int dislikeFator = ( dislikes *  Integer.parseInt(DISLIKE_MODIFIER));
+        int result = (likesFator + createdFator + playedFator) - dislikeFator;
+        return StringUtils.parseString(result);
     }
 
 }

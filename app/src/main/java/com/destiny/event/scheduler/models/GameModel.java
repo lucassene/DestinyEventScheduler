@@ -14,6 +14,8 @@ public class GameModel implements Serializable {
     private String time;
     private int minLight;
     private int inscriptions;
+    private int status;
+    private boolean joined;
 
     public String getCreatorId() {
         return creatorId;
@@ -93,5 +95,21 @@ public class GameModel implements Serializable {
 
     public void setTypeName(String typeName) {
         this.typeName = typeName;
+    }
+
+    public boolean isJoined() {
+        return joined;
+    }
+
+    public void setJoined(boolean joined) {
+        this.joined = joined;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

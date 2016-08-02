@@ -21,7 +21,7 @@ public interface ToActivityListener {
     public void closeFragment();
     public void onLoadingData();
     public void onDataLoaded();
-    public void onGameSelected(String id, String tag, String creator, String status);
+    public void onGameSelected(GameModel game, String tag);
     public void onScheduledGames(boolean status);
     public void onValidateGames(boolean status);
     public void setClanOrderBy(String orderBy);
@@ -39,5 +39,6 @@ public interface ToActivityListener {
     public void setToolbarTitle(String title);
     public int getSelectedItem();
     public void runServerService(Bundle bundle);
-    public List<GameModel> getNewGameList();
+    public List<GameModel> getGameList(int type);
+    public void getGameEntries(int gameId);
 }

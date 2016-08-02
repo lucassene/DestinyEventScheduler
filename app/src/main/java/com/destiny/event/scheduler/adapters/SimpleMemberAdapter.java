@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.models.MembersModel;
+import com.destiny.event.scheduler.models.CompleteMemberModel;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
@@ -24,10 +24,10 @@ public class SimpleMemberAdapter extends BaseAdapter {
     private static final int TYPE_MEMBER = 1;
 
     private Context context;
-    private List<MembersModel> memberList;
+    private List<CompleteMemberModel> memberList;
     private LayoutInflater inflater;
 
-    public SimpleMemberAdapter(Context context, List<MembersModel> memberList){
+    public SimpleMemberAdapter(Context context, List<CompleteMemberModel> memberList){
         this.context = context;
         this.memberList = memberList;
         inflater = LayoutInflater.from(context);
@@ -39,7 +39,7 @@ public class SimpleMemberAdapter extends BaseAdapter {
     }
 
     @Override
-    public MembersModel getItem(int position) {
+    public CompleteMemberModel getItem(int position) {
         return memberList.get(position);
     }
 
@@ -74,7 +74,7 @@ public class SimpleMemberAdapter extends BaseAdapter {
             vViewHolder = (ValidateViewHolder) convertView.getTag();
         }
 
-        MembersModel currentMember = getItem(position);
+        CompleteMemberModel currentMember = getItem(position);
 
         vViewHolder.memberName.setText(currentMember.getName());
         vViewHolder.memberTitle.setText(currentMember.getTitle());

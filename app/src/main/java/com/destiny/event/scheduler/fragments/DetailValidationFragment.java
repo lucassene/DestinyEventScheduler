@@ -36,7 +36,7 @@ import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
-import com.destiny.event.scheduler.models.MembersModel;
+import com.destiny.event.scheduler.models.CompleteMemberModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.LevelCheckService;
 import com.destiny.event.scheduler.services.TitleService;
@@ -67,7 +67,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
     private int inscriptions;
     private String origin;
 
-    private List<MembersModel> memberList;
+    private List<CompleteMemberModel> memberList;
 
     View headerView;
     View includedView;
@@ -93,7 +93,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
 
     MyAlertDialog dialog;
 
-    String originStatus;
+    int originStatus;
     int status;
 
     int actualUserLevel;
@@ -143,7 +143,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
         if (bundle != null){
             gameId = bundle.getString("gameId");
             creator = bundle.getString("creator");
-            originStatus = bundle.getString("status");
+            originStatus = bundle.getInt("status");
             origin = bundle.getString("origin");
         }
 
@@ -388,7 +388,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
             ImageView img = (ImageView) v.findViewById(R.id.rate_img);
 
             int newpos = position -1;
-            MembersModel member = adapter.getItem(newpos);
+            CompleteMemberModel member = adapter.getItem(newpos);
             int newRating = 0;
 
             if (!member.getMembershipId().equals(callback.getBungieId())){
@@ -610,7 +610,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                     evalMemberList = new ArrayList<>();
                     data.moveToFirst();
                     for (int i=0; i < data.getCount();i++){
-                        MembersModel memberModel = new MembersModel();
+                        CompleteMemberModel memberModel = new CompleteMemberModel();
                         memberModel.setMembershipId(data.getString(data.getColumnIndexOrThrow(EntryTable.COLUMN_MEMBERSHIP)));
                         memberModel.setName(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
                         memberModel.setTitle(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
@@ -634,7 +634,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                         data.moveToNext();
                     }
 
-                    if (originStatus.equals(GameTable.STATUS_EVALUATED)){
+                    if (originStatus ==GameTable.STATUS_EVALUATED){
                         initEvaluationLoader();
                     } else adapter.notifyDataSetChanged();
 

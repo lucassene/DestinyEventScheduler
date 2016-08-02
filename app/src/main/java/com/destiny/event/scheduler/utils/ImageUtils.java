@@ -101,4 +101,8 @@ public class ImageUtils {
 
     }
 
+    public static String getIconName(String iconPath){
+        return iconPath.substring(iconPath.lastIndexOf("/")+1, iconPath.length());
+    }
+
 }

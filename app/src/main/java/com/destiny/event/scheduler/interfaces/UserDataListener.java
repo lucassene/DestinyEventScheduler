@@ -7,6 +7,6 @@ import java.util.List;
 public interface UserDataListener {
 
     public void onUserDataLoaded();
-    public void onNewGamesLoaded(List<GameModel> gameList);
+    public void onGamesLoaded(List<GameModel> gameList);
 
 }

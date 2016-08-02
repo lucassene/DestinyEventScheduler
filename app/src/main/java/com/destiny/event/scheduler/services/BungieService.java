@@ -19,7 +19,7 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.SavedImagesTable;
-import com.destiny.event.scheduler.models.MembersModel;
+import com.destiny.event.scheduler.models.CompleteMemberModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.ImageUtils;
@@ -122,7 +122,7 @@ public class BungieService extends IntentService {
     private int userLikes;
     private int userDislikes;
 
-    private ArrayList<MembersModel> membersModelList;
+    private ArrayList<CompleteMemberModel> membersModelList;
     private ArrayList<String> iconsList;
 
     private static final String TAG = "BungieService";
@@ -462,7 +462,7 @@ public class BungieService extends IntentService {
                     clanBanner = jGroup.getString("bannerPath");
                     clanIcon = jGroup.getString("avatarPath");
 
-                    MembersModel user = new MembersModel();
+                    CompleteMemberModel user = new CompleteMemberModel();
                     user.setName(displayName);
                     user.setMembershipId(membershipId);
                     user.setClanId(clanId);
@@ -697,7 +697,7 @@ public class BungieService extends IntentService {
                         JSONArray jResponse = new JSONArray(response);
                         for (int i=0;i<jResponse.length();i++){
                             JSONObject jMember = jResponse.getJSONObject(i);
-                            MembersModel member = new MembersModel();
+                            CompleteMemberModel member = new CompleteMemberModel();
                             member.setMembershipId(jMember.getString("membership"));
                             member.setName(jMember.getString("name"));
                             member.setIconPath(jMember.getString("icon"));
@@ -756,7 +756,7 @@ public class BungieService extends IntentService {
                 JSONObject memberJSON = jResults.getJSONObject(i);
                 JSONObject destinyInfo = memberJSON.getJSONObject("destinyUserInfo");
 
-                MembersModel member = new MembersModel();
+                CompleteMemberModel member = new CompleteMemberModel();
                 member.setMembershipId(destinyInfo.getString("membershipId"));
                 member.setName(destinyInfo.getString("displayName"));
                 member.setPlatformId(platformId);
@@ -887,7 +887,7 @@ public class BungieService extends IntentService {
 
     }
 
-    private void insertClanMember(MembersModel member) {
+    private void insertClanMember(CompleteMemberModel member) {
 
         ContentValues values = new ContentValues();
         values.put(MemberTable.COLUMN_NAME, member.getName());

@@ -52,7 +52,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
     private String gameStatus;
     private ArrayList<String> gameCreatorList;
-    private ArrayList<String> gameStatusList;
+    private ArrayList<Integer> gameStatusList;
 
     private String where;
 
@@ -91,7 +91,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
         if (savedInstanceState != null) {
             gameCreatorList = savedInstanceState.getStringArrayList("gameCreatorList");
-            gameStatusList = savedInstanceState.getStringArrayList("gameStatusList");
+            gameStatusList = savedInstanceState.getIntegerArrayList("gameStatusList");
         }
 
         callback = (ToActivityListener) getActivity();
@@ -100,7 +100,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         gameList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                callback.onGameSelected(String.valueOf(id), TAG, gameCreatorList.get(position), gameStatusList.get(position));
+                //callback.onGameSelected(String.valueOf(id), TAG, gameCreatorList.get(position), gameStatusList.get(position));
             }
         });
 
@@ -325,7 +325,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
             for (int i=0; i < data.getCount(); i++){
                 gameCreatorList.add(i, data.getString(data.getColumnIndex(GameTable.COLUMN_CREATOR)));
-                gameStatusList.add(i, data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_STATUS)));
+                gameStatusList.add(i, data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_STATUS)));
                 data.moveToNext();
             }
 
@@ -347,7 +347,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putStringArrayList("gameCreatorList", gameCreatorList);
-        outState.putStringArrayList("gameStatusList", gameStatusList);
+        outState.putIntegerArrayList("gameStatusList", gameStatusList);
         outState.putString("status",gameStatus);
         super.onSaveInstanceState(outState);
     }

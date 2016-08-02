@@ -1,13 +1,9 @@
 package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,40 +12,29 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
-import com.destiny.event.scheduler.data.EventTable;
-import com.destiny.event.scheduler.data.EventTypeTable;
-import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.adapters.GameAdapter;
 import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
-import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.services.ServerService;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
 
-public class ValidateListFragment extends ListFragment implements RefreshDataListener, UserDataListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class ValidateListFragment extends ListFragment implements RefreshDataListener, UserDataListener{
 
-    private static final String TAG = "ValidateListFragment";
-
-    private static final int LOADER_GAME = 60;
+    public static final String TAG = "ValidateListFragment";
 
     private ToActivityListener callback;
 
-    CustomCursorAdapter adapter;
+    GameAdapter gameAdapter;
 
     View headerView;
 
     TextView sectionTitle;
 
-    private String[] projection;
-    private String[] from;
-    private static final int[] to = {R.id.primary_text, R.id.game_image, R.id.secondary_text, R.id.type_text, R.id.status_img};
-
-    private ArrayList<String> statusIdList;
-    private ArrayList<String> creatorList;
+    private List<GameModel> gameList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,9 +66,6 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
 
         sectionTitle = (TextView) headerView.findViewById(R.id.section_title);
 
-        statusIdList = new ArrayList<>();
-        creatorList = new ArrayList<>();
-
         return v;
     }
 
@@ -95,10 +77,8 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
 
         sectionTitle.setText(R.string.games_available);
 
-        String bungieId = callback.getBungieId();
-
-        if (bungieId != null){
-            getEvents();
+        if (savedInstanceState != null && savedInstanceState.containsKey("gameList")){
+            onGamesLoaded((List<GameModel>) savedInstanceState.getSerializable("gameList"));
         }
 
     }
@@ -109,64 +89,22 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
         setListAdapter(null);
     }
 
-    private void getEvents() {
-
-        prepareStrings();
-        initGameLoader();
-        adapter = new CustomCursorAdapter(getContext(), R.layout.done_game_item, null, from, to, 0, LOADER_GAME);
-
-        if (headerView != null){
-            this.getListView().addHeaderView(headerView);
-        }
-
-        setListAdapter(adapter);
-
-    }
-
-    private void initGameLoader(){
-        if (getLoaderManager().getLoader(LOADER_GAME) != null){
-            getLoaderManager().destroyLoader(LOADER_GAME);
-        }
-        getLoaderManager().restartLoader(LOADER_GAME, null, this);
-    }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        if (position > 0 ){
-            callback.onGameSelected(String.valueOf(id), TAG, creatorList.get(position - 1), statusIdList.get(position-1));
+        if (position > 0) {
+            int newPos = position - 1;
+            callback.onGameSelected(gameList.get(newPos), TAG);
         }
     }
 
-    private void prepareStrings() {
-
-        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID);
-        String c2 = GameTable.COLUMN_CREATOR;
-        String c3 = GameTable.COLUMN_TIME;
-        String c4 = GameTable.COLUMN_LIGHT;
-        String c5 = GameTable.COLUMN_INSCRIPTIONS;
-        String c6 = GameTable.COLUMN_CREATOR_NAME;
-        String c7 = GameTable.COLUMN_STATUS;
-
-        String c8 = MemberTable.COLUMN_NAME;
-
-        String c9 = EventTypeTable.COLUMN_NAME;
-        String c10 = EventTypeTable.COLUMN_ICON;
-
-        String c11 = EventTable.COLUMN_ICON;
-        String c12 = EventTable.COLUMN_NAME;
-        String c13 = EventTable.COLUMN_GUARDIANS;
-        String c14 = EventTable.COLUMN_TYPE;
-
-        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14};
-
-        from = new String[] {c2, c11, c12, c13, c9};
-
-    }
 
     @Override
     public void onRefreshData() {
-        initGameLoader();
-        Log.w(TAG, "Refreshing Validate data!");
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.RESQUEST_TAG, ServerService.TYPE_ALL_GAMES);
+        callback.runServerService(bundle);
+        Log.w(TAG, "Refreshing Scheduled Events data!");
     }
 
     @Override
@@ -176,65 +114,34 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
 
     @Override
     public void onUserDataLoaded() {
-        getEvents();
     }
 
     @Override
-    public void onNewGamesLoaded(List<GameModel> gameList) {
-
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        callback.onLoadingData();
-
-        switch (id){
-            case LOADER_GAME:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.GAME_URI,
-                        projection,
-                        GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED,
-                        null,
-                        "datetime(" + GameTable.COLUMN_TIME + ") ASC"
-                );
-            default:
-                return null;
-        }
-
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        if (data != null && data.moveToFirst()){
-            switch (loader.getId()){
-                case LOADER_GAME:
-                    adapter.swapCursor(data);
-
-                    data.moveToFirst();
-                    for (int i=0; i < data.getCount();i++){
-                        statusIdList.add(i, data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_STATUS)));
-                        creatorList.add(i, data.getString(data.getColumnIndex(GameTable.COLUMN_CREATOR)));
-                        data.moveToNext();
-                    }
-
-                    callback.onValidateGames(true);
-
-                    break;
-            }
+    public void onGamesLoaded(List<GameModel> gameList) {
+        Log.w(TAG, "onGamesLoaded called!");
+        if (gameAdapter == null) {
+            Log.w(TAG, "adapter estava null");
+            if (gameList != null) {
+                this.gameList = gameList;
+                gameAdapter = new GameAdapter(getActivity(), gameList);
+                setListAdapter(gameAdapter);
+                if (headerView != null) {
+                    this.getListView().addHeaderView(headerView);
+                }
+            } else Log.w(TAG, "gameList null ou size 0");
         } else {
-            callback.onDataLoaded();
-            callback.onValidateGames(false);
+            Log.w(TAG, "adapter já existia");
+            if (gameList != null) {
+                gameAdapter.setGameList(gameList);
+                gameAdapter.notifyDataSetChanged();
+            } else Log.w(TAG, "gameList null");
         }
-
-        callback.onDataLoaded();
-
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("gameList", (Serializable) gameList);
     }
+
 }
