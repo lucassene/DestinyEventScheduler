@@ -16,7 +16,7 @@
     <string name="validate_tab_header">VALIDAR</string>
     <string name="home_title">PRINCIPAL</string>
     <string name="empty_scheduled_list">Você não agendou nenhum evento.</string>
-    <string name="empty_new_events">Parece que não tem muita gente jogando né?</string>
+    <string name="empty_new_events">Não há nenhum novo evento nesse momento.</string>
     <string name="empty_validate_event">Você não tem nenhum evento para avaliar ou validar.</string>
 
     <string-array name="tab_titles">
@@ -85,18 +85,18 @@
         <item>SRL</item>
     </string-array>
 
-    <integer-array name="type_ids">
-        <item>0</item>
-        <item>7</item>
-        <item>1</item>
-        <item>2</item>
-        <item>6</item>
-        <item>5</item>
-        <item>8</item>
-        <item>3</item>
-        <item>4</item>
-        <item>9</item>
-    </integer-array>
+    <string-array name="type_ids">
+        <item>all</item>
+        <item>strike</item>
+        <item>court</item>
+        <item>crucible</item>
+        <item>story</item>
+        <item>raid</item>
+        <item>strike_list</item>
+        <item>patrol</item>
+        <item>prison</item>
+        <item>srl</item>
+    </string-array>
 
     <string-array name="game_status">
         <item>Todos</item>
@@ -414,5 +414,9 @@
     <string name="no_event_all">Você não jogou nenhum evento ainda guardião.</string>
     <string name="more_times">vezes</string>
     <string name="one_time">vez</string>
+    <string name="clan_updated">Clã atualizado!</string>
+    <string name="credentials_expired">Suas credenciais expiraram. Por favor faça novamente seu login para continuar.</string>
+    <string name="unable_update_clan">Não foi possível atualizar o clã. Por favor tente novamente mais tarde.</string>
+    <string name="server_error_msg">Problema ao conectar no servidor. Por favor tente novamente mais tarde.</string>
 
 </resources>

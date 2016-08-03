@@ -1,12 +1,8 @@
 package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,35 +17,34 @@ import android.widget.TextView;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
-import com.destiny.event.scheduler.data.EventTable;
-import com.destiny.event.scheduler.data.EventTypeTable;
+import com.destiny.event.scheduler.adapters.GameAdapter;
 import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
-import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.interfaces.UserDataListener;
+import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.services.ServerService;
 
-public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>, RefreshDataListener {
+import java.io.Serializable;
+import java.util.List;
+
+public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, RefreshDataListener, UserDataListener {
 
     public static final String TAG = "SearchFragment";
 
     Spinner filterSpinner;
-    ListView gamesList;
+    ListView listView;
     TextView emptyView;
 
     CustomCursorAdapter adapter;
-
-    private static final int LOADER_GAME = 60;
-
-    private static final int[] to = {R.id.primary_text, R.id.game_image, R.id.secondary_text, R.id.game_date, R.id.game_time, R.id.game_actual, R.id.game_max, R.id.type_text};
+    GameAdapter gameAdapter;
 
     private ToActivityListener callback;
 
-    private String[] projection;
-    private String[] from;
+    private String[] typeList;
+    private String eventType;
 
-    private int[] eventIdList;
-    private int eventId;
+    private List<GameModel> gameList;
 
     @Override
     public void onDetach() {
@@ -63,12 +58,15 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         callback.registerRefreshListener(this);
+        callback.registerUserDataListener(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.w(TAG, "SearchFragment destroyed!");
         callback.deleteRefreshListener(this);
+        callback.deleteUserDataListener(this);
     }
 
     @Override
@@ -84,20 +82,33 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         View v = inflater.inflate(R.layout.search_event_layout, container, false);
 
         filterSpinner = (Spinner) v.findViewById(R.id.search_spinner);
-        gamesList = (ListView) v.findViewById(R.id.search_list);
+        listView = (ListView) v.findViewById(R.id.search_list);
         emptyView = (TextView) v.findViewById(R.id.empty_label);
 
-        eventIdList = getContext().getResources().getIntArray(R.array.type_ids);
+        typeList = getContext().getResources().getStringArray(R.array.type_ids);
 
-        gamesList.setFooterDividersEnabled(false);
+        listView.setFooterDividersEnabled(false);
+        listView.setEmptyView(emptyView);
 
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
-        gamesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        if (savedInstanceState != null && savedInstanceState.containsKey("gameList")){
+            gameList = (List<GameModel>) savedInstanceState.getSerializable("gameList");
+            onGamesLoaded(gameList);
+            Log.w(TAG, "Game data already available");
+        } else if (callback.getGameList(GameTable.STATUS_AVAILABLE) == null){
+            Log.w(TAG, "Getting game data...");
+            getGamesData();
+        } else {
+            gameList = callback.getGameList(GameTable.STATUS_AVAILABLE);
+            onGamesLoaded(gameList);
+        }
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //callback.onGameSelected(String.valueOf(id), TAG, null, GameTable.STATUS_NEW);
+                callback.onGameSelected(gameAdapter.getItem(position), TAG);
             }
         });
 
@@ -111,51 +122,13 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterSpinner.setOnItemSelectedListener(this);
         filterSpinner.setAdapter(spinnerAdapter);
-        //filterSpinner.setSelection(0);
-
-        eventId = eventIdList[0];
-        getGamesData();
 
     }
 
     private void getGamesData() {
-
-        prepareStrings();
-        initGameLoader();
-        adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_GAME);
-        gamesList.setAdapter(adapter);
-
-    }
-
-    private void initGameLoader(){
-        if (getLoaderManager().getLoader(LOADER_GAME) != null){
-            getLoaderManager().destroyLoader(LOADER_GAME);
-        }
-        getLoaderManager().restartLoader(LOADER_GAME, null, this);
-    }
-
-    private void prepareStrings() {
-
-        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID); ;
-        String c2 = GameTable.COLUMN_EVENT_ID;
-        String c6 = GameTable.COLUMN_CREATOR;
-        String c9 = GameTable.COLUMN_TIME;
-        String c10 = GameTable.COLUMN_LIGHT;
-        String c12 = GameTable.COLUMN_INSCRIPTIONS;
-        String c14 = GameTable.COLUMN_CREATOR_NAME;
-
-        String c4 = EventTable.COLUMN_ICON;
-        String c5 = EventTable.COLUMN_NAME;
-        String c11 = EventTable.COLUMN_GUARDIANS;
-
-        String c8 = MemberTable.COLUMN_NAME;
-
-        String c17 = EventTypeTable.COLUMN_NAME;
-
-        projection = new String[] {c1, c2, c4, c5, c6, c8, c9, c10, c11, c12, c14, c17};
-
-        from = new String[] {c5, c4, c14, c9, c9, c12, c11, c17};
-
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_GAMES);
+        callback.runServerService(bundle);
     }
 
     @Override
@@ -172,8 +145,15 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        eventId = eventIdList[position];
-        initGameLoader();
+        eventType = typeList[position];
+        filterGameList(eventType);
+    }
+
+    public void filterGameList(String filter){
+        if (filter.isEmpty()) filter = typeList[0];
+        if (gameAdapter != null) {
+            gameAdapter.getFilter().filter(filter);
+        }
     }
 
     @Override
@@ -182,64 +162,50 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        //String where = GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS) + "=" + GameTable.STATUS_NEW + " AND " + EventTypeTable.getAliasColumn(EventTypeTable.COLUMN_ID) + "=" + eventId;
-        String where = GameTable.getQualifiedColumn(GameTable.COLUMN_ID) + " NOT IN (SELECT game._id FROM game JOIN entry ON game._id = entry.entry_game_id WHERE entry.entry_membership = " + callback.getBungieId() + ")";
-        if (eventId >0){
-            where = where + " AND " + EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID) + "=" + eventId;
-        }
-
-        callback.onLoadingData();
-
-        switch (id){
-            case LOADER_GAME:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.GAME_URI,
-                        projection,
-                        where,
-                        null,
-                        "datetime(" + GameTable.COLUMN_TIME + ") ASC"
-                );
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
-
-        if (data != null && data.moveToFirst()){
-            switch (loader.getId()){
-                case LOADER_GAME:
-                    adapter.swapCursor(data);
-            }
-            callback.onDataLoaded();
-            emptyView.setVisibility(View.GONE);
-        } else {
-            callback.onDataLoaded();
-            adapter.swapCursor(null);
-            emptyView.setVisibility(View.VISIBLE);
-        }
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
-    }
-
-    @Override
     public void onRefreshData() {
-        initGameLoader();
-        Log.w(TAG, "Refreshing Search Data!");
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.REQUEST_TAG,ServerService.TYPE_NEW_GAMES);
+        callback.runServerService(bundle);
+        Log.w(TAG, "Refreshing Search New Events data!");
     }
 
     @Override
     public Fragment getFragment() {
         return this;
     }
+
+    @Override
+    public void onUserDataLoaded() {
+
+    }
+
+    @Override
+    public void onGamesLoaded(List<GameModel> gameList) {
+        Log.w(TAG, "SearchFragment onGamesLoaded called!");
+        if (gameAdapter == null) {
+            Log.w(TAG, "adapter estava null");
+            if (gameList != null){
+                this.gameList = gameList;
+                gameAdapter = new GameAdapter(getActivity(), gameList);
+                listView.setAdapter(gameAdapter);
+                filterGameList(eventType);
+            } else Log.w(TAG, "gameList null ou size 0");
+        } else {
+            Log.w(TAG, "adapter já existia");
+            if (gameList!=null){
+                this.gameList = gameList;
+                listView.setAdapter(gameAdapter);
+                filterGameList(eventType);
+                gameAdapter.setGameList(gameList);
+                gameAdapter.notifyDataSetChanged();
+            } else Log.w(TAG, "gameList null");
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("gameList", (Serializable) gameList);
+    }
+
 }

@@ -28,7 +28,6 @@ import android.widget.Toast;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.DetailEventAdapter;
-import com.destiny.event.scheduler.adapters.MembersAdapter;
 import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
@@ -41,6 +40,7 @@ import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.models.EntryModel;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
@@ -52,8 +52,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private static final String TAG = "DetailEventFragment";
 
-    private static final int LOADER_GAME = 60;
-    private static final int LOADER_ENTRY_MEMBERS = 72;
     private static final int LOADER_NOTIFICATION = 80;
 
     private static final int DELETE_NOTIFICATION = 0;
@@ -61,10 +59,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private int notificationMethod;
 
-    private String gameId;
     private String origin;
-    private int gameStatus;
-    private String creator;
     private int inscriptions;
     private int maxGuardians;
     private String gameEventName;
@@ -93,10 +88,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private String[] gameProjection;
     private String[] membersProjection;
 
-    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_EXP, MemberTable.COLUMN_TITLE};
-    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.text_points, R.id.secondary_text};
-
-    MembersAdapter adapter;
     DetailEventAdapter detailAdapter;
 
     MyAlertDialog dialog;
@@ -149,15 +140,14 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         if (game != null){
             switch (game.getStatus()){
                 case GameTable.STATUS_NEW:
-                    joinButton.setText(R.string.join);
-                    break;
-                case GameTable.STATUS_SCHEDULED:
-                    if (creator.equals(callback.getBungieId())){
-                        joinButton.setText(R.string.delete);
-                    } else joinButton.setText(getContext().getResources().getString(R.string.leave));
+                    if (game.isJoined()){
+                        if (game.getCreatorId().equals(callback.getBungieId())){
+                            joinButton.setText(R.string.delete);
+                        } else joinButton.setText(R.string.leave);
+                    } else joinButton.setText(R.string.join);
                     break;
                 case GameTable.STATUS_WAITING:
-                    if (creator.equals(callback.getBungieId())){
+                    if (game.getCreatorId().equals(callback.getBungieId())){
                         joinButton.setText(R.string.validate);
                     } else {
                         joinButton.setText(R.string.waiting_validation);
@@ -184,7 +174,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                             showAlertDialog(MyAlertDialog.JOIN_DIALOG);
                             break;
                         case ScheduledListFragment.TAG:
-                            if (creator.equals(callback.getBungieId())){
+                            if (game.getCreatorId().equals(callback.getBungieId())){
                                 showAlertDialog(MyAlertDialog.DELETE_DIALOG);
                             } else showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
                             break;
@@ -211,6 +201,11 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
+
+        if (headerView != null && footerView != null){
+            this.getListView().addHeaderView(headerView, null, false);
+            this.getListView().addFooterView(footerView);
+        }
 
         getGameData();
 
@@ -256,20 +251,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     }
 
-    private void initGameLoader(){
-        if (getLoaderManager().getLoader(LOADER_GAME) != null){
-            getLoaderManager().destroyLoader(LOADER_GAME);
-        }
-        getLoaderManager().restartLoader(LOADER_GAME, null, this);
-    }
-
-    private void initEntryLoader(){
-        if (getLoaderManager().getLoader(LOADER_ENTRY_MEMBERS) != null){
-            getLoaderManager().destroyLoader(LOADER_ENTRY_MEMBERS);
-        }
-        getLoaderManager().restartLoader(LOADER_ENTRY_MEMBERS, null, this);
-    }
-
     private void initNotificationLoader(){
         if (getLoaderManager().getLoader(LOADER_NOTIFICATION) != null){
             getLoaderManager().destroyLoader(LOADER_NOTIFICATION);
@@ -279,8 +260,14 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private void deleteGame(Uri uri) {
         getContext().getContentResolver().delete(uri,null,null);
-        String selection = EntryTable.COLUMN_GAME + "=" + gameId;
+        String selection = EntryTable.COLUMN_GAME + "=" + game.getGameId();
         getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
+
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_DELETE_GAME);
+        callback.runServerService(bundle);
+
         notificationMethod = DELETE_NOTIFICATION;
         initNotificationLoader();
     }
@@ -290,8 +277,14 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions-1);
         getContext().getContentResolver().update(uri, values,null, null);
         values.clear();
-        String selection = EntryTable.COLUMN_GAME + "=" + gameId + " AND " + EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
+        String selection = EntryTable.COLUMN_GAME + "=" + game.getGameId() + " AND " + EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
         getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
+
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_LEAVE_GAME);
+        callback.runServerService(bundle);
+
         notificationMethod = DELETE_NOTIFICATION;
         initNotificationLoader();
 
@@ -304,15 +297,25 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         getContext().getContentResolver().update(uri, values,null, null);
         values.clear();
 
-        values.put(EntryTable.COLUMN_GAME,gameId);
+        values.put(EntryTable.COLUMN_GAME, game.getGameId());
         values.put(EntryTable.COLUMN_MEMBERSHIP, callback.getBungieId());
         values.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
         getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
         values.clear();
 
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_JOIN_GAME);
+        callback.runServerService(bundle);
+
         notificationMethod = CREATE_NOTIFICATION;
         initNotificationLoader();
 
+    }
+
+    public void onRequestSuccess(){
+        Log.w(TAG, "Request successful!");
+        callback.closeFragment();
     }
 
     private void updateGame(ContentValues values, Uri uri) {
@@ -455,27 +458,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
         callback.onLoadingData();
 
-        String[] selectionArgs = {gameId};
+        String[] selectionArgs = {String.valueOf(game.getGameId())};
 
         switch (id){
-            case LOADER_GAME:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.GAME_URI,
-                        gameProjection,
-                        GameTable.getQualifiedColumn(GameTable.COLUMN_ID)+ "=" + gameId + " AND(" + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_NEW + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED + ")",
-                        null,
-                        null
-                );
-            case LOADER_ENTRY_MEMBERS:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.ENTRY_MEMBERS_URI,
-                        membersProjection,
-                        EntryTable.getQualifiedColumn(EntryTable.COLUMN_GAME) + "=?",
-                        selectionArgs,
-                        "datetime(" + EntryTable.getQualifiedColumn(EntryTable.COLUMN_TIME) + ") ASC"
-                );
             case LOADER_NOTIFICATION:
                 //Log.w(TAG,"onCreateLoader de ID LOADER_NOTIFICATION criado");
                 return new CursorLoader(
@@ -494,70 +479,14 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        int onCloseDemanded = 0;
-
-        if (data != null && data.moveToFirst()){
-            switch (loader.getId()){
-                case LOADER_GAME:
-                    //Log.w(TAG, "LOADER GAME Cursor: " + DatabaseUtils.dumpCursorToString(data));
-                    eventIcon.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", getContext().getPackageName() ));
-
-                    gameEventName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", getContext().getPackageName()));
-                    eventName.setText(gameEventName);
-
-                    gameEventTypeName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)), "string", getContext().getPackageName()));
-                    gameEventIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
-                    eventType.setText(gameEventTypeName);
-
-                    String gameTime = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME));
-                    eventCalendar = DateUtils.stringToDate(gameTime);
-                    //Log.w(TAG, "Game Calendar: " + eventCalendar.getTime());
-                    date.setText(DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-                    time.setText(DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-                    light.setText(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_LIGHT)));
-
-                    maxGuardians = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS));
-                    inscriptions = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
-                    String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
-                    guardians.setText(sg);
-                    String gS = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_STATUS));
-                    //Log.w(TAG, "Game Cursor: " + DatabaseUtils.dumpCursorToString(data));
-
-                    Calendar now = Calendar.getInstance();
-                    if (now.getTimeInMillis() > eventCalendar.getTimeInMillis() && gS.equals(GameTable.STATUS_SCHEDULED)){
-                        dialogThread();
-                    } else {
-                        prepareMemberStrings();
-                        initEntryLoader();
-                    }
-                    break;
-                case LOADER_ENTRY_MEMBERS:
-                    adapter.swapCursor(data);
-
-                    data.moveToFirst();
-                    for (int i=0; i < data.getCount();i++){
-                        bungieIdList.add(i, data.getString(data.getColumnIndexOrThrow(EntryTable.COLUMN_MEMBERSHIP)));
-                        data.moveToNext();
-                    }
-                    //Log.w(TAG, "Entry Cursor: " + DatabaseUtils.dumpCursorToString(data));
-                    break;
-            }
-        } else {
-            if (loader.getId() == LOADER_GAME){
-                Log.w(TAG, "Closing DetailFragment");
-                onCloseDemanded = 1;
-            }
-            //callback.closeFragment();
-        }
-
-        if (loader.getId() == LOADER_NOTIFICATION){
+        if (data != null && data.moveToFirst() && loader.getId() == LOADER_NOTIFICATION){
 
             Log.w(TAG, "onLoaderFinished alcançado com ID LOADER_NOTIFICATION");
 
             switch (notificationMethod){
                 case CREATE_NOTIFICATION:
                     if (data == null || data.getCount()<=0){
-                        setAlarmNotification(getNotifyTime(), gameId, gameEventName, gameEventTypeName, gameEventIcon);
+                        setAlarmNotification(getNotifyTime(), String.valueOf(game.getGameId()), gameEventName, gameEventTypeName, gameEventIcon);
                     } else{
                         Log.w(TAG, "Notification for this game already created!");
                     }
@@ -576,13 +505,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     } else Log.w(TAG,"There is no Notification to be deleted!");
                     break;
             }
-
-            onCloseDemanded = 1;
-
         }
 
         callback.onDataLoaded();
-        checkIfCloses(onCloseDemanded);
 
     }
 
@@ -608,27 +533,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         return notifyTime;
     }
 
-    private void checkIfCloses(final int onCloseDemanded) {
-        if (onCloseDemanded == 1){
-            Handler handler = new Handler(){
-                @Override
-                public void handleMessage(Message msg){
-                    if (msg.what == 1) callback.closeFragment();
-                }
-            };
-            handler.sendEmptyMessage(onCloseDemanded);
-        }
-    }
-
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
-        switch (loader.getId()){
-            case LOADER_ENTRY_MEMBERS:
-                adapter.swapCursor(null);
-                break;
-        }
-
     }
 
     private void setAdapter(List<EntryModel> entries, int max) {
@@ -636,10 +542,10 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         //adapter = new MembersAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, max);
         detailAdapter = new DetailEventAdapter(getContext(),entries, max);
 
-        if (headerView != null && footerView != null){
+/*        if (headerView != null && footerView != null){
             this.getListView().addHeaderView(headerView, null, false);
             this.getListView().addFooterView(footerView);
-        }
+        }*/
 
         setListAdapter(detailAdapter);
     }
@@ -712,7 +618,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     public void onPositiveClick(String input, int type) {
 
         ContentValues values = new ContentValues();
-        String uriString = DataProvider.GAME_URI + "/" + gameId;
+        String uriString = DataProvider.GAME_URI + "/" + game.getGameId();
         Uri uri = Uri.parse(uriString);
 
         switch (type){

@@ -1,11 +1,12 @@
 package com.destiny.event.scheduler.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,38 +14,40 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.utils.DateUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class GameAdapter extends BaseAdapter {
+public class GameAdapter extends BaseAdapter implements Filterable {
 
     private static final String TAG = "GameAdapter";
 
-    private static final int TYPE_NEW = 0;
-    private static final int TYPE_SCHEDULED = 1;
-
     private Context context;
     private List<GameModel> gameList;
+    private List<GameModel> filteredGameList;
     private LayoutInflater inflater;
+
+    private GameFilter mFilter = new GameFilter();
 
     public GameAdapter(Context context, List<GameModel> gameList){
         this.context = context;
+        this.filteredGameList = gameList;
         this.gameList = gameList;
         inflater = LayoutInflater.from(context);
     }
 
     public void setGameList(List<GameModel> gameList){
-        this.gameList = gameList;
+        this.filteredGameList = gameList;
         //notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return gameList.size();
+        return filteredGameList.size();
     }
 
     @Override
     public GameModel getItem(int position) {
-        return gameList.get(position);
+        return filteredGameList.get(position);
     }
 
     @Override
@@ -78,6 +81,11 @@ public class GameAdapter extends BaseAdapter {
         return convertView;
     }
 
+    @Override
+    public Filter getFilter() {
+        return mFilter;
+    }
+
     private class GameViewHolder{
 
         ImageView icon;
@@ -100,6 +108,38 @@ public class GameAdapter extends BaseAdapter {
             date = (TextView) item.findViewById(R.id.game_date);
         }
 
+    }
+
+    private class GameFilter extends Filter{
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            String filter = constraint.toString().toLowerCase();
+            FilterResults results = new FilterResults();
+            final List<GameModel> originalGameList = gameList;
+            final ArrayList<GameModel> newGameList = new ArrayList<>(originalGameList.size());
+
+            if (!filter.equals("all")){
+                for (int i=0;i<originalGameList.size();i++){
+                    if (originalGameList.get(i).getTypeName().equals(filter)){
+                        newGameList.add(originalGameList.get(i));
+                    }
+                }
+                results.values = newGameList;
+                results.count = newGameList.size();
+            } else {
+                results.values = originalGameList;
+                results.count = originalGameList.size();
+            }
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            filteredGameList = (List<GameModel>) results.values;
+            notifyDataSetChanged();
+        }
     }
 
 }

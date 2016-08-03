@@ -40,6 +40,7 @@ import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
+import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.DateUtils;
@@ -68,6 +69,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private String eventTypeName;
     private int eventIcon;
     private String eventName;
+
+    private GameModel game;
 
     private ToActivityListener callback;
     private OnEventCreatedListener eventCallback;
@@ -120,6 +123,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                     selectedType = String.valueOf(bundle.getString("Type"));
             }
         }
+
+        game = new GameModel();
 
     }
 
@@ -407,6 +412,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 iconType.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName()));
                 eventTypeName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 textType.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
+                game.setTypeName(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)));
                 break;
             case LOADER_EVENT:
                 minLight = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT));
@@ -417,6 +423,10 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 iconGame.setImageResource(getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
                 eventName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 textGame.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
+                game.setEventIcon(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)));
+                game.setEventName(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)));
+                game.setMinLight(minLight);
+                game.setMaxGuardians(data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS)));
                 break;
             //Loader apenas para testes
             case LOADER_MEMBERS:
@@ -561,7 +571,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
             if (now.getTimeInMillis() <= minimumTime.getTimeInMillis()) {
                 Bundle bundle = new Bundle();
-                bundle.putInt(ServerService.RESQUEST_TAG, ServerService.TYPE_CREATE_GAME);
+                bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_CREATE_GAME);
                 bundle.putInt(ServerService.EVENT_TAG, Integer.parseInt(selectedEvent));
                 bundle.putString(ServerService.TIME_TAG, gameTime);
                 bundle.putInt(ServerService.LIGHT_TAG, minLight);
@@ -616,7 +626,15 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         callback.onDataLoaded();
         Toast.makeText(getContext(), R.string.create_match_success, Toast.LENGTH_SHORT).show();
 
-        eventCallback.onEventCreated();
+        game.setGameId(serverId);
+        game.setCreatorName(userName);
+        game.setCreatorId(bungieId);
+        game.setTime(gameTime);
+        game.setInscriptions(1);
+        game.setStatus(GameTable.STATUS_NEW);
+        game.setJoined(true);
+
+        eventCallback.onEventCreated(game);
 
     }
 

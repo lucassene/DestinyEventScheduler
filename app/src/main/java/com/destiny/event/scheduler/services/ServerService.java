@@ -36,14 +36,20 @@ public class ServerService extends IntentService {
     private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/";
     private static final String GAME_ENDPOINT = "game";
     private static final String ENTRIES_ENDPOINT = "/entries";
+    private static final String JOIN_ENDPOINT = "/join";
+    private static final String LEAVE_ENDPOINT = "/leave";
+
+    private static final String STATUS_PARAM = "status=";
+    private static final String JOINED_PARAM = "joined=";
 
     private static final String MEMBER_HEADER = "membership";
     private static final String PLATFORM_HEADER = "platform";
 
     private static final String GET_METHOD = "GET";
     private static final String POST_METHOD = "POST";
+    private static final String DELETE_METHOD = "DELETE";
 
-    public static final String RESQUEST_TAG = "request";
+    public static final String REQUEST_TAG = "request";
     public static final String ERROR_TAG = "error";
     public static final String MEMBER_TAG = "memberId";
     public static final String PLATFORM_TAG = "platformId";
@@ -64,6 +70,10 @@ public class ServerService extends IntentService {
     public static final int TYPE_ALL_GAMES = 1;
     public static final int TYPE_CREATE_GAME = 2;
     public static final int TYPE_GAME_ENTRIES = 3;
+    public static final int TYPE_JOIN_GAME = 4;
+    public static final int TYPE_LEAVE_GAME = 5;
+    public static final int TYPE_DELETE_GAME = 6;
+    public static final int TYPE_NEW_GAMES = 7;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -110,7 +120,7 @@ public class ServerService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        int type = intent.getIntExtra(RESQUEST_TAG, 0);
+        int type = intent.getIntExtra(REQUEST_TAG, 0);
         final ResultReceiver receiver = intent.getParcelableExtra(RECEIVER_TAG);
         memberId = intent.getStringExtra(MEMBER_TAG);
         platformId = intent.getIntExtra(PLATFORM_TAG, 0);
@@ -150,9 +160,57 @@ public class ServerService extends IntentService {
                         sendError(receiver, error);
                     } else sendEntryData(receiver, memberList);
                 } else sendError(receiver, ERROR_INCORRECT_GAMEID);
+                break;
+            case TYPE_JOIN_GAME:
+                if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
+                    url = SERVER_BASE_URL + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1) + JOIN_ENDPOINT;
+                    bundle.clear();
+                    bundle.putInt(GAMEID_TAG, intent.getIntExtra(GAMEID_TAG, -1));
+                    error = requestServer(receiver, type, url, bundle);
+                    if (error != NO_ERROR){
+                        sendError(receiver, error);
+                    } else sendIdWithType(receiver, intent.getIntExtra(GAMEID_TAG, -1), TYPE_JOIN_GAME);
+                }
+                break;
+            case TYPE_LEAVE_GAME:
+                if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
+                    url = SERVER_BASE_URL + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1) + LEAVE_ENDPOINT;
+                    bundle.clear();
+                    bundle.putInt(GAMEID_TAG, intent.getIntExtra(GAMEID_TAG, -1));
+                    error = requestServer(receiver, type, url, bundle);
+                    if (error != NO_ERROR){
+                        sendError(receiver, error);
+                    } else sendIdWithType(receiver, intent.getIntExtra(GAMEID_TAG, -1), TYPE_LEAVE_GAME);
+                }
+                break;
+            case TYPE_DELETE_GAME:
+                if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
+                    url = SERVER_BASE_URL + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1);
+                    bundle.clear();
+                    bundle.putInt(GAMEID_TAG, intent.getIntExtra(GAMEID_TAG, -1));
+                    error = requestServer(receiver, type, url, bundle);
+                    if (error != NO_ERROR){
+                        sendError(receiver, error);
+                    } else sendIdWithType(receiver, intent.getIntExtra(GAMEID_TAG, -1), TYPE_DELETE_GAME);
+                }
+                break;
+            case TYPE_NEW_GAMES:
+                url = SERVER_BASE_URL + GAME_ENDPOINT + "?" + STATUS_PARAM + "0&" + JOINED_PARAM + "false";
+                error = requestServer(receiver, type, url, null);
+                if (error != NO_ERROR) {
+                    sendError(receiver, error);
+                } else sendGameData(receiver, gameList);
+                break;
         }
         this.stopSelf();
 
+    }
+
+    private void sendIdWithType(ResultReceiver receiver, int gameId, int type) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(INT_TAG, gameId);
+        bundle.putInt(REQUEST_TAG, type);
+        receiver.send(STATUS_FINISHED, bundle);
     }
 
     private void sendEntryData(ResultReceiver receiver, ArrayList<EntryModel> memberList) {
@@ -192,7 +250,16 @@ public class ServerService extends IntentService {
                         urlConnection = setCreateGameCall(urlConnection, bundle);
                         break;
                     case TYPE_ALL_GAMES:
+                    case TYPE_GAME_ENTRIES:
+                    case TYPE_NEW_GAMES:
                         urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
+                        break;
+                    case TYPE_JOIN_GAME:
+                        urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
+                        break;
+                    case TYPE_LEAVE_GAME:
+                    case TYPE_DELETE_GAME:
+                        urlConnection = getDefaultHeaders(urlConnection, DELETE_METHOD);
                         break;
                 }
 
@@ -209,12 +276,23 @@ public class ServerService extends IntentService {
                                     gameId = Integer.parseInt(response);
                                     return NO_ERROR;
                                 case TYPE_ALL_GAMES:
+                                case TYPE_NEW_GAMES:
                                     error = parseNewGames(response);
                                     if (error != NO_ERROR){
                                         return error;
                                     } else return NO_ERROR;
                                 case TYPE_GAME_ENTRIES:
                                     error = parseEntries(response);
+                                    return error;
+                                case TYPE_JOIN_GAME:
+                                    Log.w(TAG, "joinGame response: " + response);
+                                    return error;
+                                case TYPE_LEAVE_GAME:
+                                    Log.w(TAG, "leaveGame response: " + response);
+                                    return error;
+                                case TYPE_DELETE_GAME:
+                                    Log.w(TAG, "deleteGame response:" + response);
+                                    return error;
                                 default:
                                     return NO_ERROR;
                             }

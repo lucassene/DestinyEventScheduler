@@ -49,7 +49,7 @@
 
     <string name="def_clan_desc">"Here goes Clan\'s description"</string>
     <string name="def_clan_header">Clan\'s name</string>
-    <string name="empty_new_events">It seems that nobody is playing huh?</string>
+    <string name="empty_new_events">There is no new events to play right now.</string>
     <string name="empty_scheduled_list">You don\'t have any scheduled event.</string>
     <string name="menu">Menu</string>
     <string name="refresh_lists">Refresh lists</string>
@@ -144,18 +144,18 @@
         <item>SRL</item>
     </string-array>
 
-    <integer-array name="type_ids">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-    </integer-array>
+    <string-array name="type_ids">
+        <item>all</item>
+        <item>court</item>
+        <item>crucible</item>
+        <item>patrol</item>
+        <item>prison</item>
+        <item>raid</item>
+        <item>story</item>
+        <item>strike</item>
+        <item>strike_list</item>
+        <item>srl</item>
+    </string-array>
 
     <string-array name="game_status">
         <item>All</item>
@@ -479,6 +479,7 @@
     <string name="clan_updated">Clan data updated!</string>
     <string name="credentials_expired">Your credentials have expired. Please login again to continue.</string>
     <string name="unable_update_clan">Unable to update clan data now. Please try again later.</string>
+    <string name="server_error_msg">Problem connecting to server. Please try again later.</string>
 
 
 </resources>

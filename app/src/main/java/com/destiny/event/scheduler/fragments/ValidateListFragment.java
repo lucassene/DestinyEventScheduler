@@ -81,6 +81,9 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
             onGamesLoaded((List<GameModel>) savedInstanceState.getSerializable("gameList"));
         }
 
+        if (headerView != null) {
+            this.getListView().addHeaderView(headerView);
+        }
     }
 
     @Override
@@ -102,7 +105,7 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
     @Override
     public void onRefreshData() {
         Bundle bundle = new Bundle();
-        bundle.putInt(ServerService.RESQUEST_TAG, ServerService.TYPE_ALL_GAMES);
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_ALL_GAMES);
         callback.runServerService(bundle);
         Log.w(TAG, "Refreshing Scheduled Events data!");
     }
@@ -125,13 +128,12 @@ public class ValidateListFragment extends ListFragment implements RefreshDataLis
                 this.gameList = gameList;
                 gameAdapter = new GameAdapter(getActivity(), gameList);
                 setListAdapter(gameAdapter);
-                if (headerView != null) {
-                    this.getListView().addHeaderView(headerView);
-                }
             } else Log.w(TAG, "gameList null ou size 0");
         } else {
             Log.w(TAG, "adapter já existia");
             if (gameList != null) {
+                this.gameList = gameList;
+                setListAdapter(gameAdapter);
                 gameAdapter.setGameList(gameList);
                 gameAdapter.notifyDataSetChanged();
             } else Log.w(TAG, "gameList null");
