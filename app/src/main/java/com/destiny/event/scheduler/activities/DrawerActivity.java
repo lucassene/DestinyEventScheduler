@@ -63,7 +63,6 @@ import com.destiny.event.scheduler.fragments.ValidateListFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
-import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.EntryModel;
@@ -79,6 +78,8 @@ import com.destiny.event.scheduler.views.SlidingTabLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class DrawerActivity extends AppCompatActivity implements ToActivityListener, LoaderManager.LoaderCallbacks<Cursor>, OnEventCreatedListener, FromDialogListener, RequestResultReceiver.Receiver{
@@ -112,11 +113,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     ProgressBar progress;
 
     private FromActivityListener newEventListener;
-    private ArrayList<RefreshDataListener> refreshDataListenerList;
     private UserDataListener newEventsListener;
     private UserDataListener scheduledEventsListener;
     private UserDataListener doneEventsListener;
     private UserDataListener searchEventsListener;
+    private UserDataListener myEventsListener;
 
     private FragmentTransaction ft;
     private FragmentManager fm;
@@ -154,10 +155,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     RequestResultReceiver mReceiver;
 
-    ArrayList<GameModel> newGameList = new ArrayList<>();
-    ArrayList<GameModel> scheduledGameList = new ArrayList<>();
-    ArrayList<GameModel> doneGameList = new ArrayList<>();
-    ArrayList<GameModel> searchGameList = new ArrayList<>();
+    ArrayList<GameModel> allGameList;
+    ArrayList<GameModel> newGameList;
+    ArrayList<GameModel> scheduledGameList;
+    ArrayList<GameModel> doneGameList;
+    ArrayList<GameModel> searchGameList;
+    ArrayList<GameModel> joinedGameList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,10 +215,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         spinnerSelections.putInt(TAG_SEARCH_EVENTS, 0);
 
         if (savedInstanceState != null){
-            newGameList = (ArrayList<GameModel>) savedInstanceState.getSerializable("newGameList");
-            scheduledGameList = (ArrayList<GameModel>) savedInstanceState.getSerializable("scheduledGameList");
-            doneGameList = (ArrayList<GameModel>) savedInstanceState.getSerializable("doneGameList");
-
             openedFragmentType = savedInstanceState.getInt("fragType");
             fragmentTag = savedInstanceState.getString("fragTag");
             openedFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
@@ -272,14 +271,18 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     private void refreshLists() {
-            if (refreshDataListenerList != null) {
-                for (int i = 0; i < refreshDataListenerList.size(); i++) {
-                    if (refreshDataListenerList.get(i).getFragment().isAdded()) {
-                        refreshDataListenerList.get(i).onRefreshData();
-                    } else
-                        Log.w(TAG, "Fragment " + refreshDataListenerList.get(i).getFragment().getClass().getName() + " não está atachado ainda!");
-                }
-            }
+        Bundle bundle = new Bundle();
+        if (openedFragment instanceof MyEventsFragment){
+            bundle.putInt(ServerService.REQUEST_TAG,ServerService.TYPE_JOINED_GAMES);
+        }
+        if (openedFragment instanceof SearchFragment){
+            bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_GAMES);
+        }
+        if (openedFragment == null){
+            bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_ALL_GAMES);
+        }
+        runServerService(bundle);
+        Log.w(TAG, "Refreshing Events data!");
     }
 
     @Override
@@ -318,9 +321,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         //Log.w(TAG, "Método onNewIntent chamado");
-        if (refreshDataListenerList != null) {
-            refreshLists();
-        } else Log.w(TAG, "refreshDataListenerList é vazio");
+        refreshLists();
     }
 
     @Override
@@ -378,11 +379,21 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("newGameList", newGameList);
-        outState.putSerializable("scheduledGameList", scheduledGameList);
-        outState.putSerializable("doneGameList" ,doneGameList);
+        outState.putSerializable("allGameList", allGameList);
         outState.putString("fragTag", fragmentTag);
         outState.putInt("fragType", openedFragmentType);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        allGameList = (ArrayList<GameModel>) savedInstanceState.getSerializable("allGameList");
+        if (allGameList != null) {
+            newGameList = getGamesFromList(allGameList, GameTable.STATUS_NEW);
+            scheduledGameList = getGamesFromList(allGameList, GameTable.STATUS_SCHEDULED);
+            doneGameList = getGamesFromList(allGameList, GameTable.STATUS_DONE);
+            searchGameList = getGamesFromList(allGameList, GameTable.STATUS_AVAILABLE);
+        }
     }
 
     private void prepareFragmentHolder(Fragment fragment, View child, Bundle bundle, String tag){
@@ -537,19 +548,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void registerRefreshListener(Fragment fragment) {
-        if (refreshDataListenerList == null){
-            refreshDataListenerList = new ArrayList<>();
-        }
-        refreshDataListenerList.add((RefreshDataListener) fragment);
-    }
-
-    @Override
-    public void deleteRefreshListener(Fragment fragment) {
-        refreshDataListenerList.remove(fragment);
-    }
-
-    @Override
     public void registerAlarmTask(Calendar firstNotification, int firstId, Calendar secondNotification, int secondId) {
 
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -591,6 +589,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (fragment instanceof SearchFragment){
             searchEventsListener = (UserDataListener) fragment;
         }
+        if (fragment instanceof MyEventsFragment){
+            myEventsListener = (UserDataListener) fragment;
+        }
     }
 
     @Override
@@ -606,6 +607,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
         if (fragment instanceof SearchFragment){
             searchEventsListener = null;
+        }
+        if (fragment instanceof MyEventsFragment){
+            myEventsListener = null;
         }
     }
 
@@ -1108,8 +1112,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
+        Bundle bundle = new Bundle();
         switch (resultCode){
             case BungieService.STATUS_RUNNING:
                 onLoadingData();
@@ -1125,7 +1131,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             case BungieService.STATUS_ERROR:
                 Log.w(TAG, "Error on BungieService");
                 progress.setVisibility(View.GONE);
-                Bundle bundle = new Bundle();
+                bundle.clear();
                 bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
                 bundle.putString("title",getString(R.string.error));
                 bundle.putString("msg",getString(R.string.unable_update_clan));
@@ -1168,6 +1174,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         searchEventsListener.onGamesLoaded(searchGameList);
                     }
                 }
+                if (openedFragment instanceof MyEventsFragment){
+                    if (myEventsListener != null){
+                        joinedGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
+                        myEventsListener.onGamesLoaded(joinedGameList);
+                    }
+                }
                 if (openedFragment instanceof DetailEventFragment){
                     if (resultData.containsKey(ServerService.REQUEST_TAG) && resultData.containsKey(ServerService.INT_TAG)){
                         switch (resultData.getInt(ServerService.REQUEST_TAG)){
@@ -1177,6 +1189,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                                         newGameList.get(i).setJoined(true);
                                         newGameList.get(i).setInscriptions(newGameList.get(i).getInscriptions()+1);
                                         scheduledGameList.add(newGameList.get(i));
+                                        Collections.sort(scheduledGameList, new GameComparator());
                                         newGameList.remove(i);
                                         break;
                                     }
@@ -1185,9 +1198,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             case ServerService.TYPE_LEAVE_GAME:
                                 for (int i=0;i<scheduledGameList.size();i++){
                                     if (scheduledGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)){
+                                        scheduledGameList.get(i).setJoined(false);
+                                        scheduledGameList.get(i).setInscriptions(scheduledGameList.get(i).getInscriptions()-1);
                                         newGameList.add(scheduledGameList.get(i));
-                                        newGameList.get(i).setJoined(false);
-                                        newGameList.get(i).setInscriptions(newGameList.get(i).getInscriptions()-1);
+                                        Collections.sort(newGameList, new GameComparator());
                                         scheduledGameList.remove(i);
                                         break;
                                     }
@@ -1209,22 +1223,24 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     }
                 }
                 if (openedFragment == null){
-                    ArrayList<GameModel> list = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
+                    allGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
 
-                    newGameList = getGamesFromList(list, GameTable.STATUS_NEW);
-                    if (newGameList != null && newEventsListener != null){
-                        newEventsListener.onGamesLoaded(newGameList);
-                    } else Log.w(TAG, "newGameList is null");
+                    if (allGameList != null){
+                        newGameList = getGamesFromList(allGameList, GameTable.STATUS_NEW);
+                        if (newGameList != null && newEventsListener != null){
+                            newEventsListener.onGamesLoaded(newGameList);
+                        } else Log.w(TAG, "newGameList is null");
 
-                    scheduledGameList = getGamesFromList(list, GameTable.STATUS_SCHEDULED);
-                    if (scheduledGameList != null && scheduledEventsListener != null){
-                        scheduledEventsListener.onGamesLoaded(scheduledGameList);
-                    } else Log.w(TAG, "scheduledGameList is null");
+                        scheduledGameList = getGamesFromList(allGameList, GameTable.STATUS_SCHEDULED);
+                        if (scheduledGameList != null && scheduledEventsListener != null){
+                            scheduledEventsListener.onGamesLoaded(scheduledGameList);
+                        } else Log.w(TAG, "scheduledGameList is null");
 
-                    doneGameList = getGamesFromList(list, GameTable.STATUS_DONE);
-                    if (doneGameList != null && doneEventsListener != null){
-                        doneEventsListener.onGamesLoaded(doneGameList);
-                    } else Log.w(TAG, "doneGameList is null");
+                        doneGameList = getGamesFromList(allGameList, GameTable.STATUS_DONE);
+                        if (doneGameList != null && doneEventsListener != null){
+                            doneEventsListener.onGamesLoaded(doneGameList);
+                        } else Log.w(TAG, "doneGameList is null");
+                    }
 
                 }
                 onDataLoaded();
@@ -1237,6 +1253,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (gList != null){
             switch (type){
                 case GameTable.STATUS_NEW:
+                case GameTable.STATUS_AVAILABLE:
                     for (int i=0;i<gList.size();i++){
                         if (gList.get(i).getStatus() == GameTable.STATUS_NEW && !gList.get(i).isJoined()){
                             result.add(gList.get(i));
@@ -1274,14 +1291,20 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private boolean isBungieServiceRunning() {
         SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        boolean var = sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
-        return var;
+        return sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
     }
 
     public boolean isServerServiceRunning() {
         SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        boolean var = sharedPrefs.getBoolean(ServerService.RUNNING_SERVICE, false);
-        return var;
+        return sharedPrefs.getBoolean(ServerService.RUNNING_SERVICE, false);
+    }
+
+    public class GameComparator implements Comparator<GameModel> {
+
+        @Override
+        public int compare(GameModel game1, GameModel game2) {
+            return game1.getGameId() - game2.getGameId();
+        }
     }
 
 }

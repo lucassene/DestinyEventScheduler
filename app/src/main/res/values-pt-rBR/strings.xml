@@ -86,16 +86,16 @@
     </string-array>
 
     <string-array name="type_ids">
-        <item>all</item>
-        <item>strike</item>
-        <item>court</item>
-        <item>crucible</item>
-        <item>story</item>
-        <item>raid</item>
-        <item>strike_list</item>
-        <item>patrol</item>
-        <item>prison</item>
-        <item>srl</item>
+        <item>type:all</item>
+        <item>type:strike</item>
+        <item>type:court</item>
+        <item>type:crucible</item>
+        <item>type:story</item>
+        <item>type:raid</item>
+        <item>type:strike_list</item>
+        <item>type:patrol</item>
+        <item>type:prison</item>
+        <item>type:srl</item>
     </string-array>
 
     <string-array name="game_status">

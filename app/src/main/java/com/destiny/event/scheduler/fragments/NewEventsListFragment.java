@@ -2,7 +2,6 @@ package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,16 +12,14 @@ import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.GameAdapter;
-import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
-import com.destiny.event.scheduler.services.ServerService;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class NewEventsListFragment extends ListFragment implements RefreshDataListener, UserDataListener {
+public class NewEventsListFragment extends ListFragment implements UserDataListener {
 
     public static final String TAG = "NewEventsListFragment";
 
@@ -45,7 +42,6 @@ public class NewEventsListFragment extends ListFragment implements RefreshDataLi
     @Override
     public void onDestroy() {
         super.onDestroy();
-        callback.deleteRefreshListener(this);
         callback.deleteUserDataListener(this);
     }
 
@@ -53,7 +49,6 @@ public class NewEventsListFragment extends ListFragment implements RefreshDataLi
     public void onAttach(Context context) {
         super.onAttach(context);
         callback = (ToActivityListener) getActivity();
-        callback.registerRefreshListener(this);
         callback.registerUserDataListener(this);
         //Log.w(TAG, "NewEventsListFragment attached!");
     }
@@ -79,8 +74,8 @@ public class NewEventsListFragment extends ListFragment implements RefreshDataLi
 
         sectionTitle.setText(R.string.games_available);
 
-        if (savedInstanceState != null && savedInstanceState.containsKey("gameList")){
-            onGamesLoaded((List<GameModel>) savedInstanceState.getSerializable("gameList"));
+        if (savedInstanceState != null && savedInstanceState.containsKey("listView")){
+            onGamesLoaded((List<GameModel>) savedInstanceState.getSerializable("listView"));
         }
 
         if (headerView != null){
@@ -103,19 +98,6 @@ public class NewEventsListFragment extends ListFragment implements RefreshDataLi
     }
 
     @Override
-    public void onRefreshData() {
-        Bundle bundle = new Bundle();
-        bundle.putInt(ServerService.REQUEST_TAG,ServerService.TYPE_ALL_GAMES);
-        callback.runServerService(bundle);
-        Log.w(TAG, "Refreshing New Events data!");
-    }
-
-    @Override
-    public Fragment getFragment() {
-        return this;
-    }
-
-    @Override
     public void onUserDataLoaded() {
     }
 
@@ -128,7 +110,7 @@ public class NewEventsListFragment extends ListFragment implements RefreshDataLi
                 this.gameList = gameList;
                 gameAdapter = new GameAdapter(getActivity(), gameList);
                 setListAdapter(gameAdapter);
-            } else Log.w(TAG, "gameList null ou size 0");
+            } else Log.w(TAG, "listView null ou size 0");
         } else {
             Log.w(TAG, "adapter já existia");
             if (gameList!=null){
@@ -136,13 +118,13 @@ public class NewEventsListFragment extends ListFragment implements RefreshDataLi
                 setListAdapter(gameAdapter);
                 gameAdapter.setGameList(gameList);
                 gameAdapter.notifyDataSetChanged();
-            } else Log.w(TAG, "gameList null");
+            } else Log.w(TAG, "listView null");
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("gameList", (Serializable) gameList);
+        outState.putSerializable("listView", (Serializable) gameList);
     }
 }

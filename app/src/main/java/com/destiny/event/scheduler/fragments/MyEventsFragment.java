@@ -1,12 +1,9 @@
 package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -19,42 +16,30 @@ import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
-import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
-import com.destiny.event.scheduler.data.EntryTable;
-import com.destiny.event.scheduler.data.EventTable;
-import com.destiny.event.scheduler.data.EventTypeTable;
+import com.destiny.event.scheduler.adapters.GameAdapter;
 import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
-import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.interfaces.UserDataListener;
+import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.services.ServerService;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class MyEventsFragment extends Fragment implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class MyEventsFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener {
 
     public static final String TAG = "MyEventsFragment";
 
     Spinner filterSpinner;
-    ListView gameList;
+    ListView listView;
     TextView emptyView;
-
-    CustomCursorAdapter adapter;
-
-    private static final int LOADER_GAME = 60;
-    private static final int LOADER_ENTRY = 70;
-
-    private static final int[] to = {R.id.primary_text, R.id.game_image, R.id.secondary_text, R.id.game_date, R.id.game_time, R.id.game_actual, R.id.game_max, R.id.type_text};
 
     private ToActivityListener callback;
 
-    private String[] projection;
-    private String[] from;
+    private GameAdapter gameAdapter;
 
-    private String gameStatus;
-    private ArrayList<String> gameCreatorList;
-    private ArrayList<Integer> gameStatusList;
-
-    private String where;
+    private List<GameModel> gameList;
+    private String statusId;
+    private String[] statusList;
 
     @Override
     public void onDetach() {
@@ -67,7 +52,14 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
-        setHasOptionsMenu(true);
+        callback.registerUserDataListener(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.w(TAG, "MyEventsFragment destroyed!");
+        callback.deleteUserDataListener(this);
     }
 
     @Override
@@ -75,32 +67,40 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         super.onPrepareOptionsMenu(menu);
         menu.clear();
         callback.setToolbarTitle(getString(R.string.my_events));
-        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
+        getActivity().getMenuInflater().inflate(R.menu.home_menu, menu);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.my_events_layout, container, false);
 
         filterSpinner = (Spinner) v.findViewById(R.id.my_events_spinner);
-        gameList = (ListView) v.findViewById(R.id.my_events_list);
+        listView = (ListView) v.findViewById(R.id.my_events_list);
         emptyView = (TextView) v.findViewById(R.id.empty_label);
-
-        gameCreatorList = new ArrayList<>();
-        gameStatusList = new ArrayList<>();
-
-        if (savedInstanceState != null) {
-            gameCreatorList = savedInstanceState.getStringArrayList("gameCreatorList");
-            gameStatusList = savedInstanceState.getIntegerArrayList("gameStatusList");
-        }
+        listView.setEmptyView(emptyView);
 
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
-        gameList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        statusList = getContext().getResources().getStringArray(R.array.game_status_id);
+
+        gameList = callback.getGameList(GameTable.STATUS_JOINED);
+        if (savedInstanceState != null && savedInstanceState.containsKey("listView")){
+            gameList = (List<GameModel>) savedInstanceState.getSerializable("listView");
+            onGamesLoaded(gameList);
+            Log.w(TAG, "Game data already available");
+        } else if (gameList == null){
+            Log.w(TAG, "Getting game data...");
+            getGamesData();
+        } else {
+            onGamesLoaded(gameList);
+        }
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //callback.onGameSelected(String.valueOf(id), TAG, gameCreatorList.get(position), gameStatusList.get(position));
+                callback.onGameSelected(gameAdapter.getItem(position), TAG);
             }
         });
 
@@ -109,116 +109,17 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getContext().getResources().getStringArray(R.array.game_status));
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterSpinner.setOnItemSelectedListener(this);
         filterSpinner.setAdapter(spinnerAdapter);
         filterSpinner.setSelection(callback.getSpinnerSelection(DrawerActivity.TAG_MY_EVENTS));
-
-        getGamesData();
-
-    }
-
-    private void initEntryLoader(){
-        if (getLoaderManager().getLoader(LOADER_ENTRY) != null){
-            getLoaderManager().destroyLoader(LOADER_ENTRY);
-        }
-        getLoaderManager().restartLoader(LOADER_ENTRY, null, this);
-    }
-
-    private void initGameLoader(){
-        if (getLoaderManager().getLoader(LOADER_GAME) != null){
-            getLoaderManager().destroyLoader(LOADER_GAME);
-        }
-        getLoaderManager().restartLoader(LOADER_GAME, null, this);
     }
 
     private void getGamesData() {
-
-        prepareStrings();
-
-        switch (filterSpinner.getSelectedItemPosition()){
-            case 0:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
-                initEntryLoader();
-                break;
-            case 1:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
-                initEntryLoader();
-                break;
-            case 2:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING;
-                initEntryLoader();
-                break;
-            case 3:
-                where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED;
-                prepareGameStrings();
-                initGameLoader();
-                break;
-            case 4:
-                where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED;
-                prepareGameStrings();
-                initGameLoader();
-                break;
-        }
-
-        adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_ENTRY);
-        gameList.setAdapter(adapter);
-
-    }
-
-    private void prepareStrings() {
-
-        String c1 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID);
-        String c2 = EntryTable.COLUMN_MEMBERSHIP;
-
-        String c3 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID);
-        String c4 = GameTable.COLUMN_EVENT_ID;
-        String c5 = GameTable.COLUMN_CREATOR;
-        String c6 = GameTable.COLUMN_TIME;
-        String c7 = GameTable.COLUMN_LIGHT;
-        String c8 = GameTable.COLUMN_INSCRIPTIONS;
-        String c9 = GameTable.COLUMN_CREATOR_NAME;
-        String c10 = GameTable.COLUMN_STATUS;
-
-        String c12 = MemberTable.COLUMN_NAME;
-
-        String c14 = EventTypeTable.COLUMN_NAME;
-
-        String c16 = EventTable.COLUMN_ICON;
-        String c17 = EventTable.COLUMN_NAME;
-        String c18 = EventTable.COLUMN_GUARDIANS;
-        String c19 = EventTable.COLUMN_TYPE;
-
-        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c12, c14, c16, c17, c18, c19};
-
-        from = new String[] {c17, c16, c5, c6, c6, c8, c18, c14};
-
-    }
-
-    private void prepareGameStrings(){
-
-        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID);
-        String c2 = GameTable.COLUMN_EVENT_ID;
-        String c3 = GameTable.COLUMN_CREATOR;
-        String c4 = GameTable.COLUMN_TIME;
-        String c5 = GameTable.COLUMN_LIGHT;
-        String c6 = GameTable.COLUMN_INSCRIPTIONS;
-        String c7 = GameTable.COLUMN_CREATOR_NAME;
-        String c8 = GameTable.COLUMN_STATUS;
-
-        String c9 = EventTypeTable.COLUMN_NAME;
-
-        String c10 = EventTable.COLUMN_ICON;
-        String c11 = EventTable.COLUMN_NAME;
-        String c12 = EventTable.COLUMN_GUARDIANS;
-        String c13 = EventTable.COLUMN_TYPE;
-
-        projection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13};
-
-        from = new String[] {c3, c4, c4, c6, c9, c10, c11, c12};
-
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_JOINED_GAMES);
+        callback.runServerService(bundle);
     }
 
     @Override
@@ -235,120 +136,49 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+       callback.setSpinnerSelection(DrawerActivity.TAG_MY_EVENTS, position);
+        statusId = statusList[position];
+        filterGameList(statusId);
+    }
 
-        switch (position){
-            case 0:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
-                prepareStrings();
-                getLoaderManager().destroyLoader(LOADER_GAME);
-                initEntryLoader();
-                break;
-            case 1:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_SCHEDULED;
-                prepareStrings();
-                getLoaderManager().destroyLoader(LOADER_GAME);
-                initEntryLoader();
-                break;
-            case 2:
-                where = EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId() + " AND " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_WAITING;
-                prepareStrings();
-                getLoaderManager().destroyLoader(LOADER_GAME);
-                initEntryLoader();
-                break;
-            case 3:
-                where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED;
-                prepareGameStrings();
-                getLoaderManager().destroyLoader(LOADER_ENTRY);
-                initGameLoader();
-                break;
-            case 4:
-                where = GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED;
-                prepareGameStrings();
-                getLoaderManager().destroyLoader(LOADER_ENTRY);
-                initGameLoader();
-                break;
+    public void filterGameList(String filter){
+        if (filter != null){
+            if (filter.isEmpty()) filter = statusList[0];
+            if (gameAdapter != null) {
+                gameAdapter.getFilter().filter(filter);
+            }
         }
-
-        callback.setSpinnerSelection(DrawerActivity.TAG_MY_EVENTS, position);
-
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+    }
+
+    @Override
+    public void onUserDataLoaded() {
 
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-       callback.onLoadingData();
-
-        switch (id){
-            case LOADER_GAME:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.GAME_URI,
-                        projection,
-                        where,
-                        null,
-                        "datetime(" + GameTable.COLUMN_TIME + ") ASC"
-                );
-            case LOADER_ENTRY:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.ENTRY_URI,
-                        projection,
-                        where,
-                        null,
-                        "datetime(" + GameTable.COLUMN_TIME + ") ASC"
-                );
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
-
-        if (data != null && data.moveToFirst()){
-
-            switch (loader.getId()){
-                case LOADER_GAME:
-                    adapter.swapCursor(data);
-                    gameStatus = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_STATUS));
-                case LOADER_ENTRY:
-                    adapter.swapCursor(data);
-                    gameStatus = data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_STATUS));
-            }
-
-            for (int i=0; i < data.getCount(); i++){
-                gameCreatorList.add(i, data.getString(data.getColumnIndex(GameTable.COLUMN_CREATOR)));
-                gameStatusList.add(i, data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_STATUS)));
-                data.moveToNext();
-            }
-
-            callback.onDataLoaded();
-            emptyView.setVisibility(View.GONE);
+    public void onGamesLoaded(List<GameModel> gameList) {
+        Log.w(TAG, "SearchFragment onGamesLoaded called!");
+        if (gameAdapter == null) {
+            Log.w(TAG, "adapter estava null");
+            if (gameList != null){
+                this.gameList = gameList;
+                gameAdapter = new GameAdapter(getActivity(), gameList);
+                listView.setAdapter(gameAdapter);
+                filterGameList(statusId);
+            } else Log.w(TAG, "listView null ou size 0");
         } else {
-            callback.onDataLoaded();
-            adapter.swapCursor(null);
-            emptyView.setVisibility(View.VISIBLE);
+            Log.w(TAG, "adapter já existia");
+            if (gameList!=null){
+                this.gameList = gameList;
+                listView.setAdapter(gameAdapter);
+                filterGameList(statusId);
+                gameAdapter.setGameList(gameList);
+                gameAdapter.notifyDataSetChanged();
+            } else Log.w(TAG, "listView null");
         }
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putStringArrayList("gameCreatorList", gameCreatorList);
-        outState.putIntegerArrayList("gameStatusList", gameStatusList);
-        outState.putString("status",gameStatus);
-        super.onSaveInstanceState(outState);
     }
 }

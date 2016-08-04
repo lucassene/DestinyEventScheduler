@@ -510,6 +510,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         String time = hourOfTheDay + " : " + min;
         timeText.setText(time);
         hasTime = true;
+        hasDate = true;
         checkIfIsOk();
 
     }

@@ -1,6 +1,7 @@
 package com.destiny.event.scheduler.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,27 +115,51 @@ public class GameAdapter extends BaseAdapter implements Filterable {
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            String filter = constraint.toString().toLowerCase();
+            String fullFilter = constraint.toString().toLowerCase();
+            String prefix = fullFilter.substring(0,fullFilter.indexOf(":"));
+            String filter = fullFilter.substring(fullFilter.indexOf(":")+1,fullFilter.length());
+            Log.w(TAG, "prefix: " + prefix + " filter: " + filter);
+
             FilterResults results = new FilterResults();
             final List<GameModel> originalGameList = gameList;
             final ArrayList<GameModel> newGameList = new ArrayList<>(originalGameList.size());
 
-            if (!filter.equals("all")){
-                for (int i=0;i<originalGameList.size();i++){
-                    if (originalGameList.get(i).getTypeName().equals(filter)){
-                        newGameList.add(originalGameList.get(i));
+            switch (prefix){
+                case "type":
+                    if (!filter.equals("all")){
+                        for (int i=0;i<originalGameList.size();i++){
+                            if (originalGameList.get(i).getTypeName().equals(filter)){
+                                newGameList.add(originalGameList.get(i));
+                            }
+                        }
+                        results.values = newGameList;
+                        results.count = newGameList.size();
+                    } else {
+                        results.values = originalGameList;
+                        results.count = originalGameList.size();
                     }
-                }
-                results.values = newGameList;
-                results.count = newGameList.size();
-            } else {
-                results.values = originalGameList;
-                results.count = originalGameList.size();
+                    break;
+                case "status":
+                    if (!filter.equals("all")){
+                        for (int i=0;i<originalGameList.size();i++){
+                            Log.w(TAG, "status: " + String.valueOf(originalGameList.get(i).getStatus()));
+                            if (String.valueOf(originalGameList.get(i).getStatus()).equals(filter)){
+                                newGameList.add(originalGameList.get(i));
+                            }
+                        }
+                        results.values = newGameList;
+                        results.count = newGameList.size();
+                    } else {
+                        results.values = originalGameList;
+                        results.count = originalGameList.size();
+                    }
+                    break;
             }
 
             return results;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             filteredGameList = (List<GameModel>) results.values;

@@ -16,10 +16,8 @@ import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
-import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
 import com.destiny.event.scheduler.adapters.GameAdapter;
 import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.interfaces.RefreshDataListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -28,7 +26,7 @@ import com.destiny.event.scheduler.services.ServerService;
 import java.io.Serializable;
 import java.util.List;
 
-public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, RefreshDataListener, UserDataListener {
+public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener {
 
     public static final String TAG = "SearchFragment";
 
@@ -36,15 +34,13 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     ListView listView;
     TextView emptyView;
 
-    CustomCursorAdapter adapter;
     GameAdapter gameAdapter;
 
     private ToActivityListener callback;
 
+    private List<GameModel> gameList;
     private String[] typeList;
     private String eventType;
-
-    private List<GameModel> gameList;
 
     @Override
     public void onDetach() {
@@ -57,7 +53,6 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
-        callback.registerRefreshListener(this);
         callback.registerUserDataListener(this);
     }
 
@@ -65,7 +60,6 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     public void onDestroy() {
         super.onDestroy();
         Log.w(TAG, "SearchFragment destroyed!");
-        callback.deleteRefreshListener(this);
         callback.deleteUserDataListener(this);
     }
 
@@ -77,6 +71,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         getActivity().getMenuInflater().inflate(R.menu.home_menu, menu);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.search_event_layout, container, false);
@@ -93,15 +88,15 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
-        if (savedInstanceState != null && savedInstanceState.containsKey("gameList")){
-            gameList = (List<GameModel>) savedInstanceState.getSerializable("gameList");
+        gameList = callback.getGameList(GameTable.STATUS_AVAILABLE);
+        if (savedInstanceState != null && savedInstanceState.containsKey("listView")){
+            gameList = (List<GameModel>) savedInstanceState.getSerializable("listView");
             onGamesLoaded(gameList);
             Log.w(TAG, "Game data already available");
-        } else if (callback.getGameList(GameTable.STATUS_AVAILABLE) == null){
+        } else if (gameList == null){
             Log.w(TAG, "Getting game data...");
             getGamesData();
         } else {
-            gameList = callback.getGameList(GameTable.STATUS_AVAILABLE);
             onGamesLoaded(gameList);
         }
 
@@ -117,12 +112,10 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getContext().getResources().getStringArray(R.array.spinner_types));
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterSpinner.setOnItemSelectedListener(this);
         filterSpinner.setAdapter(spinnerAdapter);
-
     }
 
     private void getGamesData() {
@@ -145,33 +138,23 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        callback.setSpinnerSelection(DrawerActivity.TAG_SEARCH_EVENTS, position);
         eventType = typeList[position];
         filterGameList(eventType);
     }
 
     public void filterGameList(String filter){
-        if (filter.isEmpty()) filter = typeList[0];
-        if (gameAdapter != null) {
-            gameAdapter.getFilter().filter(filter);
+        if (filter != null){
+            if (filter.isEmpty()) filter = typeList[0];
+            if (gameAdapter != null) {
+                gameAdapter.getFilter().filter(filter);
+            }
         }
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
-    }
-
-    @Override
-    public void onRefreshData() {
-        Bundle bundle = new Bundle();
-        bundle.putInt(ServerService.REQUEST_TAG,ServerService.TYPE_NEW_GAMES);
-        callback.runServerService(bundle);
-        Log.w(TAG, "Refreshing Search New Events data!");
-    }
-
-    @Override
-    public Fragment getFragment() {
-        return this;
     }
 
     @Override
@@ -189,7 +172,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
                 gameAdapter = new GameAdapter(getActivity(), gameList);
                 listView.setAdapter(gameAdapter);
                 filterGameList(eventType);
-            } else Log.w(TAG, "gameList null ou size 0");
+            } else Log.w(TAG, "listView null ou size 0");
         } else {
             Log.w(TAG, "adapter já existia");
             if (gameList!=null){
@@ -198,14 +181,14 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
                 filterGameList(eventType);
                 gameAdapter.setGameList(gameList);
                 gameAdapter.notifyDataSetChanged();
-            } else Log.w(TAG, "gameList null");
+            } else Log.w(TAG, "listView null");
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("gameList", (Serializable) gameList);
+        outState.putSerializable("listView", (Serializable) gameList);
     }
 
 }

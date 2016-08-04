@@ -21,6 +21,7 @@ public class GameTable {
     public static final int STATUS_WAITING = 1;
     public static final int STATUS_VALIDATED = 2;
     public static final int STATUS_EVALUATED = 3;
+    public static final int STATUS_JOINED = 6;
     public static final int STATUS_AVAILABLE = 7;
     public static final int STATUS_DONE = 8;
     public static final int STATUS_SCHEDULED = 9;

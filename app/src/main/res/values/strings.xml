@@ -145,16 +145,16 @@
     </string-array>
 
     <string-array name="type_ids">
-        <item>all</item>
-        <item>court</item>
-        <item>crucible</item>
-        <item>patrol</item>
-        <item>prison</item>
-        <item>raid</item>
-        <item>story</item>
-        <item>strike</item>
-        <item>strike_list</item>
-        <item>srl</item>
+        <item>type:all</item>
+        <item>type:court</item>
+        <item>type:crucible</item>
+        <item>type:patrol</item>
+        <item>type:prison</item>
+        <item>type:raid</item>
+        <item>type:story</item>
+        <item>type:strike</item>
+        <item>type:strike_list</item>
+        <item>type:srl</item>
     </string-array>
 
     <string-array name="game_status">
@@ -163,6 +163,14 @@
         <item>Waiting for Validation</item>
         <item>Validated</item>
         <item>Evaluated</item>
+    </string-array>
+
+    <string-array name="game_status_id">
+        <item>status:all</item>
+        <item>status:0</item>
+        <item>status:1</item>
+        <item>status:2</item>
+        <item>status:3</item>
     </string-array>
 
     <string-array name="table_names">

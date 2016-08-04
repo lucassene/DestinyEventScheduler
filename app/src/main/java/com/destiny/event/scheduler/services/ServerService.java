@@ -74,6 +74,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_LEAVE_GAME = 5;
     public static final int TYPE_DELETE_GAME = 6;
     public static final int TYPE_NEW_GAMES = 7;
+    public static final int TYPE_JOINED_GAMES = 8;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -201,6 +202,13 @@ public class ServerService extends IntentService {
                     sendError(receiver, error);
                 } else sendGameData(receiver, gameList);
                 break;
+            case TYPE_JOINED_GAMES:
+                url = SERVER_BASE_URL + GAME_ENDPOINT + "?" + JOINED_PARAM + "true";
+                error = requestServer(receiver, type, url, null);
+                if (error != NO_ERROR){
+                    sendError(receiver, error);
+                } else sendGameData(receiver, gameList);
+                break;
         }
         this.stopSelf();
 
@@ -252,6 +260,7 @@ public class ServerService extends IntentService {
                     case TYPE_ALL_GAMES:
                     case TYPE_GAME_ENTRIES:
                     case TYPE_NEW_GAMES:
+                    case TYPE_JOINED_GAMES:
                         urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
                         break;
                     case TYPE_JOIN_GAME:
@@ -277,7 +286,8 @@ public class ServerService extends IntentService {
                                     return NO_ERROR;
                                 case TYPE_ALL_GAMES:
                                 case TYPE_NEW_GAMES:
-                                    error = parseNewGames(response);
+                                case TYPE_JOINED_GAMES:
+                                    error = parseGames(response);
                                     if (error != NO_ERROR){
                                         return error;
                                     } else return NO_ERROR;
@@ -344,7 +354,7 @@ public class ServerService extends IntentService {
         return NO_ERROR;
     }
 
-    private int parseNewGames(String response){
+    private int parseGames(String response){
         Log.w(TAG, "GetNewGames response: " + response);
         JSONArray jResponse;
         gameList = new ArrayList<>();
