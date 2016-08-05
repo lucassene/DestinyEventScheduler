@@ -2,15 +2,11 @@ package com.destiny.event.scheduler.fragments;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -26,48 +22,35 @@ import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
-import com.destiny.event.scheduler.adapters.SimpleMemberAdapter;
-import com.destiny.event.scheduler.data.EntryTable;
+import com.destiny.event.scheduler.adapters.ValidationAdapter;
 import com.destiny.event.scheduler.data.EvaluationTable;
-import com.destiny.event.scheduler.data.EventTable;
-import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
-import com.destiny.event.scheduler.models.CompleteMemberModel;
+import com.destiny.event.scheduler.models.EntryModel;
+import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
-import com.destiny.event.scheduler.services.LevelCheckService;
-import com.destiny.event.scheduler.services.TitleService;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 
-public class DetailValidationFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener{
+public class DetailValidationFragment extends ListFragment implements FromDialogListener{
 
     private static final String TAG = "DetailValidateFragment";
-
-    private static final int LOADER_GAME = 60;
-    private static final int LOADER_ENTRY_MEMBERS = 72;
-    private static final int LOADER_EVALUATION = 90;
 
     private static final int TYPE_ONLY_CREATOR = 1;
     private static final int TYPE_NO_EVALUATIONS = 2;
     private static final int TYPE_OK = 3;
     private static final int TYPE_DELETE = 4;
 
-    private String gameId;
-    private String creator;
     private int selectedType;
-    private int inscriptions;
     private String origin;
 
-    private List<CompleteMemberModel> memberList;
+    private List<EntryModel> memberList;
 
     View headerView;
     View includedView;
@@ -82,18 +65,14 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
     boolean listStatus = true;
 
     View footerView;
-    Button joinButton;
+    Button validateButton;
 
     private ToActivityListener callback;
 
-    private String[] gameProjection;
-    private String[] membersProjection;
-
-    SimpleMemberAdapter adapter;
+    ValidationAdapter adapter;
 
     MyAlertDialog dialog;
 
-    int originStatus;
     int status;
 
     int actualUserLevel;
@@ -105,6 +84,8 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
     private static final int STATUS_EVALUATED = 3;
 
     ArrayList<String> evalMemberList;
+
+    GameModel game;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -135,21 +116,19 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
         checkBox = (CheckBox) headerView.findViewById(R.id.confirm_check);
         checkLayout = (LinearLayout) headerView.findViewById(R.id.checkbox_layout);
 
-        joinButton = (Button) footerView.findViewById(R.id.btn_join);
+        validateButton = (Button) footerView.findViewById(R.id.btn_join);
 
-        joinButton.setText(R.string.validate);
+        validateButton.setText(R.string.validate);
 
         Bundle bundle = getArguments();
         if (bundle != null){
-            gameId = bundle.getString("gameId");
-            creator = bundle.getString("creator");
-            originStatus = bundle.getInt("status");
+            game = (GameModel) bundle.getSerializable("game");
             origin = bundle.getString("origin");
         }
 
         prepareViews();
 
-        joinButton.setOnClickListener(new View.OnClickListener() {
+        validateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (NetworkUtils.checkConnection(getContext())){
@@ -176,32 +155,32 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
     }
 
     private void prepareViews() {
-        switch (originStatus){
+        switch (game.getStatus()){
             case GameTable.STATUS_WAITING:
-                if (creator.equals(callback.getBungieId())){
-                    joinButton.setVisibility(View.VISIBLE);
+                if (game.getCreatorId().equals(callback.getBungieId())){
+                    validateButton.setVisibility(View.VISIBLE);
                     checkLayout.setVisibility(View.VISIBLE);
-                    joinButton.setEnabled(true);
+                    validateButton.setEnabled(true);
                     status = STATUS_WAITING_CREATOR;
                 } else{
                     checkLayout.setVisibility(View.GONE);
-                    joinButton.setText(R.string.waiting_validation);
-                    joinButton.setEnabled(false);
+                    validateButton.setText(R.string.waiting_validation);
+                    validateButton.setEnabled(false);
                     status = STATUS_WAITING;
                 }
                 callback.setToolbarTitle(getString(R.string.validate_event_title));
                 break;
             case GameTable.STATUS_VALIDATED:
-                joinButton.setEnabled(true);
-                joinButton.setText(R.string.evaluate);
-                joinButton.setVisibility(View.VISIBLE);
+                validateButton.setEnabled(true);
+                validateButton.setText(R.string.evaluate);
+                validateButton.setVisibility(View.VISIBLE);
                 checkLayout.setVisibility(View.GONE);
                 callback.setToolbarTitle(getString(R.string.evaluate_match));
                 status = STATUS_VALIDATED;
                 break;
             case GameTable.STATUS_EVALUATED:
-                joinButton.setEnabled(true);
-                joinButton.setVisibility(View.GONE);
+                validateButton.setEnabled(true);
+                validateButton.setVisibility(View.GONE);
                 checkLayout.setVisibility(View.GONE);
                 checkBox.setChecked(true);
                 callback.setToolbarTitle(getString(R.string.event_details));
@@ -227,7 +206,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                 adapter.notifyDataSetChanged();
             }
 
-            joinButton.setText(R.string.delete);
+            validateButton.setText(R.string.delete);
 
         } else {
 
@@ -245,7 +224,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                 adapter.notifyDataSetChanged();
             }
 
-            joinButton.setText(R.string.validate);
+            validateButton.setText(R.string.validate);
 
         }
 
@@ -256,13 +235,12 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
 
         super.onViewCreated(view, savedInstanceState);
 
-        if (headerView != null && footerView != null){
+        if (headerView != null){
             this.getListView().addHeaderView(headerView, null, false);
-            this.getListView().addFooterView(footerView);
         }
 
         memberList = new ArrayList<>();
-        adapter = new SimpleMemberAdapter(getContext(), memberList);
+        adapter = new ValidationAdapter(getContext(), memberList);
         getListView().setAdapter(adapter);
 
         getGameData();
@@ -388,7 +366,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
             ImageView img = (ImageView) v.findViewById(R.id.rate_img);
 
             int newpos = position -1;
-            CompleteMemberModel member = adapter.getItem(newpos);
+            EntryModel member = memberList.get(newpos);
             int newRating = 0;
 
             if (!member.getMembershipId().equals(callback.getBungieId())){
@@ -444,80 +422,37 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
     }
 
     private void getGameData() {
-
-        prepareGameStrings();
-        initGameLoader();
+        eventIcon.setImageResource(getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
+        eventName.setText(getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
+        eventType.setText(getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
+        String date = DateUtils.onBungieDate(game.getTime());
+        String hour = DateUtils.getTime(game.getTime());
+        String timeString = date + getResources().getString(R.string.at) + hour;
+        time.setText(timeString);
+        getMembers(game.getGameId());
     }
 
-    private void initGameLoader(){
-        if (getLoaderManager().getLoader(LOADER_GAME) != null){
-            getLoaderManager().destroyLoader(LOADER_GAME);
+    private void getMembers(int gameId) {
+        callback.getGameEntries(gameId);
+    }
+
+    public void onEntriesLoaded(List<EntryModel> entryList){
+        Log.w(TAG, "entryList size: " + entryList.size());
+        for (int i=0;i<entryList.size();i++){
+            entryList.get(i).setChecked(true);
+            entryList.get(i).setRating(0);
         }
-        getLoaderManager().restartLoader(LOADER_GAME, null, this);
-    }
-
-    private void initEntryLoader() {
-        if (getLoaderManager().getLoader(LOADER_ENTRY_MEMBERS) != null){
-            getLoaderManager().destroyLoader(LOADER_ENTRY_MEMBERS);
+        memberList.addAll(entryList);
+        if (footerView != null){
+            this.getListView().addFooterView(footerView);
         }
-        getLoaderManager().restartLoader(LOADER_ENTRY_MEMBERS, null, this);
+        setAdapter(memberList);
     }
 
-    private void initEvaluationLoader() {
-        if (getLoaderManager().getLoader(LOADER_EVALUATION) != null){
-            getLoaderManager().destroyLoader(LOADER_EVALUATION);
-        }
-        getLoaderManager().restartLoader(LOADER_EVALUATION, null, this);
+    private void setAdapter(List<EntryModel> entryList) {
+        adapter = new ValidationAdapter(getContext(), entryList);
+        setListAdapter(adapter);
     }
-
-    private void prepareGameStrings() {
-
-        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID);
-        String c2 = GameTable.COLUMN_EVENT_ID;
-        String c6 = GameTable.COLUMN_CREATOR;
-        String c9 = GameTable.COLUMN_TIME;
-        String c10 = GameTable.COLUMN_LIGHT;
-        String c12 = GameTable.COLUMN_INSCRIPTIONS;
-        String c14 = GameTable.COLUMN_CREATOR_NAME;
-        String c18 = GameTable.COLUMN_STATUS;
-
-        String c4 = EventTable.COLUMN_ICON;
-        String c5 = EventTable.COLUMN_NAME;
-        String c11 = EventTable.COLUMN_GUARDIANS;
-        String c15 = EventTable.COLUMN_TYPE;
-
-        String c7 = MemberTable.COLUMN_MEMBERSHIP;
-        String c8 = MemberTable.COLUMN_NAME;
-
-        String c16 = EventTypeTable.COLUMN_ICON;
-        String c17 = EventTypeTable.COLUMN_NAME;
-
-        gameProjection = new String[] {c1, c2, c4, c5, c6, c7, c8, c9, c10, c11, c12,  c14, c15, c16, c17, c18};
-
-    }
-
-    private void prepareMemberStrings() {
-
-        String c1 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID);
-        String c2 = EntryTable.COLUMN_GAME;
-        String c3 = EntryTable.COLUMN_MEMBERSHIP;
-        String c4 = EntryTable.COLUMN_TIME;
-
-        String c5 = MemberTable.COLUMN_MEMBERSHIP;
-        String c6 = MemberTable.COLUMN_NAME;
-        String c7 = MemberTable.COLUMN_ICON;
-        String c8 = MemberTable.COLUMN_LIKES;
-        String c9 = MemberTable.COLUMN_DISLIKES;
-        String c10 = MemberTable.COLUMN_CREATED;
-        String c11 = MemberTable.COLUMN_PLAYED;
-        String c12 = MemberTable.COLUMN_TITLE;
-
-        String c14 = MemberTable.COLUMN_EXP;
-
-        membersProjection = new String[] {c1, c2, c3, c4, c5, c6, c14, c7, c8, c9, c10, c11, c12};
-
-    }
-
 
     @Override
     public void onAttach(Context context) {
@@ -541,135 +476,10 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        String[] selectionArgs = {gameId};
-
-        callback.onLoadingData();
-
-        switch (id){
-            case LOADER_GAME:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.GAME_URI,
-                        gameProjection,
-                        GameTable.getQualifiedColumn(GameTable.COLUMN_ID)+ "=?",
-                        selectionArgs,
-                        null
-                );
-            case LOADER_ENTRY_MEMBERS:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.ENTRY_MEMBERS_URI,
-                        membersProjection,
-                        EntryTable.getQualifiedColumn(EntryTable.COLUMN_GAME) + "=?",
-                        selectionArgs,
-                        "datetime(" + EntryTable.getQualifiedColumn(EntryTable.COLUMN_TIME) + ") ASC"
-                );
-            case LOADER_EVALUATION:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.EVALUATION_URI,
-                        EvaluationTable.ALL_COLUMNS,
-                        EvaluationTable.COLUMN_GAME + "=" + gameId + " AND " + EvaluationTable.COLUMN_MEMBERSHIP_A + "=" + callback.getBungieId(),
-                        null,
-                        null
-                );
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        if (data != null && data.moveToFirst()){
-            switch (loader.getId()){
-                case LOADER_GAME:
-                    eventIcon.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", getContext().getPackageName() ));
-
-                    String gameEventName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", getContext().getPackageName()));
-                    eventName.setText(gameEventName);
-
-                    String gameEventTypeName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)), "string", getContext().getPackageName()));
-                    eventType.setText(gameEventTypeName);
-
-                    String date = DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME)));
-                    String hour = DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME)));
-                    String timeString = date + getResources().getString(R.string.at) + hour;
-                    time.setText(timeString);
-
-                    inscriptions = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
-
-                    prepareMemberStrings();
-                    initEntryLoader();
-
-                    break;
-                case LOADER_ENTRY_MEMBERS:
-                    memberList.clear();
-                    evalMemberList = new ArrayList<>();
-                    data.moveToFirst();
-                    for (int i=0; i < data.getCount();i++){
-                        CompleteMemberModel memberModel = new CompleteMemberModel();
-                        memberModel.setMembershipId(data.getString(data.getColumnIndexOrThrow(EntryTable.COLUMN_MEMBERSHIP)));
-                        memberModel.setName(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
-                        memberModel.setTitle(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
-                        memberModel.setIconPath(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_ICON)));
-                        memberModel.setRating(0);
-                        memberModel.setChecked(true);
-                        memberModel.setEntryId(data.getInt(data.getColumnIndexOrThrow(EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID))));
-                        memberModel.setLikes(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES)));
-                        memberModel.setDislikes(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES)));
-                        memberModel.setGamesCreated(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED)));
-                        memberModel.setGamesPlayed(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED)));
-                        if (memberList == null){
-                            memberList = new ArrayList<>();
-                            memberList.add(memberModel);
-                        } else memberList.add(memberModel);
-                        if (memberModel.getMembershipId().equals(callback.getBungieId())){
-                            int xp = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
-                            actualUserLevel = MemberTable.getMemberLevel(xp);
-                            actualTitle = data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE));
-                        } else evalMemberList.add(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP)));
-                        data.moveToNext();
-                    }
-
-                    if (originStatus ==GameTable.STATUS_EVALUATED){
-                        initEvaluationLoader();
-                    } else adapter.notifyDataSetChanged();
-
-                    break;
-                case LOADER_EVALUATION:
-                    data.moveToFirst();
-                    for (int i=0;i<memberList.size();i++){
-                        for (int x=0;x<data.getCount();x++){
-                            if (data.getString(data.getColumnIndexOrThrow(EvaluationTable.COLUMN_MEMBERSHIP_B)).equals(memberList.get(i).getMembershipId())){
-                                memberList.get(i).setRating(data.getInt(data.getColumnIndexOrThrow(EvaluationTable.COLUMN_EVALUATION)));
-                                //Log.w(TAG, "Member: " + memberList.get(i).getMembershipId() + " rated " + data.getInt(data.getColumnIndexOrThrow(EvaluationTable.COLUMN_EVALUATION)));
-                                break;
-                            }
-                            data.moveToNext();
-                        }
-                        data.moveToFirst();
-                    }
-                    adapter.notifyDataSetChanged();
-                    break;
-            }
-        }
-
-        callback.onDataLoaded();
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-    }
-
-    @Override
     public void onPositiveClick(String input, int type) {
 
-        ContentValues values = new ContentValues();
-        String uriString = DataProvider.GAME_URI + "/" + gameId;
+        /*ContentValues values = new ContentValues();
+        String uriString = DataProvider.GAME_URI + "/" + game.getGameId();
         Uri uri = Uri.parse(uriString);
 
         switch (selectedType){
@@ -693,7 +503,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                 break;
         }
 
-        values.clear();
+        values.clear();*/
 
     }
 
@@ -702,7 +512,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
         for (int i=0;i<memberList.size();i++){
             //Log.w(TAG, "Membro " + memberList.get(i).getName() + " está vai entrar no loop de avaliação...");
             if (!memberList.get(i).getMembershipId().equals(callback.getBungieId())){
-                values.put(EvaluationTable.COLUMN_GAME, gameId);
+                values.put(EvaluationTable.COLUMN_GAME, game.getGameId());
                 values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, callback.getBungieId());
                 values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, memberList.get(i).getMembershipId());
                 values.put(EvaluationTable.COLUMN_EVALUATION, memberList.get(i).getRating());
@@ -711,96 +521,11 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                     //Log.w(TAG, "Membro " + memberList.get(i).getName() + " foi avaliado em " + memberList.get(i).getRating());
             } //else Log.w(TAG, "Membro " + memberList.get(i).getName() + " não foi avaliado pois é o criador da partida");
         }
-
-        Random random = new Random();
-
-        int size = evalMemberList.size();
-
-        //Fake Evaluations para member 0
-        values.put(EvaluationTable.COLUMN_GAME, gameId);
-        values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, evalMemberList.get(0));
-        values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, callback.getBungieId());
-        values.put(EvaluationTable.COLUMN_EVALUATION, random.nextInt(2)-1);
-        getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-        values.clear();
-
-        if (size>1){
-            values.put(EvaluationTable.COLUMN_GAME, gameId);
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, evalMemberList.get(0));
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, evalMemberList.get(1));
-            values.put(EvaluationTable.COLUMN_EVALUATION, random.nextInt(2)-1);
-            getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-            values.clear();
-        }
-
-        if (size>2){
-            values.put(EvaluationTable.COLUMN_GAME, gameId);
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, evalMemberList.get(0));
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, evalMemberList.get(2));
-            values.put(EvaluationTable.COLUMN_EVALUATION, random.nextInt(2)-1);
-            getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-            values.clear();
-        }
-
-        //Fake evaluations para member 1
-        if (size>1){
-            values.put(EvaluationTable.COLUMN_GAME, gameId);
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, evalMemberList.get(1));
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, callback.getBungieId());
-            values.put(EvaluationTable.COLUMN_EVALUATION, random.nextInt(2)-1);
-            getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-            values.clear();
-
-            values.put(EvaluationTable.COLUMN_GAME, gameId);
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, evalMemberList.get(1));
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, evalMemberList.get(0));
-            values.put(EvaluationTable.COLUMN_EVALUATION, random.nextInt(2)-1);
-            getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-            values.clear();
-        }
-
-        if(size>2){
-            values.put(EvaluationTable.COLUMN_GAME, gameId);
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, evalMemberList.get(1));
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, evalMemberList.get(2));
-            values.put(EvaluationTable.COLUMN_EVALUATION, random.nextInt(2)-1);
-            getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-            values.clear();
-        }
-
-        //Fake evaluations para member 2
-        if (size>2){
-            values.put(EvaluationTable.COLUMN_GAME, gameId);
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, evalMemberList.get(2));
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, callback.getBungieId());
-            values.put(EvaluationTable.COLUMN_EVALUATION, random.nextInt(2)-1);
-            getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-            values.clear();
-
-            values.put(EvaluationTable.COLUMN_GAME, gameId);
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, evalMemberList.get(2));
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, evalMemberList.get(0));
-            values.put(EvaluationTable.COLUMN_EVALUATION, random.nextInt(2)-1);
-            getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-            values.clear();
-
-            values.put(EvaluationTable.COLUMN_GAME, gameId);
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, evalMemberList.get(2));
-            values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, evalMemberList.get(1));
-            values.put(EvaluationTable.COLUMN_EVALUATION, random.nextInt(2)-1);
-            getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-            values.clear();
-        }
-
-        values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions);
-        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_EVALUATED);
-        getContext().getContentResolver().update(uri, values, null, null);
-
         callback.closeFragment();
 
     }
 
-    private void validateGame(ContentValues values, Uri uri) {
+    /*private void validateGame(ContentValues values, Uri uri) {
 
         values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_EVALUATED); //inserir STATUS_VALIDATED no servidor
         getContext().getContentResolver().update(uri, values, null, null);
@@ -812,7 +537,7 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
                 getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
                 //Log.w(TAG, "Membro " + memberList.get(i).getName() + " foi removido!");
                 memberList.remove(i);
-                inscriptions--;
+                game.setInscriptions(game.getInscriptions()-1);
                 i--;
             } else {
                 //Log.w(TAG, "Membro " + memberList.get(i).getName() + " terá seus status atualizados...");
@@ -873,10 +598,10 @@ public class DetailValidationFragment extends ListFragment implements LoaderMana
 
     private void deleteGame(Uri uri) {
         getContext().getContentResolver().delete(uri, null, null);
-        String selection = GameTable.getQualifiedColumn(GameTable.COLUMN_ID) + "=" + gameId;
+        String selection = GameTable.getQualifiedColumn(GameTable.COLUMN_ID) + "=" + game.getGameId();
         getContext().getContentResolver().delete(DataProvider.GAME_URI, selection, null);
         callback.closeFragment();
-    }
+    }*/
 
     @Override
     public void onDateSent(Calendar date) {

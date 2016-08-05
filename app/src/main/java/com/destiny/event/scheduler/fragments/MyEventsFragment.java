@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.services.ServerService;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class MyEventsFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener {
@@ -145,7 +147,12 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         if (filter != null){
             if (filter.isEmpty()) filter = statusList[0];
             if (gameAdapter != null) {
-                gameAdapter.getFilter().filter(filter);
+                gameAdapter.getFilter().filter(filter, new Filter.FilterListener() {
+                    @Override
+                    public void onFilterComplete(int count) {
+                        listView.setAdapter(gameAdapter);
+                    }
+                });
             }
         }
     }
@@ -165,20 +172,27 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         if (gameAdapter == null) {
             Log.w(TAG, "adapter estava null");
             if (gameList != null){
+                listView.setAdapter(null);
                 this.gameList = gameList;
                 gameAdapter = new GameAdapter(getActivity(), gameList);
-                listView.setAdapter(gameAdapter);
                 filterGameList(statusId);
             } else Log.w(TAG, "listView null ou size 0");
         } else {
             Log.w(TAG, "adapter já existia");
             if (gameList!=null){
+                listView.setAdapter(null);
                 this.gameList = gameList;
-                listView.setAdapter(gameAdapter);
                 filterGameList(statusId);
                 gameAdapter.setGameList(gameList);
                 gameAdapter.notifyDataSetChanged();
             } else Log.w(TAG, "listView null");
         }
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("listView", (Serializable) gameList);
+    }
+
 }

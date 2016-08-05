@@ -39,7 +39,7 @@ import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.DrawerAdapter;
-import com.destiny.event.scheduler.adapters.ViewPageAdapter;
+import com.destiny.event.scheduler.adapters.ViewPagerAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.data.GameTable;
@@ -143,7 +143,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private boolean hasValidatedGames = true;
 
     ViewPager viewPager;
-    ViewPageAdapter viewPageAdapter;
+    ViewPagerAdapter viewPagerAdapter;
     SlidingTabLayout tabLayout;
     private int selectedTabFragment;
 
@@ -190,9 +190,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         tabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tab);
         viewPager = (ViewPager) findViewById(R.id.content_view);
-        viewPageAdapter = new ViewPageAdapter(getSupportFragmentManager(),titles,numOfTabs);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(),titles,numOfTabs);
 
-        viewPager.setAdapter(viewPageAdapter);
+        viewPager.setAdapter(viewPagerAdapter);
 
         tabLayout.setDistributeEvenly(true);
         tabLayout.setViewPager(viewPager);
@@ -408,7 +408,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void updateViewPager() {
         fragmentTag = null;
         openedFragment = null;
-        viewPager.setAdapter(viewPageAdapter);
+        viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setViewPager(viewPager);
         selectedDrawerItem = 1;
         rAdapter.notifyDataSetChanged();
@@ -689,6 +689,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 return doneGameList;
             case GameTable.STATUS_AVAILABLE:
                 return searchGameList;
+            case GameTable.STATUS_JOINED:
+                return joinedGameList;
             default:
                 return null;
         }
@@ -1221,6 +1223,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         DetailEventFragment frag = (DetailEventFragment) openedFragment;
                         frag.onEntriesLoaded((List<EntryModel>) resultData.getSerializable(ServerService.ENTRY_TAG));
                     }
+                }
+                if (openedFragment instanceof DetailValidationFragment){
+                    DetailValidationFragment frag = (DetailValidationFragment) openedFragment;
+                    frag.onEntriesLoaded((List<EntryModel>) resultData.getSerializable(ServerService.ENTRY_TAG));
                 }
                 if (openedFragment == null){
                     allGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);

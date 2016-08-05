@@ -14,6 +14,8 @@ public class EntryModel implements Serializable {
     private String title;
     private String entryTime;
     private String lvl;
+    private boolean isChecked;
+    private int rating;
 
     public String getEntryTime() {
         return entryTime;
@@ -77,5 +79,21 @@ public class EntryModel implements Serializable {
 
     public void setLvl(int likes, int dislikes, int gamesPlayed, int gamesCreated) {
         this.lvl = MemberTable.getMemberXP(likes, dislikes, gamesPlayed, gamesCreated);
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 }

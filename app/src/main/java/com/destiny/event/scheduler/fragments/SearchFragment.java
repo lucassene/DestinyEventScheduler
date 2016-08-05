@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -147,7 +148,12 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         if (filter != null){
             if (filter.isEmpty()) filter = typeList[0];
             if (gameAdapter != null) {
-                gameAdapter.getFilter().filter(filter);
+                gameAdapter.getFilter().filter(filter, new Filter.FilterListener() {
+                    @Override
+                    public void onFilterComplete(int count) {
+                        listView.setAdapter(gameAdapter);
+                    }
+                });
             }
         }
     }
@@ -168,16 +174,16 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         if (gameAdapter == null) {
             Log.w(TAG, "adapter estava null");
             if (gameList != null){
+                listView.setAdapter(null);
                 this.gameList = gameList;
                 gameAdapter = new GameAdapter(getActivity(), gameList);
-                listView.setAdapter(gameAdapter);
                 filterGameList(eventType);
             } else Log.w(TAG, "listView null ou size 0");
         } else {
             Log.w(TAG, "adapter já existia");
             if (gameList!=null){
+                listView.setAdapter(null);
                 this.gameList = gameList;
-                listView.setAdapter(gameAdapter);
                 filterGameList(eventType);
                 gameAdapter.setGameList(gameList);
                 gameAdapter.notifyDataSetChanged();

@@ -28,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 public class ServerService extends IntentService {
 
@@ -44,6 +45,7 @@ public class ServerService extends IntentService {
 
     private static final String MEMBER_HEADER = "membership";
     private static final String PLATFORM_HEADER = "platform";
+    private static final String TIMEZONE_HEADER = "zoneid";
 
     private static final String GET_METHOD = "GET";
     private static final String POST_METHOD = "POST";
@@ -338,7 +340,7 @@ public class ServerService extends IntentService {
                 JSONObject jEntry = jResponse.getJSONObject(i);
                 JSONObject jMember = jEntry.getJSONObject("member");
                 EntryModel member = new EntryModel();
-                member.setId(jMember.getString("membership"));
+                member.setMembershipId(jMember.getString("membership"));
                 member.setName(jMember.getString("name"));
                 member.setIconPath(jMember.getString("icon"));
                 member.setPlatformId(jMember.getInt("platform"));
@@ -408,6 +410,7 @@ public class ServerService extends IntentService {
     private HttpURLConnection getDefaultHeaders(HttpURLConnection urlConnection, String postMethod) throws ProtocolException {
         urlConnection.setRequestProperty(MEMBER_HEADER, memberId);
         urlConnection.setRequestProperty(PLATFORM_HEADER, String.valueOf(platformId));
+        urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
         urlConnection.setRequestMethod(postMethod);
         return urlConnection;
     }

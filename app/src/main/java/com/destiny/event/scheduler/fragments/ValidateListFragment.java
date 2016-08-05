@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.GameAdapter;
+import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -73,8 +74,13 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
         sectionTitle.setText(R.string.games_available);
 
         if (savedInstanceState != null && savedInstanceState.containsKey("listView")){
-            onGamesLoaded((List<GameModel>) savedInstanceState.getSerializable("listView"));
+            gameList = (List<GameModel>) savedInstanceState.getSerializable("listView");
         }
+
+        if (gameList == null){
+            gameList = callback.getGameList(GameTable.STATUS_DONE);
+        }
+        onGamesLoaded(gameList);
 
         if (headerView != null) {
             this.getListView().addHeaderView(headerView);

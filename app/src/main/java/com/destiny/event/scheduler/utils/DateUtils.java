@@ -78,8 +78,7 @@ public class DateUtils {
         try {
             Date sinceDate = df.parse(date);
             df = new SimpleDateFormat("dd/MM/yyyy");
-            String finalDate = df.format(sinceDate);
-            return finalDate;
+            return df.format(sinceDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -90,9 +89,8 @@ public class DateUtils {
 
     public static String getTime(String text){
         String t = text.substring(text.indexOf("T")+1,text.length());
-        String time = t.substring(0,5);
 
-        return time;
+        return t.substring(0,5);
     }
 
     public static String getCurrentTime() {
@@ -110,44 +108,37 @@ public class DateUtils {
         SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
         String newtime = sdfTime.format(new Date(System.currentTimeMillis()));
 
-        String finalString = newdate + "T" + newtime;
-
-        return finalString ;
+        return newdate + "T" + newtime;
     }
 
     public static String getYear(String time){
         String date = time.substring(0,time.lastIndexOf("T"));
-        String year = date.substring(0,date.indexOf("-"));
         //Log.w(TAG, "Year: " + year);
-        return year;
+        return date.substring(0,date.indexOf("-"));
     }
 
     public static String getMonth(String time){
         String date = time.substring(0,time.lastIndexOf("T"));
-        String month = date.substring(date.indexOf("-")+1,date.lastIndexOf("-"));
         //Log.w(TAG, "Month: " + month);
-        return month;
+        return date.substring(date.indexOf("-")+1,date.lastIndexOf("-"));
     }
 
     public static String getDay(String time){
         String date = time.substring(0,time.lastIndexOf("T"));
-        String day = date.substring(time.lastIndexOf("-")+1,date.length());
         //Log.w(TAG, "Day: " + day);
-        return day;
+        return date.substring(time.lastIndexOf("-")+1,date.length());
     }
 
     public static String getHour(String time){
         String t = time.substring(time.indexOf("T")+1,time.length());
-        String hour = t.substring(0,2);
         //Log.w(TAG, "Hour: " + hour);
-        return hour;
+        return t.substring(0,2);
     }
 
     public static String getMinute(String time){
         String t = time.substring(time.indexOf("T")+1,time.length());
-        String minute = t.substring(3,5);
         //Log.w(TAG, "Minute: " + minute);
-        return minute;
+        return t.substring(3,5);
 
     }
 

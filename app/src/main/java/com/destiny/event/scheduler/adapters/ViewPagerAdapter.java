@@ -8,12 +8,12 @@ import com.destiny.event.scheduler.fragments.NewEventsListFragment;
 import com.destiny.event.scheduler.fragments.ScheduledListFragment;
 import com.destiny.event.scheduler.fragments.ValidateListFragment;
 
-public class ViewPageAdapter extends FragmentStatePagerAdapter {
+public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     CharSequence titles[];
     int numOfTabs;
 
-    public ViewPageAdapter(FragmentManager fm, CharSequence titles[], int numOfTabs) {
+    public ViewPagerAdapter(FragmentManager fm, CharSequence titles[], int numOfTabs) {
         super(fm);
         this.titles = titles;
         this.numOfTabs = numOfTabs;

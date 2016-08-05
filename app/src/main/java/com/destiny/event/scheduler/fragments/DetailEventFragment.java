@@ -29,10 +29,7 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.DetailEventAdapter;
 import com.destiny.event.scheduler.data.EntryTable;
-import com.destiny.event.scheduler.data.EventTable;
-import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
@@ -68,6 +65,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private Calendar eventCalendar;
 
     private ArrayList<String> bungieIdList;
+    private ArrayList<EntryModel> entryList;
 
     View headerView;
     View includedView;
@@ -202,9 +200,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
         super.onViewCreated(view, savedInstanceState);
 
-        if (headerView != null && footerView != null){
+        entryList = new ArrayList<>();
+        detailAdapter = new DetailEventAdapter(getContext(), entryList, game.getMaxGuardians());
+        getListView().setAdapter(detailAdapter);
+
+        if (headerView != null){
             this.getListView().addHeaderView(headerView, null, false);
-            this.getListView().addFooterView(footerView);
         }
 
         getGameData();
@@ -331,12 +332,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        String bungieId = bungieIdList.get(position-1);
+        //String bungieId = bungieIdList.get(position-1);
 
         Fragment fragment = new MyNewProfileFragment();
 
         Bundle bundle = new Bundle();
-        bundle.putString("bungieId", bungieId);
+        bundle.putString("bungieId", entryList.get(position-1).getMembershipId());
         bundle.putInt("type", MyNewProfileFragment.TYPE_DETAIL);
 
         callback.loadNewFragment(fragment, bundle, "profile");
@@ -379,57 +380,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     public void onEntriesLoaded(List<EntryModel> entryList){
         Log.w(TAG, "entryList size: " + entryList.size());
-        setAdapter(entryList, maxGuardians);
+        this.entryList = (ArrayList<EntryModel>) entryList;
+        setAdapter(this.entryList, maxGuardians);
+        if (footerView != null){
+            this.getListView().addFooterView(footerView);
+        }
     }
-
-    private void prepareGameStrings() {
-
-        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID);
-        String c2 = GameTable.COLUMN_EVENT_ID;
-        String c6 = GameTable.COLUMN_CREATOR;
-        String c9 = GameTable.COLUMN_TIME;
-        String c10 = GameTable.COLUMN_LIGHT;
-        String c12 = GameTable.COLUMN_INSCRIPTIONS;
-        String c14 = GameTable.COLUMN_CREATOR_NAME;
-        String c3 = GameTable.COLUMN_STATUS;
-
-        String c4 = EventTable.COLUMN_ICON;
-        String c5 = EventTable.COLUMN_NAME;
-        String c11 = EventTable.COLUMN_GUARDIANS;
-        String c15 = EventTable.COLUMN_TYPE;
-
-        String c7 = MemberTable.COLUMN_MEMBERSHIP;
-        String c8 = MemberTable.COLUMN_NAME;
-
-        String c16 = EventTypeTable.COLUMN_ICON;
-        String c17 = EventTypeTable.COLUMN_NAME;
-
-        gameProjection = new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c14, c15, c16, c17};
-
-    }
-
-    private void prepareMemberStrings() {
-
-        String c1 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID);
-        String c2 = EntryTable.COLUMN_GAME;
-        String c3 = EntryTable.COLUMN_MEMBERSHIP;
-        String c4 = EntryTable.COLUMN_TIME;
-
-        String c5 = MemberTable.COLUMN_MEMBERSHIP;
-        String c6 = MemberTable.COLUMN_NAME;
-        String c7 = MemberTable.COLUMN_ICON;
-        String c8 = MemberTable.COLUMN_LIKES;
-        String c9 = MemberTable.COLUMN_DISLIKES;
-        String c10 = MemberTable.COLUMN_CREATED;
-        String c11 = MemberTable.COLUMN_PLAYED;
-
-        String c14 = MemberTable.COLUMN_EXP;
-        String c15 = MemberTable.COLUMN_TITLE;
-
-        membersProjection = new String[] {c1, c2, c3, c4, c5, c6, c14, c7, c8, c9, c10, c11, c15};
-
-    }
-
 
     @Override
     public void onAttach(Context context) {
@@ -539,14 +495,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private void setAdapter(List<EntryModel> entries, int max) {
         setListAdapter(null);
-        //adapter = new MembersAdapter(getContext(), R.layout.member_list_item_layout, null, from, to, 0, max);
         detailAdapter = new DetailEventAdapter(getContext(),entries, max);
-
-/*        if (headerView != null && footerView != null){
-            this.getListView().addHeaderView(headerView, null, false);
-            this.getListView().addFooterView(footerView);
-        }*/
-
         setListAdapter(detailAdapter);
     }
 

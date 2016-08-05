@@ -10,24 +10,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.models.CompleteMemberModel;
+import com.destiny.event.scheduler.models.EntryModel;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
 import java.util.List;
 
-public class SimpleMemberAdapter extends BaseAdapter {
+public class ValidationAdapter extends BaseAdapter {
 
-    private static final String TAG = "SimpleMemberAdapter";
+    private static final String TAG = "ValidationAdapter";
 
     private static final int TYPE_CREATOR = 0;
     private static final int TYPE_MEMBER = 1;
 
     private Context context;
-    private List<CompleteMemberModel> memberList;
+    private List<EntryModel> memberList;
     private LayoutInflater inflater;
 
-    public SimpleMemberAdapter(Context context, List<CompleteMemberModel> memberList){
+    public ValidationAdapter(Context context, List<EntryModel> memberList){
         this.context = context;
         this.memberList = memberList;
         inflater = LayoutInflater.from(context);
@@ -39,7 +39,7 @@ public class SimpleMemberAdapter extends BaseAdapter {
     }
 
     @Override
-    public CompleteMemberModel getItem(int position) {
+    public EntryModel getItem(int position) {
         return memberList.get(position);
     }
 
@@ -74,14 +74,14 @@ public class SimpleMemberAdapter extends BaseAdapter {
             vViewHolder = (ValidateViewHolder) convertView.getTag();
         }
 
-        CompleteMemberModel currentMember = getItem(position);
+        EntryModel currentMember = getItem(position);
 
         vViewHolder.memberName.setText(currentMember.getName());
         vViewHolder.memberTitle.setText(currentMember.getTitle());
         try {
-            vViewHolder.memberIcon.setImageBitmap(ImageUtils.loadImage(context, currentMember.getIconPath()));
+            vViewHolder.memberIcon.setImageBitmap(ImageUtils.loadImage(context,ImageUtils.getIconName(currentMember.getIconPath())));
         } catch (IOException e) {
-            Log.w(TAG, "Image not found!");
+            Log.w(TAG, "Image not found");
             e.printStackTrace();
         }
         vViewHolder.memberChecked = currentMember.isChecked();
