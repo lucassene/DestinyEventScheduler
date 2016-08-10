@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
+import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.models.EntryModel;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.utils.NetworkUtils;
@@ -77,6 +78,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_DELETE_GAME = 6;
     public static final int TYPE_NEW_GAMES = 7;
     public static final int TYPE_JOINED_GAMES = 8;
+    public static final int TYPE_HISTORY_GAMES = 9;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -211,6 +213,12 @@ public class ServerService extends IntentService {
                     sendError(receiver, error);
                 } else sendGameData(receiver, gameList);
                 break;
+            case TYPE_HISTORY_GAMES:
+                url = SERVER_BASE_URL + GAME_ENDPOINT + "?" + STATUS_PARAM + String.valueOf(GameTable.STATUS_VALIDATED);
+                error = requestServer(receiver, type, url, null);
+                if (error != NO_ERROR) {
+                    sendError(receiver, error);
+                } else sendGameData(receiver, gameList);
         }
         this.stopSelf();
 
@@ -263,6 +271,7 @@ public class ServerService extends IntentService {
                     case TYPE_GAME_ENTRIES:
                     case TYPE_NEW_GAMES:
                     case TYPE_JOINED_GAMES:
+                    case TYPE_HISTORY_GAMES:
                         urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
                         break;
                     case TYPE_JOIN_GAME:
@@ -289,6 +298,7 @@ public class ServerService extends IntentService {
                                 case TYPE_ALL_GAMES:
                                 case TYPE_NEW_GAMES:
                                 case TYPE_JOINED_GAMES:
+                                case TYPE_HISTORY_GAMES:
                                     error = parseGames(response);
                                     if (error != NO_ERROR){
                                         return error;

@@ -1,13 +1,8 @@
 package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,44 +10,38 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
-import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
-import com.destiny.event.scheduler.data.EventTable;
-import com.destiny.event.scheduler.data.EventTypeTable;
+import com.destiny.event.scheduler.adapters.GameAdapter;
 import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
-import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.interfaces.UserDataListener;
+import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.services.ServerService;
 
-public class HistoryListFragment extends Fragment implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+import java.io.Serializable;
+import java.util.List;
+
+public class HistoryListFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener{
 
     public static final String TAG = "HistoryListFragment";
-    public static final int STATUS_HISTORY = 99;
 
     Spinner filterSpinner;
-    ListView gamesList;
+    ListView listView;
     TextView emptyView;
     TextView sectionTitle;
-    TextView emptyText;
-
-    CustomCursorAdapter adapter;
-
-    private static final int LOADER_GAME = 60;
-
-    private static final int[] to = {R.id.primary_text, R.id.game_image, R.id.secondary_text, R.id.game_date, R.id.game_time, R.id.game_actual, R.id.game_max, R.id.type_text};
 
     private ToActivityListener callback;
 
-    private String[] projection;
-    private String[] from;
-
-    private int[] eventIdList;
-    private int eventId;
+    GameAdapter gameAdapter;
+    private List<GameModel> gameList;
+    private String[] typeList;
+    private String eventType;
 
     @Override
     public void onDetach() {
@@ -65,7 +54,14 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
         setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+        callback.registerUserDataListener(this);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onDestroy() {
+        callback.deleteUserDataListener(this);
+        super.onDestroy();
     }
 
     @Override
@@ -73,31 +69,44 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
         super.onPrepareOptionsMenu(menu);
         menu.clear();
         callback.setToolbarTitle(getString(R.string.history));
-        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
+        getActivity().getMenuInflater().inflate(R.menu.home_menu, menu);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.search_event_layout, container, false);
 
         filterSpinner = (Spinner) v.findViewById(R.id.search_spinner);
-        gamesList = (ListView) v.findViewById(R.id.search_list);
+        listView = (ListView) v.findViewById(R.id.search_list);
         emptyView = (TextView) v.findViewById(R.id.empty_label);
         sectionTitle = (TextView) v.findViewById(R.id.section_title);
-        emptyText = (TextView) v.findViewById(R.id.empty_label);
 
         sectionTitle.setText(R.string.matches_played);
-        emptyText.setText(R.string.no_event_all);
+        listView.setEmptyView(emptyView);
+        emptyView.setText(R.string.no_event_all);
 
-        eventIdList = getContext().getResources().getIntArray(R.array.type_ids);
+        typeList = getContext().getResources().getStringArray(R.array.type_ids);
 
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
-        gamesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gameList = callback.getGameList(GameTable.STATUS_VALIDATED);
+        if (savedInstanceState != null && savedInstanceState.containsKey("listView")){
+            gameList = (List<GameModel>) savedInstanceState.getSerializable("listView");
+            onGamesLoaded(gameList);
+            Log.w(TAG, "Game data already available");
+        } else if (gameList == null){
+            Log.w(TAG, "Getting game data...");
+            getGamesData();
+        } else {
+            onGamesLoaded(gameList);
+        }
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //callback.onGameSelected(String.valueOf(id), TAG, null, STATUS_HISTORY);
+                callback.onGameSelected(gameAdapter.getItem(position), TAG);
             }
         });
 
@@ -111,55 +120,12 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterSpinner.setOnItemSelectedListener(this);
         filterSpinner.setAdapter(spinnerAdapter);
-        //filterSpinner.setSelection(0);
-
-        eventId = eventIdList[0];
-        getGamesData();
-
     }
 
     private void getGamesData() {
-
-        prepareStrings();
-
-        initGameLoader();
-
-        adapter = new CustomCursorAdapter(getContext(), R.layout.game_list_item_layout, null, from, to, 0, LOADER_GAME);
-
-        gamesList.setAdapter(adapter);
-
-    }
-
-    private void initGameLoader(){
-        if (getLoaderManager().getLoader(LOADER_GAME) != null){
-            getLoaderManager().destroyLoader(LOADER_GAME);
-        }
-        getLoaderManager().restartLoader(LOADER_GAME, null, this);
-    }
-
-    private void prepareStrings() {
-
-        String c1 = GameTable.getQualifiedColumn(GameTable.COLUMN_ID); ;
-        String c2 = GameTable.COLUMN_EVENT_ID;
-        String c6 = GameTable.COLUMN_CREATOR;
-        String c9 = GameTable.COLUMN_TIME;
-        String c10 = GameTable.COLUMN_LIGHT;
-        String c12 = GameTable.COLUMN_INSCRIPTIONS;
-        String c14 = GameTable.COLUMN_CREATOR_NAME;
-        String c15 = GameTable.COLUMN_STATUS;
-
-        String c4 = EventTable.COLUMN_ICON;
-        String c5 = EventTable.COLUMN_NAME;
-        String c11 = EventTable.COLUMN_GUARDIANS;
-
-        String c8 = MemberTable.COLUMN_NAME;
-
-        String c17 = EventTypeTable.COLUMN_NAME;
-
-        projection = new String[] {c1, c2, c4, c5, c6, c8, c9, c10, c11, c12, c14, c15, c17};
-
-        from = new String[] {c5, c4, c14, c9, c9, c12, c11, c17};
-
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_HISTORY_GAMES);
+        callback.runServerService(bundle);
     }
 
     @Override
@@ -180,11 +146,23 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        eventId = eventIdList[position];
-        if (position == 0){
-            emptyText.setText(R.string.no_event_all);
-        } else emptyText.setText(R.string.no_event);
-        initGameLoader();
+        callback.setSpinnerSelection(DrawerActivity.TAG_SEARCH_EVENTS, position);
+        eventType = typeList[position];
+        filterGameList(eventType);
+    }
+
+    public void filterGameList(String filter){
+        if (filter != null){
+            if (filter.isEmpty()) filter = typeList[0];
+            if (gameAdapter != null) {
+                gameAdapter.getFilter().filter(filter, new Filter.FilterListener() {
+                    @Override
+                    public void onFilterComplete(int count) {
+                        listView.setAdapter(gameAdapter);
+                    }
+                });
+            }
+        }
     }
 
     @Override
@@ -193,53 +171,36 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public void onUserDataLoaded() {
 
-        //String where = GameTable.getQualifiedColumn(GameTable.COLUMN_STATUS) + "=" + GameTable.STATUS_NEW + " AND " + EventTypeTable.getAliasColumn(EventTypeTable.COLUMN_ID) + "=" + eventId;
-        String where = "(" + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED + ")";
-        if (eventId >0){
-            where = where + " AND " + EventTypeTable.getQualifiedColumn(EventTypeTable.COLUMN_ID + "=" + eventId);
-        }
-
-        callback.onLoadingData();
-
-        switch (id){
-            case LOADER_GAME:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.GAME_URI,
-                        projection,
-                        where,
-                        null,
-                        "datetime(" + GameTable.COLUMN_TIME + ") ASC"
-                );
-            default:
-                return null;
-        }
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
-
-        if (data != null && data.moveToFirst()){
-            switch (loader.getId()){
-                case LOADER_GAME:
-                    adapter.swapCursor(data);
-            }
-            callback.onDataLoaded();
-            emptyView.setVisibility(View.GONE);
+    public void onGamesLoaded(List<GameModel> gameList) {
+        Log.w(TAG, "SearchFragment onGamesLoaded called!");
+        if (gameAdapter == null) {
+            Log.w(TAG, "adapter estava null");
+            if (gameList != null){
+                listView.setAdapter(null);
+                this.gameList = gameList;
+                gameAdapter = new GameAdapter(getActivity(), gameList);
+                filterGameList(eventType);
+            } else Log.w(TAG, "listView null ou size 0");
         } else {
-            callback.onDataLoaded();
-            adapter.swapCursor(null);
-            emptyView.setVisibility(View.VISIBLE);
+            Log.w(TAG, "adapter já existia");
+            if (gameList!=null){
+                listView.setAdapter(null);
+                this.gameList = gameList;
+                filterGameList(eventType);
+                gameAdapter.setGameList(gameList);
+                gameAdapter.notifyDataSetChanged();
+            } else Log.w(TAG, "listView null");
         }
-
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("listView", (Serializable) gameList);
     }
 }

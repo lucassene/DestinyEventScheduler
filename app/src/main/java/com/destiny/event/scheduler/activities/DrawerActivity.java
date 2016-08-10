@@ -73,6 +73,7 @@ import com.destiny.event.scheduler.services.BungieService;
 import com.destiny.event.scheduler.services.RequestResultReceiver;
 import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.CookiesUtils;
+import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
@@ -118,6 +119,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private UserDataListener doneEventsListener;
     private UserDataListener searchEventsListener;
     private UserDataListener myEventsListener;
+    private UserDataListener validatedEventsListener;
 
     private FragmentTransaction ft;
     private FragmentManager fm;
@@ -161,6 +163,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     ArrayList<GameModel> doneGameList;
     ArrayList<GameModel> searchGameList;
     ArrayList<GameModel> joinedGameList;
+    ArrayList<GameModel> validatedGameList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -278,6 +281,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (openedFragment instanceof SearchFragment){
             bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_GAMES);
         }
+        if (openedFragment instanceof HistoryListFragment){
+            bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_HISTORY_GAMES);
+        }
         if (openedFragment == null){
             bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_ALL_GAMES);
         }
@@ -393,6 +399,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             scheduledGameList = getGamesFromList(allGameList, GameTable.STATUS_SCHEDULED);
             doneGameList = getGamesFromList(allGameList, GameTable.STATUS_DONE);
             searchGameList = getGamesFromList(allGameList, GameTable.STATUS_AVAILABLE);
+            validatedGameList = getGamesFromList(allGameList, GameTable.STATUS_VALIDATED);
         }
     }
 
@@ -592,6 +599,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (fragment instanceof MyEventsFragment){
             myEventsListener = (UserDataListener) fragment;
         }
+        if (fragment instanceof HistoryListFragment){
+            validatedEventsListener = (UserDataListener) fragment;
+        }
     }
 
     @Override
@@ -610,6 +620,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
         if (fragment instanceof MyEventsFragment){
             myEventsListener = null;
+        }
+        if (fragment instanceof HistoryListFragment){
+            validatedEventsListener = null;
         }
     }
 
@@ -691,6 +704,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 return searchGameList;
             case GameTable.STATUS_JOINED:
                 return joinedGameList;
+            case GameTable.STATUS_VALIDATED:
+                return validatedGameList;
             default:
                 return null;
         }
@@ -709,6 +724,31 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             Toast.makeText(this, getString(R.string.check_connection), Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    @Override
+    public void updateGame(GameModel game, int status) {
+        switch (status){
+            case GameTable.STATUS_NEW:
+                for (int i=0;i<newGameList.size();i++){
+                    if (game.getGameId() == newGameList.get(i).getGameId()){
+                        newGameList.remove(i);
+                        break;
+                    }
+                }
+                break;
+            case GameTable.STATUS_SCHEDULED:
+                for (int i=0;i<scheduledGameList.size();i++){
+                    if (scheduledGameList.get(i).getGameId() == game.getGameId()){
+                        game.setStatus(GameTable.STATUS_WAITING);
+                        doneGameList.add(game);
+                        Collections.sort(doneGameList, new GameComparator());
+                        scheduledGameList.remove(i);
+                        break;
+                    }
+                }
+                break;
+        }
     }
 
     public boolean openNewEventFragment(View child){
@@ -1182,6 +1222,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         myEventsListener.onGamesLoaded(joinedGameList);
                     }
                 }
+                if (openedFragment instanceof HistoryListFragment){
+                    if (validatedEventsListener != null){
+                        validatedGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
+                        validatedEventsListener.onGamesLoaded(validatedGameList);
+                    }
+                }
                 if (openedFragment instanceof DetailEventFragment){
                     if (resultData.containsKey(ServerService.REQUEST_TAG) && resultData.containsKey(ServerService.INT_TAG)){
                         switch (resultData.getInt(ServerService.REQUEST_TAG)){
@@ -1265,6 +1311,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             result.add(gList.get(i));
                         }
                     }
+                    Collections.sort(result, new GameComparator());
                     return result;
                 case GameTable.STATUS_SCHEDULED:
                     for (int i=0;i<gList.size();i++){
@@ -1279,6 +1326,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             result.add(gList.get(i));
                         }
                     }
+                    Collections.sort(result, new GameComparator());
+                    return result;
+                case GameTable.STATUS_VALIDATED:
+                    for (int i=0;i<gList.size();i++){
+                        if (gList.get(i).getStatus() == 2){
+                            result.add(gList.get(i));
+                        }
+                    }
+                    Collections.sort(result, new GameComparator());
                     return result;
                 default:
                     return null;
@@ -1309,7 +1365,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         @Override
         public int compare(GameModel game1, GameModel game2) {
-            return game1.getGameId() - game2.getGameId();
+            return (int) (DateUtils.stringToDate(game1.getTime()).getTimeInMillis() - DateUtils.stringToDate(game2.getTime()).getTimeInMillis());
         }
     }
 

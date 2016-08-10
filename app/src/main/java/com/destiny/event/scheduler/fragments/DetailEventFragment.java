@@ -59,12 +59,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private String origin;
     private int inscriptions;
     private int maxGuardians;
-    private String gameEventName;
-    private String gameEventTypeName;
-    private int gameEventIcon;
     private Calendar eventCalendar;
 
-    private ArrayList<String> bungieIdList;
     private ArrayList<EntryModel> entryList;
 
     View headerView;
@@ -136,25 +132,30 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         }
 
         if (game != null){
-            switch (game.getStatus()){
-                case GameTable.STATUS_NEW:
-                    if (game.isJoined()){
+            Calendar now = Calendar.getInstance();
+            if (DateUtils.stringToDate(game.getTime()).getTimeInMillis() > now.getTimeInMillis()){
+                switch (game.getStatus()){
+                    case GameTable.STATUS_NEW:
+                        if (game.isJoined()){
+                            if (game.getCreatorId().equals(callback.getBungieId())){
+                                joinButton.setText(R.string.delete);
+                            } else joinButton.setText(R.string.leave);
+                        } else joinButton.setText(R.string.join);
+                        break;
+                    case GameTable.STATUS_WAITING:
                         if (game.getCreatorId().equals(callback.getBungieId())){
-                            joinButton.setText(R.string.delete);
-                        } else joinButton.setText(R.string.leave);
-                    } else joinButton.setText(R.string.join);
-                    break;
-                case GameTable.STATUS_WAITING:
-                    if (game.getCreatorId().equals(callback.getBungieId())){
-                        joinButton.setText(R.string.validate);
-                    } else {
-                        joinButton.setText(R.string.waiting_validation);
-                        joinButton.setEnabled(false);
-                    }
-                    break;
-                case GameTable.STATUS_VALIDATED:
-                    joinButton.setText(R.string.evaluate);
-                    break;
+                            joinButton.setText(R.string.validate);
+                        } else {
+                            joinButton.setText(R.string.waiting_validation);
+                            joinButton.setEnabled(false);
+                        }
+                        break;
+                    case GameTable.STATUS_VALIDATED:
+                        joinButton.setText(R.string.evaluate);
+                        break;
+                }
+            } else {
+                showAlertDialog(MyAlertDialog.ALERT_DIALOG);
             }
         }
 
@@ -167,21 +168,26 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             public void onClick(View v) {
 
                 if (NetworkUtils.checkConnection(getContext())){
-                    switch (origin){
-                        case NewEventsListFragment.TAG:
-                            showAlertDialog(MyAlertDialog.JOIN_DIALOG);
-                            break;
-                        case ScheduledListFragment.TAG:
-                            if (game.getCreatorId().equals(callback.getBungieId())){
-                                showAlertDialog(MyAlertDialog.DELETE_DIALOG);
-                            } else showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
-                            break;
-                        case SearchFragment.TAG:
-                            showAlertDialog(MyAlertDialog.JOIN_DIALOG);
-                            break;
-                        case MyEventsFragment.TAG:
-                            showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
-                            break;
+                    Calendar now = Calendar.getInstance();
+                    if (DateUtils.stringToDate(game.getTime()).getTimeInMillis() > now.getTimeInMillis()){
+                        switch (origin){
+                            case NewEventsListFragment.TAG:
+                                showAlertDialog(MyAlertDialog.JOIN_DIALOG);
+                                break;
+                            case ScheduledListFragment.TAG:
+                                if (game.getCreatorId().equals(callback.getBungieId())){
+                                    showAlertDialog(MyAlertDialog.DELETE_DIALOG);
+                                } else showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
+                                break;
+                            case SearchFragment.TAG:
+                                showAlertDialog(MyAlertDialog.JOIN_DIALOG);
+                                break;
+                            case MyEventsFragment.TAG:
+                                showAlertDialog(MyAlertDialog.LEAVE_DIALOG);
+                                break;
+                        }
+                    } else {
+                        showAlertDialog(MyAlertDialog.ALERT_DIALOG);
                     }
                 } else {
                     Toast.makeText(getContext(), getString(R.string.check_connection), Toast.LENGTH_SHORT).show();
@@ -189,8 +195,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
             }
         });
-
-        bungieIdList = new ArrayList<>();
 
         return v;
     }
@@ -314,12 +318,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     }
 
-    public void onRequestSuccess(){
-        Log.w(TAG, "Request successful!");
-        callback.closeFragment();
-    }
-
     private void updateGame(ContentValues values, Uri uri) {
+
+        callback.updateGame(game, getStatus());
 
         values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING);
         getContext().getContentResolver().update(uri, values, null, null);
@@ -330,10 +331,14 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     }
 
+    private int getStatus() {
+        if (game.isJoined()) {
+            return GameTable.STATUS_SCHEDULED;
+        } else return GameTable.STATUS_NEW;
+    }
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        //String bungieId = bungieIdList.get(position-1);
-
         Fragment fragment = new MyNewProfileFragment();
 
         Bundle bundle = new Bundle();
@@ -368,10 +373,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             getMembers(game.getGameId());
         }
 
-
-
-        //prepareGameStrings();
-        //initGameLoader();
     }
 
     private void getMembers(int gameId) {
@@ -441,14 +442,16 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
             switch (notificationMethod){
                 case CREATE_NOTIFICATION:
-                    if (data == null || data.getCount()<=0){
-                        setAlarmNotification(getNotifyTime(), String.valueOf(game.getGameId()), gameEventName, gameEventTypeName, gameEventIcon);
+                    if (data.getCount()<=0){
+                        String icon = game.getEventIcon().substring(game.getEventIcon().lastIndexOf("/"+1,game.getEventIcon().length()));
+                        int eventIcon = getResources().getIdentifier(icon,"drawable",getContext().getPackageName());
+                        setAlarmNotification(getNotifyTime(), String.valueOf(game.getGameId()), game.getEventName(), game.getTypeName(), eventIcon);
                     } else{
                         Log.w(TAG, "Notification for this game already created!");
                     }
                     break;
                 case DELETE_NOTIFICATION:
-                    if (data!= null && data.getCount()>0){
+                    if (data.getCount()>0){
                         for (int i=0;i<data.getCount();i++){
                             String notificationId = data.getString(data.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
                             Uri uri = Uri.parse(DataProvider.NOTIFICATION_URI + "/" + notificationId);
@@ -464,7 +467,20 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         }
 
         callback.onDataLoaded();
+        checkIfCloses(1);
 
+    }
+
+    private void checkIfCloses(final int onCloseDemanded) {
+        if (onCloseDemanded == 1){
+            Handler handler = new Handler(){
+                @Override
+                public void handleMessage(Message msg){
+                    if (msg.what == 1) callback.closeFragment();
+                }
+            };
+            handler.sendEmptyMessage(onCloseDemanded);
+        }
     }
 
     private void dialogThread() {

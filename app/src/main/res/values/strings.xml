@@ -476,7 +476,7 @@
     <string name="my_clan">MY CLAN</string>
     <string name="waiting_data">WAITING DATA</string>
     <string name="oops" translatable="false">Oops!</string>
-    <string name="event_happened">Looks like this event already happen, my bad Guardian.</string>
+    <string name="event_happened">Looks like this event already happen.</string>
     <string name="level_up">Level up!</string>
     <string name="level_msg_1">"You achieved level "</string>
     <string name="title_msg">"And become "</string>
