@@ -1,8 +1,6 @@
 package com.destiny.event.scheduler.fragments;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
@@ -23,14 +21,14 @@ import android.widget.Toast;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.ValidationAdapter;
-import com.destiny.event.scheduler.data.EvaluationTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.models.EntryModel;
+import com.destiny.event.scheduler.models.EvaluationModel;
 import com.destiny.event.scheduler.models.GameModel;
-import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
@@ -47,7 +45,6 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     private static final int TYPE_OK = 3;
     private static final int TYPE_DELETE = 4;
 
-    private int selectedType;
     private String origin;
 
     private List<EntryModel> memberList;
@@ -75,15 +72,15 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
 
     int status;
 
-    int actualUserLevel;
-    String actualTitle;
-
     private static final int STATUS_WAITING_CREATOR = 1;
     private static final int STATUS_WAITING = 0;
     private static final int STATUS_VALIDATED = 2;
     private static final int STATUS_EVALUATED = 3;
 
-    ArrayList<String> evalMemberList;
+    ArrayList<String> validatedEntryList;
+    ArrayList<EvaluationModel> evaluationList;
+
+    int selectedType;
 
     GameModel game;
 
@@ -332,7 +329,6 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-
         switch (status){
             case STATUS_WAITING_CREATOR:
                 changeListItem(v, position, status);
@@ -347,7 +343,6 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
                 callProfileFragment(position);
                 break;
         }
-
     }
 
     private void callProfileFragment(int position) {
@@ -478,130 +473,77 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     @Override
     public void onPositiveClick(String input, int type) {
 
-        /*ContentValues values = new ContentValues();
-        String uriString = DataProvider.GAME_URI + "/" + game.getGameId();
-        Uri uri = Uri.parse(uriString);
-
         switch (selectedType){
             case TYPE_DELETE:
-                deleteGame(uri);
+                deleteGame();
                 break;
             case TYPE_NO_EVALUATIONS:
                 if (status == STATUS_WAITING_CREATOR){
-                    validateGame(values, uri);
-                    evaluateGame(values, uri);
-                } else evaluateGame(values, uri);
+                    validateGame();
+                } else evaluateGame();
                 break;
             case TYPE_OK:
                 if (status == STATUS_WAITING_CREATOR){
-                    validateGame(values, uri);
-                    evaluateGame(values, uri);
-                } else evaluateGame(values, uri);
+                    validateGame();
+                } else evaluateGame();
                 break;
             case TYPE_ONLY_CREATOR:
-                deleteGame(uri);
+                deleteGame();
                 break;
         }
 
-        values.clear();*/
-
     }
 
-    private void evaluateGame(ContentValues values, Uri uri) {
-
+    private void evaluateGame() {
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_EVALUATE_GAME);
+        evaluationList = new ArrayList<>();
         for (int i=0;i<memberList.size();i++){
-            //Log.w(TAG, "Membro " + memberList.get(i).getName() + " está vai entrar no loop de avaliação...");
-            if (!memberList.get(i).getMembershipId().equals(callback.getBungieId())){
-                values.put(EvaluationTable.COLUMN_GAME, game.getGameId());
-                values.put(EvaluationTable.COLUMN_MEMBERSHIP_A, callback.getBungieId());
-                values.put(EvaluationTable.COLUMN_MEMBERSHIP_B, memberList.get(i).getMembershipId());
-                values.put(EvaluationTable.COLUMN_EVALUATION, memberList.get(i).getRating());
-                getContext().getContentResolver().insert(DataProvider.EVALUATION_URI, values);
-                values.clear();
-                    //Log.w(TAG, "Membro " + memberList.get(i).getName() + " foi avaliado em " + memberList.get(i).getRating());
-            } //else Log.w(TAG, "Membro " + memberList.get(i).getName() + " não foi avaliado pois é o criador da partida");
-        }
-        callback.closeFragment();
-
-    }
-
-    /*private void validateGame(ContentValues values, Uri uri) {
-
-        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_EVALUATED); //inserir STATUS_VALIDATED no servidor
-        getContext().getContentResolver().update(uri, values, null, null);
-
-        for (int i=0; i<memberList.size(); i++) {
-            //Log.w(TAG, "Membro " + memberList.get(i).getName() + " está marcado como " + memberList.get(i).isChecked());
-            if (!memberList.get(i).isChecked()) {
-                String selection = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID) + "=" + memberList.get(i).getEntryId();
-                getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
-                //Log.w(TAG, "Membro " + memberList.get(i).getName() + " foi removido!");
-                memberList.remove(i);
-                game.setInscriptions(game.getInscriptions()-1);
-                i--;
-            } else {
-                //Log.w(TAG, "Membro " + memberList.get(i).getName() + " terá seus status atualizados...");
-                updateMemberStatuses(i);
+            if (memberList.get(i).isChecked() && !memberList.get(i).getMembershipId().equals(callback.getBungieId())){
+                Log.w(TAG, "memberB: " + memberList.get(i).getMembershipId() + " rate: " + memberList.get(i).getRating());
+                EvaluationModel eval = new EvaluationModel();
+                eval.setMembershipId(memberList.get(i).getMembershipId());
+                eval.setRate(memberList.get(i).getRating());
+                evaluationList.add(eval);
             }
         }
+        bundle.putParcelableArrayList(ServerService.EVALUATIONS_TAG, evaluationList);
+        callback.runServerService(bundle);
+    }
 
-        Intent intent = new Intent(getContext(),TitleService.class);
-        ArrayList<String> memberIdList = new ArrayList<>();
+    private void validateGame() {
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_VALIDATE_GAME);
+
+        validatedEntryList = new ArrayList<>();
+        evaluationList = new ArrayList<>();
         for (int i=0;i<memberList.size();i++){
-            memberIdList.add(memberList.get(i).getMembershipId());
+            if (memberList.get(i).isChecked()){
+                validatedEntryList.add(memberList.get(i).getMembershipId());
+                if (!memberList.get(i).getMembershipId().equals(callback.getBungieId())){
+                    Log.w(TAG, "memberB: " + memberList.get(i).getMembershipId() + " rate: " + memberList.get(i).getRating());
+                    EvaluationModel eval = new EvaluationModel();
+                    eval.setMembershipId(memberList.get(i).getMembershipId());
+                    eval.setRate(memberList.get(i).getRating());
+                    evaluationList.add(eval);
+                }
+            }
         }
-        intent.putStringArrayListExtra("membershipList",memberIdList);
-        getContext().startService(intent);
+        Log.w(TAG, "validatedEntryList size: " + validatedEntryList.size());
 
-        Intent levelIntent = new Intent(getContext(), LevelCheckService.class);
-        //Log.w(TAG, "actualTitle: " + actualTitle);
-        levelIntent.putExtra("level", actualUserLevel);
-        levelIntent.putExtra("title", actualTitle);
-        getContext().startService(levelIntent);
-
-        values.clear();
-
+        bundle.putStringArrayList(ServerService.ENTRY_TAG, validatedEntryList);
+        bundle.putParcelableArrayList(ServerService.EVALUATIONS_TAG, evaluationList);
+        callback.runServerService(bundle);
     }
 
-    private void updateMemberStatuses(int position) {
-
-        ContentValues memberValues = new ContentValues();
-
-        switch (memberList.get(position).getRating()){
-            case -1:
-                int newValue = memberList.get(position).getDislikes() + 1;
-                memberValues.put(MemberTable.COLUMN_DISLIKES,newValue);
-                //Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Dislikes atualizado de " + memberList.get(position).getDislikes() + " para " + newValue);
-                break;
-            case 1:
-                newValue = memberList.get(position).getLikes() + 1;
-                memberValues.put(MemberTable.COLUMN_LIKES,newValue);
-                //Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Likes atualizado de " + memberList.get(position).getLikes() + " para " + newValue);
-                break;
-        }
-
-        if (memberList.get(position).getMembershipId().equals(callback.getBungieId())){
-            int newValue = memberList.get(position).getGamesCreated() + 1;
-            memberValues.put(MemberTable.COLUMN_CREATED,newValue);
-            //Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Created atualizado de " + memberList.get(position).getGamesCreated() + " para " + newValue);
-        } else {
-            int newValue = memberList.get(position).getGamesPlayed() + 1;
-            memberValues.put(MemberTable.COLUMN_PLAYED, newValue);
-            //Log.w(TAG, "Membro " + memberList.get(position).getName() + " teve seu campo Played atualizado de " + memberList.get(position).getGamesPlayed() + " para " + newValue);
-        }
-
-        String where = MemberTable.COLUMN_MEMBERSHIP + "=" + memberList.get(position).getMembershipId();
-        getContext().getContentResolver().update(DataProvider.MEMBER_URI, memberValues, where, null);
-        memberValues.clear();
-
+    private void deleteGame() {
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_DELETE_GAME);
+        callback.runServerService(bundle);
     }
-
-    private void deleteGame(Uri uri) {
-        getContext().getContentResolver().delete(uri, null, null);
-        String selection = GameTable.getQualifiedColumn(GameTable.COLUMN_ID) + "=" + game.getGameId();
-        getContext().getContentResolver().delete(DataProvider.GAME_URI, selection, null);
-        callback.closeFragment();
-    }*/
 
     @Override
     public void onDateSent(Calendar date) {

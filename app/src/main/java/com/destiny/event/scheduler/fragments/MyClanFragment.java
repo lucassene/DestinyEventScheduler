@@ -3,8 +3,6 @@ package com.destiny.event.scheduler.fragments;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -25,6 +23,7 @@ import android.widget.TextView;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
+import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
@@ -38,6 +37,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     private static final String TAG = "MyClanFragment";
 
     private static final int LOADER_MEMBERS = 50;
+    private static final int LOADER_CLAN = 40;
 
     //private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE + " ASC";
     private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME + " COLLATE NOCASE ASC";
@@ -206,6 +206,15 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
                         null,
                         orderBy
                 );
+            case LOADER_CLAN:
+                return new CursorLoader(
+                        getContext(),
+                        DataProvider.CLAN_URI,
+                        ClanTable.ALL_COLUMNS,
+                        null,
+                        null,
+                        null
+                );
             default:
                 return null;
         }
@@ -223,6 +232,18 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
                     }
                     adapter.swapCursor(data);
                     break;
+                case LOADER_CLAN:
+                    clanNameTxt.setText(data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_NAME)));
+                    clanDesc.setText(data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_DESC)));
+                    Log.w(TAG, "clanDesc: " + clanDesc.getText());
+                    try {
+                        clanLogo.setImageBitmap(ImageUtils.loadImage(getContext(),data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_ICON))));
+                        clanBanner.setImageBitmap(ImageUtils.loadImage(getContext(), data.getString(data.getColumnIndexOrThrow(ClanTable.COLUMN_BACKGROUND))));
+                    } catch (IOException e){
+                        Log.w(TAG, "Clan Logo not found");
+                        e.printStackTrace();
+                    }
+                    break;
             }
         }
         callback.onDataLoaded();
@@ -230,7 +251,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+        //adapter.swapCursor(null);
         Log.w("MyClan Loader: ", "O Loader entrou no método onLoaderReset");
 
     }
@@ -266,11 +287,22 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
     }
 
+    private void initClanLoader(){
+        callback.onLoadingData();
+        Log.w(TAG, "Inicializing ClanLoader...");
+        if (getLoaderManager().getLoader(LOADER_CLAN) != null){
+            getLoaderManager().destroyLoader(LOADER_CLAN);
+        }
+        getLoaderManager().restartLoader(LOADER_CLAN, null, this);
+    }
+
+
     public ArrayList<String> getBungieIdList(){
         return bungieIdList;
     }
 
     public void refreshData(){
+        initClanLoader();
         adapter.notifyDataSetChanged();
     }
 

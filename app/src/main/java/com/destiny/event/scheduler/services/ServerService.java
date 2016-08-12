@@ -12,6 +12,7 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.models.EntryModel;
+import com.destiny.event.scheduler.models.EvaluationModel;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
@@ -40,6 +41,8 @@ public class ServerService extends IntentService {
     private static final String ENTRIES_ENDPOINT = "/entries";
     private static final String JOIN_ENDPOINT = "/join";
     private static final String LEAVE_ENDPOINT = "/leave";
+    private static final String VALIDATE_ENDPOINT = "/validate";
+    private static final String EVALUATION_ENDPOINT = "/evaluations/";
 
     private static final String STATUS_PARAM = "status=";
     private static final String JOINED_PARAM = "joined=";
@@ -65,6 +68,7 @@ public class ServerService extends IntentService {
     public static final String GAME_TAG = "gameList";
     public static final String GAMEID_TAG = "gameId";
     public static final String ENTRY_TAG = "entries";
+    public static final String EVALUATIONS_TAG = "evaluations";
 
     public static final int STATUS_RUNNING = 0;
     public static final int STATUS_FINISHED = 210;
@@ -79,6 +83,8 @@ public class ServerService extends IntentService {
     public static final int TYPE_NEW_GAMES = 7;
     public static final int TYPE_JOINED_GAMES = 8;
     public static final int TYPE_HISTORY_GAMES = 9;
+    public static final int TYPE_VALIDATE_GAME = 10;
+    public static final int TYPE_EVALUATE_GAME = 11;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -175,7 +181,7 @@ public class ServerService extends IntentService {
                     if (error != NO_ERROR){
                         sendError(receiver, error);
                     } else sendIdWithType(receiver, intent.getIntExtra(GAMEID_TAG, -1), TYPE_JOIN_GAME);
-                }
+                } else sendError(receiver, ERROR_INCORRECT_REQUEST);
                 break;
             case TYPE_LEAVE_GAME:
                 if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
@@ -219,6 +225,32 @@ public class ServerService extends IntentService {
                 if (error != NO_ERROR) {
                     sendError(receiver, error);
                 } else sendGameData(receiver, gameList);
+                break;
+            case TYPE_VALIDATE_GAME:
+                if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
+                    url = SERVER_BASE_URL + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1) + VALIDATE_ENDPOINT;
+                    bundle.clear();
+                    bundle.putInt(GAMEID_TAG, intent.getIntExtra(GAMEID_TAG, -1));
+                    bundle.putStringArrayList(ENTRY_TAG, intent.getStringArrayListExtra(ENTRY_TAG));
+                    bundle.putParcelableArrayList(EVALUATIONS_TAG, intent.getParcelableArrayListExtra(EVALUATIONS_TAG));
+                    error = requestServer(receiver, type, url, bundle);
+                    if (error != NO_ERROR){
+                        sendError(receiver, error);
+                    } else sendIdWithType(receiver, intent.getIntExtra(GAMEID_TAG, -1), TYPE_VALIDATE_GAME);
+                } else sendError(receiver, ERROR_INCORRECT_REQUEST);
+                break;
+            case TYPE_EVALUATE_GAME:
+                if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
+                    url = SERVER_BASE_URL + EVALUATION_ENDPOINT + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1);
+                    bundle.clear();
+                    bundle.putInt(GAMEID_TAG, intent.getIntExtra(GAMEID_TAG, -1));
+                    bundle.putParcelableArrayList(EVALUATIONS_TAG, intent.getParcelableArrayListExtra(EVALUATIONS_TAG));
+                    error = requestServer(receiver, type, url, bundle);
+                    if (error != NO_ERROR){
+                        sendError(receiver, error);
+                    } else sendIdWithType(receiver, intent.getIntExtra(GAMEID_TAG, -1), TYPE_VALIDATE_GAME);
+                } else sendError(receiver, ERROR_INCORRECT_REQUEST);
+                break;
         }
         this.stopSelf();
 
@@ -250,6 +282,7 @@ public class ServerService extends IntentService {
     }
 
     private void sendError(ResultReceiver receiver, int error) {
+        Log.w(TAG, "Error: " + error);
         Bundle bundle = new Bundle();
         bundle.clear();
         bundle.putInt(ERROR_TAG, error);
@@ -257,6 +290,7 @@ public class ServerService extends IntentService {
     }
 
     private int requestServer(ResultReceiver receiver, int type, String url, Bundle bundle) {
+        Log.w(TAG, "URL: " + url);
         receiver.send(STATUS_RUNNING, Bundle.EMPTY);
         try {
             if (NetworkUtils.checkConnection(getApplicationContext())){
@@ -265,7 +299,7 @@ public class ServerService extends IntentService {
 
                 switch (type){
                     case TYPE_CREATE_GAME:
-                        urlConnection = setCreateGameCall(urlConnection, bundle);
+                        urlConnection = createGameRequest(urlConnection, bundle);
                         break;
                     case TYPE_ALL_GAMES:
                     case TYPE_GAME_ENTRIES:
@@ -281,9 +315,18 @@ public class ServerService extends IntentService {
                     case TYPE_DELETE_GAME:
                         urlConnection = getDefaultHeaders(urlConnection, DELETE_METHOD);
                         break;
+                    case TYPE_VALIDATE_GAME:
+                        urlConnection = createValidateRequest(urlConnection, bundle);
+                        break;
+                    case TYPE_EVALUATE_GAME:
+                        urlConnection = createEvaluationRequest(urlConnection, bundle);
+                        break;
                 }
 
-                int statusCode = urlConnection.getResponseCode();
+                int statusCode;
+                if (urlConnection != null){
+                    statusCode = urlConnection.getResponseCode();
+                } else return ERROR_JSON;
 
                 if (statusCode == 200) {
                     int error = NO_ERROR;
@@ -307,13 +350,11 @@ public class ServerService extends IntentService {
                                     error = parseEntries(response);
                                     return error;
                                 case TYPE_JOIN_GAME:
-                                    Log.w(TAG, "joinGame response: " + response);
-                                    return error;
                                 case TYPE_LEAVE_GAME:
-                                    Log.w(TAG, "leaveGame response: " + response);
-                                    return error;
                                 case TYPE_DELETE_GAME:
-                                    Log.w(TAG, "deleteGame response:" + response);
+                                case TYPE_VALIDATE_GAME:
+                                case TYPE_EVALUATE_GAME:
+                                    Log.w(TAG, "Response: " + response);
                                     return error;
                                 default:
                                     return NO_ERROR;
@@ -403,7 +444,7 @@ public class ServerService extends IntentService {
         return joined.equals("true");
     }
 
-    private HttpURLConnection setCreateGameCall(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
+    private HttpURLConnection createGameRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
         urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -413,6 +454,38 @@ public class ServerService extends IntentService {
         OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
         writer.write(gameJSON.toString());
         writer.flush();
+
+        return urlConnection;
+    }
+
+    private HttpURLConnection createValidateRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
+        urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
+        urlConnection.setDoOutput(true);
+        urlConnection.setRequestProperty("Content-Type", "application/json");
+        urlConnection.setRequestProperty("Accept", "application/json");
+
+        JSONObject validateJSON = createValidateJSON(bundle);
+        if (validateJSON != null){
+            OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+            writer.write(validateJSON.toString());
+            writer.flush();
+        } else return null;
+
+        return urlConnection;
+    }
+
+    private HttpURLConnection createEvaluationRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
+        urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
+        urlConnection.setDoOutput(true);
+        urlConnection.setRequestProperty("Content-Type", "application/json");
+        urlConnection.setRequestProperty("Accept", "application/json");
+
+        JSONArray evaluationJSON = createEvaluationJSON(bundle);
+        if (evaluationJSON != null){
+            OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+            writer.write(evaluationJSON.toString());
+            writer.flush();
+        } else return null;
 
         return urlConnection;
     }
@@ -434,6 +507,50 @@ public class ServerService extends IntentService {
         json.put("light",minLight);
         json.put("status",0);
         Log.w(TAG, "GameJSON: " + json.toString());
+        return json;
+    }
+
+    private JSONObject createValidateJSON(Bundle bundle) throws JSONException {
+        JSONObject json = new JSONObject();
+
+        JSONArray jEntriesArray = new JSONArray();
+        ArrayList<String> entriesList = bundle.getStringArrayList(ENTRY_TAG);
+        if (entriesList != null){
+            for (int i=0;i<entriesList.size();i++){
+                jEntriesArray.put(Long.valueOf(entriesList.get(i)));
+            }
+        } else return null;
+
+        JSONArray jEvalArray = new JSONArray();
+        ArrayList<EvaluationModel> evalList = bundle.getParcelableArrayList(EVALUATIONS_TAG);
+        if (evalList != null){
+            for (int i=0;i<evalList.size();i++){
+                JSONObject jEvalObject = new JSONObject();
+                jEvalObject.put("memberB",Long.valueOf(evalList.get(i).getMembershipId()));
+                jEvalObject.put("rate",evalList.get(i).getRate());
+                jEvalArray.put(jEvalObject);
+            }
+        }
+
+        json.put("entries", jEntriesArray);
+        json.put("evaluations", jEvalArray);
+        Log.w(TAG, "ValidateJSON: " + json.toString());
+        return json;
+    }
+
+
+    private JSONArray createEvaluationJSON(Bundle bundle) throws JSONException {
+        JSONArray json = new JSONArray();
+        ArrayList<EvaluationModel> evalList = bundle.getParcelableArrayList(EVALUATIONS_TAG);
+        if (evalList != null){
+            for (int i=0;i<evalList.size();i++){
+                JSONObject jEvalObject = new JSONObject();
+                jEvalObject.put("memberB",Long.valueOf(evalList.get(i).getMembershipId()));
+                jEvalObject.put("rate",evalList.get(i).getRate());
+                json.put(jEvalObject);
+            }
+        }
+        Log.w(TAG, "EvaluationJSON: " + json.toString());
         return json;
     }
 

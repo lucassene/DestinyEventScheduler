@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -258,6 +259,7 @@ public class BungieService extends IntentService {
 
                 urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
                 urlConnection.setRequestMethod(GET_METHOD);
+                //urlConnection.setRequestProperty("Content-Type", "application/json;charset=ISO-8859-1");
 
                 int statusCode = urlConnection.getResponseCode();
 
@@ -265,15 +267,21 @@ public class BungieService extends IntentService {
                     InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     String response = convertInputStreamToString(inputStream);
 
+                    //Log.w(TAG, "getGroup response: " + response );
+
                     if (response != null){
                         try {
                             JSONObject jO = new JSONObject(response);
+                            Log.w(TAG, "getGroup response: " + jO.toString());
                             JSONObject jResponse = jO.getJSONObject("Response");
                             JSONObject jDetail = jResponse.getJSONObject("detail");
                             clanId = jDetail.getString("groupId");
                             clanName = jDetail.getString("name");
                             motto = jDetail.getString("motto");
+                            motto = UTF8toISO(motto);
+                            //motto = URLEncoder.encode(motto, "UTF-8");
                             clanBanner = jDetail.getString("bannerPath");
+                            Log.w(TAG, "clanDesc: " + motto);
                             clanIcon = jDetail.getString("avatarPath");
 
                             Cursor cursor = null;
@@ -573,7 +581,7 @@ public class BungieService extends IntentService {
                 if (statusCode == 200){
                     InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     String response = convertInputStreamToString(inputStream);
-                    //Log.w(TAG, "getMembersOfClan: " + response);
+                    Log.w(TAG, "getMembersOfClan: " + response);
 
                     if (response != null){
                         ArrayList<String> memberList = new ArrayList<>();
@@ -679,8 +687,10 @@ public class BungieService extends IntentService {
                 urlConnection.setDoOutput(true);
                 JSONArray jsonList = createJSONMemberList(memberList);
                 urlConnection.setRequestMethod(POST_METHOD);
-                urlConnection.setRequestProperty("Content-Type", "application/json");
-                urlConnection.setRequestProperty("Accept", "application/json");
+                urlConnection.setRequestProperty("Accept-Charset", "ISO-8859-1");
+                urlConnection.setRequestProperty("Accept-Language", "ISO-8859-1");
+                urlConnection.setRequestProperty("Content-Type", "application/json;charset=ISO-8859-1");
+                urlConnection.setRequestProperty("Accept", "application/json;charset=ISO-8859-1");
 
                 OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
                 writer.write(jsonList.toString());
@@ -817,7 +827,7 @@ public class BungieService extends IntentService {
 
     private String convertInputStreamToString(InputStream inputStream) throws IOException {
 
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         String line;
         String result = "";
 
@@ -827,7 +837,24 @@ public class BungieService extends IntentService {
 
         inputStream.close();
 
+        //result = URLDecoder.decode(result, "ISO-8859-1");
+        //result = Html.fromHtml(result);
+        result = new String(result.getBytes("ISO-8859-1"),"UTF-8");
+
         return result;
+    }
+
+    public static String UTF8toISO( String str )
+    {
+        try
+        {
+            return new String( str.getBytes( "ISO-8859-1" ), "UTF-8" );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            e.printStackTrace();
+        }
+        return str;
     }
 
     private void insertFakeEvents(ResultReceiver receiver) {

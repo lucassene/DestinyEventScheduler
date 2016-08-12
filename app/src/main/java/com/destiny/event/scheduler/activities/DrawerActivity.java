@@ -685,6 +685,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             if (bundle.containsKey(ServerService.TIME_TAG)) intent.putExtra(ServerService.TIME_TAG, bundle.getString(ServerService.TIME_TAG));
             if (bundle.containsKey(ServerService.LIGHT_TAG)) intent.putExtra(ServerService.LIGHT_TAG, bundle.getInt(ServerService.LIGHT_TAG));
             if (bundle.containsKey(ServerService.GAMEID_TAG)) intent.putExtra(ServerService.GAMEID_TAG, bundle.getInt(ServerService.GAMEID_TAG));
+            if (bundle.containsKey(ServerService.ENTRY_TAG)) intent.putStringArrayListExtra(ServerService.ENTRY_TAG, bundle.getStringArrayList(ServerService.ENTRY_TAG));
+            if (bundle.containsKey(ServerService.EVALUATIONS_TAG)) intent.putParcelableArrayListExtra(ServerService.EVALUATIONS_TAG, bundle.getParcelableArrayList(ServerService.EVALUATIONS_TAG));
 
             startService(intent);
             //}
@@ -1167,8 +1169,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     MyClanFragment frag = (MyClanFragment) openedFragment;
                     frag.refreshData();
                 }
-                Toast.makeText(this, R.string.clan_updated, Toast.LENGTH_SHORT).show();
-                onDataLoaded();
+                //Toast.makeText(this, R.string.clan_updated, Toast.LENGTH_SHORT).show();
+                //onDataLoaded();
                 break;
             case BungieService.STATUS_ERROR:
                 Log.w(TAG, "Error on BungieService");
@@ -1271,8 +1273,23 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     }
                 }
                 if (openedFragment instanceof DetailValidationFragment){
-                    DetailValidationFragment frag = (DetailValidationFragment) openedFragment;
-                    frag.onEntriesLoaded((List<EntryModel>) resultData.getSerializable(ServerService.ENTRY_TAG));
+                    if (resultData.containsKey(ServerService.REQUEST_TAG) && resultData.containsKey(ServerService.INT_TAG)) {
+                        switch (resultData.getInt(ServerService.REQUEST_TAG)){
+                            case ServerService.TYPE_VALIDATE_GAME:
+                            case ServerService.TYPE_DELETE_GAME:
+                            case ServerService.TYPE_EVALUATE_GAME:
+                                for(int i=0;i<doneGameList.size();i++){
+                                    if (doneGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)){
+                                        doneGameList.remove(i);
+                                    }
+                                }
+                                break;
+                        }
+                        closeFragment();
+                    } else {
+                        DetailValidationFragment frag = (DetailValidationFragment) openedFragment;
+                        frag.onEntriesLoaded((List<EntryModel>) resultData.getSerializable(ServerService.ENTRY_TAG));
+                    }
                 }
                 if (openedFragment == null){
                     allGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
