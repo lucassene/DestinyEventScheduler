@@ -185,7 +185,7 @@ public class DBViewerFragment extends Fragment implements LoaderManager.LoaderCa
                 selectedTable = NotificationTable.TABLE_NAME;
                 selectedLoader = NOTIFICATION;
                 selectedUri = DataProvider.NOTIFICATION_URI;
-                to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5, R.id.txt6};
+                to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5, R.id.txt6, R.id.txt7};
                 projection = NotificationTable.ALL_COLUMNS;
                 break;
             case 8:

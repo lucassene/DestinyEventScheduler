@@ -13,20 +13,23 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.destiny.event.scheduler.activities.DrawerActivity;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.NotificationTable;
+import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.NotificationModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class UpdateNotificationsService extends IntentService {
 
     private static final String TAG = "UpdateNotifyService";
 
     public static final String NOTIFY_RUNNING = "updateNotify";
+
+    public static final String GAME_HEADER = "gameList";
 
     private ArrayList<NotificationModel> notificationList;
 
@@ -37,6 +40,7 @@ public class UpdateNotificationsService extends IntentService {
         super(UpdateNotificationsService.class.getName());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void onHandleIntent(Intent intent) {
 
@@ -45,19 +49,20 @@ public class UpdateNotificationsService extends IntentService {
 
         previousTime = intent.getIntExtra("previousTime",15);
         previousCheck = intent.getBooleanExtra("previousCheck",true);
+        List<GameModel> gameList = (List<GameModel>) intent.getSerializableExtra(GAME_HEADER);
         Log.w(TAG, "previousCheck: " + previousCheck);
 
-        String[] projection = {NotificationTable.getQualifiedColumn(NotificationTable.COLUMN_ID), NotificationTable.COLUMN_GAME, NotificationTable.COLUMN_TIME, NotificationTable.COLUMN_TYPE, NotificationTable.COLUMN_EVENT, NotificationTable.COLUMN_ICON, GameTable.COLUMN_TIME};
+        //String[] projection = {NotificationTable.getQualifiedColumn(NotificationTable.COLUMN_ID), NotificationTable.COLUMN_GAME, NotificationTable.COLUMN_TIME, NotificationTable.COLUMN_TYPE, NotificationTable.COLUMN_EVENT, NotificationTable.COLUMN_ICON, GameTable.COLUMN_TIME};
 
         try {
-            cursor = getContentResolver().query(DataProvider.NOTIFICATION_GAMES_URI, projection, null, null, NotificationTable.COLUMN_TIME + " ASC");
+            cursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, null, null, NotificationTable.COLUMN_TIME + " ASC");
             if (cursor != null && cursor.moveToFirst()){
                 Log.w(TAG, DatabaseUtils.dumpCursorToString(cursor));
                 for (int i=0;i<cursor.getCount();i++){
                     int nId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
                     int gId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME));
                     String nDate = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TIME));
-                    String gDate = cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME));
+                    String gDate = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME_TIME));
                     Log.w(TAG, nId + " | " + gId + " | " + nDate + " | " + gDate );
                     NotificationModel notification = new NotificationModel();
                     notification.setNotificationId(nId);
@@ -140,6 +145,7 @@ public class UpdateNotificationsService extends IntentService {
                     values.put(NotificationTable.COLUMN_ICON, notificationList.get(i).getIcon());
                     String notifyDate = DateUtils.calendarToString(c);
                     values.put(NotificationTable.COLUMN_TIME, notifyDate);
+                    values.put(NotificationTable.COLUMN_GAME_TIME, notificationList.get(i).getGameTime());
                     Uri inserted = getContentResolver().insert(DataProvider.NOTIFICATION_URI,values);
                     if (inserted != null){
                         Log.w(TAG, "Notification inserted with success");

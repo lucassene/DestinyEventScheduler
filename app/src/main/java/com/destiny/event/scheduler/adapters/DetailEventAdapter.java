@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.models.EntryModel;
+import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
@@ -24,18 +24,18 @@ public class DetailEventAdapter extends BaseAdapter {
     private static final int TYPE_WAITING = 2;
 
     private Context context;
-    private List<EntryModel> entryList;
+    private List<MemberModel> entryList;
     private LayoutInflater inflater;
     private int maxGuardians;
 
-    public DetailEventAdapter(Context context, List<EntryModel> entryList, int maxGuardians){
+    public DetailEventAdapter(Context context, List<MemberModel> entryList, int maxGuardians){
         this.context = context;
         this.entryList = entryList;
         this.maxGuardians = maxGuardians;
         inflater = LayoutInflater.from(context);
     }
 
-    public void setEntryList(List<EntryModel> entryList){
+    public void setEntryList(List<MemberModel> entryList){
         this.entryList = entryList;
         //notifyDataSetChanged();
     }
@@ -60,7 +60,7 @@ public class DetailEventAdapter extends BaseAdapter {
     }
 
     @Override
-    public EntryModel getItem(int position) {
+    public MemberModel getItem(int position) {
         return entryList.get(position);
     }
 
@@ -94,7 +94,7 @@ public class DetailEventAdapter extends BaseAdapter {
             viewHolder = (EntryViewHolder) convertView.getTag();
         }
 
-        EntryModel currentMember = getItem(position);
+        MemberModel currentMember = getItem(position);
         try {
             viewHolder.iconPath.setImageBitmap(ImageUtils.loadImage(context,ImageUtils.getIconName(currentMember.getIconPath())));
         } catch (IOException e) {

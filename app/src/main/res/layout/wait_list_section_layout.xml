@@ -32,8 +32,10 @@
             android:layout_width="59dp"
             android:layout_height="match_parent"
             android:scaleType="fitStart"
-            android:layout_margin="5dp"
-            android:layout_marginLeft="8dp"/>
+            android:layout_margin="6.5dp"
+            android:layout_marginLeft="8dp"
+            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"/>
 
         <LinearLayout
             android:id="@+id/text_layout"

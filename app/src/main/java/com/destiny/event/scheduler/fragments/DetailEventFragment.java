@@ -34,8 +34,8 @@ import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
-import com.destiny.event.scheduler.models.EntryModel;
 import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.DateUtils;
@@ -47,7 +47,7 @@ import java.util.List;
 
 public class DetailEventFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener{
 
-    private static final String TAG = "DetailEventFragment";
+    public static final String TAG = "DetailEventFragment";
 
     private static final int LOADER_NOTIFICATION = 80;
 
@@ -61,7 +61,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     private int maxGuardians;
     private Calendar eventCalendar;
 
-    private ArrayList<EntryModel> entryList;
+    private ArrayList<MemberModel> entryList;
 
     View headerView;
     View includedView;
@@ -78,9 +78,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     Button joinButton;
 
     private ToActivityListener callback;
-
-    private String[] gameProjection;
-    private String[] membersProjection;
 
     DetailEventAdapter detailAdapter;
 
@@ -320,7 +317,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     private void updateGame(ContentValues values, Uri uri) {
 
-        callback.updateGame(game, getStatus());
+        callback.updateGameStatus(game, getStatus());
 
         values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING);
         getContext().getContentResolver().update(uri, values, null, null);
@@ -379,9 +376,16 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         callback.getGameEntries(gameId);
     }
 
-    public void onEntriesLoaded(List<EntryModel> entryList){
+    public void onEntriesLoaded(List<MemberModel> entryList){
         Log.w(TAG, "entryList size: " + entryList.size());
-        this.entryList = (ArrayList<EntryModel>) entryList;
+        this.entryList = (ArrayList<MemberModel>) entryList;
+
+        int status;
+        if (game.isJoined()){
+            status = GameTable.STATUS_SCHEDULED;
+        } else status = GameTable.STATUS_NEW;
+
+        callback.updateGameEntries(status, game.getGameId(), entryList.size());
         setAdapter(this.entryList, maxGuardians);
         if (footerView != null){
             this.getListView().addFooterView(footerView);
@@ -445,7 +449,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     if (data.getCount()<=0){
                         String icon = game.getEventIcon().substring(game.getEventIcon().lastIndexOf("/"+1,game.getEventIcon().length()));
                         int eventIcon = getResources().getIdentifier(icon,"drawable",getContext().getPackageName());
-                        setAlarmNotification(getNotifyTime(), String.valueOf(game.getGameId()), game.getEventName(), game.getTypeName(), eventIcon);
+                        setAlarmNotification(getNotifyTime(), game.getTime(), game.getGameId(), game.getEventName(), game.getTypeName(), eventIcon);
                     } else{
                         Log.w(TAG, "Notification for this game already created!");
                     }
@@ -509,13 +513,13 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-    private void setAdapter(List<EntryModel> entries, int max) {
+    private void setAdapter(List<MemberModel> entries, int max) {
         setListAdapter(null);
         detailAdapter = new DetailEventAdapter(getContext(),entries, max);
         setListAdapter(detailAdapter);
     }
 
-    private void setAlarmNotification(Calendar notifyTime, String gameId, String title, String typeName, int typeIcon) {
+    private void setAlarmNotification(Calendar notifyTime, String gameTime, int gameId, String title, String typeName, int typeIcon) {
 
         int firstId = 0;
         int secondId = 0;
@@ -527,6 +531,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             values.put(NotificationTable.COLUMN_TYPE, typeName);
             values.put(NotificationTable.COLUMN_ICON, typeIcon);
             values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(notifyTime));
+            values.put(NotificationTable.COLUMN_GAME_TIME, gameTime);
 
             Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
             if (uri != null) firstId = Integer.parseInt(uri.getLastPathSegment());
@@ -544,6 +549,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                 values.put(NotificationTable.COLUMN_TYPE, typeName);
                 values.put(NotificationTable.COLUMN_ICON, typeIcon);
                 values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(notifyTime));
+                values.put(NotificationTable.COLUMN_GAME_TIME, gameTime);
 
                 Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
                 if (uri != null) firstId = Integer.parseInt(uri.getLastPathSegment());
@@ -555,6 +561,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                     values.put(NotificationTable.COLUMN_TYPE, typeName);
                     values.put(NotificationTable.COLUMN_ICON, typeIcon);
                     values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(eventCalendar));
+                    values.put(NotificationTable.COLUMN_GAME_TIME, gameTime);
 
                     uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
                     if (uri != null) secondId = Integer.parseInt(uri.getLastPathSegment());
@@ -568,6 +575,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
                 values.put(NotificationTable.COLUMN_TYPE, typeName);
                 values.put(NotificationTable.COLUMN_ICON, typeIcon);
                 values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(eventCalendar));
+                values.put(NotificationTable.COLUMN_GAME_TIME, gameTime);
 
                 Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
                 if (uri != null) secondId = Integer.parseInt(uri.getLastPathSegment());

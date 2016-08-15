@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.models.EntryModel;
+import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
 import java.io.IOException;
@@ -24,10 +24,10 @@ public class ValidationAdapter extends BaseAdapter {
     private static final int TYPE_MEMBER = 1;
 
     private Context context;
-    private List<EntryModel> memberList;
+    private List<MemberModel> memberList;
     private LayoutInflater inflater;
 
-    public ValidationAdapter(Context context, List<EntryModel> memberList){
+    public ValidationAdapter(Context context, List<MemberModel> memberList){
         this.context = context;
         this.memberList = memberList;
         inflater = LayoutInflater.from(context);
@@ -39,7 +39,7 @@ public class ValidationAdapter extends BaseAdapter {
     }
 
     @Override
-    public EntryModel getItem(int position) {
+    public MemberModel getItem(int position) {
         return memberList.get(position);
     }
 
@@ -74,7 +74,7 @@ public class ValidationAdapter extends BaseAdapter {
             vViewHolder = (ValidateViewHolder) convertView.getTag();
         }
 
-        EntryModel currentMember = getItem(position);
+        MemberModel currentMember = getItem(position);
 
         vViewHolder.memberName.setText(currentMember.getName());
         vViewHolder.memberTitle.setText(currentMember.getTitle());

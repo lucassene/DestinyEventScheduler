@@ -7,9 +7,11 @@ public class GameModel implements Serializable {
     private int gameId;
     private String creatorId;
     private String creatorName;
+    private int eventId;
     private String eventName;
     private String eventIcon;
     private int maxGuardians;
+    private int typeId;
     private String typeName;
     private String time;
     private int minLight;
@@ -113,4 +115,19 @@ public class GameModel implements Serializable {
         this.status = status;
     }
 
+    public int getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
+    }
+
+    public int getTypeId() {
+        return typeId;
+    }
+
+    public void setTypeId(int typeId) {
+        this.typeId = typeId;
+    }
 }

@@ -370,7 +370,7 @@ public class DataProvider extends ContentProvider {
                 sbNotification.append(" ON ");
                 sbNotification.append(NotificationTable.COLUMN_GAME);
                 sbNotification.append(" = ");
-                sbNotification.append(GameTable.getQualifiedColumn(GameTable.COLUMN_ID));
+                sbNotification.append(GameTable.COLUMN_SERVER);
                 queryBuilder.setTables(sbNotification.toString());
                 break;
             case GAME_ALL:

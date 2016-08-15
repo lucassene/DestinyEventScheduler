@@ -11,9 +11,9 @@ import android.util.Log;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.models.EntryModel;
 import com.destiny.event.scheduler.models.EvaluationModel;
 import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import org.json.JSONArray;
@@ -102,7 +102,7 @@ public class ServerService extends IntentService {
     private String memberId;
     private int platformId;
     private ArrayList<GameModel> gameList;
-    private ArrayList<EntryModel> memberList;
+    private ArrayList<MemberModel> memberList;
 
     public ServerService() {
         super(ServerService.class.getName());
@@ -263,7 +263,7 @@ public class ServerService extends IntentService {
         receiver.send(STATUS_FINISHED, bundle);
     }
 
-    private void sendEntryData(ResultReceiver receiver, ArrayList<EntryModel> memberList) {
+    private void sendEntryData(ResultReceiver receiver, ArrayList<MemberModel> memberList) {
         Bundle bundle = new Bundle();
         bundle.putSerializable(ENTRY_TAG, memberList);
         receiver.send(STATUS_FINISHED, bundle);
@@ -390,11 +390,15 @@ public class ServerService extends IntentService {
             for (int i=0;i<jResponse.length();i++){
                 JSONObject jEntry = jResponse.getJSONObject(i);
                 JSONObject jMember = jEntry.getJSONObject("member");
-                EntryModel member = new EntryModel();
+                MemberModel member = new MemberModel();
                 member.setMembershipId(jMember.getString("membership"));
                 member.setName(jMember.getString("name"));
                 member.setIconPath(jMember.getString("icon"));
                 member.setPlatformId(jMember.getInt("platform"));
+                member.setLikes(jMember.getInt("likes"));
+                member.setDislikes(jMember.getInt("dislikes"));
+                member.setGamesCreated(jMember.getInt("gamesCreated"));
+                member.setGamesPlayed(jMember.getInt("gamesPlayed"));
                 member.setLvl(jMember.getInt("likes"),jMember.getInt("dislikes"),jMember.getInt("gamesPlayed"),jMember.getInt("gamesCreated"));
                 member.setEntryTime(jEntry.getString("time"));
                 member.setTitle(getString(R.string.default_title));
@@ -421,10 +425,12 @@ public class ServerService extends IntentService {
                 game.setCreatorId(jCreator.getString("membership"));
                 game.setCreatorName(jCreator.getString("name"));
                 JSONObject jEvent = jGame.getJSONObject("event");
+                game.setEventId(jEvent.getInt("id"));
                 game.setEventName(jEvent.getString("name"));
                 game.setEventIcon(jEvent.getString("icon"));
                 game.setMaxGuardians(jEvent.getInt("maxGuardians"));
                 JSONObject jType = jEvent.getJSONObject("eventType");
+                game.setTypeId(jType.getInt("id"));
                 game.setTypeName(jType.getString("name"));
                 game.setTime(jGame.getString("time"));
                 game.setMinLight(jGame.getInt("light"));

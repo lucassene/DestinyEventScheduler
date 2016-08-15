@@ -13,8 +13,9 @@ public class NotificationTable {
     public static final String COLUMN_TYPE = "notification_type";
     public static final String COLUMN_ICON = "notification_icon";
     public static final String COLUMN_TIME = "notification_time";
+    public static final String COLUMN_GAME_TIME = "notification_game_time";
 
-    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_GAME, COLUMN_EVENT, COLUMN_TYPE, COLUMN_ICON, COLUMN_TIME};
+    public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_GAME, COLUMN_EVENT, COLUMN_TYPE, COLUMN_ICON, COLUMN_TIME, COLUMN_GAME_TIME};
 
     private static final String CREATE_TABLE = "CREATE TABLE "
             + TABLE_NAME
@@ -30,6 +31,8 @@ public class NotificationTable {
             + COLUMN_ICON
             + " INTEGER NOT NULL, "
             + COLUMN_TIME
+            + " TEXT NOT NULL, "
+            + COLUMN_GAME_TIME
             + " TEXT NOT NULL"
             + ");";
 

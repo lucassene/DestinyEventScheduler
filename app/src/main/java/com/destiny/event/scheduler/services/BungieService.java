@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.text.Html;
 import android.util.Log;
 
 import com.destiny.event.scheduler.BuildConfig;
@@ -35,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -278,7 +278,6 @@ public class BungieService extends IntentService {
                             clanId = jDetail.getString("groupId");
                             clanName = jDetail.getString("name");
                             motto = jDetail.getString("motto");
-                            motto = UTF8toISO(motto);
                             //motto = URLEncoder.encode(motto, "UTF-8");
                             clanBanner = jDetail.getString("bannerPath");
                             Log.w(TAG, "clanDesc: " + motto);
@@ -839,22 +838,10 @@ public class BungieService extends IntentService {
 
         //result = URLDecoder.decode(result, "ISO-8859-1");
         //result = Html.fromHtml(result);
-        result = new String(result.getBytes("ISO-8859-1"),"UTF-8");
+        //result = new String(result.getBytes("ISO-8859-1"),"UTF-8");
+        result = Html.fromHtml(result).toString();
 
         return result;
-    }
-
-    public static String UTF8toISO( String str )
-    {
-        try
-        {
-            return new String( str.getBytes( "ISO-8859-1" ), "UTF-8" );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            e.printStackTrace();
-        }
-        return str;
     }
 
     private void insertFakeEvents(ResultReceiver receiver) {

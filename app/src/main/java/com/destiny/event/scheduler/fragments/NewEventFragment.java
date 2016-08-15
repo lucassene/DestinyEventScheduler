@@ -27,11 +27,9 @@ import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
-import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyDatePickerDialog;
 import com.destiny.event.scheduler.dialogs.MyTimePickerDialog;
@@ -49,7 +47,6 @@ import com.destiny.event.scheduler.utils.NetworkUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Random;
 
 
 public class NewEventFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener, FromActivityListener {
@@ -59,7 +56,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int LOADER_TYPE = 10;
     private static final int LOADER_EVENT = 20;
     private static final int LOADER_NOTIFICATION = 80;
-    private static final int LOADER_MEMBERS = 50;
 
     private String selectedType;
     private String selectedEvent;
@@ -296,9 +292,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         fillTypeData();
         fillgameData();
 
-        //Loader apenas para testes
-        initMemberLoader();
-
         createButton.setEnabled(false);
         createButton.setText(R.string.waiting_data);
 
@@ -388,16 +381,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                         null,
                         null
                 );
-            //Loader apenas para testes
-            case LOADER_MEMBERS:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.MEMBER_URI,
-                        new String[] {MemberTable.COLUMN_MEMBERSHIP},
-                        null,
-                        null,
-                        null
-                );
             default:
                 return null;
         }
@@ -427,21 +410,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 game.setEventName(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)));
                 game.setMinLight(minLight);
                 game.setMaxGuardians(data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS)));
-                break;
-            //Loader apenas para testes
-            case LOADER_MEMBERS:
-                //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
-                data.moveToFirst();
-                if (membershipIdList == null){
-                    membershipIdList = new ArrayList<>();
-                }
-                for (int i=0;i<data.getCount();i++){
-                    String id = data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP));
-                    if (!id.equals(callback.getBungieId())){
-                        membershipIdList.add(id);
-                    }
-                    data.moveToNext();
-                }
                 break;
         }
         callback.onDataLoaded();
@@ -551,7 +519,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
-
     private void createNewEvent() {
 
         String date = dateText.getText().toString();
@@ -592,37 +559,10 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
         timeText.setText(time);
         gameTime = getBungieTime(date, time);
-
-        int minLight = Integer.parseInt(lightText.getText().toString());
         String bungieId = callback.getBungieId();
         String userName = callback.getUserName();
 
-        ContentValues gameValues = new ContentValues();
-        gameValues.put(GameTable.COLUMN_SERVER, serverId);
-        gameValues.put(GameTable.COLUMN_CREATOR, bungieId);
-        gameValues.put(GameTable.COLUMN_CREATOR_NAME,userName);
-        gameValues.put(GameTable.COLUMN_EVENT_ID, selectedEvent);
-        gameValues.put(GameTable.COLUMN_TIME, gameTime);
-        gameValues.put(GameTable.COLUMN_LIGHT, minLight);
-        gameValues.put(GameTable.COLUMN_INSCRIPTIONS, 1);
-        gameValues.put(GameTable.COLUMN_STATUS, GameTable.STATUS_SCHEDULED); //Inserir STATUS_NEW no Servidor
-        gameValues.put(GameTable.COLUMN_PLATFORM, callback.getPlatform());
-
-        Uri result = getContext().getContentResolver().insert(DataProvider.GAME_URI, gameValues);
-        if (result != null) {
-            gameId = result.getLastPathSegment();
-        }
-
-        ContentValues entryValues = new ContentValues();
-        entryValues.put(EntryTable.COLUMN_MEMBERSHIP, bungieId);
-        entryValues.put(EntryTable.COLUMN_GAME, gameId);
-        entryValues.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
-        getContext().getContentResolver().insert(DataProvider.ENTRY_URI, entryValues);
-
-        //Apenas para testes
-        //createFakeEntries();
-
-        setAlarmNotification(notifyTime, gameId, eventName, eventTypeName, eventIcon);
+        setAlarmNotification(notifyTime, serverId, eventName, eventTypeName, eventIcon);
 
         callback.onDataLoaded();
         Toast.makeText(getContext(), R.string.create_match_success, Toast.LENGTH_SHORT).show();
@@ -639,14 +579,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
-    //Loader apenas para testes
-    private void initMemberLoader() {
-        if (getLoaderManager().getLoader(LOADER_MEMBERS) != null){
-            getLoaderManager().destroyLoader(LOADER_MEMBERS);
-        }
-        getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
-    }
-
     private Calendar getNotifyTime() {
         Calendar notifyTime = Calendar.getInstance();
         notifyTime.setTime(insertedDate.getTime());
@@ -659,52 +591,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         return notifyTime;
     }
 
-    //Inserindo entries falsas apenas para testes
-    private void createFakeEntries() {
-
-        Random random = new Random();
-
-        Calendar newDate = Calendar.getInstance();
-        newDate.setTime(insertedDate.getTime());
-        newDate.add(Calendar.MINUTE, -(random.nextInt(3)+1));
-        int mId;
-
-        ContentValues values = new ContentValues();
-        mId = random.nextInt(membershipIdList.size());
-        values.put(EntryTable.COLUMN_MEMBERSHIP, membershipIdList.get(mId));
-        membershipIdList.remove(mId);
-        values.put(EntryTable.COLUMN_GAME, gameId);
-        values.put(EntryTable.COLUMN_TIME,DateUtils.calendarToString(newDate));
-        getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
-        values.clear();
-
-        values = new ContentValues();
-        mId = random.nextInt(membershipIdList.size());
-        values.put(EntryTable.COLUMN_MEMBERSHIP, membershipIdList.get(mId));
-        membershipIdList.remove(mId);
-        values.put(EntryTable.COLUMN_GAME, gameId);
-        newDate = Calendar.getInstance();
-        newDate.setTime(insertedDate.getTime());
-        newDate.add(Calendar.MINUTE, -(random.nextInt(3)+1));
-        values.put(EntryTable.COLUMN_TIME,DateUtils.calendarToString(newDate));
-        getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
-        values.clear();
-
-        values = new ContentValues();
-        mId = random.nextInt(membershipIdList.size());
-        values.put(EntryTable.COLUMN_MEMBERSHIP, membershipIdList.get(mId));
-        membershipIdList.remove(mId);
-        values.put(EntryTable.COLUMN_GAME, gameId);
-        newDate = Calendar.getInstance();
-        newDate.setTime(insertedDate.getTime());
-        newDate.add(Calendar.MINUTE, -(random.nextInt(3)+1));
-        values.put(EntryTable.COLUMN_TIME,DateUtils.calendarToString(newDate));
-        getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
-        values.clear();
-
-    }
-
-    private void setAlarmNotification(Calendar notifyTime, String gameId, String title, String typeName, int typeIcon) {
+    private void setAlarmNotification(Calendar notifyTime, int gameId, String title, String typeName, int typeIcon) {
 
         int firstId = 0;
         int secondId = 0;
@@ -716,6 +603,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             values.put(NotificationTable.COLUMN_TYPE, typeName);
             values.put(NotificationTable.COLUMN_ICON, typeIcon);
             values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(notifyTime));
+            values.put(NotificationTable.COLUMN_GAME_TIME, DateUtils.calendarToString(insertedDate));
             Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
             if (uri != null) {
                 firstId = Integer.parseInt(uri.getLastPathSegment());
@@ -728,6 +616,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             values.put(NotificationTable.COLUMN_TYPE, typeName);
             values.put(NotificationTable.COLUMN_ICON, typeIcon);
             values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(notifyTime));
+            values.put(NotificationTable.COLUMN_GAME_TIME, DateUtils.calendarToString(insertedDate));
             Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
             if (uri != null) {
                 firstId = Integer.parseInt(uri.getLastPathSegment());
@@ -740,6 +629,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             values.put(NotificationTable.COLUMN_TYPE, typeName);
             values.put(NotificationTable.COLUMN_ICON, typeIcon);
             values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(insertedDate));
+            values.put(NotificationTable.COLUMN_GAME_TIME, DateUtils.calendarToString(insertedDate));
             uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
             if (uri != null) {
                 secondId = Integer.parseInt(uri.getLastPathSegment());

@@ -25,9 +25,9 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
-import com.destiny.event.scheduler.models.EntryModel;
 import com.destiny.event.scheduler.models.EvaluationModel;
 import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
@@ -38,7 +38,7 @@ import java.util.List;
 
 public class DetailValidationFragment extends ListFragment implements FromDialogListener{
 
-    private static final String TAG = "DetailValidateFragment";
+    public static final String TAG = "DetailValidateFragment";
 
     private static final int TYPE_ONLY_CREATOR = 1;
     private static final int TYPE_NO_EVALUATIONS = 2;
@@ -47,7 +47,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
 
     private String origin;
 
-    private List<EntryModel> memberList;
+    private List<MemberModel> memberList;
 
     View headerView;
     View includedView;
@@ -361,7 +361,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
             ImageView img = (ImageView) v.findViewById(R.id.rate_img);
 
             int newpos = position -1;
-            EntryModel member = memberList.get(newpos);
+            MemberModel member = memberList.get(newpos);
             int newRating = 0;
 
             if (!member.getMembershipId().equals(callback.getBungieId())){
@@ -431,7 +431,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         callback.getGameEntries(gameId);
     }
 
-    public void onEntriesLoaded(List<EntryModel> entryList){
+    public void onEntriesLoaded(List<MemberModel> entryList){
         Log.w(TAG, "entryList size: " + entryList.size());
         for (int i=0;i<entryList.size();i++){
             entryList.get(i).setChecked(true);
@@ -441,10 +441,11 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         if (footerView != null){
             this.getListView().addFooterView(footerView);
         }
+        callback.updateGameEntries(GameTable.STATUS_DONE, game.getGameId(), memberList.size());
         setAdapter(memberList);
     }
 
-    private void setAdapter(List<EntryModel> entryList) {
+    private void setAdapter(List<MemberModel> entryList) {
         adapter = new ValidationAdapter(getContext(), entryList);
         setListAdapter(adapter);
     }

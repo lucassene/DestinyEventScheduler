@@ -295,7 +295,7 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 lbl4.setText(NotificationTable.COLUMN_TYPE);
                 lbl5.setText(NotificationTable.COLUMN_ICON);
                 lbl6.setText(NotificationTable.COLUMN_TIME);
-                lbl7.setVisibility(View.GONE);
+                lbl7.setText(NotificationTable.COLUMN_GAME_TIME);
                 lbl8.setVisibility(View.GONE);
                 lbl9.setVisibility(View.GONE);
                 lbl10.setVisibility(View.GONE);
@@ -306,7 +306,7 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 txt4.setText(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TYPE)));
                 txt5.setText(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ICON)));
                 txt6.setText(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TIME)));
-                txt7.setVisibility(View.GONE);
+                txt7.setText(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME_TIME)));
                 txt8.setVisibility(View.GONE);
                 txt9.setVisibility(View.GONE);
                 txt10.setVisibility(View.GONE);
