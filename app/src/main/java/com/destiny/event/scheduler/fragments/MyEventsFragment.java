@@ -138,7 +138,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-       callback.setSpinnerSelection(DrawerActivity.TAG_MY_EVENTS, position);
+        callback.setSpinnerSelection(DrawerActivity.TAG_MY_EVENTS, position);
         statusId = statusList[position];
         filterGameList(statusId);
     }
@@ -174,8 +174,8 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
             if (gameList != null){
                 listView.setAdapter(null);
                 this.gameList = gameList;
-                gameAdapter = new GameAdapter(getActivity(), gameList);
                 filterGameList(statusId);
+                gameAdapter = new GameAdapter(getActivity(), gameList);
             } else Log.w(TAG, "listView null ou size 0");
         } else {
             Log.w(TAG, "adapter já existia");

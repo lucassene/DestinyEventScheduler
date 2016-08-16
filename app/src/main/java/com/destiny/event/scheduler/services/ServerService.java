@@ -437,6 +437,7 @@ public class ServerService extends IntentService {
                 game.setInscriptions(jGame.getInt("inscriptions"));
                 game.setStatus(jGame.getInt("status"));
                 game.setJoined(getBoolean(jGame.getString("joined")));
+                game.setEvaluated(getBoolean(jGame.getString("evaluated")));
                 gameList.add(game);
             }
         } catch (JSONException e) {

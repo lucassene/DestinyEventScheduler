@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.models.MemberModel;
 
 import java.util.Calendar;
 import java.util.List;
@@ -41,4 +42,5 @@ public interface ToActivityListener {
     public void getGameEntries(int gameId);
     public void updateGameStatus(GameModel game, int status);
     public void updateGameEntries(int status, int gameId, int entries);
+    public void updateMembers(List<MemberModel> list);
 }

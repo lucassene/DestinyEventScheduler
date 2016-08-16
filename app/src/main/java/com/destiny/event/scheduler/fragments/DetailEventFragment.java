@@ -97,6 +97,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         setRetainInstance(true);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.event_details);
@@ -192,6 +193,10 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
             }
         });
+
+        //if (savedInstanceState != null){
+            //entryList = (ArrayList<MemberModel>) savedInstanceState.getSerializable("entryList");
+        //}
 
         return v;
     }
@@ -367,7 +372,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         if (now.getTimeInMillis() > eventCalendar.getTimeInMillis() && gS == GameTable.STATUS_SCHEDULED){
             dialogThread();
         } else {
-            getMembers(game.getGameId());
+            if (entryList.size()==0){
+                getMembers(game.getGameId());
+            } else onEntriesLoaded(entryList, false);
         }
 
     }
@@ -376,20 +383,30 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         callback.getGameEntries(gameId);
     }
 
-    public void onEntriesLoaded(List<MemberModel> entryList){
-        Log.w(TAG, "entryList size: " + entryList.size());
-        this.entryList = (ArrayList<MemberModel>) entryList;
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded){
+        if (entryList != null){
+            Log.w(TAG, "entryList size: " + entryList.size());
+            this.entryList = (ArrayList<MemberModel>) entryList;
 
-        int status;
-        if (game.isJoined()){
-            status = GameTable.STATUS_SCHEDULED;
-        } else status = GameTable.STATUS_NEW;
+            int status;
+            if (game.isJoined()){
+                status = GameTable.STATUS_SCHEDULED;
+            } else status = GameTable.STATUS_NEW;
 
-        callback.updateGameEntries(status, game.getGameId(), entryList.size());
-        setAdapter(this.entryList, maxGuardians);
-        if (footerView != null){
-            this.getListView().addFooterView(footerView);
+            if (isUpdateNeeded) { callback.updateGameEntries(status, game.getGameId(), entryList.size()); }
+            String sg = entryList.size() + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
+            guardians.setText(sg);
+            setAdapter(this.entryList, maxGuardians);
+            if (footerView != null){
+                this.getListView().addFooterView(footerView);
+            }
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("entryList",entryList);
     }
 
     @Override

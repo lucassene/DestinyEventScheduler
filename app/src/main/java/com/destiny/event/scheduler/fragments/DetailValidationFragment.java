@@ -79,6 +79,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
 
     ArrayList<String> validatedEntryList;
     ArrayList<EvaluationModel> evaluationList;
+    private ArrayList<MemberModel> entryList;
 
     int selectedType;
 
@@ -152,8 +153,10 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     }
 
     private void prepareViews() {
+        Log.w(TAG, "Game Status: " + game.getStatus());
         switch (game.getStatus()){
             case GameTable.STATUS_WAITING:
+                Log.w(TAG, "getBungieId: " + callback.getBungieId());
                 if (game.getCreatorId().equals(callback.getBungieId())){
                     validateButton.setVisibility(View.VISIBLE);
                     checkLayout.setVisibility(View.VISIBLE);
@@ -174,14 +177,6 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
                 checkLayout.setVisibility(View.GONE);
                 callback.setToolbarTitle(getString(R.string.evaluate_match));
                 status = STATUS_VALIDATED;
-                break;
-            case GameTable.STATUS_EVALUATED:
-                validateButton.setEnabled(true);
-                validateButton.setVisibility(View.GONE);
-                checkLayout.setVisibility(View.GONE);
-                checkBox.setChecked(true);
-                callback.setToolbarTitle(getString(R.string.event_details));
-                status = STATUS_EVALUATED;
                 break;
         }
     }
@@ -231,6 +226,8 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
+
+        entryList = new ArrayList<>();
 
         if (headerView != null){
             this.getListView().addHeaderView(headerView, null, false);
@@ -424,25 +421,36 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         String hour = DateUtils.getTime(game.getTime());
         String timeString = date + getResources().getString(R.string.at) + hour;
         time.setText(timeString);
-        getMembers(game.getGameId());
+        if (entryList.size()==0){
+            getMembers(game.getGameId());
+        } else onEntriesLoaded(entryList, false);
     }
 
     private void getMembers(int gameId) {
         callback.getGameEntries(gameId);
     }
 
-    public void onEntriesLoaded(List<MemberModel> entryList){
-        Log.w(TAG, "entryList size: " + entryList.size());
-        for (int i=0;i<entryList.size();i++){
-            entryList.get(i).setChecked(true);
-            entryList.get(i).setRating(0);
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded){
+        if (entryList != null){
+            Log.w(TAG, "entryList size: " + entryList.size());
+            this.entryList = (ArrayList<MemberModel>) entryList;
+            for (int i=0;i<entryList.size();i++){
+                entryList.get(i).setChecked(true);
+                entryList.get(i).setRating(0);
+            }
+            memberList.addAll(entryList);
+            if (footerView != null){
+                this.getListView().addFooterView(footerView);
+            }
+            if (isUpdateNeeded) { callback.updateGameEntries(GameTable.STATUS_DONE, game.getGameId(), memberList.size()); }
+            setAdapter(memberList);
         }
-        memberList.addAll(entryList);
-        if (footerView != null){
-            this.getListView().addFooterView(footerView);
-        }
-        callback.updateGameEntries(GameTable.STATUS_DONE, game.getGameId(), memberList.size());
-        setAdapter(memberList);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("entryList",entryList);
     }
 
     private void setAdapter(List<MemberModel> entryList) {
@@ -511,6 +519,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         }
         bundle.putParcelableArrayList(ServerService.EVALUATIONS_TAG, evaluationList);
         callback.runServerService(bundle);
+        callback.updateMembers(memberList);
     }
 
     private void validateGame() {
@@ -537,6 +546,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         bundle.putStringArrayList(ServerService.ENTRY_TAG, validatedEntryList);
         bundle.putParcelableArrayList(ServerService.EVALUATIONS_TAG, evaluationList);
         callback.runServerService(bundle);
+        callback.updateMembers(memberList);
     }
 
     private void deleteGame() {

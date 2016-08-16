@@ -42,7 +42,9 @@ public class DetailEventAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return entryList.size();
+        if (entryList == null){
+            return 0;
+        } else return entryList.size();
     }
 
     @Override

@@ -162,7 +162,6 @@
         <item>Scheduled</item>
         <item>Waiting for Validation</item>
         <item>Validated</item>
-        <item>Evaluated</item>
     </string-array>
 
     <string-array name="game_status_id">
@@ -170,7 +169,6 @@
         <item>status:0</item>
         <item>status:1</item>
         <item>status:2</item>
-        <item>status:3</item>
     </string-array>
 
     <string-array name="table_names">

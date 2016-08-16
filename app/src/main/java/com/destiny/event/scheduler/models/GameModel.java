@@ -18,6 +18,7 @@ public class GameModel implements Serializable {
     private int inscriptions;
     private int status;
     private boolean joined;
+    private boolean evaluated;
 
     public String getCreatorId() {
         return creatorId;
@@ -129,5 +130,13 @@ public class GameModel implements Serializable {
 
     public void setTypeId(int typeId) {
         this.typeId = typeId;
+    }
+
+    public boolean isEvaluated() {
+        return evaluated;
+    }
+
+    public void setEvaluated(boolean evaluated) {
+        this.evaluated = evaluated;
     }
 }

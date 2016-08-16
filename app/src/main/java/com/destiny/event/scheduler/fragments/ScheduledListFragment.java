@@ -47,16 +47,22 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        callback = (ToActivityListener) getActivity();
+        callback.registerUserDataListener(this);
+        Log.w(TAG, "ScheduledListFragment attached!");
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.scheduled_list_layout, container, false);
-
         headerView = inflater.inflate(R.layout.list_section_layout, null);
-
         sectionTitle = (TextView) headerView.findViewById(R.id.section_title);
-
         return v;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -66,7 +72,7 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
         sectionTitle.setText(R.string.scheduled_games);
 
         if (savedInstanceState != null && savedInstanceState.containsKey("listView")){
-            onGamesLoaded((List<GameModel>) savedInstanceState.getSerializable("listView"));
+            gameList = (List<GameModel>) savedInstanceState.getSerializable("listView");
         }
 
         if (gameList == null){
@@ -87,20 +93,10 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        //Toast.makeText(getContext(), "GameID Selected: " + gameIdList.get(position-1), Toast.LENGTH_SHORT).show();
         if (position > 0){
             int newPos = position - 1;
             callback.onGameSelected(gameList.get(newPos), TAG);
         }
-    }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        callback = (ToActivityListener) getActivity();
-        callback.registerUserDataListener(this);
-        Log.w(TAG, "ScheduledListFragment attached!");
     }
 
     @Override
@@ -120,6 +116,7 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
             Log.w(TAG, "adapter já existia");
             if (gameList!=null){
                 this.gameList = gameList;
+                setListAdapter(gameAdapter);
                 gameAdapter.setGameList(gameList);
                 gameAdapter.notifyDataSetChanged();
             } else Log.w(TAG, "listView null");

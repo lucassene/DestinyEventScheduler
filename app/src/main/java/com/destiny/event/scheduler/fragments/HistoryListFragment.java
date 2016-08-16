@@ -177,10 +177,11 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
 
     @Override
     public void onGamesLoaded(List<GameModel> gameList) {
-        Log.w(TAG, "SearchFragment onGamesLoaded called!");
+        Log.w(TAG, "HistoryFragment onGamesLoaded called!");
         if (gameAdapter == null) {
             Log.w(TAG, "adapter estava null");
             if (gameList != null){
+                Log.w(TAG, "gameList size: " + gameList.size());
                 listView.setAdapter(null);
                 this.gameList = gameList;
                 gameAdapter = new GameAdapter(getActivity(), gameList);

@@ -51,22 +51,18 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
         super.onAttach(context);
         callback = (ToActivityListener) getActivity();
         callback.registerUserDataListener(this);
-        //Log.w(TAG, "NewEventsListFragment attached!");
+        Log.w(TAG, "NewEventsListFragment attached!");
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View v = inflater.inflate(R.layout.new_list_layout, container, false);
-
         headerView = inflater.inflate(R.layout.list_section_layout, null);
-
         sectionTitle = (TextView) headerView.findViewById(R.id.section_title);
-
         return v;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -104,8 +100,7 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
     }
 
     @Override
-    public void onUserDataLoaded() {
-    }
+    public void onUserDataLoaded() {}
 
     @Override
     public void onGamesLoaded(List<GameModel> gameList) {

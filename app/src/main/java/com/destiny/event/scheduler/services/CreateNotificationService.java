@@ -58,14 +58,16 @@ public class CreateNotificationService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         List<GameModel> gameList = (List<GameModel>) intent.getSerializableExtra(GAME_HEADER);
-        List<Integer> gameIdList = new ArrayList<>();
+        List<Integer> notifyList = new ArrayList<>();
+        List<Integer> nIdList = new ArrayList<>();
 
         Cursor notifyCursor = null;
         try {
             notifyCursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, null, null, null);
             if (notifyCursor != null && notifyCursor.moveToFirst()){
                 for (int i=0;i<notifyCursor.getCount();i++){
-                    gameIdList.add(notifyCursor.getInt(notifyCursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME)));
+                    nIdList.add(notifyCursor.getInt(notifyCursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ID)));
+                    notifyList.add(notifyCursor.getInt(notifyCursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME)));
                     notifyCursor.moveToNext();
                 }
             }
@@ -75,16 +77,17 @@ public class CreateNotificationService extends IntentService {
             if (notifyCursor != null) notifyCursor.close();
         }
 
-        createNotifications(gameList, gameIdList);
+        createNotifications(gameList, notifyList, nIdList);
 
     }
 
-    private void createNotifications(List<GameModel> gameList, List<Integer> gameIdList) {
+    private void createNotifications(List<GameModel> gameList, List<Integer> notifyList, List<Integer> nIdList) {
         boolean insert = false;
-        if (gameIdList.size()>0){
+        if (notifyList.size()>0){
+            Log.w(TAG, "notifyList size > 0 (" + notifyList.size() + ")");
             for (int i=0;i<gameList.size();i++){
-                for (int x=0;x<gameIdList.size();x++){
-                    if (gameList.get(i).getGameId() == gameIdList.get(x)){
+                for (int x=0;x<notifyList.size();x++){
+                    if (gameList.get(i).getGameId() == notifyList.get(x)){
                         insert = false;
                         break;
                     } else insert = true;
@@ -94,21 +97,32 @@ public class CreateNotificationService extends IntentService {
                 }
             }
             boolean delete = false;
-            for (int i=0;i<gameIdList.size();i++){
-                for (int x=0;x<gameList.size();x++){
-                    if (gameIdList.get(i) == gameList.get(x).getGameId()){
-                        delete = false;
-                        break;
-                    } else delete = true;
+            if (gameList.size()>0){
+                for (int i=0;i<notifyList.size();i++){
+                    for (int x=0;x<gameList.size();x++){
+                        if (notifyList.get(i) == gameList.get(x).getGameId()){
+                            delete = false;
+                            break;
+                        } else delete = true;
+                    }
+                    if (delete){
+                        int deletedId = getContentResolver().delete(DataProvider.NOTIFICATION_URI,NotificationTable.COLUMN_GAME + "=" + notifyList.get(i), null);
+                        if (deletedId != 0) cancelAlarmTask(nIdList.get(i));
+                    }
                 }
-                if (delete){
-                    int deletedId = getContentResolver().delete(DataProvider.NOTIFICATION_URI,NotificationTable.COLUMN_GAME + "=" + gameIdList.get(i), null);
-                    if (deletedId != 0) cancelAlarmTask(deletedId);
+            } else {
+                Log.w(TAG, "Deleting all notifications...");
+                for (int i=0;i<notifyList.size();i++){
+                    int deletedId = getContentResolver().delete(DataProvider.NOTIFICATION_URI,NotificationTable.COLUMN_ID + "= (SELECT MAX(_id) FROM notification WHERE notification_game=" + notifyList.get(i) + ")", null);
+                    if (deletedId != 0) cancelAlarmTask(nIdList.get(i));
                 }
             }
         } else {
-            for (int i=0;i<gameList.size();i++){
-                insertNotifications(gameList.get(i));
+            Log.w(TAG, "notifyList size < 0");
+            if (gameList.size()>0){
+                for (int i=0;i<gameList.size();i++){
+                    insertNotifications(gameList.get(i));
+                }
             }
         }
     }
