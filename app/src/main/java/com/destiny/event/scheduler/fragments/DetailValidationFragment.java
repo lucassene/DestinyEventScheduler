@@ -25,6 +25,7 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
+import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.EvaluationModel;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class DetailValidationFragment extends ListFragment implements FromDialogListener{
+public class DetailValidationFragment extends ListFragment implements FromDialogListener, UserDataListener{
 
     public static final String TAG = "DetailValidateFragment";
 
@@ -430,6 +431,17 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         callback.getGameEntries(gameId);
     }
 
+    @Override
+    public void onUserDataLoaded() {
+
+    }
+
+    @Override
+    public void onGamesLoaded(List<GameModel> gameList) {
+
+    }
+
+    @Override
     public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded){
         if (entryList != null){
             Log.w(TAG, "entryList size: " + entryList.size());
@@ -463,7 +475,14 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         super.onAttach(context);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+        callback.registerUserDataListener(this);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        callback.deleteUserDataListener(this);
     }
 
     @Override

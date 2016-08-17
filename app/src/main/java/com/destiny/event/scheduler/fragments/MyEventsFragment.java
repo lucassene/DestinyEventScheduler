@@ -22,6 +22,7 @@ import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.services.ServerService;
 
 import java.io.Serializable;
@@ -187,6 +188,11 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
                 gameAdapter.notifyDataSetChanged();
             } else Log.w(TAG, "listView null");
         }
+    }
+
+    @Override
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded) {
+
     }
 
     @Override

@@ -45,7 +45,6 @@ import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 
@@ -57,10 +56,11 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int LOADER_EVENT = 20;
     private static final int LOADER_NOTIFICATION = 80;
 
+    private static final int MAX_LIGHT = 400;
+
     private String selectedType;
     private String selectedEvent;
 
-    private String gameId;
     private String gameTime;
     private String eventTypeName;
     private int eventIcon;
@@ -73,11 +73,9 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     private ImageView iconType;
     private TextView textType;
-    private RelativeLayout typeLayout;
 
     private ImageView iconGame;
     private TextView textGame;
-    private RelativeLayout gameLayout;
 
     private TextView lightText;
     private SeekBar lightBar;
@@ -96,8 +94,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private boolean hasDate = false;
     private boolean hasTime = false;
 
-    private ArrayList<String> membershipIdList;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +102,11 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         selectedType = "2";
         selectedEvent = "4";
 
+        if (savedInstanceState != null){
+            selectedType = String.valueOf(savedInstanceState.getInt("id"));
+            selectedType = String.valueOf(savedInstanceState.getInt("Type"));
+        }
+
         Bundle bundle = getArguments();
         if (bundle != null){
             switch (bundle.getString("Table")){
@@ -113,6 +114,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                     selectedType = String.valueOf(bundle.getLong("id"));
                     callEventList();
                     checkGame(selectedType);
+                    initLoader(LOADER_TYPE);
                     break;
                 case EventTable.TABLE_NAME:
                     selectedEvent = String.valueOf(bundle.getLong("id"));
@@ -122,6 +124,13 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
         game = new GameModel();
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("id", Integer.parseInt(selectedEvent));
+        outState.putInt("Type", Integer.parseInt(selectedType));
     }
 
     @Override
@@ -145,22 +154,22 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 selectedEvent = "4";
                 break;
             case "3":
-                selectedEvent = "20";
-                break;
-            case "4":
                 selectedEvent = "25";
                 break;
-            case "5":
+            case "4":
                 selectedEvent = "31";
                 break;
-            case "6":
+            case "5":
                 selectedEvent = "37";
                 break;
+            case "6":
+                selectedEvent = "45";
+                break;
             case "7":
-                selectedEvent = "39";
+                selectedEvent = "47";
                 break;
             case "8":
-                selectedEvent = "53";
+                selectedEvent = "64";
                 break;
         }
     }
@@ -186,11 +195,11 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
         iconType = (ImageView) v.findViewById(R.id.type_icon);
         textType = (TextView) v.findViewById(R.id.type_text);
-        typeLayout = (RelativeLayout) v.findViewById(R.id.type_list);
+        RelativeLayout typeLayout = (RelativeLayout) v.findViewById(R.id.type_list);
 
         iconGame = (ImageView) v.findViewById(R.id.game_icon);
         textGame = (TextView) v.findViewById(R.id.game_text);
-        gameLayout = (RelativeLayout) v.findViewById(R.id.game_list);
+        RelativeLayout gameLayout = (RelativeLayout) v.findViewById(R.id.game_list);
 
         lightText = (TextView) v.findViewById(R.id.light_min_text);
         lightBar = (SeekBar) v.findViewById(R.id.light_bar);
@@ -255,7 +264,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 bundle.putString("title", getResources().getString(R.string.min_light_label));
                 bundle.putString("yes", getResources().getString(R.string.save));
                 bundle.putString("no", getResources().getString(R.string.cancel));
-                bundle.putInt("max", 335);
+                bundle.putInt("max", MAX_LIGHT);
                 bundle.putInt("min", minLight);
                 bundle.putInt("type", FromDialogListener.LIGHT_TYPE);
                 String hint = getResources().getString(R.string.value_between2) + minLight + getResources().getString(R.string.and320);
@@ -289,8 +298,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         });
 
 
-        fillTypeData();
-        fillgameData();
+        initLoader(LOADER_EVENT);
+        initLoader(LOADER_TYPE);
 
         createButton.setEnabled(false);
         createButton.setText(R.string.waiting_data);
@@ -310,12 +319,13 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         callback.loadNewFragment(fragment, bundle, "game");
     }
 
-    private void fillgameData() {
-        getLoaderManager().initLoader(LOADER_EVENT, null, this);
-    }
-
-    private void fillTypeData() {
-        getLoaderManager().initLoader(LOADER_TYPE, null, this);
+    private void initLoader(int loaderType){
+        callback.onLoadingData();
+        Log.w(TAG, "Inicializing Loader " + loaderType);
+        if (getLoaderManager().getLoader(loaderType) != null){
+            getLoaderManager().destroyLoader(loaderType);
+        }
+        getLoaderManager().restartLoader(loaderType, null, this);
     }
 
     private void checkIfIsOk(){
@@ -377,7 +387,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                         getContext(),
                         DataProvider.NOTIFICATION_URI,
                         NotificationTable.ALL_COLUMNS,
-                        NotificationTable.COLUMN_GAME + "=" + gameId,
+                        NotificationTable.COLUMN_GAME + "=" + game.getGameId(),
                         null,
                         null
                 );
@@ -399,7 +409,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 break;
             case LOADER_EVENT:
                 minLight = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT));
-                lightBar.setMax(335 - minLight);
+                lightBar.setMax(MAX_LIGHT - minLight);
                 lightText.setText(String.valueOf(minLight));
                 String iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
                 eventIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
@@ -501,8 +511,9 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onEventTypeSent(String id) {
         selectedType = id;
+        checkGame(selectedType);
+        initLoader(LOADER_TYPE);
         callEventList();
-        getLoaderManager().restartLoader(LOADER_TYPE, null, this);
         //checkGame(id);
         //getLoaderManager().restartLoader(LOADER_EVENT, null, this);
     }
@@ -511,7 +522,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     public void onEventGameSent(String id) {
         selectedEvent = id;
         checkIfIsOk();
-        getLoaderManager().restartLoader(LOADER_EVENT, null, this);
+        initLoader(LOADER_EVENT);
+        initLoader(LOADER_TYPE);
     }
 
     @Override

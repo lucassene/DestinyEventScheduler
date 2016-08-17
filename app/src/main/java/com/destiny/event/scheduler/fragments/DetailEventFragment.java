@@ -34,6 +34,7 @@ import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
+import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.provider.DataProvider;
@@ -45,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class DetailEventFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener{
+public class DetailEventFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener, UserDataListener{
 
     public static final String TAG = "DetailEventFragment";
 
@@ -373,8 +374,12 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             dialogThread();
         } else {
             if (entryList.size()==0){
+                Log.w(TAG, "entryList size = 0");
                 getMembers(game.getGameId());
-            } else onEntriesLoaded(entryList, false);
+            } else {
+                Log.w(TAG, "entryList size > 0");
+                onEntriesLoaded(entryList, false);
+            }
         }
 
     }
@@ -383,6 +388,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         callback.getGameEntries(gameId);
     }
 
+    @Override
     public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded){
         if (entryList != null){
             Log.w(TAG, "entryList size: " + entryList.size());
@@ -414,7 +420,14 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         super.onAttach(context);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
+        callback.registerUserDataListener(this);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        callback.deleteUserDataListener(this);
     }
 
     @Override
@@ -651,6 +664,16 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public void onMultiItemSelected(boolean[] items) {
+
+    }
+
+    @Override
+    public void onUserDataLoaded() {
+
+    }
+
+    @Override
+    public void onGamesLoaded(List<GameModel> gameList) {
 
     }
 }

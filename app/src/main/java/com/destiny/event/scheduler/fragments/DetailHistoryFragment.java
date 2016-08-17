@@ -1,14 +1,9 @@
 package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,27 +16,19 @@ import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
-import com.destiny.event.scheduler.adapters.HistoryAdapter;
-import com.destiny.event.scheduler.data.EntryTable;
-import com.destiny.event.scheduler.data.EvaluationTable;
-import com.destiny.event.scheduler.data.EventTable;
-import com.destiny.event.scheduler.data.EventTypeTable;
-import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.adapters.DetailEventAdapter;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
-import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.interfaces.UserDataListener;
+import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.utils.DateUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class DetailHistoryFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DetailHistoryFragment extends ListFragment implements UserDataListener{
 
     private static final String TAG = "DetailHistoryFragment";
-
-    private static final int LOADER_HISTORY = 74;
-
-    private String gameId;
-    private ArrayList<String> bungieIdList;
 
     View headerView;
     View includedView;
@@ -57,12 +44,13 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
 
     private ToActivityListener callback;
 
-    private String[] gameProjection;
+    DetailEventAdapter adapter;
 
-    private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, "likes", "dislikes", "likes", "dislikes", MemberTable.COLUMN_TITLE}; //Atualizar com os campos que serão exibidos
-    private static final int[] to = {R.id.primary_text, R.id.profile_pic, R.id.txt_xp, R.id.txt_likes, R.id.txt_dislikes, R.id.secondary_text};
+    ArrayList<MemberModel> entryList;
 
-    HistoryAdapter adapter;
+    GameModel game;
+    int maxGuardians;
+    int inscriptions;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,10 +84,8 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
 
         Bundle bundle = getArguments();
         if (bundle != null) {
-            gameId = bundle.getString("gameId");
+            game = (GameModel) bundle.getSerializable("game");
         }
-
-        bungieIdList = new ArrayList<>();
 
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
@@ -109,11 +95,15 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         super.onViewCreated(view, savedInstanceState);
+        entryList = new ArrayList<>();
+        adapter = new DetailEventAdapter(getContext(), entryList, game.getMaxGuardians());
+        getListView().setAdapter(adapter);
 
+        if (headerView != null){
+            this.getListView().addHeaderView(headerView, null, false);
+        }
         getGameData();
-
     }
 
     @Override
@@ -124,64 +114,69 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        String bungieId = bungieIdList.get(position - 1);
-
         Fragment fragment = new MyNewProfileFragment();
 
         Bundle bundle = new Bundle();
-        bundle.putString("bungieId", bungieId);
+        bundle.putString("bungieId", entryList.get(position-1).getMembershipId());
         bundle.putInt("type", MyNewProfileFragment.TYPE_DETAIL);
 
         callback.loadNewFragment(fragment, bundle, "profile");
     }
 
     private void getGameData() {
+        eventIcon.setImageResource(getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
+        eventName.setText(getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
+        eventType.setText(getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
 
-        if (headerView != null){
-            this.getListView().addHeaderView(headerView, null, false);
+        String gameTime = game.getTime();
+        date.setText(DateUtils.onBungieDate(gameTime));
+        time.setText(DateUtils.getTime(gameTime));
+        light.setText(String.valueOf(game.getMinLight()));
+
+        maxGuardians = game.getMaxGuardians();
+        inscriptions = game.getInscriptions();
+        String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
+        guardians.setText(sg);
+
+        if (entryList == null || entryList.size() == 0){
+            Log.w(TAG, "entryList size = 0");
+            callback.getGameEntries(game.getGameId());
+        } else {
+            Log.w(TAG, "entryList size > 0");
+            onEntriesLoaded(entryList, false);
         }
 
-        adapter = new HistoryAdapter(getContext(), R.layout.history_member_item, null, from, to, 0);
-        setListAdapter(adapter);
-
-        prepareStrings();
-        getLoaderManager().initLoader(LOADER_HISTORY, null, this);
     }
 
-    private void prepareStrings() {
+    @Override
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded) {
+        if (entryList != null){
+            Log.w(TAG, "entryList size: " + entryList.size());
+            this.entryList = (ArrayList<MemberModel>) entryList;
+            String sg = entryList.size() + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
+            guardians.setText(sg);
+            setAdapter(this.entryList, maxGuardians);
+        }
+    }
 
-        String c1 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID);
-        String c2 = EntryTable.COLUMN_TIME;
-
-        String c3 = GameTable.COLUMN_INSCRIPTIONS;
-        String c4 = GameTable.COLUMN_TIME;
-        String c5 = GameTable.COLUMN_LIGHT;
-        String c6 = GameTable.COLUMN_CREATOR;
-
-        String c7 = EventTable.COLUMN_NAME;
-        String c8 = EventTable.COLUMN_ICON;
-        String c9 = EventTable.COLUMN_GUARDIANS;
-
-        String c10= EventTypeTable.COLUMN_NAME;
-
-        String c11 = MemberTable.COLUMN_MEMBERSHIP;
-        String c12 = MemberTable.COLUMN_NAME;
-        String c13 = MemberTable.COLUMN_ICON;
-
-        String c14 = "SUM(CASE WHEN " + EvaluationTable.COLUMN_EVALUATION + " = -1 AND " + EvaluationTable.COLUMN_MEMBERSHIP_B + "=" + MemberTable.COLUMN_MEMBERSHIP + " THEN 1 ELSE 0 END) AS dislikes"; // colocar um AND para somar apenas os que são do memberId
-        String c15 = "SUM(CASE WHEN " + EvaluationTable.COLUMN_EVALUATION + " = 1 AND " + EvaluationTable.COLUMN_MEMBERSHIP_B + "=" + MemberTable.COLUMN_MEMBERSHIP + " THEN 1 ELSE 0 END) AS likes";
-
-        String c16 = MemberTable.COLUMN_TITLE;
-
-        gameProjection = new String[]{c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16};
-
+    private void setAdapter(List<MemberModel> entries, int max) {
+        setListAdapter(null);
+        adapter = new DetailEventAdapter(getContext(),entries, max);
+        setListAdapter(adapter);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         callback = (ToActivityListener) getActivity();
+        callback.registerUserDataListener(this);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        callback.deleteUserDataListener(this);
     }
 
     @Override
@@ -199,72 +194,14 @@ public class DetailHistoryFragment extends ListFragment implements LoaderManager
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        callback.onLoadingData();
-
-        String sumDislikes = "SUM(CASE WHEN " + EvaluationTable.COLUMN_EVALUATION + "=-1 THEN 1 ELSE 0 END) AS dislikes";
-        String sumLikes = "SUM(CASE WHEN " + EvaluationTable.COLUMN_EVALUATION + "=1 THEN 1 ELSE 0 END) AS likes";
-        String totalSum = "SUM(" + EvaluationTable.COLUMN_EVALUATION + ") AS sum";
-
-        String[] proj = new String[] {EvaluationTable.COLUMN_GAME, EvaluationTable.COLUMN_MEMBERSHIP_A, EvaluationTable.COLUMN_MEMBERSHIP_B, sumLikes, sumDislikes};
-
-        switch (id) {
-            case LOADER_HISTORY:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.ENTRY_HISTORY_URI,
-                        gameProjection,
-                        EntryTable.COLUMN_GAME + "=" + gameId,
-                        null,
-                        "datetime(" + EntryTable.COLUMN_TIME + ") ASC"
-                );
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        if (data != null && data.moveToFirst()) {
-            Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
-            switch (loader.getId()) {
-                case LOADER_HISTORY:
-                    adapter.swapCursor(data);
-
-                    eventIcon.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", getContext().getPackageName() ));
-
-                    String gameEventName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", getContext().getPackageName()));
-                    eventName.setText(gameEventName);
-
-                    String gameEventTypeName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)), "string", getContext().getPackageName()));
-                    eventType.setText(gameEventTypeName);
-
-                    date.setText(DateUtils.onBungieDate(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-                    time.setText(DateUtils.getTime(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-                    light.setText(data.getString(data.getColumnIndexOrThrow(GameTable.COLUMN_LIGHT)));
-
-                    int maxGuardians = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS));
-                    int inscriptions = data.getInt(data.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
-                    String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
-                    guardians.setText(sg);
-
-                    data.moveToFirst();
-                    for (int i = 0; i < data.getCount(); i++) {
-                        bungieIdList.add(i, data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP)));
-                        data.moveToNext();
-                    }
-                    //Log.w(TAG, "Entry Cursor: " + DatabaseUtils.dumpCursorToString(data));
-                    break;
-            }
-        }
-        callback.onDataLoaded();
+    public void onUserDataLoaded() {
 
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+    public void onGamesLoaded(List<GameModel> gameList) {
+
     }
+
+
 }

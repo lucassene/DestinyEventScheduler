@@ -157,6 +157,24 @@
         <item>Ligeiro</item>
     </string-array>
 
+    <string-array name="medal_names">
+        <item>Meu jogo, minhas regras</item>
+        <item>Jogador</item>
+        <item>O olho que tudo vê</item>
+        <item>Sem dor, sem ganho</item>
+        <item>Assaltante</item>
+        <item>Cowboy do espaço</item>
+    </string-array>
+
+    <string-array name="medal_desc">
+        <item>Número de eventos criados</item>
+        <item>Número de eventos jogados</item>
+        <item>Avaliações feitas</item>
+        <item>Partidas de crisol disputados</item>
+        <item>Número de assaltos realizados</item>
+        <item>Número de inscursões realizadas</item>
+    </string-array>
+
     <string name="refresh_lists">Atualizar listas</string>
     <string name="game_type_label">Tipo de jogo</string>
     <string name="max_guardians_label">Mínimo de guardiões</string>
@@ -218,7 +236,7 @@
     <string name="dreadnaught">Patrulhe o Encouraçado</string>
     <string name="dust">Palácio das Areias</string>
     <string name="echo">Câmara do Eco</string>
-    <string name="heroic">Assalto Heróico</string>
+    <string name="heroic">Assalto Heroico</string>
     <string name="king_normal">A Queda do Rei - NORMAL</string>
     <string name="legacy">Assalto Clássico</string>
     <string name="mars">Patrulhe Marte</string>
@@ -244,7 +262,7 @@
     <string name="vault_hard">Câmara de Cristal - DIFÍCIL</string>
     <string name="vault_normal">Câmara de Cristal - NORMAL</string>
     <string name="venus">Patrulhe Vênus</string>
-    <string name="weekly">Assalto Heróico Semanal</string>
+    <string name="weekly">Assalto Heroico Semanal</string>
     <string name="will">A Vontade de Crota</string>
     <string name="winter">Caminho Invernal</string>
     <string name="choose_type">Escolha o tipo de jogo:</string>
@@ -254,7 +272,7 @@
     <string name="choose_game">Escolha o modo de jogo:</string>
     <string name="inferno3">Inferno 3v3</string>
     <string name="inferno6">Inferno 6v6</string>
-    <string name="and320">" e 335"</string>
+    <string name="and320">" e 400"</string>
     <string name="cancel">Cancelar</string>
     <string name="save">Salvar</string>
     <string name="value_between2">"Valor entre "</string>
@@ -417,5 +435,13 @@
     <string name="credentials_expired">Suas credenciais expiraram. Por favor faça novamente seu login para continuar.</string>
     <string name="unable_update_clan">Não foi possível atualizar o clã. Por favor tente novamente mais tarde.</string>
     <string name="server_error_msg">Problema ao conectar no servidor. Por favor tente novamente mais tarde.</string>
+    <string name="mayhem_supremacy">Caos: Supremacia</string>
+    <string name="supremacy1">Supremacia FFA</string>
+    <string name="supremacy3">Supremacia 3v3</string>
+    <string name="supremacy6">Supremacia 6v6</string>
+    <string name="wrath_hard">A Ira da Máquina - DIFÍCIL</string>
+    <string name="wrath_normal">A Ira da Máquina - NORMAL</string>
+    <string name="wretched">O Olho Miserável</string>
+    <string name="perfected"></string>
 
 </resources>

@@ -244,6 +244,33 @@
         <item>Swift</item>
     </string-array>
 
+    <string name="medals_icons">
+        <item>@drawable/ic_created_medal</item>
+        <item>@drawable/ic_played_medal</item>
+        <item>@drawable/ic_eval_medal</item>
+        <item>@drawable/ic_crucible_medal</item>
+        <item>@drawable/ic_strike_medal</item>
+        <item>@drawable/ic_raid_medal</item>
+    </string>
+
+    <string-array name="medal_names">
+        <item>My game, my rules</item>
+        <item>Player</item>
+        <item>Eye of the beholder</item>
+        <item>No pain, no gain</item>
+        <item>Striker</item>
+        <item>Space cowboy</item>
+    </string-array>
+
+    <string-array name="medal_desc">
+        <item>Number of created events</item>
+        <item>Number of played events</item>
+        <item>Evaluations made</item>
+        <item>Crucible events played</item>
+        <item>Strike events played</item>
+        <item>Raid events played</item>
+    </string-array>
+
     <string name="default_title">New on the block</string>
 
     <string name="tier1">Reciprocate Rune</string>
@@ -269,7 +296,11 @@
     <string name="trials">Trials of Osiris</string>
     <string name="zone_control">Zone Control</string>
     <string name="srl_race">SRL Race</string>
-    
+    <string name="supremacy1">Supremacy FFA</string>
+    <string name="supremacy3">Supremacy 3v3</string>
+    <string name="supremacy6">Supremacy 6v6</string>
+    <string name="mayhem_supremacy">Mayhem Supremacy</string>
+
     <string name="malok">Blighted Chalice</string>
     <string name="valus">Cerberus Vae III</string>
     <string name="dust">Dust Palace</string>
@@ -284,6 +315,9 @@
     <string name="mind">The Undying Mind</string>
     <string name="will">The Will of Crota</string>
     <string name="winter">Winter\'s Run</string>
+    <string name="wretched">Wretched Eye</string>
+    <string name="heist">Abomination Heist</string>
+    <string name="perfected">Sepiks Perfected</string>
 
     <string name="nightfall">Nightfall</string>
     <string name="weekly">Weekly Heroic Strike</string>
@@ -297,12 +331,15 @@
     <string name="king_hard">King\'s Fall - HARD</string>
     <string name="vault_normal">Vault of Glass - NORMAL</string>
     <string name="vault_hard">Vault of Glass - HARD</string>
+    <string name="wrath_normal">Wrath of the Machine - NORMAL</string>
+    <string name="wrath_hard">Wrath of the Machine - HARD</string>
 
     <string name="cosmodrome">Patrol the Cosmodrome</string>
     <string name="dreadnaught">Patrol the Dreadnaught</string>
     <string name="mars">Patrol Mars</string>
     <string name="moon">Patrol the Moon</string>
     <string name="venus">Patrol Venus</string>
+    <string name="plaguelands">Patrol the Plaguelands</string>
     
     <string name="prison28">Prison of Elders - 28</string>
     <string name="prison32">Prison of Elders - 32</string>
@@ -323,7 +360,7 @@
     <string name="cancel">Cancel</string>
     <string name="values_between1">"Value between 2 and "</string>
     <string name="value_between2">"Value between "</string>
-    <string name="and320">" and 335"</string>
+    <string name="and320">" and 400"</string>
     <string name="prepare_label1">Looking for your documents</string>
     <string name="prepare_label2">Have you been here?</string>
     <string name="prepare_label3">Taking a picture</string>
