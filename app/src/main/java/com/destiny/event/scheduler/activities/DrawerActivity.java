@@ -167,6 +167,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     ArrayList<GameModel> validatedGameList;
 
     ArrayList<MemberModel> entryList;
+    ArrayList<MemberModel> historyEntries;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -389,6 +390,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         outState.putString("fragTag", fragmentTag);
         outState.putInt("fragType", openedFragmentType);
         outState.putSerializable("entryList", entryList);
+        outState.putSerializable("historyEntries", historyEntries);
         outState.putString("bungieId", bungieId);
     }
 
@@ -416,6 +418,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             joinedGameList = getGamesFromList(allGameList, GameTable.STATUS_JOINED);
         }
         entryList = (ArrayList<MemberModel>) savedInstanceState.getSerializable("entryList");
+        historyEntries = (ArrayList<MemberModel>) savedInstanceState.getSerializable("historyEntries");
         bungieId = savedInstanceState.getString("bungieId");
     }
 
@@ -519,6 +522,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void onGameSelected(GameModel game, String tag) {
 
         entryList = null;
+        historyEntries = null;
         Fragment fragment;
         Bundle bundle = new Bundle();
         bundle.clear();
@@ -729,6 +733,27 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
+    public void getGameHistory(int gameId) {
+        if (historyEntries == null){
+            Log.w(TAG, "historyEntries is null");
+            if (NetworkUtils.checkConnection(this)){
+                if (!isServerServiceRunning()){
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_HISTORY);
+                    bundle.putInt(ServerService.GAMEID_TAG, gameId);
+                    runServerService(bundle);
+                } else Log.w(TAG, "ServerService still running");
+            } else {
+                Toast.makeText(this, getString(R.string.check_connection), Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            if (userDataListener != null){
+                userDataListener.onEntriesLoaded(historyEntries, false);
+            }
+        }
+    }
+
+    @Override
     public void updateGameStatus(GameModel game, int status) {
         switch (status) {
             case GameTable.STATUS_NEW:
@@ -850,7 +875,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         Bundle bundle = new Bundle();
         bundle.putString("bungieId", bungieId);
-        bundle.putString("clanName", clanName);
         bundle.putInt("type", MyNewProfileFragment.TYPE_MENU);
 
         prepareFragmentHolder(fragment, child, bundle, "profile");
@@ -1325,9 +1349,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     }
                 }
                 if (getOpenedFragment() instanceof DetailHistoryFragment){
-                    entryList = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
-                    userDataListener.onEntriesLoaded(entryList, true);
-                    if (!isLocalServiceRunning() && entryList != null) updateMembers(entryList);
+                    historyEntries = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
+                    userDataListener.onEntriesLoaded(historyEntries, true);
                 }
                 if (openedFragment == null) {
                     Log.w(TAG, "No fragments open. Refreshing main lists");

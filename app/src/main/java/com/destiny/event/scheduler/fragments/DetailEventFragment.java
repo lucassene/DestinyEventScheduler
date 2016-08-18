@@ -195,10 +195,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             }
         });
 
-        //if (savedInstanceState != null){
-            //entryList = (ArrayList<MemberModel>) savedInstanceState.getSerializable("entryList");
-        //}
-
         return v;
     }
 

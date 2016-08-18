@@ -444,7 +444,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     @Override
     public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded){
         if (entryList != null){
-            Log.w(TAG, "entryList size: " + entryList.size());
+            Log.w(TAG, "historyEntries size: " + entryList.size());
             this.entryList = (ArrayList<MemberModel>) entryList;
             for (int i=0;i<entryList.size();i++){
                 entryList.get(i).setChecked(true);
@@ -462,7 +462,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("entryList",entryList);
+        outState.putSerializable("historyEntries",entryList);
     }
 
     private void setAdapter(List<MemberModel> entryList) {

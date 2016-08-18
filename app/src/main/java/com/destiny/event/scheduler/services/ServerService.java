@@ -43,6 +43,7 @@ public class ServerService extends IntentService {
     private static final String LEAVE_ENDPOINT = "/leave";
     private static final String VALIDATE_ENDPOINT = "/validate";
     private static final String EVALUATION_ENDPOINT = "/evaluations/";
+    private static final String HISTORY_ENDPOINT = "/history";
 
     private static final String STATUS_PARAM = "status=";
     private static final String JOINED_PARAM = "joined=";
@@ -85,6 +86,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_HISTORY_GAMES = 9;
     public static final int TYPE_VALIDATE_GAME = 10;
     public static final int TYPE_EVALUATE_GAME = 11;
+    public static final int TYPE_HISTORY = 12;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -251,6 +253,17 @@ public class ServerService extends IntentService {
                     } else sendIdWithType(receiver, intent.getIntExtra(GAMEID_TAG, -1), TYPE_VALIDATE_GAME);
                 } else sendError(receiver, ERROR_INCORRECT_REQUEST);
                 break;
+            case TYPE_HISTORY:
+                if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
+                    url = SERVER_BASE_URL + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1) + HISTORY_ENDPOINT;
+                    bundle.clear();
+                    bundle.putInt(GAMEID_TAG, intent.getIntExtra(GAMEID_TAG, -1));
+                    error = requestServer(receiver, type, url, bundle);
+                    if (error != NO_ERROR){
+                        sendError(receiver, error);
+                    } else sendEntryData(receiver, memberList);
+                } else sendError(receiver, ERROR_INCORRECT_REQUEST);
+                break;
         }
         this.stopSelf();
 
@@ -306,6 +319,7 @@ public class ServerService extends IntentService {
                     case TYPE_NEW_GAMES:
                     case TYPE_JOINED_GAMES:
                     case TYPE_HISTORY_GAMES:
+                    case TYPE_HISTORY:
                         urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
                         break;
                     case TYPE_JOIN_GAME:
@@ -356,6 +370,9 @@ public class ServerService extends IntentService {
                                 case TYPE_EVALUATE_GAME:
                                     Log.w(TAG, "Response: " + response);
                                     return error;
+                                case TYPE_HISTORY:
+                                    error = parseHistory(response);
+                                    return error;
                                 default:
                                     return NO_ERROR;
                             }
@@ -379,6 +396,30 @@ public class ServerService extends IntentService {
             Log.w(TAG, "Error in HTTP request");
             return ERROR_HTTP_REQUEST;
         }
+    }
+
+    private int parseHistory(String response) {
+        Log.w(TAG, "GetHistory response: " + response);
+        JSONArray jResponse;
+        memberList = new ArrayList<>();
+        try {
+            jResponse = new JSONArray(response);
+            for (int i=0;i<jResponse.length();i++){
+                JSONObject jEntry = jResponse.getJSONObject(i);
+                MemberModel member = new MemberModel();
+                member.setMembershipId(jEntry.getString("membership"));
+                member.setName(jEntry.getString("name"));
+                member.setIconPath(jEntry.getString("icon"));
+                member.setLikes(jEntry.getInt("totalLikes"));
+                member.setDislikes(jEntry.getInt("totalDislikes"));
+                member.setTitle(getString(R.string.default_title));
+                memberList.add(member);
+            }
+        } catch (JSONException e){
+            e.printStackTrace();
+            return ERROR_JSON;
+        }
+        return NO_ERROR;
     }
 
     private int parseEntries(String response) {

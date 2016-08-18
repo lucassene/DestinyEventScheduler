@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
-import com.destiny.event.scheduler.adapters.DetailEventAdapter;
+import com.destiny.event.scheduler.adapters.DetailHistoryAdapter;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -44,13 +44,13 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
 
     private ToActivityListener callback;
 
-    DetailEventAdapter adapter;
+    DetailHistoryAdapter adapter;
 
-    ArrayList<MemberModel> entryList;
+    ArrayList<MemberModel> historyEntries;
 
     GameModel game;
-    int maxGuardians;
     int inscriptions;
+    int maxGuardians;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,8 +96,8 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        entryList = new ArrayList<>();
-        adapter = new DetailEventAdapter(getContext(), entryList, game.getMaxGuardians());
+        historyEntries = new ArrayList<>();
+        adapter = new DetailHistoryAdapter(getContext(), historyEntries);
         getListView().setAdapter(adapter);
 
         if (headerView != null){
@@ -117,7 +117,7 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
         Fragment fragment = new MyNewProfileFragment();
 
         Bundle bundle = new Bundle();
-        bundle.putString("bungieId", entryList.get(position-1).getMembershipId());
+        bundle.putString("bungieId", historyEntries.get(position-1).getMembershipId());
         bundle.putInt("type", MyNewProfileFragment.TYPE_DETAIL);
 
         callback.loadNewFragment(fragment, bundle, "profile");
@@ -138,12 +138,12 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
         String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
         guardians.setText(sg);
 
-        if (entryList == null || entryList.size() == 0){
-            Log.w(TAG, "entryList size = 0");
-            callback.getGameEntries(game.getGameId());
+        if (historyEntries == null || historyEntries.size() == 0){
+            Log.w(TAG, "historyEntries size = 0");
+            callback.getGameHistory(game.getGameId());
         } else {
-            Log.w(TAG, "entryList size > 0");
-            onEntriesLoaded(entryList, false);
+            Log.w(TAG, "historyEntries size > 0");
+            onEntriesLoaded(historyEntries, false);
         }
 
     }
@@ -151,17 +151,17 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
     @Override
     public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded) {
         if (entryList != null){
-            Log.w(TAG, "entryList size: " + entryList.size());
-            this.entryList = (ArrayList<MemberModel>) entryList;
+            Log.w(TAG, "historyEntries size: " + entryList.size());
+            this.historyEntries = (ArrayList<MemberModel>) entryList;
             String sg = entryList.size() + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
             guardians.setText(sg);
-            setAdapter(this.entryList, maxGuardians);
+            setAdapter(this.historyEntries);
         }
     }
 
-    private void setAdapter(List<MemberModel> entries, int max) {
+    private void setAdapter(List<MemberModel> entries) {
         setListAdapter(null);
-        adapter = new DetailEventAdapter(getContext(),entries, max);
+        adapter = new DetailHistoryAdapter(getContext(),entries);
         setListAdapter(adapter);
     }
 

@@ -16,6 +16,11 @@
         <item>finished</item>
     </string-array>
 
+    <string-array name="profile_tab_titles">
+        <item>stats</item>
+        <item>medals</item>
+    </string-array>
+
     <string-array name="menu_item">
         <item>Main</item>
         <item>Create event</item>
@@ -214,44 +219,86 @@
     </string-array>
 
     <string-array name="event_title">
-        <item>Rune</item>
-        <item>of War</item>
-        <item>of Olds</item>
-        <item>Control</item>
-        <item>of the Brotherhood</item>
-        <item>of Death</item>
-        <item>from Hell</item>
-        <item>Iron</item>
-        <item>of Mayhem</item>
-        <item>Rift</item>
-        <item>of Relics</item>
-        <item>Battle</item>
-        <item>of Osiris</item>
-        <item>Zone</item>
-        <item>of the City</item>
-        <item>Hive</item>
-        <item>of Sands</item>
-        <item>Lunatic</item>
-        <item>of Ishtar</item>
-        <item>of Chains</item>
-        <item>Eri\'s</item>
-        <item>of Time</item>
-        <item>Regicide</item>
-        <item>Vanguard</item>
-        <item>of Dawn</item>
-        <item>Lone</item>
-        <item>Galaxy</item>
-        <item>Swift</item>
+        <item>b:Rune</item> //1
+        <item>b:Rune</item> //2
+        <item>b:Rune</item> //3
+        <item>a:of War</item> //4
+        <item>a:of Olds</item> //5
+        <item>a:of Olds</item> //6
+        <item>a:of Olds</item> //7
+        <item>b:Control</item> //8
+        <item>a:of the Brotherhood</item> //9
+        <item>a:of Death</item> //10
+        <item>a:from Hell</item> //11
+        <item>a:from Hell</item> //12
+        <item>a:from Hell</item> //13
+        <item>b:Iron</item> //14
+        <item>a:of Mayhem</item> //15
+        <item>a:of Mayhem</item> //16
+        <item>b:Rift</item> //17
+        <item>a:Lone</item> //18
+        <item>a:of Relics</item> //19
+        <item>b:Battle</item> //20
+        <item>b:Supreme</item> //21
+        <item>b:Supreme</item> //22
+        <item>b:Supreme</item> //23
+        <item>a:of Osiris</item> //24
+        <item>b:Zone</item> //25
+        <item>a:of the City</item> //26
+        <item>b:Hive</item> //27
+        <item>a:of Sands</item> //28
+        <item>b:Lunatic</item> //29
+        <item>a:Cursed</item> //30
+        <item>a:of Ishtar</item> //31
+        <item>a:of Chains</item> //32
+        <item>a:of Chains</item> //33
+        <item>a:of Chains</item> //34
+        <item>a:of Chains</item> //35
+        <item>a:of Chains</item> //36
+        <item>a:of Chains</item> //37
+        <item>b:Eri\'s</item> //38
+        <item>b:Eri\'s</item> //39
+        <item>b:Regicide</item> //40
+        <item>b:Regicide</item> //41
+        <item>a:of Time</item> //42
+        <item>a:of Time</item> //43
+        <item>a:John Henry</item> //44
+        <item>a:John Henry</item> //45
+        <item>b:Galaxy</item> //46
+        <item>b:Galaxy</item> //47
+        <item>b:Vanguard</item> //48
+        <item>b:Vanguard</item> //49
+        <item>b:Vanguard</item> //50
+        <item>b:Vanguard</item> //51
+        <item>b:Vanguard</item> //52
+        <item>b:Vanguard</item> //53
+        <item>b:Vanguard</item> //54
+        <item>b:Vanguard</item> //55
+        <item>b:Vanguard</item> //56
+        <item>b:Vanguard</item> //57
+        <item>b:Vanguard</item> //58
+        <item>b:Vanguard</item> //59
+        <item>b:Vanguard</item> //60
+        <item>b:Vanguard</item> //61
+        <item>b:Vanguard</item> //62
+        <item>b:Vanguard</item> //63
+        <item>b:Vanguard</item> //64
+        <item>a:of Dawn</item> //65
+        <item>b:Heroic</item> //66
+        <item>b:Heroic</item> //67
+        <item>b:Vanguard</item> //68
+        <item>b:Legacy</item> //69
+        <item>b:Swift</item> //70
     </string-array>
 
-    <string name="medals_icons">
+    <array name="medals_icons">
         <item>@drawable/ic_created_medal</item>
         <item>@drawable/ic_played_medal</item>
         <item>@drawable/ic_eval_medal</item>
         <item>@drawable/ic_crucible_medal</item>
         <item>@drawable/ic_strike_medal</item>
         <item>@drawable/ic_raid_medal</item>
-    </string>
+    </array>
 
     <string-array name="medal_names">
         <item>My game, my rules</item>
@@ -523,6 +570,7 @@
     <string name="credentials_expired">Your credentials have expired. Please login again to continue.</string>
     <string name="unable_update_clan">Unable to update clan data now. Please try again later.</string>
     <string name="server_error_msg">Problem connecting to server. Please try again later.</string>
+    <string name="xp">XP</string>
 
 
 </resources>

@@ -154,22 +154,22 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 selectedEvent = "4";
                 break;
             case "3":
-                selectedEvent = "25";
+                selectedEvent = "26";
                 break;
             case "4":
-                selectedEvent = "31";
+                selectedEvent = "32";
                 break;
             case "5":
-                selectedEvent = "37";
+                selectedEvent = "38";
                 break;
             case "6":
-                selectedEvent = "45";
+                selectedEvent = "46";
                 break;
             case "7":
-                selectedEvent = "47";
+                selectedEvent = "48";
                 break;
             case "8":
-                selectedEvent = "64";
+                selectedEvent = "65";
                 break;
         }
     }
