@@ -327,7 +327,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
     @Override
-    public void onItemSelected(String entry, int value) {
+    public void onItemSelected(String type, String entry, int value) {
 
     }
 

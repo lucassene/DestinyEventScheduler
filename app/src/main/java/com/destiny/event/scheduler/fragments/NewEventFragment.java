@@ -499,7 +499,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onItemSelected(String entry, int value) {
+    public void onItemSelected(String type, String entry, int value) {
     }
 
     @Override

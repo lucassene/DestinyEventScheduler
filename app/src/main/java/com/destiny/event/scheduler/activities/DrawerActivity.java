@@ -101,10 +101,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String SCHEDULED_TIME_PREF = "notificationTime";
     public static final String SOUND_PREF = "scheduledNotifySound";
     public static final String NEW_NOTIFY_PREF = "allowNewNotify";
+    public static final String NEW_NOTIFY_TIME_PREF = "newNotificationTime";
     public static final String FOREGROUND_PREF = "isForeground";
     public static final String DOWNLOAD_PREF = "downloadList";
     public static final String COOKIES_PREF = "cookies";
     public static final String XCSRF_PREF = "xcsrf";
+    public static final int DEFAULT_INTERVAL = 3600000;
 
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
     public static final int FRAGMENT_TYPE_WITH_BACKSTACK = 1;
@@ -580,6 +582,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         if (firstId != 0) {
             Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
             PendingIntent pIntent = PendingIntent.getBroadcast(this, firstId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             alarm.set(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
             Log.w(TAG, "requestId: " + firstId + " registered!");
@@ -587,6 +590,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         if (secondId != 0) {
             Intent sIntent = new Intent(this, AlarmReceiver.class);
+            sIntent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
             PendingIntent psIntent = PendingIntent.getBroadcast(this, secondId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
             Log.w(TAG, "requestId: " + secondId + " registered!");
@@ -1201,7 +1205,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void onItemSelected(String entry, int value) {
+    public void onItemSelected(String type, String entry, int value) {
 
     }
 
@@ -1399,6 +1403,35 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         intent.putExtra(LocalService.MEMBERS_HEADER, (Serializable) list);
         intent.putExtra(LocalService.CLAN_HEADER, clanId);
         startService(intent);
+    }
+
+    @Override
+    public void registerNewGamesAlarm() {
+        SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        if (sharedPrefs.getBoolean(NEW_NOTIFY_PREF,false)){
+            int interval = sharedPrefs.getInt(NEW_NOTIFY_TIME_PREF, DEFAULT_INTERVAL);
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
+            intent.putExtra("memberId",bungieId);
+            intent.putExtra("platformId",platformId);
+            PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(),interval, pIntent);
+            Log.w(TAG, "New game alarm registered in an interval of " + interval + " millis");
+        }
+    }
+
+    @Override
+    public void deleteNewGamesAlarm() {
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
+        intent.putExtra("memberId",bungieId);
+        intent.putExtra("platformId",platformId);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarm.cancel(pIntent);
+        Log.w(TAG, "New game alarm deleted.");
+
     }
 
     private ArrayList<GameModel> getGamesFromList(ArrayList<GameModel> gList, int type) {

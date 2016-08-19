@@ -3,10 +3,14 @@ package com.destiny.event.scheduler.services;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.destiny.event.scheduler.activities.DrawerActivity;
+import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.provider.DataProvider;
 
@@ -34,15 +38,36 @@ public class AlarmService extends IntentService {
             }
 
             cursor.close();
+        }
 
+        Cursor newCursor = getContentResolver().query(DataProvider.LOGGED_USER_URI, LoggedUserTable.ALL_COLUMNS, null, null, null);
+        if (newCursor != null && newCursor.moveToFirst()){
+            String memberId = newCursor.getString(newCursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
+            int platformId = newCursor.getInt(newCursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
+            registerNewGamesAlarm(memberId, platformId);
+            newCursor.close();
         }
 
     }
 
-    private void registerAlarm(Integer notifyId, String notifyTime) {
+    private void registerNewGamesAlarm(String memberId, int platformId) {
+        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        int interval = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, DrawerActivity.DEFAULT_INTERVAL);
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
+        intent.putExtra("memberId",memberId);
+        intent.putExtra("platformId",platformId);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(), interval, pIntent);
+        Log.w(TAG, "New game alarm registered after boot.");
 
+    }
+
+    private void registerAlarm(Integer notifyId, String notifyTime) {
         long time = Long.parseLong(notifyTime);
         Intent intent = new Intent(this, AlarmReceiver.class);
+        intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
         PendingIntent pIntent = PendingIntent.getBroadcast(this, notifyId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarm.set(AlarmManager.RTC_WAKEUP, time, pIntent);

@@ -18,41 +18,55 @@ public class SingleChoiceDialog extends DialogFragment implements DialogInterfac
 
     private int selectedItem = 0;
 
+    String[] entries;
+    int[] values;
+
+    String type;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         String title = "";
-
         Bundle bundle = getArguments();
 
+        int array = 0;
         if (bundle != null){
             title = bundle.getString("title");
             selectedItem = bundle.getInt("selectedItem");
             listener = (FromDialogListener) getFragmentManager().findFragmentByTag(bundle.getString("fragTag"));
+            type = bundle.getString("type");
+            if (type.equals("scheduled")){
+                array = R.array.pref_time_list_entries;
+                entries = getResources().getStringArray(R.array.pref_time_list_entries);
+                values = getResources().getIntArray(R.array.pref_time_list_values);
+            } else if (bundle.getString("type").equals("new")){
+                array = R.array.pref_new_time_list_entries;
+                entries = getResources().getStringArray(R.array.pref_new_time_list_entries);
+                values = getResources().getIntArray(R.array.pref_new_time_list_values);
+            }
         }
 
+        return buildDialog(title, array);
+    }
+
+    private AlertDialog buildDialog(String title, int array) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(), R.style.DestinyApp_AlertDialog)
                 .setTitle(title)
-                .setSingleChoiceItems(R.array.pref_time_list_entries, selectedItem, this)
+                .setSingleChoiceItems(array, selectedItem, this)
                 .setNegativeButton(getResources().getString(R.string.nevermind), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
-
         return dialog.create();
     }
 
-
-
     @Override
     public void onClick(DialogInterface dialog, int which) {
-        String[] entries = getResources().getStringArray(R.array.pref_time_list_entries);
-        String[] values = getResources().getStringArray(R.array.pref_time_list_values);
         if (listener != null ){
             selectedItem = which;
-            listener.onItemSelected(entries[which],Integer.parseInt(values[which]));
+            listener.onItemSelected(type, entries[which],values[which]);
         } else {
             Log.w(TAG, "Listener não foi encontrado!");
         }

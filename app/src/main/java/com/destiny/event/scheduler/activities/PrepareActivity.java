@@ -227,7 +227,8 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
         sharedEditor.putBoolean(DrawerActivity.SOUND_PREF, true);
         sharedEditor.putBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, true);
         sharedEditor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
-        sharedEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
+        sharedEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, 0);
+        sharedEditor.putInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, DrawerActivity.DEFAULT_INTERVAL);
         sharedEditor.apply();
 
        if (sharedPrefs.getBoolean(DrawerActivity.FOREGROUND_PREF, false)){
@@ -264,7 +265,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
     }
 
     @Override
-    public void onItemSelected(String entry, int value) {
+    public void onItemSelected(String type, String entry, int value) {
 
     }
 

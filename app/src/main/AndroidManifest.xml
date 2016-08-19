@@ -100,6 +100,11 @@
             android:enabled="true">
         </service>
 
+        <service android:name=".services.NewGameNotificationService"
+            android:exported="false"
+            android:enabled="true">
+        </service>
+
 
         <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->

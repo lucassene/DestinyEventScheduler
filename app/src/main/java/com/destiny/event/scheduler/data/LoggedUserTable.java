@@ -28,7 +28,7 @@ public class LoggedUserTable {
             + COLUMN_CLAN
             + " TEXT NOT NULL, "
             + COLUMN_PLATFORM
-            + " TEXT NOT NULL"
+            + " INTEGER NOT NULL"
             + ");";
 
     public static void onCreate(SQLiteDatabase db){

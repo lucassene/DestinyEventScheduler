@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,6 +33,8 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     private static final String TAG = "MainSettingsFragment";
 
+    private static final int DIVISOR = 60000;
+
     private SwitchCompat scheduledSwitch;
     private LinearLayout scheduledListLayout;
     private TextView timeText;
@@ -44,6 +45,9 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     private SwitchCompat newSwitch;
     private LinearLayout newListLayout;
     private TextView listText;
+
+    private TextView newTimeText;
+    private LinearLayout newTimeLayout;
 
     private ToActivityListener callback;
 
@@ -56,6 +60,10 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     private int previousScheduleTime;
     private int newScheduleTime;
+    private boolean previousNewPrefs;
+    private boolean newNewPrefs;
+    private int previousNewTime;
+    private int newNewTime;
 
     private boolean checkChanged;
     private boolean previousCheck;
@@ -68,7 +76,6 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.settings);
         View v = inflater.inflate(R.layout.settings_layout, container, false);
 
         scheduledSwitch = (SwitchCompat) v.findViewById(R.id.scheduled_switch);
@@ -81,6 +88,9 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         newSwitch = (SwitchCompat) v.findViewById(R.id.new_switch);
         newListLayout = (LinearLayout) v.findViewById(R.id.new_list_layout);
         listText = (TextView) v.findViewById(R.id.new_list_text);
+
+        newTimeText = (TextView) v.findViewById(R.id.new_list_time_text);
+        newTimeLayout = (LinearLayout) v.findViewById(R.id.new_time_list_layout);
 
         scheduledSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -96,6 +106,22 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
                 bundle.putString("title",getResources().getString(R.string.time));
                 bundle.putInt("selectedItem", getSelectedTime());
                 bundle.putString("fragTag",getTag());
+                bundle.putString("type","scheduled");
+
+                SingleChoiceDialog dialog = new SingleChoiceDialog();
+                dialog.setArguments(bundle);
+                dialog.show(getFragmentManager(),"singleChoiceDialog");
+            }
+        });
+
+        newTimeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putString("title",getResources().getString(R.string.time));
+                bundle.putInt("selectedItem", getNewSelectedTime());
+                bundle.putString("fragTag",getTag());
+                bundle.putString("type","new");
 
                 SingleChoiceDialog dialog = new SingleChoiceDialog();
                 dialog.setArguments(bundle);
@@ -135,6 +161,11 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         sharedPrefs = getActivity().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         previousScheduleTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
         newScheduleTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
+
+        previousNewPrefs = sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
+        previousNewTime = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF,DrawerActivity.DEFAULT_INTERVAL);
+        previousNewTime = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF,DrawerActivity.DEFAULT_INTERVAL);
+        newNewPrefs = sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
 
         checkChanged = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
         previousCheck = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
@@ -177,6 +208,22 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
                 Toast.makeText(getContext(), "Atualizando notificações ainda, por favor aguarde!", Toast.LENGTH_SHORT).show();
             }
         } else Log.w(TAG, "New notifyTime equals to previsous notifyTime. No need to change");
+        if (previousNewPrefs != newNewPrefs){
+            Log.w(TAG, "previousNew: " + previousNewPrefs + " / newNew: " + newNewPrefs);
+            Log.w(TAG, "Updating new prefs");
+            if (newNewPrefs){
+                Log.w(TAG, "Creating New games notify alarm.");
+                callback.registerNewGamesAlarm();
+            } else {
+                Log.w(TAG, "Deleting new games notify alarm.");
+                callback.deleteNewGamesAlarm();
+            }
+        }
+        if (previousNewTime != newNewTime){
+            Log.w(TAG, "Change in newTime. Updating alarm.");
+            callback.deleteNewGamesAlarm();
+            callback.registerNewGamesAlarm();
+        }
     }
 
     @Override
@@ -215,6 +262,23 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         }
     }
 
+    private int getNewSelectedTime(){
+        switch (newNewTime){
+            case 600000:
+                return 4;
+            case 1800000:
+                return 3;
+            case 3600000:
+                return 2;
+            case 7200000:
+                return 1;
+            case 21600000:
+                return 0;
+            default:
+                return 2;
+        }
+    }
+
     private void saveSoundPref(String scheduledSoundPref, boolean checked) {
         prefsEditor = sharedPrefs.edit();
         prefsEditor.putBoolean(scheduledSoundPref, checked);
@@ -232,6 +296,9 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             text = time + " " + getResources().getString(R.string.minutes_before);
         }
         timeText.setText(text);
+        int newTime = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF,DrawerActivity.DEFAULT_INTERVAL);
+        newTimeText.setText(getNewTimeText(newTime));
+
         soundCheckBox.setChecked(sharedPrefs.getBoolean(DrawerActivity.SOUND_PREF, true));
 
         newSwitch.setChecked(sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, true));
@@ -283,24 +350,32 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
                 switchType = 2;
             } else switchType = 1;
             prefsEditor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, true);
+            newNewPrefs = true;
             AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
             anim.setDuration(250);
             anim.setFillAfter(true);
             newListLayout.startAnimation(anim);
             newListLayout.setClickable(true);
             newListLayout.setFocusable(true);
+            newTimeLayout.startAnimation(anim);
+            newTimeLayout.setClickable(true);
+            newTimeLayout.setFocusable(true);
             changeSoundStatus();
         } else {
             if (!scheduledSwitch.isChecked()){
                 switchType = 0;
             } else switchType = 1;
             prefsEditor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
+            newNewPrefs = false;
             AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
             anim.setDuration(250);
             anim.setFillAfter(true);
             newListLayout.startAnimation(anim);
             newListLayout.setClickable(false);
             newListLayout.setFocusable(false);
+            newTimeLayout.startAnimation(anim);
+            newTimeLayout.setClickable(false);
+            newTimeLayout.setFocusable(false);
             changeSoundStatus();
         }
         prefsEditor.apply();
@@ -371,16 +446,40 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     }
 
     @Override
-    public void onItemSelected(String entry, int value) {
+    public void onItemSelected(String type, String entry, int value) {
         String text;
-        if (value == 0){
-            text = getResources().getString(R.string.on_time);
-        } else {
-            text = value + " " + getResources().getString(R.string.minutes_before);
+        switch(type){
+            case "scheduled":
+                if (value == 0){
+                    text = getResources().getString(R.string.on_time);
+                } else {
+                    text = value + " " + getResources().getString(R.string.minutes_before);
+                }
+                newScheduleTime = value;
+                timeText.setText(text);
+                break;
+            case "new":
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                editor.putInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, value);
+                editor.apply();
+                newNewTime = value;
+                newTimeText.setText(getNewTimeText(value));
+                break;
         }
-        newScheduleTime = value;
-        timeText.setText(text);
     }
+
+    public String getNewTimeText(int value){
+        String text;
+        if (value <= 1800000){
+            text = String.valueOf(value/DIVISOR) + getString(R.string.minutes);
+        } else if (value == 3600000){
+            text = String.valueOf((value/DIVISOR)/60) + getString(R.string.hour);
+        } else {
+            text = String.valueOf((value/DIVISOR)/60) + getString(R.string.hours);
+        }
+        return text;
+    }
+
 
     @Override
     public void onMultiItemSelected(boolean[] items) {

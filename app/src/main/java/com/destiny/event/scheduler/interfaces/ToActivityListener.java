@@ -44,4 +44,6 @@ public interface ToActivityListener {
     public void updateGameStatus(GameModel game, int status);
     public void updateGameEntries(int status, int gameId, int entries);
     public void updateMembers(List<MemberModel> list);
+    public void registerNewGamesAlarm();
+    public void deleteNewGamesAlarm();
 }
