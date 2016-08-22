@@ -1,9 +1,11 @@
 package com.destiny.event.scheduler.data;
 
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.utils.StringUtils;
 
 public class MemberTable {
@@ -108,6 +110,42 @@ public class MemberTable {
         int dislikeFator = ( dislikes *  Integer.parseInt(DISLIKE_MODIFIER));
         int result = (likesFator + createdFator + playedFator) - dislikeFator;
         return StringUtils.parseString(result);
+    }
+
+    public static String getMemberTitle(Context context, int xp, int favoriteId){
+        String[] eventTitles = context.getResources().getStringArray(R.array.event_title);
+        String title = eventTitles[favoriteId];
+        String prefix = title.substring(0,title.indexOf(":"));
+        Log.w(TAG, "Prefix: " + prefix);
+        if (prefix.equals("a")){
+            return getTitle(context, xp) + " " + title.substring(title.indexOf(":")+1,title.length());
+        } else if (prefix.equals("b")){
+            return title + " " + getTitle(context, xp);
+        } else return "Error";
+    }
+
+    private static String getTitle(Context context, int xp) {
+        String[] levelTitles = context.getResources().getStringArray(R.array.level_title);
+        int lvl = MemberTable.getMemberLevel(xp);
+        if (lvl<=10){
+            return levelTitles[0];
+        } else if (lvl<=20){
+            return levelTitles[1];
+        } else if (lvl<=30){
+            return levelTitles[2];
+        } else if (lvl<=40){
+            return levelTitles[3];
+        } else if (lvl<=50){
+            return levelTitles[4];
+        } else if (lvl<=60){
+            return levelTitles[5];
+        } else if (lvl<=70){
+            return levelTitles[6];
+        } else if (lvl<=80){
+            return levelTitles[7];
+        } else if (lvl<=90){
+            return levelTitles[8];
+        } else return levelTitles[9];
     }
 
 }

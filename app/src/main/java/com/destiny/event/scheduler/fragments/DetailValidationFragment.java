@@ -102,6 +102,8 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.detail_event_layout, container, false);
 
+        callback.registerUserDataListener(this);
+
         headerView = inflater.inflate(R.layout.validate_header_layout, null);
         footerView = inflater.inflate(R.layout.detail_footer_layout, null);
 
@@ -457,6 +459,11 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
             if (isUpdateNeeded) { callback.updateGameEntries(GameTable.STATUS_DONE, game.getGameId(), memberList.size()); }
             setAdapter(memberList);
         }
+    }
+
+    @Override
+    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {
+
     }
 
     @Override

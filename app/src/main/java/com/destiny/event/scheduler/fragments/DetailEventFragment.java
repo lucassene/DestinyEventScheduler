@@ -13,7 +13,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -101,8 +100,9 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     @SuppressWarnings("unchecked")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.event_details);
         View v = inflater.inflate(R.layout.detail_event_layout, container, false);
+
+        callback.registerUserDataListener(this);
 
         headerView = inflater.inflate(R.layout.detail_header_layout, null);
         footerView = inflater.inflate(R.layout.detail_footer_layout, null);
@@ -402,7 +402,14 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
             if (footerView != null){
                 this.getListView().addFooterView(footerView);
             }
+        } else {
+            Log.w(TAG, "entryList is null");
         }
+    }
+
+    @Override
+    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {
+
     }
 
     @Override
@@ -414,6 +421,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.w(TAG, "DetailEventFragment attached!");
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
         callback.registerUserDataListener(this);
@@ -423,6 +431,7 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.w(TAG, "DetailEventFragment destroyed!");
         callback.deleteUserDataListener(this);
     }
 
@@ -437,7 +446,8 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onDetach() {
         super.onDetach();
-
+        Log.w(TAG, "DetailEventFragment detached!");
+        callback.deleteUserDataListener(this);
     }
 
     @Override

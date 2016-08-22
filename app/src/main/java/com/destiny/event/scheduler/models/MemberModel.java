@@ -4,6 +4,7 @@ import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.utils.StringUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class MemberModel implements Serializable {
 
@@ -20,6 +21,9 @@ public class MemberModel implements Serializable {
     private String lvl;
     private boolean isChecked;
     private int rating;
+    private int evaluationsMade;
+    private ArrayList<EventTypeModel> typesPlayed;
+    private EventModel favoriteEvent;
 
     public MemberModel(){
         super();
@@ -128,5 +132,29 @@ public class MemberModel implements Serializable {
 
     public void setPlatformId(int platformId) {
         this.platformId = platformId;
+    }
+
+    public int getEvaluationsMade() {
+        return evaluationsMade;
+    }
+
+    public void setEvaluationsMade(int evaluationsMade) {
+        this.evaluationsMade = evaluationsMade;
+    }
+
+    public ArrayList<EventTypeModel> getTypesPlayed() {
+        return typesPlayed;
+    }
+
+    public void setTypesPlayed(ArrayList<EventTypeModel> typesPlayed) {
+        this.typesPlayed = typesPlayed;
+    }
+
+    public EventModel getFavoriteEvent() {
+        return favoriteEvent;
+    }
+
+    public void setFavoriteEvent(EventModel favoriteEvent) {
+        this.favoriteEvent = favoriteEvent;
     }
 }

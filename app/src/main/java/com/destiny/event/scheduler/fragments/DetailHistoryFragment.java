@@ -67,6 +67,8 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.event_details);
         View v = inflater.inflate(R.layout.detail_event_layout, container, false);
 
+        callback.registerUserDataListener(this);
+
         headerView = inflater.inflate(R.layout.detail_header_layout, null);
 
         includedView = headerView.findViewById(R.id.header);
@@ -157,6 +159,11 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
             guardians.setText(sg);
             setAdapter(this.historyEntries);
         }
+    }
+
+    @Override
+    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {
+
     }
 
     private void setAdapter(List<MemberModel> entries) {

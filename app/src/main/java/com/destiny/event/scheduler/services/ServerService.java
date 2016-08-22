@@ -12,6 +12,8 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.models.EvaluationModel;
+import com.destiny.event.scheduler.models.EventModel;
+import com.destiny.event.scheduler.models.EventTypeModel;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.utils.NetworkUtils;
@@ -44,6 +46,8 @@ public class ServerService extends IntentService {
     private static final String VALIDATE_ENDPOINT = "/validate";
     private static final String EVALUATION_ENDPOINT = "/evaluations/";
     private static final String HISTORY_ENDPOINT = "/history";
+    private static final String MEMBER_ENDPOINT = "/member/";
+    private static final String PROFILE_ENDPOINT = "/profile";
 
     private static final String STATUS_PARAM = "status=";
     private static final String JOINED_PARAM = "joined=";
@@ -59,6 +63,7 @@ public class ServerService extends IntentService {
     public static final String REQUEST_TAG = "request";
     public static final String ERROR_TAG = "error";
     public static final String MEMBER_TAG = "memberId";
+    public static final String PROFILE_TAG = "profile";
     public static final String PLATFORM_TAG = "platformId";
     public static final String EVENT_TAG = "eventId";
     public static final String TIME_TAG = "time";
@@ -87,6 +92,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_VALIDATE_GAME = 10;
     public static final int TYPE_EVALUATE_GAME = 11;
     public static final int TYPE_HISTORY = 12;
+    public static final int TYPE_PROFILE = 13;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -105,6 +111,7 @@ public class ServerService extends IntentService {
     private int platformId;
     private ArrayList<GameModel> gameList;
     private ArrayList<MemberModel> memberList;
+    private MemberModel member;
 
     public ServerService() {
         super(ServerService.class.getName());
@@ -264,9 +271,25 @@ public class ServerService extends IntentService {
                     } else sendEntryData(receiver, memberList);
                 } else sendError(receiver, ERROR_INCORRECT_REQUEST);
                 break;
+            case TYPE_PROFILE:
+                if (intent.hasExtra(PROFILE_TAG)){
+                    url = SERVER_BASE_URL + MEMBER_ENDPOINT + intent.getStringExtra(PROFILE_TAG) + PROFILE_ENDPOINT;
+                    bundle.clear();
+                    bundle.putString(PROFILE_TAG, intent.getStringExtra(PROFILE_TAG));
+                    error = requestServer(receiver, type, url, bundle);
+                    if (error != NO_ERROR){
+                        sendError(receiver, error);
+                    } else sendMemberData(receiver, member);
+                } else sendError(receiver, ERROR_INCORRECT_REQUEST);
         }
         this.stopSelf();
 
+    }
+
+    private void sendMemberData(ResultReceiver receiver, MemberModel member) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(PROFILE_TAG, member);
+        receiver.send(STATUS_FINISHED, bundle);
     }
 
     private void sendIdWithType(ResultReceiver receiver, int gameId, int type) {
@@ -335,6 +358,9 @@ public class ServerService extends IntentService {
                     case TYPE_EVALUATE_GAME:
                         urlConnection = createEvaluationRequest(urlConnection, bundle);
                         break;
+                    case TYPE_PROFILE:
+                        urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
+                        break;
                 }
 
                 int statusCode;
@@ -373,6 +399,9 @@ public class ServerService extends IntentService {
                                 case TYPE_HISTORY:
                                     error = parseHistory(response);
                                     return error;
+                                case TYPE_PROFILE:
+                                    error = parseProfile(response);
+                                    return error;
                                 default:
                                     return NO_ERROR;
                             }
@@ -396,6 +425,58 @@ public class ServerService extends IntentService {
             Log.w(TAG, "Error in HTTP request");
             return ERROR_HTTP_REQUEST;
         }
+    }
+
+    private int parseProfile(String response) {
+        Log.w(TAG, "GetProfile response: " + response);
+        member = new MemberModel();
+        try {
+            JSONObject jResponse = new JSONObject(response);
+
+            JSONObject jMember = jResponse.getJSONObject("member");
+            member.setMembershipId(jMember.getString("membership"));
+            member.setName(jMember.getString("name"));
+            member.setIconPath(jMember.getString("icon"));
+            member.setPlatformId(jMember.getInt("platform"));
+            member.setLikes(jMember.getInt("likes"));
+            member.setDislikes(jMember.getInt("dislikes"));
+            member.setGamesCreated(jMember.getInt("gamesCreated"));
+            member.setGamesPlayed(jMember.getInt("gamesPlayed"));
+
+            member.setEvaluationsMade(jResponse.getInt("evaluationsMade"));
+
+            JSONArray jTypes = jResponse.getJSONArray("playedTypes");
+            ArrayList<EventTypeModel> typeList = new ArrayList<>();
+            for (int i=0;i<jTypes.length();i++){
+                JSONObject jType = jTypes.getJSONObject(i);
+                EventTypeModel type = new EventTypeModel();
+                type.setTypeId(jType.getInt("eventTypeId"));
+                type.setTypeName(jType.getString("eventTypeName"));
+                type.setTimesPlayed(jType.getInt("timesPlayed"));
+                typeList.add(type);
+            }
+            member.setTypesPlayed(typeList);
+
+            JSONObject jFavorite = jResponse.getJSONObject("favoriteEvent");
+            EventModel event = new EventModel();
+            event.setTimesPlayed(jFavorite.getInt("timesPlayed"));
+            JSONObject jEvent = jFavorite.getJSONObject("event");
+            event.setEventId(jEvent.getInt("id"));
+            event.setEventName(jEvent.getString("name"));
+            event.setEventIcon(jEvent.getString("icon"));
+            EventTypeModel favType = new EventTypeModel();
+            JSONObject jFavType = jEvent.getJSONObject("eventType");
+            favType.setTypeId(jFavType.getInt("id"));
+            favType.setTypeName(jFavType.getString("name"));
+            favType.setTypeIcon(jFavType.getString("icon"));
+            event.setEventType(favType);
+            member.setFavoriteEvent(event);
+
+            return NO_ERROR;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return NO_ERROR;
     }
 
     private int parseHistory(String response) {

@@ -9,26 +9,40 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.ProfileViewPagerAdapter;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
+import com.destiny.event.scheduler.interfaces.UserDataListener;
+import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.models.MemberModel;
+import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.views.SlidingTabLayout;
 
-public class MyNewProfileFragment extends Fragment {
+import java.util.List;
+
+public class MyNewProfileFragment extends Fragment implements UserDataListener {
 
     public static final int TYPE_MENU = 1;
     public static final int TYPE_DETAIL = 2;
 
-    private ViewPager viewPager;
     private ProfileViewPagerAdapter viewPagerAdapter;
-    private SlidingTabLayout tabLayout;
 
     private ToActivityListener callback;
+    ViewPager viewPager;
+    SlidingTabLayout tabLayout;
+    TextView emptyText;
 
     private int type;
-    private String memberId;
+    String memberId;
+    MemberModel member;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @Override
@@ -36,22 +50,8 @@ public class MyNewProfileFragment extends Fragment {
         View v = inflater.inflate(R.layout.my_new_profile_layout, container, false);
 
         viewPager = (ViewPager) v.findViewById(R.id.profile_view);
-
-        String titles[] = getResources().getStringArray(R.array.profile_tab_titles);
-        int numOfTabs = titles.length;
-        viewPagerAdapter = new ProfileViewPagerAdapter(getChildFragmentManager(), titles, numOfTabs, getArguments());
-
-        viewPager.setAdapter(viewPagerAdapter);
-
         tabLayout = (SlidingTabLayout) v.findViewById(R.id.profile_tab);
-        tabLayout.setDistributeEvenly(true);
-        tabLayout.setViewPager(viewPager);
-        tabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-            @Override
-            public int getIndicatorColor(int position) {
-                return getResources().getColor(R.color.tabIndicatorColor);
-            }
-        });
+        emptyText = (TextView) v.findViewById(R.id.text_empty);
 
         if (getArguments()!=null){
             memberId = getArguments().getString("bungieId");
@@ -64,13 +64,48 @@ public class MyNewProfileFragment extends Fragment {
         } else callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
         setHasOptionsMenu(true);
 
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_PROFILE);
+        bundle.putString(ServerService.PROFILE_TAG, memberId);
+        callback.runServerService(bundle);
+
         return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    private void setAdapter(MemberModel member){
+        String titles[] = getResources().getStringArray(R.array.profile_tab_titles);
+        int numOfTabs = titles.length;
+        viewPagerAdapter = new ProfileViewPagerAdapter(getChildFragmentManager(), titles, numOfTabs, member);
+
+        viewPager.setAdapter(viewPagerAdapter);
+
+        tabLayout.setDistributeEvenly(true);
+        tabLayout.setViewPager(viewPager);
+        tabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.tabIndicatorColor);
+            }
+        });
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         setHasOptionsMenu(true);
+        callback = (ToActivityListener) getActivity();
+        //callback.registerUserDataListener(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //callback.deleteUserDataListener(this);
     }
 
     @Override
@@ -78,6 +113,34 @@ public class MyNewProfileFragment extends Fragment {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
         callback.setToolbarTitle(getString(R.string.my_profile));
-        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
+        callback.deleteUserDataListener(this);
+        getActivity().getMenuInflater().inflate(R.menu.home_menu, menu);
+    }
+
+    @Override
+    public void onUserDataLoaded() {
+
+    }
+
+    @Override
+    public void onGamesLoaded(List<GameModel> gameList) {
+
+    }
+
+    @Override
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded) {
+
+    }
+
+    @Override
+    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {
+        if (member != null){
+            emptyText.setVisibility(View.GONE);
+            setAdapter(member);
+        } else emptyText.setVisibility(View.VISIBLE);
+    }
+
+    public MemberModel getMember(){
+        return member;
     }
 }

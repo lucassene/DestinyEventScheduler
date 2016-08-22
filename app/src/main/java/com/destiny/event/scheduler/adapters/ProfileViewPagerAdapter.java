@@ -7,18 +7,19 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.destiny.event.scheduler.fragments.MyMedalsFragment;
 import com.destiny.event.scheduler.fragments.MyStatsFragment;
+import com.destiny.event.scheduler.models.MemberModel;
 
 public class ProfileViewPagerAdapter extends FragmentStatePagerAdapter {
 
     CharSequence titles[];
     int numOfTabs;
-    Bundle bundle;
+    Bundle bundle = new Bundle();
 
-    public ProfileViewPagerAdapter(FragmentManager fm, CharSequence titles[], int numOfTabs, Bundle bundle) {
+    public ProfileViewPagerAdapter(FragmentManager fm, CharSequence titles[], int numOfTabs, MemberModel member) {
         super(fm);
         this.titles = titles;
         this.numOfTabs = numOfTabs;
-        this.bundle = bundle;
+        this.bundle.putSerializable("member", member);
     }
 
     @Override

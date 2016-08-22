@@ -591,6 +591,8 @@
     <string name="interval">Check interval</string>
     <string name="hour">" hour"</string>
     <string name="hours">" hours"</string>
+    <string name="fail_medals_data">Can\'t retrieve medals data now. Please check your internet connection and try again later.</string>
+    <string name="fail_member_data">Can\'t get member data. Please check your internet connection and try again later.</string>
 
 
 </resources>

@@ -10,5 +10,6 @@ public interface UserDataListener {
     public void onUserDataLoaded();
     public void onGamesLoaded(List<GameModel> gameList);
     public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded);
+    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded);
 
 }

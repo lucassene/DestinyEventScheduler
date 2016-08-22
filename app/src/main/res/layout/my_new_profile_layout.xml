@@ -11,9 +11,25 @@
         android:layout_height="wrap_content"
         android:elevation="2dp" />
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/profile_view"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/text_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/fail_member_data"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingRight="@dimen/global_padding"
+            android:visibility="gone"/>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/profile_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
 
 </LinearLayout>

@@ -171,6 +171,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     ArrayList<MemberModel> entryList;
     ArrayList<MemberModel> historyEntries;
 
+    MemberModel userProfile;
+    MemberModel memberProfile;
+
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -618,7 +621,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         } else {
             userDataListener = (UserDataListener) fragment;
         }
-
     }
 
     @Override
@@ -704,6 +706,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 intent.putStringArrayListExtra(ServerService.ENTRY_TAG, bundle.getStringArrayList(ServerService.ENTRY_TAG));
             if (bundle.containsKey(ServerService.EVALUATIONS_TAG))
                 intent.putParcelableArrayListExtra(ServerService.EVALUATIONS_TAG, bundle.getParcelableArrayList(ServerService.EVALUATIONS_TAG));
+            if (bundle.containsKey(ServerService.PROFILE_TAG))
+                intent.putExtra(ServerService.PROFILE_TAG,bundle.getString(ServerService.PROFILE_TAG));
 
             startService(intent);
             //}
@@ -732,7 +736,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         } else {
             if (userDataListener != null){
                 userDataListener.onEntriesLoaded(entryList, false);
-            }
+            } else Log.w(TAG, "userDataListener is null");
         }
     }
 
@@ -1382,6 +1386,22 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         if (validatedGameList != null) { validatedGameList = getGamesFromList(allGameList, GameTable.STATUS_VALIDATED); }
                     }
                 }
+                if (resultData.containsKey(ServerService.PROFILE_TAG)){
+                    MemberModel member = (MemberModel) resultData.getSerializable(ServerService.PROFILE_TAG);
+                    if (member != null){
+                        Log.w(TAG, "member " + member.getName() + " sent by ServerService");
+                        if (member.getMembershipId().equals(bungieId)){
+                            userProfile = member;
+                        } else {
+                            memberProfile = member;
+                        }
+                        if (getOpenedFragment() instanceof MyNewProfileFragment){
+                            MyNewProfileFragment frag = (MyNewProfileFragment) getOpenedFragment();
+                            frag.onMemberLoaded(member, true);
+                            //userDataListener.onMemberLoaded(member, true);
+                        }
+                    }
+                }
                 onDataLoaded();
                 break;
         }
@@ -1505,8 +1525,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean isServerServiceRunning() {
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        return sharedPrefs.getBoolean(ServerService.RUNNING_SERVICE, false);
+        //SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        //return sharedPrefs.getBoolean(ServerService.RUNNING_SERVICE, false);
+        return false;
     }
 
     public boolean isLocalServiceRunning() {

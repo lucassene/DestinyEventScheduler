@@ -28,7 +28,7 @@ public class MedalsAdapter extends BaseAdapter{
         inflater = LayoutInflater.from(context);
     }
 
-    public void setGameList(ArrayList<MedalModel> medalsList){
+    public void setMedalList(ArrayList<MedalModel> medalsList){
         this.medalsList = medalsList;
     }
 

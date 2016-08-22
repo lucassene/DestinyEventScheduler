@@ -1,13 +1,8 @@
 package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,14 +17,9 @@ import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.ChartLegendAdapter;
-import com.destiny.event.scheduler.data.EntryTable;
-import com.destiny.event.scheduler.data.EventTable;
-import com.destiny.event.scheduler.data.EventTypeTable;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
-import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.models.ChartLegendModel;
-import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.utils.ImageUtils;
 import com.destiny.event.scheduler.utils.StringUtils;
 import com.github.mikephil.charting.charts.PieChart;
@@ -43,15 +33,9 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MyStatsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MyStatsFragment extends Fragment{
 
     private static final String TAG = "MyStatsFragment";
-
-    private static final int LOADER_MEMBER = 50;
-    private static final int LOADER_PROFILE = 75;
-    private static final int LOADER_FAVORITE = 76;
-
-    private int type;
 
     ImageView profilePic;
     TextView userName;
@@ -80,13 +64,11 @@ public class MyStatsFragment extends Fragment implements LoaderManager.LoaderCal
     LinearLayout eventHeaderLayout;
     LinearLayout gameHeaderLayout;
 
-    private String memberId;
+    private MemberModel member;
 
     PieChart eventsChart;
     PieChart likesChart;
     PieChart gamesChart;
-
-    private ToActivityListener callback;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,15 +78,10 @@ public class MyStatsFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
         Bundle bundle = getArguments();
-
         if (bundle != null){
-            memberId = bundle.getString("bungieId");
-            type = bundle.getInt("type");
+            member = (MemberModel) bundle.getSerializable("member");
         }
-
-        Log.w(TAG, "Menu (1) and Detail (2) | Type: " + type);
     }
 
     @Override
@@ -175,214 +152,110 @@ public class MyStatsFragment extends Fragment implements LoaderManager.LoaderCal
         Legend gamesLeg = gamesChart.getLegend();
         gamesLeg.setEnabled(false);
 
-        callback = (ToActivityListener) getActivity();
-
-        getMemberData();
-
         return v;
-    }
-
-    private void getMemberData() {
-
-        getLoaderManager().initLoader(LOADER_MEMBER, null, this);
-        getLoaderManager().initLoader(LOADER_PROFILE, null, this);
-        getLoaderManager().initLoader(LOADER_FAVORITE, null, this);
-
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-    }
+        if (member != null){
+            userName.setText(member.getName());
+            try {
+                String iconName = member.getIconPath().substring(member.getIconPath().lastIndexOf("/")+1,member.getIconPath().length());
+                profilePic.setImageBitmap(ImageUtils.loadImage(getContext(),iconName));
+            } catch (IOException e) {
+                Log.e(TAG, "Image Not Found");
+                e.printStackTrace();
+            }
+            int xp = Integer.parseInt(MemberTable.getMemberXP(member.getLikes(), member.getDislikes(), member.getGamesPlayed(), member.getGamesCreated()));
+            memberLevel.setText(StringUtils.parseString(MemberTable.getMemberLevel(xp)));
+            progressBar.setMax(MemberTable.getExpNeeded(xp));
+            progressBar.setProgress(xp);
+            String xpTxt = xp + " / " + MemberTable.getExpNeeded(xp);
+            xpText.setText(xpTxt);
+            if (member.getFavoriteEvent() == null){
+                titleText.setText(getString(R.string.default_title));
+            } else { titleText.setText(MemberTable.getMemberTitle(getActivity(), xp, member.getFavoriteEvent().getEventId())); }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            int likes = member.getLikes();
+            int dislikes = member.getDislikes();
 
-        callback.onLoadingData();
-
-        switch (id){
-            case LOADER_MEMBER:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.MEMBER_URI,
-                        getMemberProjection(),
-                        MemberTable.COLUMN_MEMBERSHIP + "=" + memberId,
-                        null,
-                        null
-                );
-            case LOADER_PROFILE:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.ENTRY_PROFILE_URI,
-                        getProfileProjection(),
-                        EntryTable.COLUMN_MEMBERSHIP + "=" + memberId + " AND(" + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED + ")",
-                        null,
-                        "type_total DESC"
-                );
-            case LOADER_FAVORITE:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.ENTRY_FAVORITE_URI,
-                        getFavoriteProjection(),
-                        EntryTable.COLUMN_MEMBERSHIP + "=" + memberId + " AND(" + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_VALIDATED + " OR " + GameTable.COLUMN_STATUS + "=" + GameTable.STATUS_EVALUATED + ")",
-                        null,
-                        "total DESC"
-                );
-        }
-
-        return null;
-    }
-
-    private String[] getFavoriteProjection() {
-
-        String c1 = "COUNT(*) AS total";
-        String c2 = EventTable.COLUMN_NAME;
-        String c3 = EventTypeTable.COLUMN_NAME;
-        String c4 = EventTable.COLUMN_ICON;
-
-        return new String[] {c1, c2, c3, c4};
-
-    }
-
-    private String[] getProfileProjection() {
-
-        //String c1 = EntryTable.getQualifiedColumn(EntryTable.COLUMN_ID);
-        String c2 = "COUNT(*) AS type_total";
-        String c3 = EventTypeTable.COLUMN_NAME;
-
-        return new String[] {c2, c3};
-    }
-
-    private String[] getMemberProjection() {
-
-        String c1 = MemberTable.getQualifiedColumn(MemberTable.COLUMN_ID);
-        String c2 = MemberTable.COLUMN_ICON;
-        String c3 = MemberTable.COLUMN_NAME;
-        String c4 = MemberTable.COLUMN_LIKES;
-        String c5 = MemberTable.COLUMN_DISLIKES;
-        String c6 = MemberTable.COLUMN_CREATED;
-        String c7 = MemberTable.COLUMN_PLAYED;
-        String c8 = MemberTable.COLUMN_EXP;
-        String c9 = MemberTable.COLUMN_TITLE;
-
-        return new String[] {c1, c2, c3, c4, c5, c6, c7, c8, c9};
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        //if (data != null && data.moveToFirst()){
-
-            //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
-
-            switch (loader.getId()){
-                case LOADER_MEMBER:
-                    if (data != null && data.moveToFirst()){
-                        try {
-                            profilePic.setImageBitmap(ImageUtils.loadImage(getContext(), data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_ICON))));
-                        } catch (IOException e) {
-                            Log.e(TAG, "Image Not Found");
-                            e.printStackTrace();
-                        }
-                        userName.setText(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
-                        titleText.setText(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
-                        int xp = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
-                        int lvl = MemberTable.getMemberLevel(xp);
-                        memberLevel.setText(StringUtils.parseString(lvl));
-                        progressBar.setMax(MemberTable.getExpNeeded(xp));
-                        progressBar.setProgress(xp);
-                        String xpTxt = xp + " / " + MemberTable.getExpNeeded(xp);
-                        xpText.setText(xpTxt);
-                        //Log.w(TAG, "Player XP: " + progressBar.getProgress() + "/" + progressBar.getMax());
-
-                        int created = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED));
-                        int played = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED));
-                        //Log.w(TAG, "Created: " + created + "; Played: " + played);
-                        int likes = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_LIKES));
-                        int dislikes = data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_DISLIKES));
-                        //Log.w(TAG, "Likes: " + likes + "; Dislikes: " + dislikes);
-
-                        if (likes != 0 && dislikes != 0){
-                            emptyEval.setVisibility(View.GONE);
-                            likesChart.setVisibility(View.VISIBLE);
-                            likeHeaderLayout.setVisibility(View.VISIBLE);
-                            setLikesChart(likes, dislikes);
-                        } else {
-                            emptyEval.setVisibility(View.VISIBLE);
-                            likesChart.setVisibility(View.GONE);
-                            likeHeaderLayout.setVisibility(View.GONE);
-                        }
-
-                        if (created != 0 && played != 0){
-                            emptyEvents.setVisibility(View.GONE);
-                            eventsChart.setVisibility(View.VISIBLE);
-                            eventHeaderLayout.setVisibility(View.VISIBLE);
-                            setEventChart(created, played);
-                        } else {
-                            emptyEvents.setVisibility(View.VISIBLE);
-                            eventsChart.setVisibility(View.GONE);
-                            eventHeaderLayout.setVisibility(View.GONE);
-                        }
-
-                    } else {
-                        emptyEval.setVisibility(View.VISIBLE);
-                        emptyEvents.setVisibility(View.VISIBLE);
-                        eventsChart.setVisibility(View.GONE);
-                        likesChart.setVisibility(View.GONE);
-                        likeHeaderLayout.setVisibility(View.GONE);
-                        eventHeaderLayout.setVisibility(View.GONE);
-                    }
-                    break;
-                case LOADER_PROFILE:
-                    if (data != null && data.moveToFirst()){
-                        //Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
-                        emptyGame.setVisibility(View.GONE);
-                        gamesChart.setVisibility(View.VISIBLE);
-                        gameHeaderLayout.setVisibility(View.VISIBLE);
-                        ArrayList<String> labels = new ArrayList<>();
-                        ArrayList<Integer> values = new ArrayList<>();
-
-                        data.moveToFirst();
-                        for(int i=0;i<data.getCount();i++){
-                            String text = getResources().getString(getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
-                            labels.add(text);
-                            int value = data.getInt(data.getColumnIndexOrThrow("type_total"));
-                            values.add(value);
-                            data.moveToNext();
-                        }
-                        setGamesChart(labels, values);
-                    } else {
-                        emptyGame.setVisibility(View.VISIBLE);
-                        gamesChart.setVisibility(View.GONE);
-                        gameHeaderLayout.setVisibility(View.GONE);
-                    }
-                    break;
-                case LOADER_FAVORITE:
-                    if (data != null && data.moveToFirst()){
-                        favEmpty.setVisibility(View.GONE);
-                        favLayout.setVisibility(View.VISIBLE);
-                        Log.w(TAG, DatabaseUtils.dumpCursorToString(data));
-                        favIcon.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)),"drawable",getContext().getPackageName()));
-                        int title = getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName());
-                        favTitle.setText(title);
-                        title = getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName());
-                        favType.setText(title);
-                        int count = data.getInt(data.getColumnIndexOrThrow("total"));
-                        String countText;
-                        if (count == 1){
-                            countText = " " + StringUtils.parseString(count) + " " + getString(R.string.one_time);
-                        } else countText = " " + StringUtils.parseString(count) + " " + getString(R.string.more_times);
-                        favCount.setText(countText);
-                    } else {
-                        favEmpty.setVisibility(View.VISIBLE);
-                        favLayout.setVisibility(View.GONE);
-                    }
-
-                    break;
+            if (likes != 0 || dislikes != 0){
+                emptyEval.setVisibility(View.GONE);
+                likesChart.setVisibility(View.VISIBLE);
+                likeHeaderLayout.setVisibility(View.VISIBLE);
+                setLikesChart(likes, dislikes);
+            } else {
+                emptyEval.setVisibility(View.VISIBLE);
+                likesChart.setVisibility(View.GONE);
+                likeHeaderLayout.setVisibility(View.GONE);
             }
 
-        callback.onDataLoaded();
-        //}
+            int created = member.getGamesCreated();
+            int played = member.getGamesPlayed();
+
+            if (created != 0 || played != 0){
+                emptyEvents.setVisibility(View.GONE);
+                eventsChart.setVisibility(View.VISIBLE);
+                eventHeaderLayout.setVisibility(View.VISIBLE);
+                setEventChart(created, played);
+            } else {
+                emptyEvents.setVisibility(View.VISIBLE);
+                eventsChart.setVisibility(View.GONE);
+                eventHeaderLayout.setVisibility(View.GONE);
+            }
+
+            if (member.getTypesPlayed().size() > 0){
+                emptyGame.setVisibility(View.GONE);
+                gamesChart.setVisibility(View.VISIBLE);
+                gameHeaderLayout.setVisibility(View.VISIBLE);
+                ArrayList<String> labels = new ArrayList<>();
+                ArrayList<Integer> values = new ArrayList<>();
+                for(int i=0;i<member.getTypesPlayed().size();i++){
+                    String text = getResources().getString(getResources().getIdentifier(member.getTypesPlayed().get(i).getTypeName(),"string",getContext().getPackageName()));
+                    labels.add(text);
+                    int value = member.getTypesPlayed().get(i).getTimesPlayed();
+                    values.add(value);
+                }
+                setGamesChart(labels, values);
+            } else {
+                eventHeaderLayout.setVisibility(View.GONE);
+                emptyGame.setVisibility(View.VISIBLE);
+                gamesChart.setVisibility(View.GONE);
+                gameHeaderLayout.setVisibility(View.GONE);
+            }
+
+            if (member.getFavoriteEvent() != null){
+                favEmpty.setVisibility(View.GONE);
+                favLayout.setVisibility(View.VISIBLE);
+                favIcon.setImageResource(getContext().getResources().getIdentifier(member.getFavoriteEvent().getEventIcon(),"drawable",getContext().getPackageName()));
+                int name = getResources().getIdentifier(member.getFavoriteEvent().getEventName(),"string",getContext().getPackageName());
+                favTitle.setText(name);
+                name = getResources().getIdentifier(member.getFavoriteEvent().getEventType().getTypeName(),"string",getContext().getPackageName());
+                favType.setText(name);
+                int count = member.getFavoriteEvent().getTimesPlayed();
+                String countText;
+                if (count == 1){
+                    countText = " " + StringUtils.parseString(count) + " " + getString(R.string.one_time);
+                } else countText = " " + StringUtils.parseString(count) + " " + getString(R.string.more_times);
+                favCount.setText(countText);
+            } else {
+                favEmpty.setVisibility(View.VISIBLE);
+                favLayout.setVisibility(View.GONE);
+            }
+        } else {
+            emptyEval.setVisibility(View.VISIBLE);
+            emptyEvents.setVisibility(View.VISIBLE);
+            eventsChart.setVisibility(View.GONE);
+            likesChart.setVisibility(View.GONE);
+            likeHeaderLayout.setVisibility(View.GONE);
+            eventHeaderLayout.setVisibility(View.GONE);
+            emptyGame.setVisibility(View.VISIBLE);
+            gamesChart.setVisibility(View.GONE);
+            gameHeaderLayout.setVisibility(View.GONE);
+            favEmpty.setVisibility(View.VISIBLE);
+            favLayout.setVisibility(View.GONE);
+        }
     }
 
     private void setGamesChart(ArrayList<String> labels, ArrayList<Integer> values) {
@@ -565,10 +438,5 @@ public class MyStatsFragment extends Fragment implements LoaderManager.LoaderCal
         } else return 1;
     }
 
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
 
 }
