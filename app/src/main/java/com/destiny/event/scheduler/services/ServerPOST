@@ -1,9 +1,0 @@
-//Endpoint: createGame
-{
-  "creatorId": {"membershipId": "4611686018437203239"},
-  "platform": 2,
-  "eventId": {"eventId": 10},
-  "gameTime": "2016-06-29T11:54:00",
-  "gameLight": 330,
-  "entryTime": "2016-06-29T10:00:00"
-}

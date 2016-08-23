@@ -21,9 +21,19 @@
             <ImageView
                 android:id="@+id/profile_pic"
                 android:layout_width="59dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:scaleType="fitStart"
-                android:layout_margin="5dp"/>
+                android:layout_marginLeft="5dp"
+                android:src="@drawable/default_profile_img"/>
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="false"
+                style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_alignLeft="@id/profile_pic"/>
 
             <LinearLayout
                 android:id="@+id/profile_text"
@@ -51,29 +61,15 @@
             <TextView
                 android:id="@+id/member_level"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:layout_alignTop="@id/profile_pic"
                 android:textSize="46sp"
-                android:gravity="center"
                 android:textColor="@android:color/white"
-                android:alpha="0.8"/>
+                android:alpha="0.8"
+                android:text="99"/>
 
         </RelativeLayout>
-
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="false"
-            style="@android:style/Widget.Holo.ProgressBar.Horizontal" />
-
-        <TextView
-            android:id="@+id/xp_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:textColor="@color/toolbarBackground"
-            android:layout_gravity="end"/>
 
         <LinearLayout
             android:layout_width="match_parent"

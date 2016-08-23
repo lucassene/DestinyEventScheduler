@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -25,10 +26,10 @@ import java.util.List;
 
 public class MyNewProfileFragment extends Fragment implements UserDataListener {
 
+    private static final String TAG = "MyNewProfileFragment";
+
     public static final int TYPE_MENU = 1;
     public static final int TYPE_DETAIL = 2;
-
-    private ProfileViewPagerAdapter viewPagerAdapter;
 
     private ToActivityListener callback;
     ViewPager viewPager;
@@ -64,10 +65,16 @@ public class MyNewProfileFragment extends Fragment implements UserDataListener {
         } else callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITH_BACKSTACK);
         setHasOptionsMenu(true);
 
-        Bundle bundle = new Bundle();
-        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_PROFILE);
-        bundle.putString(ServerService.PROFILE_TAG, memberId);
-        callback.runServerService(bundle);
+        MemberModel member = callback.getMemberProfile();
+        if (member == null){
+            Bundle bundle = new Bundle();
+            bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_PROFILE);
+            bundle.putString(ServerService.PROFILE_TAG, memberId);
+            boolean success = callback.runServerService(bundle);
+            if (!success){
+                emptyText.setVisibility(View.VISIBLE);
+            } else emptyText.setVisibility(View.GONE);
+        } else onMemberLoaded(member, false);
 
         return v;
     }
@@ -78,6 +85,7 @@ public class MyNewProfileFragment extends Fragment implements UserDataListener {
     }
 
     private void setAdapter(MemberModel member){
+        ProfileViewPagerAdapter viewPagerAdapter;
         String titles[] = getResources().getStringArray(R.array.profile_tab_titles);
         int numOfTabs = titles.length;
         viewPagerAdapter = new ProfileViewPagerAdapter(getChildFragmentManager(), titles, numOfTabs, member);
@@ -87,6 +95,7 @@ public class MyNewProfileFragment extends Fragment implements UserDataListener {
         tabLayout.setDistributeEvenly(true);
         tabLayout.setViewPager(viewPager);
         tabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @SuppressWarnings("deprecation")
             @Override
             public int getIndicatorColor(int position) {
                 return getResources().getColor(R.color.tabIndicatorColor);
@@ -134,6 +143,7 @@ public class MyNewProfileFragment extends Fragment implements UserDataListener {
 
     @Override
     public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {
+        Log.w(TAG, "onMemberLoaded called");
         if (member != null){
             emptyText.setVisibility(View.GONE);
             setAdapter(member);

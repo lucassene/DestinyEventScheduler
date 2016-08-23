@@ -31,6 +31,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
 
     String membershipId;
     String userName;
+    int platformId;
 
     int errorCode;
     String msg = "";
@@ -149,6 +150,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
             case BungieService.STATUS_DOCS:
                 membershipId = resultData.getString("bungieId");
                 userName = resultData.getString("userName");
+                platformId = resultData.getInt("platform");
                 msg = getString(R.string.prior_entries);
                 text.setText(msg);
                 break;
@@ -229,6 +231,8 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
         sharedEditor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
         sharedEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, 0);
         sharedEditor.putInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, DrawerActivity.DEFAULT_INTERVAL);
+        sharedEditor.putString(DrawerActivity.MEMBER_PREF, membershipId);
+        sharedEditor.putInt(DrawerActivity.PLATFORM_PREF, platformId);
         sharedEditor.apply();
 
        if (sharedPrefs.getBoolean(DrawerActivity.FOREGROUND_PREF, false)){

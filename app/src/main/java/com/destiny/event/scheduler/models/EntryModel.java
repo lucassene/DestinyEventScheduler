@@ -1,6 +1,7 @@
 package com.destiny.event.scheduler.models;
 
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.utils.StringUtils;
 
 import java.io.Serializable;
 
@@ -78,7 +79,7 @@ public class EntryModel implements Serializable {
     }
 
     public void setLvl(int likes, int dislikes, int gamesPlayed, int gamesCreated) {
-        this.lvl = MemberTable.getMemberXP(likes, dislikes, gamesPlayed, gamesCreated);
+        this.lvl = StringUtils.parseString(MemberTable.getMemberXP(likes, dislikes, gamesPlayed, gamesCreated));
     }
 
     public boolean isChecked() {

@@ -442,6 +442,7 @@ public class BungieService extends IntentService {
                 bundle.clear();
                 bundle.putString("bungieId", membershipId);
                 bundle.putString("userName", displayName);
+                bundle.putInt("platform", platformId);
                 receiver.send(STATUS_DOCS, bundle);
 
                 String userIconPath;

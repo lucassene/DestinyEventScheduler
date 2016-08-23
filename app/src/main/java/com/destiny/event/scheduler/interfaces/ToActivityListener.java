@@ -37,7 +37,7 @@ public interface ToActivityListener {
     public int getFmBackStackCount();
     public void setToolbarTitle(String title);
     public int getSelectedItem();
-    public void runServerService(Bundle bundle);
+    public boolean runServerService(Bundle bundle);
     public List<GameModel> getGameList(int type);
     public void getGameEntries(int gameId);
     public void getGameHistory(int gameId);
@@ -46,4 +46,5 @@ public interface ToActivityListener {
     public void updateMembers(List<MemberModel> list);
     public void registerNewGamesAlarm();
     public void deleteNewGamesAlarm();
+    public MemberModel getMemberProfile();
 }

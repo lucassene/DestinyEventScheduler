@@ -60,6 +60,8 @@ public class NewGameNotificationService extends IntentService {
     ArrayList<Integer> selectedIds;
     ArrayList<GameModel> gameList;
 
+    ArrayList<String> previousGames;
+
     @Override
     protected void onHandleIntent(Intent intent) {
 
@@ -72,6 +74,8 @@ public class NewGameNotificationService extends IntentService {
             if (b) { selectedIds.add(typeId); }
         }
         Log.w(TAG, "selectedIds size: " + selectedIds.size());
+
+        previousGames = getPreviousGamesList(sharedPrefs.getString(DrawerActivity.NEW_GAMES_PREF,""));
 
         memberId = intent.getStringExtra("memberId");
         platformId = intent.getIntExtra("platformId",0);
@@ -174,15 +178,53 @@ public class NewGameNotificationService extends IntentService {
         return finalIcon;
     }
 
+    private ArrayList<String> getPreviousGamesList(String string) {
+        Log.w(TAG, "previousGames string: " + string);
+        if (string.equals(",42")) string = "";
+        ArrayList<String> list = new ArrayList<>();
+        if (!string.equals("")){
+            while (string.length()>0){
+                String gameId = string.substring(0,string.indexOf(","));
+                Log.w(TAG, "Adding " + gameId + " to the list" );
+                list.add(gameId);
+                string = string.replace(gameId+",","");
+            }
+            Log.w(TAG, "previousGamesList size: " + list.size());
+            return list;
+        }
+        return null;
+    }
+
     private boolean checkifHasSelectedGames() {
+        String gameIds = "";
         int numberOfGames = 0;
+        ArrayList<String> idList = new ArrayList<>();
         for (int i=0;i<gameList.size();i++){
             for (int x=0;x<selectedIds.size();x++){
                 Log.w(TAG, "Comparing game.typeId: " + gameList.get(i).getTypeId() + " with selectedTypeId: " + selectedIds.get(x));
                 if (gameList.get(i).getTypeId() == selectedIds.get(x)){
+                    idList.add(String.valueOf(gameList.get(i).getGameId()));
+                    gameIds = gameIds + String.valueOf(gameList.get(i).getGameId()) + ",";
                     numberOfGames++;
                 }
             }
+        }
+        if (previousGames != null){
+            for (int i=0;i<previousGames.size();i++){
+                for (int x=0;x<idList.size();x++){
+                    if (previousGames.get(i).equals(idList.get(x))){
+                        idList.remove(x);
+                        x--;
+                    }
+                }
+            }
+            numberOfGames = idList.size();
+        }
+        if (!gameIds.equals("")){
+            Log.w(TAG, "Saving string: " + gameIds);
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            editor.putString(DrawerActivity.NEW_GAMES_PREF, gameIds);
+            editor.apply();
         }
         return numberOfGames > 0;
     }

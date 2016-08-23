@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.utils.StringUtils;
 
 public class MemberTable {
 
@@ -103,13 +102,13 @@ public class MemberTable {
         } else return (int) Math.round(result);
     }
 
-    public static String getMemberXP(int likes, int dislikes, int gamesPlayed, int gamesCreated){
+    public static int getMemberXP(int likes, int dislikes, int gamesPlayed, int gamesCreated){
         int likesFator = ( likes * Integer.parseInt(LIKE_MODIFIER));
         int createdFator = ( gamesCreated * Integer.parseInt(CREATOR_MODIFIER));
         int playedFator = ( gamesPlayed * Integer.parseInt(PLAYED_MODIFIER));
         int dislikeFator = ( dislikes *  Integer.parseInt(DISLIKE_MODIFIER));
         int result = (likesFator + createdFator + playedFator) - dislikeFator;
-        return StringUtils.parseString(result);
+        return result;
     }
 
     public static String getMemberTitle(Context context, int xp, int favoriteId){

@@ -114,8 +114,8 @@ public class MemberModel implements Serializable {
     }
 
     public void setLvl(int likes, int dislikes, int gamesPlayed, int gamesCreated) {
-        String xp = MemberTable.getMemberXP(likes, dislikes, gamesPlayed, gamesCreated);
-        this.lvl = StringUtils.parseString(MemberTable.getMemberLevel(Integer.parseInt(xp)));
+        int xp = MemberTable.getMemberXP(likes, dislikes, gamesPlayed, gamesCreated);
+        this.lvl = StringUtils.parseString(MemberTable.getMemberLevel((xp)));
     }
 
     public String getEntryTime() {

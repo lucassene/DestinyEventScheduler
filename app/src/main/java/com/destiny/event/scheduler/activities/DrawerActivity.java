@@ -106,6 +106,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String DOWNLOAD_PREF = "downloadList";
     public static final String COOKIES_PREF = "cookies";
     public static final String XCSRF_PREF = "xcsrf";
+    public static final String NEW_GAMES_PREF = "newGames";
+    public static final String MEMBER_PREF = "membership";
+    public static final String PLATFORM_PREF = "platform";
     public static final int DEFAULT_INTERVAL = 3600000;
 
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
@@ -171,7 +174,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     ArrayList<MemberModel> entryList;
     ArrayList<MemberModel> historyEntries;
 
-    MemberModel userProfile;
     MemberModel memberProfile;
 
     @SuppressWarnings("unchecked")
@@ -235,7 +237,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         getClanData();
         getLoggedUserData();
-
     }
 
     private void getLoggedUserData() {
@@ -281,6 +282,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         } else
                             Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
                     } else Log.w(TAG, "bungieIdList is empty!");
+                } else if ( getOpenedFragment() instanceof MyNewProfileFragment){
+                    Log.w(TAG, "opened Fragment: " + getOpenedFragment().toString());
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_PROFILE);
+                    bundle.putString(ServerService.PROFILE_TAG, memberProfile.getMembershipId());
+                    runServerService(bundle);
                 } else refreshLists();
         }
         return super.onOptionsItemSelected(item);
@@ -397,6 +404,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         outState.putSerializable("entryList", entryList);
         outState.putSerializable("historyEntries", historyEntries);
         outState.putString("bungieId", bungieId);
+        outState.putSerializable("memberProfile", memberProfile);
     }
 
     @Override
@@ -424,6 +432,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
         entryList = (ArrayList<MemberModel>) savedInstanceState.getSerializable("entryList");
         historyEntries = (ArrayList<MemberModel>) savedInstanceState.getSerializable("historyEntries");
+        memberProfile = (MemberModel) savedInstanceState.getSerializable("memberProfile");
         bungieId = savedInstanceState.getString("bungieId");
     }
 
@@ -462,6 +471,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         ft.commit();
         fragmentTag = tag;
         //Toast.makeText(this, "openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
+        if (tag.equals("profile")){ memberProfile = null; }
         openedFragment = fragment;
         rAdapter.notifyDataSetChanged();
         invalidateOptionsMenu();
@@ -526,6 +536,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onGameSelected(GameModel game, String tag) {
 
+        String[] strings = { "a", "b", "c" };
+                 for (int i = 0; i <= strings.length; i++) {
+                       String x = strings[i];
+                     }
+
         entryList = null;
         historyEntries = null;
         Fragment fragment;
@@ -538,8 +553,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             case GameTable.STATUS_NEW:
                 fragment = new DetailEventFragment();
                 if (game.isJoined()){
-                    isNewScheduledOrValidated = GameTable.STATUS_NEW;
-                } else isNewScheduledOrValidated = GameTable.STATUS_SCHEDULED;
+                    isNewScheduledOrValidated = GameTable.STATUS_SCHEDULED;
+                } else isNewScheduledOrValidated = GameTable.STATUS_NEW;
                 break;
             case GameTable.STATUS_WAITING:
                 isNewScheduledOrValidated = GameTable.STATUS_VALIDATED;
@@ -682,7 +697,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void runServerService(Bundle bundle) {
+    public boolean runServerService(Bundle bundle) {
         if (NetworkUtils.checkConnection(this)) {
             //if (!isServerServiceRunning()){
             onLoadingData();
@@ -710,8 +725,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 intent.putExtra(ServerService.PROFILE_TAG,bundle.getString(ServerService.PROFILE_TAG));
 
             startService(intent);
-            //}
-        } else Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
+            return true;
+        } else {
+            Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
+            return false;
+        }
     }
 
     @Override
@@ -875,7 +893,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openMyProfileFragment(View child) {
-        if (openedFragment instanceof MyNewProfileFragment) {
+        if (openedFragment instanceof MyNewProfileFragment && memberProfile.getMembershipId().equals(bungieId)) {
             drawerLayout.closeDrawers();
             return false;
         }
@@ -1390,11 +1408,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     MemberModel member = (MemberModel) resultData.getSerializable(ServerService.PROFILE_TAG);
                     if (member != null){
                         Log.w(TAG, "member " + member.getName() + " sent by ServerService");
-                        if (member.getMembershipId().equals(bungieId)){
-                            userProfile = member;
-                        } else {
-                            memberProfile = member;
-                        }
+                        memberProfile = member;
                         if (getOpenedFragment() instanceof MyNewProfileFragment){
                             MyNewProfileFragment frag = (MyNewProfileFragment) getOpenedFragment();
                             frag.onMemberLoaded(member, true);
@@ -1452,6 +1466,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         alarm.cancel(pIntent);
         Log.w(TAG, "New game alarm deleted.");
 
+    }
+
+    @Override
+    public MemberModel getMemberProfile() {
+        return memberProfile;
     }
 
     private ArrayList<GameModel> getGamesFromList(ArrayList<GameModel> gList, int type) {
@@ -1525,9 +1544,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean isServerServiceRunning() {
-        //SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        //return sharedPrefs.getBoolean(ServerService.RUNNING_SERVICE, false);
-        return false;
+        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        return sharedPrefs.getBoolean(ServerService.RUNNING_SERVICE, false);
     }
 
     public boolean isLocalServiceRunning() {
