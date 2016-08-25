@@ -549,6 +549,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     }
 
     private void validateGame() {
+        Log.w(TAG, "Validating game " + game.getGameId());
         Bundle bundle = new Bundle();
         bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_VALIDATE_GAME);

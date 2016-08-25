@@ -128,7 +128,7 @@ public class LocalService extends IntentService {
         memberValues.put(MemberTable.COLUMN_CREATED, memberModel.getGamesCreated());
         memberValues.put(MemberTable.COLUMN_PLAYED, memberModel.getGamesPlayed());
         memberValues.put(MemberTable.COLUMN_ICON, getIconName(memberModel.getIconPath()));
-        memberValues.put(MemberTable.COLUMN_TITLE, memberModel.getTitle());
+        memberValues.put(MemberTable.COLUMN_TITLE, memberModel.getFavoriteEvent().getEventId());
         getContentResolver().insert(DataProvider.MEMBER_URI, memberValues);
         memberValues.clear();
     }
@@ -140,7 +140,7 @@ public class LocalService extends IntentService {
         memberValues.put(MemberTable.COLUMN_CREATED, memberModel.getGamesCreated());
         memberValues.put(MemberTable.COLUMN_PLAYED, memberModel.getGamesPlayed());
         memberValues.put(MemberTable.COLUMN_ICON, getIconName(memberModel.getIconPath()));
-        memberValues.put(MemberTable.COLUMN_TITLE, memberModel.getTitle());
+        memberValues.put(MemberTable.COLUMN_TITLE, memberModel.getFavoriteEvent().getEventId());
         getContentResolver().update(DataProvider.MEMBER_URI, memberValues, MemberTable.COLUMN_MEMBERSHIP + "=" + memberModel.getMembershipId(), null);
         memberValues.clear();
     }

@@ -12,17 +12,14 @@ import android.text.Html;
 import android.util.Log;
 
 import com.destiny.event.scheduler.BuildConfig;
-import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.ClanTable;
-import com.destiny.event.scheduler.data.EntryTable;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.SavedImagesTable;
-import com.destiny.event.scheduler.models.CompleteMemberModel;
+import com.destiny.event.scheduler.models.EventModel;
+import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.provider.DataProvider;
-import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.ImageUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
@@ -40,7 +37,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 public class BungieService extends IntentService {
@@ -61,8 +57,6 @@ public class BungieService extends IntentService {
     private static final String GROUP_PREFIX = "Group/";
 
     public static final String GET_CURRENT_ACCOUNT = "GetCurrentBungieAccount/";
-    public static final String GET_BUNGIE_ACCOUNT = "GetBungieAccount/";
-    public static final String GET_CLAN_MEMBERS = "GetClanMembers/";
 
     public static final int TYPE_LOGIN = 100;
     public static final int TYPE_UPDATE_CLAN = 110;
@@ -122,8 +116,9 @@ public class BungieService extends IntentService {
     private int userPlayed;
     private int userLikes;
     private int userDislikes;
+    private EventModel userFavoriteEvent;
 
-    private ArrayList<CompleteMemberModel> membersModelList;
+    private ArrayList<MemberModel> membersModelList;
     private ArrayList<String> iconsList;
 
     private static final String TAG = "BungieService";
@@ -134,7 +129,6 @@ public class BungieService extends IntentService {
     private String getCurrentBungieAccountResponse;
 
     private ArrayList<String> actualMemberList;
-    private String userMembership;
 
     public static final String RUNNING_SERVICE = "bungieRunning";
 
@@ -144,8 +138,6 @@ public class BungieService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
-        //Log.d(TAG, "HTTP Service started!");
 
         int request = intent.getIntExtra(REQUEST_EXTRA, 0);
         if (intent.hasExtra(COOKIE_EXTRA)) cookie = intent.getStringExtra(COOKIE_EXTRA);
@@ -183,9 +175,7 @@ public class BungieService extends IntentService {
                             for (int i=0;i<membersModelList.size();i++){
                                 insertClanMember(membersModelList.get(i));
                             }
-                            //insertFakeEvents(receiver);
                             insertLoggedUser();
-                            callTitleService();
                             receiver.send(STATUS_FINISHED, Bundle.EMPTY);
                         }
                     }
@@ -213,7 +203,6 @@ public class BungieService extends IntentService {
                 if (error != NO_ERROR){
                     sendError(receiver);
                 } else {
-                    callTitleService();
                     error = updateClan(receiver);
                     if (error != NO_ERROR){
                         sendError(receiver);
@@ -229,19 +218,6 @@ public class BungieService extends IntentService {
 
         this.stopSelf();
 
-    }
-
-    private void callTitleService(){
-        ArrayList<String> memberIdList = new ArrayList<>();
-
-        for (int i=0;i<membersModelList.size();i++){
-            memberIdList.add(membersModelList.get(i).getMembershipId());
-        }
-
-        //Log.w(TAG, "Iniciando TitleService...");
-        Intent titleIntent = new Intent(getApplicationContext(),TitleService.class);
-        titleIntent.putStringArrayListExtra("membershipList",memberIdList);
-        startService(titleIntent);
     }
 
     private int updateClan(ResultReceiver receiver) {
@@ -403,7 +379,7 @@ public class BungieService extends IntentService {
                         return NO_ERROR;
                     }
                 } else {
-                    Log.w(TAG, "Response Code do JSON diferente de 200");
+                    Log.w(TAG, "Response Code do JSON diferente de 200 (GetCurrentBungieAccount");
                     return ERROR_RESPONSE_CODE;
                 }
 
@@ -454,8 +430,6 @@ public class BungieService extends IntentService {
                     userIconPath = DEFAULT_ICON;
                 }
 
-                checkInServer(receiver);
-
                 try {
                     JSONArray jClans = jResponse.getJSONArray("clans");
                     JSONObject clanObj = jClans.getJSONObject(0);
@@ -470,20 +444,26 @@ public class BungieService extends IntentService {
                     clanBanner = jGroup.getString("bannerPath");
                     clanIcon = jGroup.getString("avatarPath");
 
-                    CompleteMemberModel user = new CompleteMemberModel();
+                    int err = checkInServer(receiver);
+                    if (err != NO_ERROR) { return err; }
+
+                    MemberModel user = new MemberModel();
                     user.setName(displayName);
                     user.setMembershipId(membershipId);
                     user.setClanId(clanId);
                     user.setIconPath(userIconPath);
-                    user.setPlatformId(String.valueOf(platformId));
+                    user.setPlatformId(platformId);
                     user.setLikes(userLikes);
                     user.setDislikes(userDislikes);
                     user.setGamesCreated(userCreated);
                     user.setGamesPlayed(userPlayed);
+                    user.setFavoriteEvent(userFavoriteEvent);
                     user.setInsert(true);
 
                     membersModelList.add(user);
-                    receiver.send(STATUS_FRIENDS, null);
+                    bundle.clear();
+                    bundle.putString("clanId", clanId);
+                    receiver.send(STATUS_FRIENDS, bundle);
                     return NO_ERROR;
                 } catch (JSONException e){
                     Log.w(TAG, "Erro no JSON do getGroup");
@@ -514,7 +494,7 @@ public class BungieService extends IntentService {
 
     }
 
-    private void checkInServer(ResultReceiver receiver) {
+    private int checkInServer(ResultReceiver receiver) {
         String myURL = SERVER_BASE_URL + LOGIN_ENDPOINT;
         receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 
@@ -526,6 +506,7 @@ public class BungieService extends IntentService {
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
+                urlConnection.setRequestProperty(ServerService.CLAN_TAG, clanId);
                 urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
                 urlConnection.setRequestMethod(POST_METHOD);
 
@@ -542,19 +523,31 @@ public class BungieService extends IntentService {
                         userDislikes = jObject.getInt("dislikes");
                         userCreated = jObject.getInt("gamesCreated");
                         userPlayed = jObject.getInt("gamesPlayed");
+                        EventModel event = new EventModel();
+                        if (jObject.isNull("favoriteEvent")){
+                            event.setEventId(0);
+                        } else {
+                            JSONObject jFavorite = jObject.getJSONObject("favoriteEvent");
+                            event.setEventId(jFavorite.getInt("id"));
+                        }
+                        userFavoriteEvent = event;
                         receiver.send(STATUS_VERIFY, Bundle.EMPTY);
-                    }
+                        return NO_ERROR;
+                    } else { return ERROR_RESPONSE_CODE; }
                 } else {
-                    Log.w(TAG, "Response Code do JSON diferente de 200");
+                    Log.w(TAG, "Response Code do JSON diferente de 200 (Server Login)");
+                    return ERROR_RESPONSE_CODE;
                 }
 
             } else {
                 Log.w(TAG, "Sem conexão com a internet");
+                return ERROR_NO_CONNECTION;
             }
 
         } catch (Exception e) {
             Log.w(TAG, "Problema no HTTP Request (getCurrentBungieAccount)");
             e.printStackTrace();
+            return ERROR_HTTP_REQUEST;
         }
     }
 
@@ -590,7 +583,7 @@ public class BungieService extends IntentService {
                             memberList.add(jArray.getString(i));
                             Log.w(TAG, "added member: " + jArray.getString(i));
                         }
-                        int error = NO_ERROR;
+                        int error;
                         if (actualMemberList != null){
                             memberList.add(membershipId);
                             Log.w(TAG, "added member: " + membershipId);
@@ -663,10 +656,10 @@ public class BungieService extends IntentService {
             iconsList.removeAll(savedIcons);
             downloadImages();
 
-            //Log.w(TAG, "Iniciando TitleService...");
+/*            //Log.w(TAG, "Iniciando TitleService...");
             Intent titleIntent = new Intent(getApplicationContext(),TitleService.class);
             titleIntent.putStringArrayListExtra("membershipList",memberList);
-            startService(titleIntent);
+            startService(titleIntent);*/
             return NO_ERROR;
         }
 
@@ -683,6 +676,7 @@ public class BungieService extends IntentService {
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
+                urlConnection.setRequestProperty(ServerService.CLAN_TAG, clanId);
                 urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
                 urlConnection.setDoOutput(true);
                 JSONArray jsonList = createJSONMemberList(memberList);
@@ -707,15 +701,23 @@ public class BungieService extends IntentService {
                         JSONArray jResponse = new JSONArray(response);
                         for (int i=0;i<jResponse.length();i++){
                             JSONObject jMember = jResponse.getJSONObject(i);
-                            CompleteMemberModel member = new CompleteMemberModel();
+                            MemberModel member = new MemberModel();
                             member.setMembershipId(jMember.getString("membership"));
                             member.setName(jMember.getString("name"));
                             member.setIconPath(jMember.getString("icon"));
-                            member.setPlatformId(jMember.getString("platform"));
+                            member.setPlatformId(jMember.getInt("platform"));
                             member.setLikes(jMember.getInt("likes"));
                             member.setDislikes(jMember.getInt("dislikes"));
                             member.setGamesCreated(jMember.getInt("gamesCreated"));
                             member.setGamesPlayed(jMember.getInt("gamesPlayed"));
+                            EventModel event = new EventModel();
+                            if (jMember.isNull("favoriteEvent")){
+                                event.setEventId(0);
+                            } else {
+                                JSONObject jFavorite = jMember.getJSONObject("favoriteEvent");
+                                event.setEventId(jFavorite.getInt("id"));
+                            }
+                            member.setFavoriteEvent(event);
                             member.setInsert(true);
                             membersModelList.add(member);
                         }
@@ -726,7 +728,7 @@ public class BungieService extends IntentService {
                         return ERROR_RESPONSE_CODE;
                     }
                 } else {
-                    Log.w(TAG, "Response Code do JSON diferente de 200");
+                    Log.w(TAG, "Response Code do JSON diferente de 200 (Server MemberList)");
                     error = ERROR_RESPONSE_CODE;
                     return ERROR_RESPONSE_CODE;
                 }
@@ -752,54 +754,6 @@ public class BungieService extends IntentService {
         Log.w(TAG, "jsonMemberList: " + json.toString());
         return json;
     }
-
-    /*private int parseMembersOfClan(ResultReceiver receiver, String response) {
-
-        //Log.w(TAG, "getMembersOfClan JSON unparsed :" + response);
-
-        try{
-            JSONObject jObject = new JSONObject(response);
-            JSONObject jResponse = jObject.getJSONObject("Response");
-            JSONArray jResults = jResponse.getJSONArray("results");
-
-            for (int i=0;i<jResults.length();i++){
-                JSONObject memberJSON = jResults.getJSONObject(i);
-                JSONObject destinyInfo = memberJSON.getJSONObject("destinyUserInfo");
-
-                CompleteMemberModel member = new CompleteMemberModel();
-                member.setMembershipId(destinyInfo.getString("membershipId"));
-                member.setName(destinyInfo.getString("displayName"));
-                member.setPlatformId(platformId);
-
-                try {
-                    JSONObject bungieInfo = memberJSON.getJSONObject("bungieNetUserInfo");
-                    member.setIconPath(bungieInfo.getString("iconPath"));
-                } catch (JSONException e){
-                    Log.w(TAG, "bungieNetUserInfo tag not found");
-                    member.setIconPath(DEFAULT_ICON);
-                }
-                membersModelList.add(i, member);
-            }
-
-            String hasMore = jResponse.getString("hasMore");
-
-            JSONObject jQuery = jResponse.getJSONObject("query");
-            int currentPage = Integer.parseInt(jQuery.getString("currentPage"));
-
-            if (hasMore.equals("true")){
-                currentPage++;
-                getMembersOfClan(receiver, currentPage);
-            }
-
-            return NO_ERROR;
-
-        } catch (JSONException e) {
-            Log.w(TAG, response);
-            Log.w(TAG, "Erro no JSON de getMembersOfClan");
-            e.printStackTrace();
-            return ERROR_MEMBERS_OF_CLAN;
-        }
-    }*/
 
     private void getIconList(boolean withClan) {
         int notAdd = 0;
@@ -836,73 +790,12 @@ public class BungieService extends IntentService {
         }
 
         inputStream.close();
-
-        //result = URLDecoder.decode(result, "ISO-8859-1");
-        //result = Html.fromHtml(result);
-        //result = new String(result.getBytes("ISO-8859-1"),"UTF-8");
         result = Html.fromHtml(result).toString();
 
         return result;
     }
 
-    private void insertFakeEvents(ResultReceiver receiver) {
-        Log.w(TAG, "Inserting fakeEvents data");
-
-        Random random = new Random();
-
-        for (int i=0; i<10; i++){
-            int member = random.nextInt(membersModelList.size()-1);
-            String id = membersModelList.get(member).getMembershipId();
-            int event = random.nextInt(57)+1;
-            int insc = random.nextInt(5)+1;
-
-            ContentValues values = new ContentValues();
-            values.put(GameTable.COLUMN_CREATOR, id);
-            values.put(GameTable.COLUMN_CREATOR_NAME, membersModelList.get(member).getName());
-            values.put(GameTable.COLUMN_EVENT_ID, event);
-            values.put(GameTable.COLUMN_TIME, "2016-05-10T18:13:26");
-            values.put(GameTable.COLUMN_LIGHT, 320);
-            values.put(GameTable.COLUMN_INSCRIPTIONS, insc);
-            values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_NEW);
-            values.put(GameTable.COLUMN_PLATFORM, platformId);
-            getContentResolver().insert(DataProvider.GAME_URI, values);
-            values.clear();
-
-            ContentValues first = new ContentValues();
-            first.put(EntryTable.COLUMN_GAME,i+1);
-            first.put(EntryTable.COLUMN_MEMBERSHIP, id);
-            first.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
-            getContentResolver().insert(DataProvider.ENTRY_URI, first);
-            first.clear();
-
-            for (int x=0; x<insc-1; x++){
-                ContentValues entries = new ContentValues();
-                entries.put(EntryTable.COLUMN_GAME, i+1);
-                String mid = membersModelList.get(random.nextInt(membersModelList.size()-1)).getMembershipId();
-                entries.put(EntryTable.COLUMN_MEMBERSHIP, mid);
-                entries.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
-                getContentResolver().insert(DataProvider.ENTRY_URI, entries);
-                entries.clear();
-            }
-
-        }
-
-        ArrayList<String> memberIdList = new ArrayList<>();
-
-        for (int i=0;i<membersModelList.size();i++){
-            memberIdList.add(membersModelList.get(i).getMembershipId());
-        }
-
-        //Log.w(TAG, "Iniciando TitleService...");
-        Intent intent = new Intent(getApplicationContext(),TitleService.class);
-        intent.putStringArrayListExtra("membershipList",memberIdList);
-        startService(intent);
-
-        receiver.send(STATUS_FINISHED, Bundle.EMPTY);
-
-    }
-
-    private void insertClanMember(CompleteMemberModel member) {
+    private void insertClanMember(MemberModel member) {
 
         ContentValues values = new ContentValues();
         values.put(MemberTable.COLUMN_NAME, member.getName());
@@ -911,7 +804,7 @@ public class BungieService extends IntentService {
         String imageName = member.getIconPath().substring(member.getIconPath().lastIndexOf("/")+1, member.getIconPath().length());
         values.put(MemberTable.COLUMN_ICON, imageName);
         values.put(MemberTable.COLUMN_PLATFORM, member.getPlatformId());
-        values.put(MemberTable.COLUMN_TITLE, getResources().getString(R.string.default_title));
+        values.put(MemberTable.COLUMN_TITLE, member.getFavoriteEvent().getEventId());
         values.put(MemberTable.COLUMN_LIKES, member.getLikes());
         values.put(MemberTable.COLUMN_DISLIKES, member.getDislikes());
         values.put(MemberTable.COLUMN_CREATED, member.getGamesCreated());

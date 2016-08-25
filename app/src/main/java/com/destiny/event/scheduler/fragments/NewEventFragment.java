@@ -403,7 +403,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         switch (loader.getId()){
             case LOADER_TYPE:
                 iconType.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName()));
-                eventTypeName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
+                eventTypeName = data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME));
                 textType.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 game.setTypeName(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)));
                 break;
@@ -414,7 +414,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 String iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
                 eventIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
                 iconGame.setImageResource(getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
-                eventName = getContext().getResources().getString(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
+                eventName = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME));
                 textGame.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 game.setEventIcon(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)));
                 game.setEventName(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)));

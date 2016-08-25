@@ -109,6 +109,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String NEW_GAMES_PREF = "newGames";
     public static final String MEMBER_PREF = "membership";
     public static final String PLATFORM_PREF = "platform";
+    public static final String CLAN_PREF = "clanId";
     public static final int DEFAULT_INTERVAL = 3600000;
 
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
@@ -182,6 +183,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.drawer_layout);
+
+        //progress.setProgress(10);
 
         progress = (ProgressBar) findViewById(R.id.progress_bar);
 
@@ -343,9 +346,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void onBackPressed() {
         if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            //Toast.makeText(this, "Back Count: " + fm.getBackStackEntryCount(), Toast.LENGTH_SHORT).show();
-            //Toast.makeText(this, "prior openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
+        } else if (!isServerServiceRunning() || !isBungieServiceRunning()){
             if (fragmentTag == null) {
                 finish();
             } else if (openedFragmentType == FRAGMENT_TYPE_WITHOUT_BACKSTACK) {
@@ -536,11 +537,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onGameSelected(GameModel game, String tag) {
 
-        String[] strings = { "a", "b", "c" };
-                 for (int i = 0; i <= strings.length; i++) {
-                       String x = strings[i];
-                     }
-
         entryList = null;
         historyEntries = null;
         Fragment fragment;
@@ -561,8 +557,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 fragment = new DetailValidationFragment();
                 break;
             case GameTable.STATUS_VALIDATED:
-                isNewScheduledOrValidated = GameTable.STATUS_VALIDATED;
-                fragment = new DetailHistoryFragment();
+                if (!game.isEvaluated()){
+                    isNewScheduledOrValidated = GameTable.STATUS_VALIDATED;
+                    fragment = new DetailValidationFragment();
+                } else {
+                    isNewScheduledOrValidated = GameTable.STATUS_VALIDATED;
+                    fragment = new DetailHistoryFragment();
+                }
                 break;
             default:
                 fragment = new DetailEventFragment();
@@ -708,6 +709,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             intent.putExtra(ServerService.RECEIVER_TAG, mReceiver);
             intent.putExtra(ServerService.MEMBER_TAG, bungieId);
             intent.putExtra(ServerService.PLATFORM_TAG, platformId);
+            intent.putExtra(ServerService.CLAN_TAG, clanId);
 
             if (bundle.containsKey(ServerService.EVENT_TAG))
                 intent.putExtra(ServerService.EVENT_TAG, bundle.getInt(ServerService.EVENT_TAG));
@@ -800,6 +802,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         break;
                     }
                 }
+                closeFragment();
                 break;
         }
     }
@@ -1312,6 +1315,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     } else Log.w(TAG, "validatedEventListener is null");
                 }
                 if (getOpenedFragment() instanceof DetailEventFragment) {
+                    Log.w(TAG, "DetailEventFragment is the opened Fragment");
                     if (resultData.containsKey(ServerService.REQUEST_TAG) && resultData.containsKey(ServerService.INT_TAG)) {
                         switch (resultData.getInt(ServerService.REQUEST_TAG)) {
                             case ServerService.TYPE_JOIN_GAME:
@@ -1348,6 +1352,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                                 break;
                         }
                         closeFragment();
+                        if (newEventsListener != null) { newEventsListener.onGamesLoaded(newGameList); }
+                        if (scheduledEventsListener != null) { scheduledEventsListener.onGamesLoaded(scheduledGameList); }
                     } else {
                         entryList = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
                         userDataListener.onEntriesLoaded(entryList, true);
@@ -1360,14 +1366,17 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             case ServerService.TYPE_VALIDATE_GAME:
                             case ServerService.TYPE_DELETE_GAME:
                             case ServerService.TYPE_EVALUATE_GAME:
+                                Log.w(TAG, "Updating doneGameList... (size: " + doneGameList.size() +") removing gameId: " + resultData.getInt(ServerService.INT_TAG));
                                 for (int i = 0; i < doneGameList.size(); i++) {
                                     if (doneGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
                                         doneGameList.remove(i);
+                                        Collections.sort(doneGameList, new GameComparator());
                                     }
                                 }
                                 break;
                         }
                         closeFragment();
+                        if (doneEventsListener != null) { doneEventsListener.onGamesLoaded(doneGameList); }
                     } else {
                         entryList = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
                         userDataListener.onEntriesLoaded(entryList, true);

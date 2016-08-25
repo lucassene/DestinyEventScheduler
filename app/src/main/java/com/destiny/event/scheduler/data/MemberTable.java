@@ -22,7 +22,7 @@ public class MemberTable {
     public static final String COLUMN_DISLIKES = "dislikes";
     public static final String COLUMN_CREATED = "games_created";
     public static final String COLUMN_PLAYED = "games_played";
-    public static final String COLUMN_TITLE = "member_title";
+    public static final String COLUMN_TITLE = "member_favoriteid";
     //public static final String COLUMN_SINCE = "member_since";
 
     //public static final String POINTS_COLUMNS = "((" + COLUMN_LIKES + "*1.0)/(" + COLUMN_CREATED + "+" + COLUMN_PLAYED + "))*100+(" + COLUMN_CREATED + "*0.5)-" + COLUMN_DISLIKES;
@@ -61,7 +61,7 @@ public class MemberTable {
             + COLUMN_PLAYED
             + " INTEGER, "
             + COLUMN_TITLE
-            + " TEXT NOT NULL"
+            + " INTEGER NOT NULL"
             + ");";
 
     public static void onCreate(SQLiteDatabase db){
@@ -113,17 +113,22 @@ public class MemberTable {
 
     public static String getMemberTitle(Context context, int xp, int favoriteId){
         String[] eventTitles = context.getResources().getStringArray(R.array.event_title);
-        String title = eventTitles[favoriteId];
-        String prefix = title.substring(0,title.indexOf(":"));
-        Log.w(TAG, "Prefix: " + prefix);
-        if (prefix.equals("a")){
-            return getTitle(context, xp) + " " + title.substring(title.indexOf(":")+1,title.length());
-        } else if (prefix.equals("b")){
-            return title + " " + getTitle(context, xp);
-        } else return "Error";
+        if (favoriteId == 0){
+            return context.getString(R.string.default_title);
+        } else {
+            String title = eventTitles[favoriteId-1];
+            Log.w(TAG, "FavId: " + favoriteId + " / Title: " + title);
+            String prefix = title.substring(0,title.indexOf(":"));
+            Log.w(TAG, "Prefix: " + prefix);
+            if (prefix.equals("a")){
+                return getLevelTitle(context, xp) + " " + title.substring(title.indexOf(":")+1,title.length());
+            } else if (prefix.equals("b")){
+                return title + " " + getLevelTitle(context, xp);
+            } else return "Error";
+        }
     }
 
-    private static String getTitle(Context context, int xp) {
+    private static String getLevelTitle(Context context, int xp) {
         String[] levelTitles = context.getResources().getStringArray(R.array.level_title);
         int lvl = MemberTable.getMemberLevel(xp);
         if (lvl<=10){

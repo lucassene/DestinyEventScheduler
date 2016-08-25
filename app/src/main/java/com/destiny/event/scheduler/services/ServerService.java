@@ -48,12 +48,14 @@ public class ServerService extends IntentService {
     private static final String HISTORY_ENDPOINT = "/history";
     private static final String MEMBER_ENDPOINT = "/member/";
     private static final String PROFILE_ENDPOINT = "/profile";
+    private static final String EXCEPTION_ENDPOINT = "log-app";
 
     private static final String STATUS_PARAM = "status=";
     private static final String JOINED_PARAM = "joined=";
 
     private static final String MEMBER_HEADER = "membership";
     private static final String PLATFORM_HEADER = "platform";
+    private static final String CLAN_HEADER = "clanId";
     private static final String TIMEZONE_HEADER = "zoneid";
 
     private static final String GET_METHOD = "GET";
@@ -70,11 +72,13 @@ public class ServerService extends IntentService {
     public static final String LIGHT_TAG = "minLight";
     public static final String RECEIVER_TAG = "receiver";
     public static final String INT_TAG = "intData";
-    public static final String STRING_TAG = "stringData";
     public static final String GAME_TAG = "gameList";
     public static final String GAMEID_TAG = "gameId";
     public static final String ENTRY_TAG = "entries";
     public static final String EVALUATIONS_TAG = "evaluations";
+    public static final String CLAN_TAG = "clanId";
+    public static final String CLASS_TAG = "class";
+    public static final String EXCEPTION_TAG = "exception";
 
     public static final int STATUS_RUNNING = 0;
     public static final int STATUS_FINISHED = 210;
@@ -93,6 +97,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_EVALUATE_GAME = 11;
     public static final int TYPE_HISTORY = 12;
     public static final int TYPE_PROFILE = 13;
+    public static final int TYPE_EXCEPTION = 14;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -107,6 +112,7 @@ public class ServerService extends IntentService {
     public static final String RUNNING_SERVICE = "serverRunning";
 
     private int gameId;
+    private String clanId;
     private String memberId;
     private int platformId;
     private ArrayList<GameModel> gameList;
@@ -141,8 +147,13 @@ public class ServerService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         int type = intent.getIntExtra(REQUEST_TAG, 0);
-        final ResultReceiver receiver = intent.getParcelableExtra(RECEIVER_TAG);
+        Log.w(TAG, "Request Tag: " + type);
+        ResultReceiver receiver;
+        if (intent.hasExtra(RECEIVER_TAG)){
+            receiver = intent.getParcelableExtra(RECEIVER_TAG);
+        } else receiver = null;
         memberId = intent.getStringExtra(MEMBER_TAG);
+        clanId = intent.getStringExtra(CLAN_TAG);
         platformId = intent.getIntExtra(PLATFORM_TAG, 0);
         int error;
         String url;
@@ -250,7 +261,7 @@ public class ServerService extends IntentService {
                 break;
             case TYPE_EVALUATE_GAME:
                 if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
-                    url = SERVER_BASE_URL + EVALUATION_ENDPOINT + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1);
+                    url = SERVER_BASE_URL + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1) + EVALUATION_ENDPOINT;
                     bundle.clear();
                     bundle.putInt(GAMEID_TAG, intent.getIntExtra(GAMEID_TAG, -1));
                     bundle.putParcelableArrayList(EVALUATIONS_TAG, intent.getParcelableArrayListExtra(EVALUATIONS_TAG));
@@ -281,6 +292,16 @@ public class ServerService extends IntentService {
                         sendError(receiver, error);
                     } else sendMemberData(receiver, member);
                 } else sendError(receiver, ERROR_INCORRECT_REQUEST);
+                break;
+            case TYPE_EXCEPTION:
+                if (intent.hasExtra(CLASS_TAG) && intent.hasExtra(EXCEPTION_TAG)){
+                    url = SERVER_BASE_URL + EXCEPTION_ENDPOINT;
+                    bundle.clear();
+                    bundle.putString(CLASS_TAG, intent.getStringExtra(CLASS_TAG));
+                    bundle.putString(EXCEPTION_TAG, intent.getStringExtra(EXCEPTION_TAG));
+                    requestServer(receiver, type, url, bundle);
+                }
+                break;
         }
         this.stopSelf();
 
@@ -327,7 +348,7 @@ public class ServerService extends IntentService {
 
     private int requestServer(ResultReceiver receiver, int type, String url, Bundle bundle) {
         Log.w(TAG, "URL: " + url);
-        receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+        if (receiver != null) { receiver.send(STATUS_RUNNING, Bundle.EMPTY); }
         try {
             if (NetworkUtils.checkConnection(getApplicationContext())){
                 URL myURL = new URL(url);
@@ -360,6 +381,9 @@ public class ServerService extends IntentService {
                         break;
                     case TYPE_PROFILE:
                         urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
+                        break;
+                    case TYPE_EXCEPTION:
+                        urlConnection = createExceptionRequest(urlConnection, bundle);
                         break;
                 }
 
@@ -494,6 +518,14 @@ public class ServerService extends IntentService {
                 member.setLikes(jEntry.getInt("totalLikes"));
                 member.setDislikes(jEntry.getInt("totalDislikes"));
                 member.setTitle(getString(R.string.default_title));
+                EventModel event = new EventModel();
+                if (jEntry.isNull("favoriteEvent")){
+                    event.setEventId(0);
+                } else {
+                    JSONObject jFavorite = jEntry.getJSONObject("favoriteEvent");
+                    event.setEventId(jFavorite.getInt("id"));
+                }
+                member.setFavoriteEvent(event);
                 memberList.add(member);
             }
         } catch (JSONException e){
@@ -523,7 +555,14 @@ public class ServerService extends IntentService {
                 member.setGamesPlayed(jMember.getInt("gamesPlayed"));
                 member.setLvl(jMember.getInt("likes"),jMember.getInt("dislikes"),jMember.getInt("gamesPlayed"),jMember.getInt("gamesCreated"));
                 member.setEntryTime(jEntry.getString("time"));
-                member.setTitle(getString(R.string.default_title));
+                EventModel event = new EventModel();
+                if (jMember.isNull("favoriteEvent")){
+                    event.setEventId(0);
+                } else {
+                    JSONObject jFavorite = jMember.getJSONObject("favoriteEvent");
+                    event.setEventId(jFavorite.getInt("id"));
+                }
+                member.setFavoriteEvent(event);
                 memberList.add(member);
             }
         } catch (JSONException e){
@@ -571,6 +610,20 @@ public class ServerService extends IntentService {
 
     private boolean getBoolean(String joined) {
         return joined.equals("true");
+    }
+
+    private HttpURLConnection createExceptionRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
+        urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
+        urlConnection.setDoOutput(true);
+        urlConnection.setRequestProperty("Content-Type", "application/json");
+        urlConnection.setRequestProperty("Accept", "application/json");
+
+        JSONObject gameJSON = createExceptionJSON(bundle.getString(CLASS_TAG), bundle.getString(EXCEPTION_TAG));
+        OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+        writer.write(gameJSON.toString());
+        writer.flush();
+
+        return urlConnection;
     }
 
     private HttpURLConnection createGameRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
@@ -622,9 +675,18 @@ public class ServerService extends IntentService {
     private HttpURLConnection getDefaultHeaders(HttpURLConnection urlConnection, String postMethod) throws ProtocolException {
         urlConnection.setRequestProperty(MEMBER_HEADER, memberId);
         urlConnection.setRequestProperty(PLATFORM_HEADER, String.valueOf(platformId));
+        urlConnection.setRequestProperty(CLAN_HEADER, String.valueOf(clanId));
         urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
         urlConnection.setRequestMethod(postMethod);
         return urlConnection;
+    }
+
+    private JSONObject createExceptionJSON(String className, String exception) throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("exception", exception);
+        json.put("class", className);
+        Log.w(TAG, "ExceptionJSON: " + json.toString());
+        return json;
     }
 
     private JSONObject createCreateGameJSON(int eventId, String time, int minLight) throws JSONException {

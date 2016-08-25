@@ -106,7 +106,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/listItemHeight"
                         android:gravity="center"
-                        android:text="@string/no_events_played"
+                        android:text="@string/no_evaluations_received"
                         android:visibility="gone"
                         android:alpha=".75"/>
 

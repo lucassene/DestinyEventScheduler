@@ -10,6 +10,7 @@ public class MemberModel implements Serializable {
 
     private String name;
     private String membershipId;
+    private String clanId;
     private String iconPath;
     private int platformId;
     private String title;
@@ -24,6 +25,7 @@ public class MemberModel implements Serializable {
     private int evaluationsMade;
     private ArrayList<EventTypeModel> typesPlayed;
     private EventModel favoriteEvent;
+    private boolean isInsert;
 
     public MemberModel(){
         super();
@@ -156,5 +158,21 @@ public class MemberModel implements Serializable {
 
     public void setFavoriteEvent(EventModel favoriteEvent) {
         this.favoriteEvent = favoriteEvent;
+    }
+
+    public boolean isInsert() {
+        return isInsert;
+    }
+
+    public void setInsert(boolean insert) {
+        isInsert = insert;
+    }
+
+    public String getClanId() {
+        return clanId;
+    }
+
+    public void setClanId(String clanId) {
+        this.clanId = clanId;
     }
 }

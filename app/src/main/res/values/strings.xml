@@ -2,7 +2,7 @@
 <resources>
     <string name="psn" translatable="false">PSN</string>
     <string name="live" translatable="false">LIVE</string>
-    <string name="app_name" translatable="false">Destiny Event Scheduler</string>
+    <string name="app_name" translatable="false">Destiny Scheduler</string>
     <string name="default_url" translatable="false">https://www.bungie.net</string>
     <string name="default_img_desc">Icon</string>
     <string name="open_menu">Open menu</string>
@@ -349,6 +349,7 @@
     <string name="elimination">Elimination</string>
     <string name="inferno3">Inferno 3v3</string>
     <string name="inferno6">Inferno 6v6</string>
+    <string name="inferno_sup">Inferno Supremacy</string>
     <string name="iron_banner">Iron Banner</string>
     <string name="mayhem_clash">Mayhem Clash</string>
     <string name="mayhem_rumble">Mayhem Rumble</string>
@@ -593,6 +594,7 @@
     <string name="hours">" hours"</string>
     <string name="fail_medals_data">Can\'t retrieve medals data. Please check your internet connection and try again.</string>
     <string name="fail_member_data">Can\'t get member data. Please check your internet connection and try again.</string>
+    <string name="no_evaluations_received">No evaluations received.</string>
 
 
 </resources>

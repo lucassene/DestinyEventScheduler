@@ -66,6 +66,7 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
         return v;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

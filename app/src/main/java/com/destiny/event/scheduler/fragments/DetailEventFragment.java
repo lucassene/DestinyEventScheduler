@@ -3,16 +3,12 @@ package com.destiny.event.scheduler.fragments;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,7 +23,6 @@ import android.widget.Toast;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.DetailEventAdapter;
-import com.destiny.event.scheduler.data.EntryTable;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
@@ -45,16 +40,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class DetailEventFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener, UserDataListener{
+public class DetailEventFragment extends ListFragment implements FromDialogListener, UserDataListener{
 
     public static final String TAG = "DetailEventFragment";
-
-    private static final int LOADER_NOTIFICATION = 80;
-
-    private static final int DELETE_NOTIFICATION = 0;
-    private static final int CREATE_NOTIFICATION = 1;
-
-    private int notificationMethod;
 
     private String origin;
     private int inscriptions;
@@ -255,79 +243,47 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     }
 
-    private void initNotificationLoader(){
-        if (getLoaderManager().getLoader(LOADER_NOTIFICATION) != null){
-            getLoaderManager().destroyLoader(LOADER_NOTIFICATION);
-        }
-        getLoaderManager().restartLoader(LOADER_NOTIFICATION, null, this);
-    }
-
-    private void deleteGame(Uri uri) {
-        getContext().getContentResolver().delete(uri,null,null);
-        String selection = EntryTable.COLUMN_GAME + "=" + game.getGameId();
-        getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
-
+    private void deleteGame() {
         Bundle bundle = new Bundle();
         bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_DELETE_GAME);
         callback.runServerService(bundle);
 
-        notificationMethod = DELETE_NOTIFICATION;
-        initNotificationLoader();
+        deleteNotifications(game.getGameId());
     }
 
-    private void leaveGame(ContentValues values, Uri uri) {
-
-        values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions-1);
-        getContext().getContentResolver().update(uri, values,null, null);
-        values.clear();
-        String selection = EntryTable.COLUMN_GAME + "=" + game.getGameId() + " AND " + EntryTable.COLUMN_MEMBERSHIP + "=" + callback.getBungieId();
-        getContext().getContentResolver().delete(DataProvider.ENTRY_URI, selection, null);
-
+    private void leaveGame() {
         Bundle bundle = new Bundle();
         bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_LEAVE_GAME);
         callback.runServerService(bundle);
 
-        notificationMethod = DELETE_NOTIFICATION;
-        initNotificationLoader();
-
+        deleteNotifications(game.getGameId());
     }
 
-    private void joinGame(ContentValues values, Uri uri) {
-
-        values.put(GameTable.COLUMN_INSCRIPTIONS, inscriptions+1);
-        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_SCHEDULED);
-        getContext().getContentResolver().update(uri, values,null, null);
-        values.clear();
-
-        values.put(EntryTable.COLUMN_GAME, game.getGameId());
-        values.put(EntryTable.COLUMN_MEMBERSHIP, callback.getBungieId());
-        values.put(EntryTable.COLUMN_TIME, DateUtils.getCurrentTime());
-        getContext().getContentResolver().insert(DataProvider.ENTRY_URI, values);
-        values.clear();
-
+    private void joinGame() {
         Bundle bundle = new Bundle();
         bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_JOIN_GAME);
         callback.runServerService(bundle);
 
-        notificationMethod = CREATE_NOTIFICATION;
-        initNotificationLoader();
-
+        createNotifications(game);
     }
 
-    private void updateGame(ContentValues values, Uri uri) {
-
+    private void updateGame() {
         callback.updateGameStatus(game, getStatus());
+        deleteNotifications(game.getGameId());
+    }
 
-        values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING);
-        getContext().getContentResolver().update(uri, values, null, null);
-        values.clear();
+    private void createNotifications(GameModel game) {
+        int eventIcon = getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName());
+        setAlarmNotification(getNotifyTime(), game.getTime(), game.getGameId(), game.getEventName(), game.getTypeName(), eventIcon);
+        //callback.closeFragment();
+    }
 
-        notificationMethod = DELETE_NOTIFICATION;
-        initNotificationLoader();
-
+    private void deleteNotifications(int gameId) {
+        getContext().getContentResolver().delete(DataProvider.NOTIFICATION_URI,NotificationTable.COLUMN_GAME + "=" + gameId,null);
+        //callback.closeFragment();
     }
 
     private int getStatus() {
@@ -450,79 +406,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         callback.deleteUserDataListener(this);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        callback.onLoadingData();
-
-        String[] selectionArgs = {String.valueOf(game.getGameId())};
-
-        switch (id){
-            case LOADER_NOTIFICATION:
-                //Log.w(TAG,"onCreateLoader de ID LOADER_NOTIFICATION criado");
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.NOTIFICATION_URI,
-                        NotificationTable.ALL_COLUMNS,
-                        NotificationTable.COLUMN_GAME + "=?",
-                        selectionArgs,
-                        null
-                );
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        if (data != null && data.moveToFirst() && loader.getId() == LOADER_NOTIFICATION){
-
-            Log.w(TAG, "onLoaderFinished alcançado com ID LOADER_NOTIFICATION");
-
-            switch (notificationMethod){
-                case CREATE_NOTIFICATION:
-                    if (data.getCount()<=0){
-                        String icon = game.getEventIcon().substring(game.getEventIcon().lastIndexOf("/"+1,game.getEventIcon().length()));
-                        int eventIcon = getResources().getIdentifier(icon,"drawable",getContext().getPackageName());
-                        setAlarmNotification(getNotifyTime(), game.getTime(), game.getGameId(), game.getEventName(), game.getTypeName(), eventIcon);
-                    } else{
-                        Log.w(TAG, "Notification for this game already created!");
-                    }
-                    break;
-                case DELETE_NOTIFICATION:
-                    if (data.getCount()>0){
-                        for (int i=0;i<data.getCount();i++){
-                            String notificationId = data.getString(data.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
-                            Uri uri = Uri.parse(DataProvider.NOTIFICATION_URI + "/" + notificationId);
-                            int deletedRow = getContext().getContentResolver().delete(uri, null, null);
-                            Log.w(TAG, "NotificationID deleted: " + String.valueOf(deletedRow));
-                            int requestId = Integer.parseInt(notificationId);
-                            callback.cancelAlarmTask(requestId);
-                            data.moveToNext();
-                        }
-                    } else Log.w(TAG,"There is no Notification to be deleted!");
-                    break;
-            }
-        }
-
-        callback.onDataLoaded();
-        checkIfCloses(1);
-
-    }
-
-    private void checkIfCloses(final int onCloseDemanded) {
-        if (onCloseDemanded == 1){
-            Handler handler = new Handler(){
-                @Override
-                public void handleMessage(Message msg){
-                    if (msg.what == 1) callback.closeFragment();
-                }
-            };
-            handler.sendEmptyMessage(onCloseDemanded);
-        }
-    }
-
     private void dialogThread() {
         Handler handler = new Handler(){
             @Override
@@ -543,10 +426,6 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
         notifyTime.add(Calendar.MINUTE,alarmTime);
 
         return notifyTime;
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
     }
 
     private void setAdapter(List<MemberModel> entries, int max) {
@@ -625,23 +504,18 @@ public class DetailEventFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public void onPositiveClick(String input, int type) {
-
-        ContentValues values = new ContentValues();
-        String uriString = DataProvider.GAME_URI + "/" + game.getGameId();
-        Uri uri = Uri.parse(uriString);
-
         switch (type){
             case MyAlertDialog.JOIN_DIALOG:
-                joinGame(values, uri);
+                joinGame();
                 break;
             case MyAlertDialog.LEAVE_DIALOG:
-                leaveGame(values, uri);
+                leaveGame();
                 break;
             case MyAlertDialog.DELETE_DIALOG:
-                deleteGame(uri);
+                deleteGame();
                 break;
             case MyAlertDialog.ALERT_DIALOG:
-                updateGame(values, uri);
+                updateGame();
                 break;
         }
 

@@ -59,8 +59,10 @@ public class NotificationService extends IntentService {
             Log.w(TAG, "Notificação encontrada, abrindo...");
             notificationId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
             String title = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_EVENT));
+            title = getString(getResources().getIdentifier(title,"string",getPackageName()));
             int iconId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ICON));
             String typeName = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TYPE));
+            typeName = getString(getResources().getIdentifier(typeName,"string",getPackageName()));
             gameId = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME));
             cursor.close();
 
@@ -95,7 +97,7 @@ public class NotificationService extends IntentService {
             nBuilder.setLargeIcon(getLargeIcon(iconId));
             nBuilder.setContentTitle(title);
             if (notificationCount > 1) {
-                nBuilder.setContentText(getString(R.string.event_begin_in) + sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15) + getString(R.string.minutes));
+                nBuilder.setContentText(getString(R.string.event_begin_in) + sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0) + getString(R.string.minutes));
             } else nBuilder.setContentText(getString(R.string.your_match_of) + typeName + getString(R.string.will_begin_soon));
             nBuilder.setTicker(getString(R.string.match_begin));
             setPriority(nBuilder);

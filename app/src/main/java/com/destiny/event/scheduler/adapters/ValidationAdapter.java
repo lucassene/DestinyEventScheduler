@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
+import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
@@ -77,7 +78,8 @@ public class ValidationAdapter extends BaseAdapter {
         MemberModel currentMember = getItem(position);
 
         vViewHolder.memberName.setText(currentMember.getName());
-        vViewHolder.memberTitle.setText(currentMember.getTitle());
+        int xp = MemberTable.getMemberXP(currentMember.getLikes(), currentMember.getDislikes(), currentMember.getGamesPlayed(), currentMember.getGamesCreated());
+        vViewHolder.memberTitle.setText(MemberTable.getMemberTitle(context, xp, currentMember.getFavoriteEvent().getEventId()));
         try {
             vViewHolder.memberIcon.setImageBitmap(ImageUtils.loadImage(context,ImageUtils.getIconName(currentMember.getIconPath())));
         } catch (IOException e) {

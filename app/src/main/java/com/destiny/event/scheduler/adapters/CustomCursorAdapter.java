@@ -40,8 +40,6 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
         this.code = code;
     }
 
-
-
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         super.bindView(view, context, cursor);
@@ -155,10 +153,11 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
 
         int xp = cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
         int lvl = MemberTable.getMemberLevel(xp);
+        String memberTitle = MemberTable.getMemberTitle(context, xp, cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
         points.setText(StringUtils.parseString(lvl));
 
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
-        title.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
+        title.setText(memberTitle);
 
         //String sinceString = DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
         //memberSince.setText(sinceString);

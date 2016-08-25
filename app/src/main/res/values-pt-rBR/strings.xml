@@ -505,5 +505,7 @@
     <string name="new_like_events">Alguém criou um evento que você gosta de jogar.</string>
     <string name="fail_medals_data">Não foi possível obter as medalhas. Por favor cheque sua conexão com a internet e tente novamente.</string>
     <string name="fail_member_data">Não foi possível obter as informações do membro. Por favor cheque sua conexão com a internet e tente novamente.</string>
+    <string name="inferno_sup">Inferno Supremacia</string>
+    <string name="no_evaluations_received">Nenhuma avaliação recebida.</string>
 
 </resources>
