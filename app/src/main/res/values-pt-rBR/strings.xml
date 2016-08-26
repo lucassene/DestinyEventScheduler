@@ -439,7 +439,7 @@
     <string name="events">Eventos</string>
     <string name="favorite_game">Jogo favorito</string>
     <string name="games">Jogos</string>
-    <string name="played">Jogado</string>
+    <string name="played">Jogados</string>
     <string name="value">Valor</string>
     <string name="default_title">Novo no pedaço</string>
     <string name="bungie_net_error_msg">Resposta incorreta de Bungie.net. Por favor, tente novamente mais tarde.</string>

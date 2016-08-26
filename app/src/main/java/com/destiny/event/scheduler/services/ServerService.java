@@ -49,6 +49,7 @@ public class ServerService extends IntentService {
     private static final String MEMBER_ENDPOINT = "/member/";
     private static final String PROFILE_ENDPOINT = "/profile";
     private static final String EXCEPTION_ENDPOINT = "log-app";
+    private static final String MEMBERLIST_ENDPOINT = "member/list";
 
     private static final String STATUS_PARAM = "status=";
     private static final String JOINED_PARAM = "joined=";
@@ -98,6 +99,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_HISTORY = 12;
     public static final int TYPE_PROFILE = 13;
     public static final int TYPE_EXCEPTION = 14;
+    public static final int TYPE_CLAN_MEMBERS = 15;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -328,6 +330,7 @@ public class ServerService extends IntentService {
 
     private void sendGameData(ResultReceiver receiver, ArrayList<GameModel> gameList) {
         Bundle bundle = new Bundle();
+        bundle.putInt(REQUEST_TAG, TYPE_ALL_GAMES);
         bundle.putSerializable(GAME_TAG, gameList);
         receiver.send(STATUS_FINISHED, bundle);
     }
@@ -385,6 +388,9 @@ public class ServerService extends IntentService {
                     case TYPE_EXCEPTION:
                         urlConnection = createExceptionRequest(urlConnection, bundle);
                         break;
+                    case TYPE_CLAN_MEMBERS:
+                        urlConnection = createMemberListRequest(urlConnection, bundle);
+                        break;
                 }
 
                 int statusCode;
@@ -416,20 +422,36 @@ public class ServerService extends IntentService {
                                 case TYPE_JOIN_GAME:
                                 case TYPE_LEAVE_GAME:
                                 case TYPE_DELETE_GAME:
+                                    Log.w(TAG, "Response: " + response);
+                                    return error;
                                 case TYPE_VALIDATE_GAME:
                                 case TYPE_EVALUATE_GAME:
                                     Log.w(TAG, "Response: " + response);
-                                    return error;
+                                    String mUrl = SERVER_BASE_URL + MEMBERLIST_ENDPOINT;
+                                    int err = requestServer(receiver, TYPE_CLAN_MEMBERS, mUrl, bundle);
+                                    Log.w(TAG, "MemberList error: " + err);
+                                    if (err == NO_ERROR){
+                                        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, LocalService.class);
+                                        intent.putExtra(LocalService.REQUEST_HEADER, LocalService.TYPE_UPDATE_MEMBERS);
+                                        intent.putExtra(LocalService.MEMBERS_HEADER, memberList);
+                                        intent.putExtra(LocalService.CLAN_HEADER, clanId);
+                                        startService(intent);
+                                        return err;
+                                    } else return err;
                                 case TYPE_HISTORY:
                                     error = parseHistory(response);
                                     return error;
                                 case TYPE_PROFILE:
                                     error = parseProfile(response);
                                     return error;
+                                case TYPE_CLAN_MEMBERS:
+                                    error = parseMembers(response);
+                                    return error;
                                 default:
                                     return NO_ERROR;
                             }
                         } catch (Exception e){
+                            e.printStackTrace();
                             return ERROR_INCORRECT_RESPONSE;
                         }
                     } else {
@@ -448,6 +470,40 @@ public class ServerService extends IntentService {
             e.printStackTrace();
             Log.w(TAG, "Error in HTTP request");
             return ERROR_HTTP_REQUEST;
+        }
+    }
+
+    private int parseMembers(String response) {
+        Log.w(TAG, "MemberList response: " + response);
+        memberList = new ArrayList<>();
+        try{
+            JSONArray jResponse = new JSONArray(response);
+            for (int i=0;i<jResponse.length();i++){
+                JSONObject jMember = jResponse.getJSONObject(i);
+                MemberModel member = new MemberModel();
+                member.setMembershipId(jMember.getString("membership"));
+                member.setName(jMember.getString("name"));
+                member.setIconPath(jMember.getString("icon"));
+                member.setPlatformId(jMember.getInt("platform"));
+                member.setLikes(jMember.getInt("likes"));
+                member.setDislikes(jMember.getInt("dislikes"));
+                member.setGamesCreated(jMember.getInt("gamesCreated"));
+                member.setGamesPlayed(jMember.getInt("gamesPlayed"));
+                EventModel event = new EventModel();
+                if (jMember.isNull("favoriteEvent")){
+                    event.setEventId(0);
+                } else {
+                    JSONObject jFavorite = jMember.getJSONObject("favoriteEvent");
+                    event.setEventId(jFavorite.getInt("id"));
+                }
+                member.setFavoriteEvent(event);
+                member.setInsert(true);
+                memberList.add(member);
+            }
+            return NO_ERROR;
+        } catch (JSONException e){
+            e.printStackTrace();
+            return ERROR_JSON;
         }
     }
 
@@ -499,8 +555,8 @@ public class ServerService extends IntentService {
             return NO_ERROR;
         } catch (JSONException e) {
             e.printStackTrace();
+            return ERROR_JSON;
         }
-        return NO_ERROR;
     }
 
     private int parseHistory(String response) {
@@ -522,8 +578,7 @@ public class ServerService extends IntentService {
                 if (jEntry.isNull("favoriteEvent")){
                     event.setEventId(0);
                 } else {
-                    JSONObject jFavorite = jEntry.getJSONObject("favoriteEvent");
-                    event.setEventId(jFavorite.getInt("id"));
+                    event.setEventId(jEntry.getInt("favoriteEvent"));
                 }
                 member.setFavoriteEvent(event);
                 memberList.add(member);
@@ -612,6 +667,28 @@ public class ServerService extends IntentService {
         return joined.equals("true");
     }
 
+    @SuppressWarnings("unchecked")
+    private HttpURLConnection createMemberListRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
+        urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
+        urlConnection.setDoOutput(true);
+        urlConnection.setRequestProperty("Content-Type", "application/json");
+        urlConnection.setRequestProperty("Accept", "application/json");
+
+        ArrayList<EvaluationModel> memberList = (ArrayList<EvaluationModel>) bundle.getSerializable(EVALUATIONS_TAG);
+        if (memberList != null){
+            EvaluationModel member = new EvaluationModel();
+            member.setMembershipId(memberId);
+            memberList.add(member);
+        }
+
+        JSONArray listJSON = createJSONMemberList(memberList);
+        OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+        writer.write(listJSON.toString());
+        writer.flush();
+
+        return urlConnection;
+    }
+
     private HttpURLConnection createExceptionRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
         urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
         urlConnection.setDoOutput(true);
@@ -686,6 +763,15 @@ public class ServerService extends IntentService {
         json.put("exception", exception);
         json.put("class", className);
         Log.w(TAG, "ExceptionJSON: " + json.toString());
+        return json;
+    }
+
+    private JSONArray createJSONMemberList(ArrayList<EvaluationModel> memberList) {
+        JSONArray json = new JSONArray();
+        for (int i=0;i<memberList.size();i++){
+            json.put(memberList.get(i).getMembershipId());
+        }
+        Log.w(TAG, "jsonMemberList: " + json.toString());
         return json;
     }
 

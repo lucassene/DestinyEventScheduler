@@ -272,18 +272,15 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
 
     private void updateGame() {
         callback.updateGameStatus(game, getStatus());
-        deleteNotifications(game.getGameId());
     }
 
     private void createNotifications(GameModel game) {
         int eventIcon = getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName());
         setAlarmNotification(getNotifyTime(), game.getTime(), game.getGameId(), game.getEventName(), game.getTypeName(), eventIcon);
-        //callback.closeFragment();
     }
 
     private void deleteNotifications(int gameId) {
-        getContext().getContentResolver().delete(DataProvider.NOTIFICATION_URI,NotificationTable.COLUMN_GAME + "=" + gameId,null);
-        //callback.closeFragment();
+        getActivity().getContentResolver().delete(DataProvider.NOTIFICATION_URI,NotificationTable.COLUMN_GAME + "=" + gameId,null);
     }
 
     private int getStatus() {

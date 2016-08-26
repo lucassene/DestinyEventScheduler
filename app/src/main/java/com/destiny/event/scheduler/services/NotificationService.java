@@ -5,7 +5,6 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,7 +24,6 @@ import android.util.Log;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.provider.DataProvider;
 
@@ -51,6 +49,13 @@ public class NotificationService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.w(TAG, "NotificationService running...");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.w(TAG, "NotificationService destroyed");
     }
 
     private void getNotificationInfo() {
@@ -116,12 +121,9 @@ public class NotificationService extends IntentService {
             nManager.notify(0, nBuilder.build());
 
             deleteShowedNotification();
-            updateGameStatus();
-
             this.stopSelf();
 
         } else {
-            updateGameStatus();
             this.stopSelf();
         }
 
@@ -135,17 +137,6 @@ public class NotificationService extends IntentService {
     @TargetApi(16)
     private void setPriority(NotificationCompat.Builder nBuilder) {
         nBuilder.setPriority(Notification.PRIORITY_DEFAULT);
-    }
-
-    private void updateGameStatus() {
-        if (notificationCount == 1){
-            ContentValues values = new ContentValues();
-            values.put(GameTable.COLUMN_STATUS, GameTable.STATUS_WAITING);
-            Uri uri = Uri.parse(DataProvider.GAME_URI + "/" + gameId);
-            getContentResolver().update(uri, values, GameTable.COLUMN_ID + "=" + gameId, null);
-            Log.w(TAG, "Game status from ID: " + gameId + " updated to Waiting for Validation");
-            values.clear();
-        }
     }
 
     private void deleteShowedNotification() {

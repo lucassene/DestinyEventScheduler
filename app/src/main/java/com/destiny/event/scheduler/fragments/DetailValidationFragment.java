@@ -545,7 +545,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         }
         bundle.putParcelableArrayList(ServerService.EVALUATIONS_TAG, evaluationList);
         callback.runServerService(bundle);
-        callback.updateMembers(memberList);
+        //callback.updateMembers(memberList);
     }
 
     private void validateGame() {
@@ -573,7 +573,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         bundle.putStringArrayList(ServerService.ENTRY_TAG, validatedEntryList);
         bundle.putParcelableArrayList(ServerService.EVALUATIONS_TAG, evaluationList);
         callback.runServerService(bundle);
-        callback.updateMembers(memberList);
+        //callback.updateMembers(memberList);
     }
 
     private void deleteGame() {

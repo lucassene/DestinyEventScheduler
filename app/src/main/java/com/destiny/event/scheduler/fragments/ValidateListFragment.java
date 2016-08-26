@@ -18,7 +18,6 @@ import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class ValidateListFragment extends ListFragment implements UserDataListener{
@@ -74,10 +73,6 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
         callback.onSelectedFragment(2);
 
         sectionTitle.setText(R.string.games_available);
-
-        if (savedInstanceState != null && savedInstanceState.containsKey("listView")){
-            gameList = (List<GameModel>) savedInstanceState.getSerializable("listView");
-        }
 
         if (gameList == null){
             gameList = callback.getGameList(GameTable.STATUS_DONE);
@@ -138,12 +133,6 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
     @Override
     public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {
 
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("listView", (Serializable) gameList);
     }
 
 }

@@ -44,6 +44,7 @@ import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
+import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.fragments.AboutSettingsFragment;
 import com.destiny.event.scheduler.fragments.DBViewerFragment;
@@ -416,7 +417,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @SuppressWarnings("unchecked")
     private void readyAllLists(Bundle savedInstanceState){
-        allGameList = (ArrayList<GameModel>) savedInstanceState.getSerializable("allGameList");
+        allGameList = new ArrayList<>();
+        allGameList.addAll((ArrayList<GameModel>) savedInstanceState.getSerializable("allGameList"));
         if (allGameList != null) {
             newGameList = getGamesFromList(GameTable.STATUS_NEW);
             if (newEventsListener != null) newEventsListener.onGamesLoaded(newGameList);
@@ -801,6 +803,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     }
                 }
                 scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
+                getContentResolver().delete(DataProvider.NOTIFICATION_URI, NotificationTable.COLUMN_GAME + "=" + game.getGameId(),null);
                 closeFragment();
                 break;
         }
@@ -1361,9 +1364,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     historyEntries = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
                     userDataListener.onEntriesLoaded(historyEntries, true);
                 }
-                if (openedFragment == null) {
+                if (resultData.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_ALL_GAMES) {
                     Log.w(TAG, "No fragments open. Refreshing main lists");
-                    allGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
+                    allGameList = new ArrayList<>();
+                    allGameList.addAll((ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG));
 
                     if (allGameList != null) {
                         newGameList = getGamesFromList(GameTable.STATUS_NEW);
@@ -1392,6 +1396,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     if (member != null){
                         Log.w(TAG, "member " + member.getName() + " sent by ServerService");
                         memberProfile = member;
+                        ArrayList<MemberModel> mList = new ArrayList<>();
+                        mList.add(member);
+                        updateMembers(mList);
                         if (getOpenedFragment() instanceof MyNewProfileFragment){
                             MyNewProfileFragment frag = (MyNewProfileFragment) getOpenedFragment();
                             frag.onMemberLoaded(member, true);
@@ -1414,7 +1421,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void updateMembers(List<MemberModel> list) {
-       Intent intent = new Intent(Intent.ACTION_SYNC, null, this, LocalService.class);
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, LocalService.class);
         intent.putExtra(LocalService.REQUEST_HEADER, LocalService.TYPE_UPDATE_MEMBERS);
         intent.putExtra(LocalService.MEMBERS_HEADER, (Serializable) list);
         intent.putExtra(LocalService.CLAN_HEADER, clanId);

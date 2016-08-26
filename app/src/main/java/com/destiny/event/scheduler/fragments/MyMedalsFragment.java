@@ -102,7 +102,7 @@ public class MyMedalsFragment extends ListFragment {
         int count = 0;
         for (int i=0;i<member.getTypesPlayed().size();i++){
             if (member.getTypesPlayed().get(i).getTypeId() == type){
-                count++;
+                count = member.getTypesPlayed().get(i).getTimesPlayed();
             }
         }
         return count;

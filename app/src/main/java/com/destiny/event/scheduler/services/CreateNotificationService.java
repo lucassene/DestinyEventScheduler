@@ -131,12 +131,18 @@ public class CreateNotificationService extends IntentService {
         SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         int diff = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF,0);
         int times = 1;
-        if (diff != 0) times = 2;
+        if (diff != 0){
+            Calendar now = Calendar.getInstance();
+            Calendar notifyTime = DateUtils.stringToDate(getNotificationTime(gameModel.getTime()));
+            if (notifyTime.getTimeInMillis() < now.getTimeInMillis()){
+                times = 1;
+            } else times = 2;
+        }
         for (int i=0;i<times;i++){
             ContentValues values = new ContentValues();
             values.put(NotificationTable.COLUMN_GAME, gameModel.getGameId());
-            values.put(NotificationTable.COLUMN_EVENT, gameModel.getEventId());
-            values.put(NotificationTable.COLUMN_TYPE, gameModel.getTypeId());
+            values.put(NotificationTable.COLUMN_EVENT, gameModel.getEventName());
+            values.put(NotificationTable.COLUMN_TYPE, gameModel.getTypeName());
             values.put(NotificationTable.COLUMN_ICON, getEventIconId(gameModel.getEventIcon()));
             if (i==0){
                 values.put(NotificationTable.COLUMN_TIME, gameModel.getTime());
@@ -145,6 +151,7 @@ public class CreateNotificationService extends IntentService {
             Uri success = getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
             values.clear();
             if (success != null){
+                Log.w(TAG, "Inserted Notification ID: " + success.getLastPathSegment());
                 registerAlarmTask(DateUtils.stringToDate(gameModel.getTime()), Integer.parseInt(success.getLastPathSegment()));
             }
         }
@@ -154,6 +161,7 @@ public class CreateNotificationService extends IntentService {
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (requestId != 0){
             Intent sIntent = new Intent(this, AlarmReceiver.class);
+            sIntent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
             PendingIntent psIntent = PendingIntent.getBroadcast(this, requestId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             alarm.set(AlarmManager.RTC_WAKEUP, notifyTime.getTimeInMillis(), psIntent);
         }
