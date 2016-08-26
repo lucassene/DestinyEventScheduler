@@ -130,9 +130,7 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
     }
 
     @Override
-    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {
-
-    }
+    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

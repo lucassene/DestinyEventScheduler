@@ -164,10 +164,10 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                 msg = getString(R.string.network);
                 text.setText(msg);
                 break;
-            case BungieService.STATUS_PARTY:
+/*            case BungieService.STATUS_PARTY:
                 msg = getString(R.string.creating_db);
                 text.setText(msg);
-                break;
+                break;*/
             case BungieService.STATUS_FINISHED:
                 if (errorCode != BungieService.NO_ERROR){
                     showAlertDialog();
@@ -235,7 +235,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
         sharedEditor.putInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, DrawerActivity.DEFAULT_INTERVAL);
         sharedEditor.putString(DrawerActivity.MEMBER_PREF, membershipId);
         sharedEditor.putInt(DrawerActivity.PLATFORM_PREF, platformId);
-        sharedEditor.putInt(DrawerActivity.CLAN_PREF, Integer.parseInt(clanId));
+        sharedEditor.putString(DrawerActivity.CLAN_PREF, clanId);
         sharedEditor.apply();
 
        if (sharedPrefs.getBoolean(DrawerActivity.FOREGROUND_PREF, false)){

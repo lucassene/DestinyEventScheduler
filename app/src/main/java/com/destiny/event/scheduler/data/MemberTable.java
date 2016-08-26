@@ -117,9 +117,9 @@ public class MemberTable {
             return context.getString(R.string.default_title);
         } else {
             String title = eventTitles[favoriteId-1];
-            Log.w(TAG, "FavId: " + favoriteId + " / Title: " + title);
+            //Log.w(TAG, "FavId: " + favoriteId + " / Title: " + title);
             String prefix = title.substring(0,title.indexOf(":"));
-            Log.w(TAG, "Prefix: " + prefix);
+            //Log.w(TAG, "Prefix: " + prefix);
             if (prefix.equals("a")){
                 return getLevelTitle(context, xp) + " " + title.substring(title.indexOf(":")+1,title.length());
             } else if (prefix.equals("b")){

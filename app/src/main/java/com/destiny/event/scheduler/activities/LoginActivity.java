@@ -90,9 +90,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
     public boolean isBungieServiceRunning() {
         SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        boolean var = sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
-        //Log.w(TAG, "BungieService running? " +  var);
-        return var;
+        return sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
     }
 
     public void callWebView(View v) {
@@ -225,20 +223,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 break;
             case BungieService.STATUS_ERROR:
                 switch (resultData.getInt(BungieService.ERROR_TAG)){
-                    case BungieService.ERROR_NO_CONNECTION:
-                        errorCode = BungieService.ERROR_NO_CONNECTION;
-                        break;
-                    case BungieService.ERROR_HTTP_REQUEST:
-                    case BungieService.ERROR_RESPONSE_CODE:
-                    case BungieService.ERROR_CLAN_MEMBER:
-                        errorCode = BungieService.ERROR_HTTP_REQUEST;
-                        break;
                     case BungieService.ERROR_NO_CLAN:
                         errorCode = BungieService.ERROR_NO_CLAN;
-                        break;
-                    case BungieService.ERROR_INCORRECT_REQUEST:
-                        errorCode = BungieService.ERROR_INCORRECT_REQUEST;
-                        Log.w(TAG, "Incorrect Request to BungieService");
                         break;
                     case BungieService.ERROR_AUTH:
                         errorCode = BungieService.ERROR_AUTH;
@@ -246,18 +232,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 }
                 Log.w(TAG, "Erro ao receber dados do getBungieAccount: " + resultData.getInt(BungieService.ERROR_TAG));
                 progressBar.setVisibility(View.GONE);
-                showAlertDialog();
+                if (errorCode == BungieService.ERROR_NO_CLAN || errorCode == BungieService.ERROR_AUTH) {
+                    showAlertDialog();
+                } else {
+                    callDrawerActivity();
+                }
                 break;
             default:
-                progressBar.setVisibility(View.GONE);
-                Intent intent = new Intent(this, DrawerActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("bungieId",bungieId);
-                intent.putExtra("userName",userName);
-                startActivity(intent);
-                finish();
+                callDrawerActivity();
                 break;
         }
+    }
+
+    private void callDrawerActivity(){
+        progressBar.setVisibility(View.GONE);
+        Intent intent = new Intent(this, DrawerActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("bungieId",bungieId);
+        intent.putExtra("userName",userName);
+        startActivity(intent);
+        finish();
     }
 
     private void showAlertDialog() {

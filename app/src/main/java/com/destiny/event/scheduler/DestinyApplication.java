@@ -22,9 +22,10 @@ public class DestinyApplication extends Application {
             SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
             String membership = sharedPrefs.getString(DrawerActivity.MEMBER_PREF,"");
             int platform = sharedPrefs.getInt(DrawerActivity.PLATFORM_PREF, 0);
-            int clanId = sharedPrefs.getInt(DrawerActivity.CLAN_PREF, 0);
-
-            for (int i=0;i<ex.getStackTrace().length;i++){
+            String clanId = sharedPrefs.getString(DrawerActivity.CLAN_PREF, "");
+            int lines = 4;
+            if (ex.getStackTrace().length<=4){ lines = ex.getStackTrace().length; }
+            for (int i=0;i<lines;i++){
                 errorMessage = errorMessage + "\n at " + ex.getStackTrace()[i].toString();
                 if (i==0){
                     String s = ex.getStackTrace()[i].toString();
@@ -37,7 +38,7 @@ public class DestinyApplication extends Application {
         }
     };
 
-    private void callServerService(String membership, int platformId, int clanId, String exceptionClass, String errorMessage) {
+    private void callServerService(String membership, int platformId, String clanId, String exceptionClass, String errorMessage) {
         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ServerService.class);
         intent.putExtra(ServerService.REQUEST_TAG, ServerService.TYPE_EXCEPTION);
         intent.putExtra(ServerService.MEMBER_TAG, membership);

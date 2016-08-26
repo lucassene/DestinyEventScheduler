@@ -418,18 +418,18 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private void readyAllLists(Bundle savedInstanceState){
         allGameList = (ArrayList<GameModel>) savedInstanceState.getSerializable("allGameList");
         if (allGameList != null) {
-            newGameList = getGamesFromList(allGameList, GameTable.STATUS_NEW);
+            newGameList = getGamesFromList(GameTable.STATUS_NEW);
             if (newEventsListener != null) newEventsListener.onGamesLoaded(newGameList);
 
-            scheduledGameList = getGamesFromList(allGameList, GameTable.STATUS_SCHEDULED);
+            scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
             if (scheduledEventsListener != null) scheduledEventsListener.onGamesLoaded(scheduledGameList);
 
-            doneGameList = getGamesFromList(allGameList, GameTable.STATUS_DONE);
+            doneGameList = getGamesFromList(GameTable.STATUS_DONE);
             if (doneEventsListener != null) doneEventsListener.onGamesLoaded(doneGameList);
 
-            searchGameList = getGamesFromList(allGameList, GameTable.STATUS_AVAILABLE);
-            validatedGameList = getGamesFromList(allGameList, GameTable.STATUS_VALIDATED);
-            joinedGameList = getGamesFromList(allGameList, GameTable.STATUS_JOINED);
+            searchGameList = getGamesFromList(GameTable.STATUS_AVAILABLE);
+            validatedGameList = getGamesFromList(GameTable.STATUS_VALIDATED);
+            joinedGameList = getGamesFromList(GameTable.STATUS_JOINED);
         }
         entryList = (ArrayList<MemberModel>) savedInstanceState.getSerializable("entryList");
         historyEntries = (ArrayList<MemberModel>) savedInstanceState.getSerializable("historyEntries");
@@ -736,7 +736,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public List<GameModel> getGameList(int type) {
-        return getGamesFromList(allGameList, type);
+        return getGamesFromList(type);
     }
 
     @Override
@@ -785,23 +785,22 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void updateGameStatus(GameModel game, int status) {
         switch (status) {
             case GameTable.STATUS_NEW:
-                for (int i = 0; i < newGameList.size(); i++) {
-                    if (game.getGameId() == newGameList.get(i).getGameId()) {
-                        newGameList.remove(i);
+                for (int i = 0; i < allGameList.size(); i++) {
+                    if (game.getGameId() == allGameList.get(i).getGameId()) {
+                        allGameList.remove(i);
                         break;
                     }
                 }
+                newGameList = getGamesFromList(GameTable.STATUS_NEW);
                 break;
             case GameTable.STATUS_SCHEDULED:
-                for (int i = 0; i < scheduledGameList.size(); i++) {
-                    if (scheduledGameList.get(i).getGameId() == game.getGameId()) {
-                        game.setStatus(GameTable.STATUS_WAITING);
-                        doneGameList.add(game);
-                        Collections.sort(doneGameList, new GameComparator());
-                        scheduledGameList.remove(i);
+                for (int i = 0; i < allGameList.size(); i++) {
+                    if (allGameList.get(i).getGameId() == game.getGameId()) {
+                        allGameList.get(i).setStatus(GameTable.STATUS_WAITING);
                         break;
                     }
                 }
+                scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
                 closeFragment();
                 break;
         }
@@ -809,30 +808,21 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void updateGameEntries(int status, int gameId, int entries) {
+        for (int i=0;i<allGameList.size();i++){
+            if (allGameList.get(i).getGameId() == gameId){
+                allGameList.get(i).setInscriptions(entries);
+                break;
+            }
+        }
         switch (status){
             case GameTable.STATUS_DONE:
-                for (int i=0;i<doneGameList.size();i++){
-                    if (doneGameList.get(i).getGameId() == gameId){
-                        doneGameList.get(i).setInscriptions(entries);
-                        break;
-                    }
-                }
+                doneGameList = getGamesFromList(GameTable.STATUS_DONE);
                 break;
             case GameTable.STATUS_SCHEDULED:
-                for (int i=0;i<scheduledGameList.size();i++){
-                    if (scheduledGameList.get(i).getGameId() == gameId){
-                        scheduledGameList.get(i).setInscriptions(entries);
-                        break;
-                    }
-                }
+                scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
                 break;
             case GameTable.STATUS_NEW:
-                for (int i=0;i<newGameList.size();i++){
-                    if (newGameList.get(i).getGameId() == gameId){
-                        newGameList.get(i).setInscriptions(entries);
-                        break;
-                    }
-                }
+                newGameList = getGamesFromList(GameTable.STATUS_NEW);
                 break;
         }
     }
@@ -943,7 +933,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         prepareFragmentHolder(fragment, child, null, "dbviewer");
         return true;
     }
-
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -1195,19 +1184,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void onPositiveClick(String input, int type) {
-
-    }
+    public void onPositiveClick(String input, int type) {    }
 
     @Override
-    public void onDateSent(Calendar date) {
-
-    }
+    public void onDateSent(Calendar date) {    }
 
     @Override
-    public void onTimeSent(int hour, int minute) {
-
-    }
+    public void onTimeSent(int hour, int minute) {    }
 
     @Override
     public void onLogoff() {
@@ -1230,14 +1213,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void onItemSelected(String type, String entry, int value) {
-
-    }
+    public void onItemSelected(String type, String entry, int value) {    }
 
     @Override
-    public void onMultiItemSelected(boolean[] items) {
-
-    }
+    public void onMultiItemSelected(boolean[] items) {    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -1252,8 +1231,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     MyClanFragment frag = (MyClanFragment) openedFragment;
                     frag.refreshData();
                 }
-                //Toast.makeText(this, R.string.clan_updated, Toast.LENGTH_SHORT).show();
-                //onDataLoaded();
                 break;
             case BungieService.STATUS_ERROR:
                 Log.w(TAG, "Error on BungieService");
@@ -1274,11 +1251,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         progress.setVisibility(View.GONE);
                         Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
                         break;
-                    case ServerService.ERROR_HTTP_REQUEST:
-                    case ServerService.ERROR_INCORRECT_REQUEST:
-                    case ServerService.ERROR_INCORRECT_RESPONSE:
-                    case ServerService.ERROR_NULL_RESPONSE:
-                    case ServerService.ERROR_RESPONSE_CODE:
+                    default:
                         progress.setVisibility(View.GONE);
                         Bundle dialogBundle = new Bundle();
                         dialogBundle.putInt("type", MyAlertDialog.ALERT_DIALOG);
@@ -1303,7 +1276,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 }
                 if (getOpenedFragment() instanceof MyEventsFragment) {
                     if (userDataListener != null) {
-                        joinedGameList = getGamesFromList((ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG),GameTable.STATUS_JOINED);
+                        ArrayList<GameModel> gameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
+                        joinedGameList = getJoinedGames(gameList);
                         userDataListener.onGamesLoaded(joinedGameList);
                     }
                 }
@@ -1319,38 +1293,34 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     if (resultData.containsKey(ServerService.REQUEST_TAG) && resultData.containsKey(ServerService.INT_TAG)) {
                         switch (resultData.getInt(ServerService.REQUEST_TAG)) {
                             case ServerService.TYPE_JOIN_GAME:
-                                for (int i = 0; i < newGameList.size(); i++) {
-                                    if (newGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
-                                        newGameList.get(i).setJoined(true);
-                                        newGameList.get(i).setInscriptions(newGameList.get(i).getInscriptions() + 1);
-                                        scheduledGameList.add(newGameList.get(i));
-                                        Collections.sort(scheduledGameList, new GameComparator());
-                                        newGameList.remove(i);
+                                for (int i = 0; i < allGameList.size(); i++) {
+                                    if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
+                                        allGameList.get(i).setJoined(true);
+                                        allGameList.get(i).setInscriptions(allGameList.get(i).getInscriptions() + 1);
                                         break;
                                     }
                                 }
                                 break;
                             case ServerService.TYPE_LEAVE_GAME:
-                                for (int i = 0; i < scheduledGameList.size(); i++) {
-                                    if (scheduledGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
-                                        scheduledGameList.get(i).setJoined(false);
-                                        scheduledGameList.get(i).setInscriptions(scheduledGameList.get(i).getInscriptions() - 1);
-                                        newGameList.add(scheduledGameList.get(i));
-                                        Collections.sort(newGameList, new GameComparator());
-                                        scheduledGameList.remove(i);
+                                for (int i = 0; i < allGameList.size(); i++) {
+                                    if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
+                                        allGameList.get(i).setJoined(false);
+                                        allGameList.get(i).setInscriptions(allGameList.get(i).getInscriptions() - 1);
                                         break;
                                     }
                                 }
                                 break;
                             case ServerService.TYPE_DELETE_GAME:
-                                for (int i = 0; i < scheduledGameList.size(); i++) {
-                                    if (scheduledGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
-                                        scheduledGameList.remove(i);
+                                for (int i = 0; i < allGameList.size(); i++) {
+                                    if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
+                                        allGameList.remove(i);
                                         break;
                                     }
                                 }
                                 break;
                         }
+                        newGameList = getGamesFromList(GameTable.STATUS_NEW);
+                        scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
                         closeFragment();
                         if (newEventsListener != null) { newEventsListener.onGamesLoaded(newGameList); }
                         if (scheduledEventsListener != null) { scheduledEventsListener.onGamesLoaded(scheduledGameList); }
@@ -1362,19 +1332,23 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 }
                 if (getOpenedFragment() instanceof DetailValidationFragment) {
                     if (resultData.containsKey(ServerService.REQUEST_TAG) && resultData.containsKey(ServerService.INT_TAG)) {
-                        switch (resultData.getInt(ServerService.REQUEST_TAG)) {
-                            case ServerService.TYPE_VALIDATE_GAME:
-                            case ServerService.TYPE_DELETE_GAME:
-                            case ServerService.TYPE_EVALUATE_GAME:
-                                Log.w(TAG, "Updating doneGameList... (size: " + doneGameList.size() +") removing gameId: " + resultData.getInt(ServerService.INT_TAG));
-                                for (int i = 0; i < doneGameList.size(); i++) {
-                                    if (doneGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
-                                        doneGameList.remove(i);
-                                        Collections.sort(doneGameList, new GameComparator());
-                                    }
+                        for (int i = 0; i < allGameList.size(); i++) {
+                            if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
+                                switch (resultData.getInt(ServerService.REQUEST_TAG)){
+                                    case ServerService.TYPE_VALIDATE_GAME:
+                                        allGameList.get(i).setStatus(GameTable.STATUS_VALIDATED);
+                                        allGameList.get(i).setEvaluated(true);
+                                        break;
+                                    case ServerService.TYPE_DELETE_GAME:
+                                        allGameList.remove(i);
+                                        break;
+                                    case ServerService.TYPE_EVALUATE_GAME:
+                                        allGameList.get(i).setEvaluated(true);
+                                        break;
                                 }
-                                break;
+                            }
                         }
+                        doneGameList = getGamesFromList(GameTable.STATUS_DONE);
                         closeFragment();
                         if (doneEventsListener != null) { doneEventsListener.onGamesLoaded(doneGameList); }
                     } else {
@@ -1392,25 +1366,25 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     allGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
 
                     if (allGameList != null) {
-                        newGameList = getGamesFromList(allGameList, GameTable.STATUS_NEW);
+                        newGameList = getGamesFromList(GameTable.STATUS_NEW);
                         if (newGameList != null && newEventsListener != null) {
                             newEventsListener.onGamesLoaded(newGameList);
                         } else Log.w(TAG, "newGameList is null");
 
-                        scheduledGameList = getGamesFromList(allGameList, GameTable.STATUS_SCHEDULED);
+                        scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
                         if (scheduledGameList != null && scheduledEventsListener != null) {
                             scheduledEventsListener.onGamesLoaded(scheduledGameList);
                             if (!isNotifyServiceRunning()) updateNotifications(scheduledGameList);
                         } else Log.w(TAG, "scheduledGameList is null");
 
-                        doneGameList = getGamesFromList(allGameList, GameTable.STATUS_DONE);
+                        doneGameList = getGamesFromList(GameTable.STATUS_DONE);
                         if (doneGameList != null && doneEventsListener != null) {
                             doneEventsListener.onGamesLoaded(doneGameList);
                         } else Log.w(TAG, "doneGameList is null");
 
-                        if (searchGameList != null) { searchGameList = getGamesFromList(allGameList, GameTable.STATUS_NEW); }
-                        if (joinedGameList != null) { joinedGameList = getGamesFromList(allGameList, GameTable.STATUS_JOINED); }
-                        if (validatedGameList != null) { validatedGameList = getGamesFromList(allGameList, GameTable.STATUS_VALIDATED); }
+                        searchGameList = getGamesFromList(GameTable.STATUS_NEW);
+                        joinedGameList = getGamesFromList(GameTable.STATUS_JOINED);
+                        validatedGameList = getGamesFromList(GameTable.STATUS_VALIDATED);
                     }
                 }
                 if (resultData.containsKey(ServerService.PROFILE_TAG)){
@@ -1421,7 +1395,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         if (getOpenedFragment() instanceof MyNewProfileFragment){
                             MyNewProfileFragment frag = (MyNewProfileFragment) getOpenedFragment();
                             frag.onMemberLoaded(member, true);
-                            //userDataListener.onMemberLoaded(member, true);
                         }
                     }
                 }
@@ -1441,7 +1414,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void updateMembers(List<MemberModel> list) {
-        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, LocalService.class);
+       Intent intent = new Intent(Intent.ACTION_SYNC, null, this, LocalService.class);
         intent.putExtra(LocalService.REQUEST_HEADER, LocalService.TYPE_UPDATE_MEMBERS);
         intent.putExtra(LocalService.MEMBERS_HEADER, (Serializable) list);
         intent.putExtra(LocalService.CLAN_HEADER, clanId);
@@ -1482,51 +1455,68 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         return memberProfile;
     }
 
-    private ArrayList<GameModel> getGamesFromList(ArrayList<GameModel> gList, int type) {
+    private ArrayList<GameModel> getJoinedGames(ArrayList<GameModel> gameList) {
         ArrayList<GameModel> result = new ArrayList<>();
-        if (gList != null) {
+        for (int i=0;i<gameList.size();i++){
+            if (gameList.get(i).isJoined() && !gameList.get(i).isEvaluated()){
+                if (gameList.get(i).getStatus() == 2){
+                    if (!gameList.get(i).getCreatorId().equals(bungieId)){
+                        result.add(gameList.get(i));
+                    }
+                } else {
+                    result.add(gameList.get(i));
+                }
+            }
+        }
+        Collections.sort(result, new GameComparator());
+        return result;
+    }
+
+    private ArrayList<GameModel> getGamesFromList(int type) {
+        ArrayList<GameModel> result = new ArrayList<>();
+        if (allGameList != null) {
             switch (type) {
                 case GameTable.STATUS_NEW:
                 case GameTable.STATUS_AVAILABLE:
-                    for (int i = 0; i < gList.size(); i++) {
-                        if (gList.get(i).getStatus() == GameTable.STATUS_NEW && !gList.get(i).isJoined()) {
-                            result.add(gList.get(i));
+                    for (int i = 0; i < allGameList.size(); i++) {
+                        if (allGameList.get(i).getStatus() == GameTable.STATUS_NEW && !allGameList.get(i).isJoined()) {
+                            result.add(allGameList.get(i));
                         }
                     }
                     Collections.sort(result, new GameComparator());
                     return result;
                 case GameTable.STATUS_SCHEDULED:
-                    for (int i = 0; i < gList.size(); i++) {
-                        if (gList.get(i).getStatus() == GameTable.STATUS_NEW && gList.get(i).isJoined()) {
-                            result.add(gList.get(i));
+                    for (int i = 0; i < allGameList.size(); i++) {
+                        if (allGameList.get(i).getStatus() == GameTable.STATUS_NEW && allGameList.get(i).isJoined()) {
+                            result.add(allGameList.get(i));
                         }
                     }
                     return result;
                 case GameTable.STATUS_DONE:
-                    for (int i = 0; i < gList.size(); i++) {
-                        if (gList.get(i).getStatus() > 0 && gList.get(i).isJoined() && !gList.get(i).isEvaluated()) {
-                            result.add(gList.get(i));
+                    for (int i = 0; i < allGameList.size(); i++) {
+                        if (allGameList.get(i).getStatus() > 0 && allGameList.get(i).isJoined() && !allGameList.get(i).isEvaluated()) {
+                            result.add(allGameList.get(i));
                         }
                     }
                     Collections.sort(result, new GameComparator());
                     return result;
                 case GameTable.STATUS_VALIDATED:
-                    for (int i = 0; i < gList.size(); i++) {
-                        if (gList.get(i).getStatus() == 2 && gList.get(i).isJoined() && gList.get(i).isEvaluated()) {
-                            result.add(gList.get(i));
+                    for (int i = 0; i < allGameList.size(); i++) {
+                        if (allGameList.get(i).getStatus() == 2 && allGameList.get(i).isJoined() && allGameList.get(i).isEvaluated()) {
+                            result.add(allGameList.get(i));
                         }
                     }
                     Collections.sort(result, new GameComparator());
                     return result;
                 case GameTable.STATUS_JOINED:
-                    for (int i=0;i<gList.size();i++){
-                        if (gList.get(i).isJoined() && !gList.get(i).isEvaluated()){
-                            if (gList.get(i).getStatus() == 2){
-                                if (!gList.get(i).getCreatorId().equals(bungieId)){
-                                    result.add(gList.get(i));
+                    for (int i=0;i<allGameList.size();i++){
+                        if (allGameList.get(i).isJoined() && !allGameList.get(i).isEvaluated()){
+                            if (allGameList.get(i).getStatus() == 2){
+                                if (!allGameList.get(i).getCreatorId().equals(bungieId)){
+                                    result.add(allGameList.get(i));
                                 }
                             } else {
-                                result.add(gList.get(i));
+                                result.add(allGameList.get(i));
                             }
                         }
                     }
