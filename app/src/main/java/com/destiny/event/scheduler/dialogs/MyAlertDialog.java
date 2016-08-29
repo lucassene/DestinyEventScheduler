@@ -19,6 +19,7 @@ public class MyAlertDialog extends DialogFragment {
 
     private static final String TAG = "MyAlertDialog";
 
+    public static final int LOGOFF_DIALOG = 0;
     public static final int LEAVE_DIALOG = 10;
     public static final int DELETE_DIALOG = 11;
     public static final int JOIN_DIALOG = 12;
@@ -52,7 +53,7 @@ public class MyAlertDialog extends DialogFragment {
         if (bundle != null) {
 
             switch (bundle.getInt("type")){
-                case 0:
+                case LOGOFF_DIALOG:
                     title = getResources().getString(R.string.leaving);
                     message = getResources().getString(R.string.oblivion);
                     posButton = getResources().getString(R.string.leave);
@@ -90,8 +91,8 @@ public class MyAlertDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (dialogType){
-                            case 0:
-                                listener.onLogoff();
+                            case LOGOFF_DIALOG:
+                                listener.onPositiveClick(null, dialogType);
                                 break;
                             case JOIN_DIALOG:
                                 fragmentListener.onPositiveClick(null, dialogType);

@@ -595,6 +595,7 @@
     <string name="fail_medals_data">Can\'t retrieve medals data. Please check your internet connection and try again.</string>
     <string name="fail_member_data">Can\'t get member data. Please check your internet connection and try again.</string>
     <string name="no_evaluations_received">No evaluations received.</string>
+    <string name="minute">" minute"</string>
 
 
 </resources>

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import com.destiny.event.scheduler.activities.DrawerActivity;
@@ -152,7 +153,9 @@ public class CreateNotificationService extends IntentService {
             values.clear();
             if (success != null){
                 Log.w(TAG, "Inserted Notification ID: " + success.getLastPathSegment());
-                registerAlarmTask(DateUtils.stringToDate(gameModel.getTime()), Integer.parseInt(success.getLastPathSegment()));
+                if (i==0){
+                    registerAlarmTask(DateUtils.stringToDate(gameModel.getTime()), Integer.parseInt(success.getLastPathSegment()));
+                } else registerAlarmTask(DateUtils.stringToDate(getNotificationTime(gameModel.getTime())), Integer.parseInt(success.getLastPathSegment()));
             }
         }
     }
@@ -162,8 +165,11 @@ public class CreateNotificationService extends IntentService {
         if (requestId != 0){
             Intent sIntent = new Intent(this, AlarmReceiver.class);
             sIntent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
+            sIntent.putExtra(AlarmReceiver.NOTIFY_ID, requestId);
             PendingIntent psIntent = PendingIntent.getBroadcast(this, requestId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            alarm.set(AlarmManager.RTC_WAKEUP, notifyTime.getTimeInMillis(), psIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                alarm.setExact(AlarmManager.RTC_WAKEUP, notifyTime.getTimeInMillis(), psIntent);
+            } else alarm.set(AlarmManager.RTC_WAKEUP, notifyTime.getTimeInMillis(), psIntent);
         }
         Log.w(TAG, "Alarm for request Id " + requestId + " created");
     }

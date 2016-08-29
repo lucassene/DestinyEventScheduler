@@ -44,7 +44,7 @@
         android:id="@+id/img"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:src="@drawable/img_destiny_symbol_white"
+        android:src="@drawable/ic_app"
         android:gravity="center_horizontal"
         android:layout_margin="@dimen/image_margin"
         android:layout_below="@id/linear_layout" />

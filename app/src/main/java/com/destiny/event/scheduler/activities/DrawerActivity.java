@@ -2,13 +2,15 @@ package com.destiny.event.scheduler.activities;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
@@ -129,12 +131,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private UserDataListener doneEventsListener;
     private UserDataListener userDataListener;
 
-    private FragmentTransaction ft;
     private FragmentManager fm;
     private Fragment openedFragment;
     private int openedFragmentType;
     private String fragmentTag;
-    //private ArrayList<String> backStackList;
 
     private String clanName;
     private String clanId;
@@ -177,6 +177,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     ArrayList<MemberModel> historyEntries;
 
     MemberModel memberProfile;
+    GameModel toCreateGame;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -213,6 +214,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         tabLayout.setDistributeEvenly(true);
         tabLayout.setViewPager(viewPager);
         tabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @SuppressWarnings("deprecation")
             @Override
             public int getIndicatorColor(int position) {
                 return getResources().getColor(R.color.tabIndicatorColor);
@@ -287,11 +289,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
                     } else Log.w(TAG, "bungieIdList is empty!");
                 } else if ( getOpenedFragment() instanceof MyNewProfileFragment){
-                    Log.w(TAG, "opened Fragment: " + getOpenedFragment().toString());
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_PROFILE);
-                    bundle.putString(ServerService.PROFILE_TAG, memberProfile.getMembershipId());
-                    runServerService(bundle);
+                    if (memberProfile != null){
+                        Log.w(TAG, "opened Fragment: " + getOpenedFragment().toString());
+                        Bundle bundle = new Bundle();
+                        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_PROFILE);
+                        bundle.putString(ServerService.PROFILE_TAG, memberProfile.getMembershipId());
+                        runServerService(bundle);
+                    }
                 } else refreshLists();
         }
         return super.onOptionsItemSelected(item);
@@ -339,7 +343,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        //Log.w(TAG, "Método onNewIntent chamado");
+        openMainActivity(null);
         refreshLists();
     }
 
@@ -468,7 +472,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void loadNewFragment(Fragment fragment, Bundle bundle, String tag) {
 
         fragment.setArguments(bundle);
-        ft = fm.beginTransaction();
+        FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.content_frame, fragment, tag);
         ft.addToBackStack(null);
         ft.commit();
@@ -604,16 +608,22 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (firstId != 0) {
             Intent intent = new Intent(this, AlarmReceiver.class);
             intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
+            intent.putExtra(AlarmReceiver.NOTIFY_ID, firstId);
             PendingIntent pIntent = PendingIntent.getBroadcast(this, firstId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            alarm.set(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                alarm.setExact(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
+            } else alarm.set(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
             Log.w(TAG, "requestId: " + firstId + " registered!");
         }
 
         if (secondId != 0) {
             Intent sIntent = new Intent(this, AlarmReceiver.class);
             sIntent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
+            sIntent.putExtra(AlarmReceiver.NOTIFY_ID, secondId);
             PendingIntent psIntent = PendingIntent.getBroadcast(this, secondId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                alarm.setExact(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
+            } else alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
             Log.w(TAG, "requestId: " + secondId + " registered!");
         }
 
@@ -692,11 +702,76 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onEventCreated(GameModel game) {
         openMainActivity(null);
+        allGameList.add(game);
         scheduledGameList.add(game);
         if (scheduledEventsListener != null){
             scheduledEventsListener.onGamesLoaded(scheduledGameList);
         }
         viewPager.setCurrentItem(1);
+        setAlarmNotification(game);
+    }
+
+    private void setAlarmNotification(GameModel game) {
+
+        int firstId = 0;
+        int secondId = 0;
+
+        Calendar gameTime = DateUtils.stringToDate(game.getTime());
+        Calendar notifyTime = getNotifyTime(gameTime);
+        Log.w(TAG, "gameTime: " + game.getTime() + " and notifyTime: " + DateUtils.calendarToString(notifyTime));
+
+        if (notifyTime.getTimeInMillis() == gameTime.getTimeInMillis()){
+            ContentValues values = new ContentValues();
+            values.put(NotificationTable.COLUMN_GAME, game.getGameId());
+            values.put(NotificationTable.COLUMN_EVENT, game.getEventName());
+            values.put(NotificationTable.COLUMN_TYPE, game.getTypeName());
+            values.put(NotificationTable.COLUMN_ICON, game.getEventIcon());
+            values.put(NotificationTable.COLUMN_TIME, game.getTime());
+            values.put(NotificationTable.COLUMN_GAME_TIME, game.getTime());
+            Uri uri = getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+            if (uri != null) {
+                firstId = Integer.parseInt(uri.getLastPathSegment());
+            } else Log.w(TAG, "Notification cannot be created");
+            values.clear();
+        } else {
+            ContentValues values = new ContentValues();
+            values.put(NotificationTable.COLUMN_GAME, game.getGameId());
+            values.put(NotificationTable.COLUMN_EVENT, game.getEventName());
+            values.put(NotificationTable.COLUMN_TYPE, game.getTypeName());
+            values.put(NotificationTable.COLUMN_ICON, game.getEventIcon());
+            values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(notifyTime));
+            values.put(NotificationTable.COLUMN_GAME_TIME, game.getTime());
+            Uri uri = getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+            if (uri != null) {
+                firstId = Integer.parseInt(uri.getLastPathSegment());
+            } else Log.w(TAG, "Notification cannot be created");
+            values.clear();
+
+            values = new ContentValues();
+            values.put(NotificationTable.COLUMN_GAME, game.getGameId());
+            values.put(NotificationTable.COLUMN_EVENT, game.getEventName());
+            values.put(NotificationTable.COLUMN_TYPE, game.getTypeName());
+            values.put(NotificationTable.COLUMN_ICON, game.getEventIcon());
+            values.put(NotificationTable.COLUMN_TIME, game.getTime());
+            values.put(NotificationTable.COLUMN_GAME_TIME, game.getTime());
+            uri = getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
+            if (uri != null) {
+                secondId = Integer.parseInt(uri.getLastPathSegment());
+            } else Log.w(TAG, "Notification cannot be created");
+            values.clear();
+        }
+
+        registerAlarmTask(notifyTime, firstId, gameTime, secondId);
+
+    }
+
+    private Calendar getNotifyTime(Calendar gameTime) {
+        Calendar notifyTime = Calendar.getInstance();
+        notifyTime.setTime(gameTime.getTime());
+        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0)*-1;
+        notifyTime.add(Calendar.MINUTE,alarmTime);
+        return notifyTime;
     }
 
     @Override
@@ -727,6 +802,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 intent.putParcelableArrayListExtra(ServerService.EVALUATIONS_TAG, bundle.getParcelableArrayList(ServerService.EVALUATIONS_TAG));
             if (bundle.containsKey(ServerService.PROFILE_TAG))
                 intent.putExtra(ServerService.PROFILE_TAG,bundle.getString(ServerService.PROFILE_TAG));
+
+            if(bundle.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_CREATE_GAME){
+                toCreateGame = (GameModel) bundle.getSerializable(ServerService.GAME_TAG);
+            }
 
             startService(intent);
             return true;
@@ -1016,14 +1095,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void prepareDrawerMenu() {
 
         String[] items = getResources().getStringArray(R.array.menu_item);
-        TypedArray icons = getResources().obtainTypedArray(R.array.menu_icons);
+        //TypedArray icons = getResources().obtainTypedArray(R.array.menu_icons);
 
-        String header = getResources().getString(R.string.def_clan_header);
         String[] sections = getResources().getStringArray(R.array.menu_section);
 
         selectedDrawerItem = 1;
         rView = (RecyclerView) findViewById(R.id.drawer_view);
-        rAdapter = new DrawerAdapter(this, header, sections, icons, items, clanIcon, clanName, clanDesc, clanBanner);
+        rAdapter = new DrawerAdapter(this, sections, items, clanIcon, clanName, clanDesc, clanBanner);
         rView.setAdapter(rAdapter);
         rLayoutManager = new LinearLayoutManager(this);
         rView.setLayoutManager(rLayoutManager);
@@ -1179,7 +1257,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private boolean showLogOffDialog(View child) {
         DialogFragment logOffDialog = new MyAlertDialog();
         Bundle bundle = new Bundle();
-        bundle.putInt("type", 0);
+        bundle.putInt("type", MyAlertDialog.LOGOFF_DIALOG);
         logOffDialog.setArguments(bundle);
         logOffDialog.show(getSupportFragmentManager(), "Logoff");
         child.playSoundEffect(SoundEffectConstants.CLICK);
@@ -1187,7 +1265,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void onPositiveClick(String input, int type) {    }
+    public void onPositiveClick(String input, int type) {
+        if (type == MyAlertDialog.LOGOFF_DIALOG){
+            onLogoff();
+        }
+    }
 
     @Override
     public void onDateSent(Calendar date) {    }
@@ -1266,11 +1348,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 }
                 break;
             case ServerService.STATUS_FINISHED:
-                if (getOpenedFragment() instanceof NewEventFragment) {
+                if (resultData.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_CREATE_GAME){
+                    toCreateGame.setGameId(resultData.getInt(ServerService.INT_TAG));
+                    onEventCreated(toCreateGame);
+                }
+/*                if (getOpenedFragment() instanceof NewEventFragment) {
                     NewEventFragment frag = (NewEventFragment) openedFragment;
                     int gameId = resultData.getInt(ServerService.INT_TAG);
                     frag.createLocalEvent(gameId);
-                }
+                }*/
                 if (getOpenedFragment() instanceof SearchFragment) {
                     if (userDataListener != null) {
                         searchGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
@@ -1372,6 +1458,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     if (allGameList != null) {
                         newGameList = getGamesFromList(GameTable.STATUS_NEW);
                         if (newGameList != null && newEventsListener != null) {
+                            updateNewGamesListPref();
                             newEventsListener.onGamesLoaded(newGameList);
                         } else Log.w(TAG, "newGameList is null");
 
@@ -1408,6 +1495,39 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 onDataLoaded();
                 break;
         }
+    }
+
+    private void updateNewGamesListPref() {
+
+        ArrayList<Integer> selectedIds = new ArrayList<>();
+        SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        String gameIds = "";
+        ArrayList<GameModel> gameList = getGamesFromList(GameTable.STATUS_NEW);
+
+        if (gameList != null && gameList.size() >0){
+            int typeIds[] = getResources().getIntArray(R.array.event_type_ids);
+            for (int typeId : typeIds) {
+                boolean b = sharedPrefs.getBoolean(String.valueOf(typeId), false);
+                if (b) { selectedIds.add(typeId); }
+            }
+
+            for (int i=0;i<gameList.size();i++){
+                for (int x=0;x<selectedIds.size();x++){
+                    Log.w(TAG, "Comparing game.typeId: " + gameList.get(i).getTypeId() + " with selectedTypeId: " + selectedIds.get(x));
+                    if (gameList.get(i).getTypeId() == selectedIds.get(x)){
+                        gameIds = gameIds + String.valueOf(gameList.get(i).getGameId()) + ",";
+                    }
+                }
+            }
+
+            if (!gameIds.equals("")){
+                Log.w(TAG, "Saving string: " + gameIds);
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                editor.putString(DrawerActivity.NEW_GAMES_PREF, gameIds);
+                editor.apply();
+            }
+        }
+
     }
 
     private void updateNotifications(ArrayList<GameModel> scheduledGameList) {

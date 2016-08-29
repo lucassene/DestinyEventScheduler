@@ -1,10 +1,8 @@
 package com.destiny.event.scheduler.fragments;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -30,18 +28,15 @@ import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.GameTable;
-import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyDatePickerDialog;
 import com.destiny.event.scheduler.dialogs.MyTimePickerDialog;
 import com.destiny.event.scheduler.dialogs.SimpleInputDialog;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
-import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.ServerService;
-import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import java.text.SimpleDateFormat;
@@ -54,22 +49,15 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     private static final int LOADER_TYPE = 10;
     private static final int LOADER_EVENT = 20;
-    private static final int LOADER_NOTIFICATION = 80;
 
     private static final int MAX_LIGHT = 400;
 
     private String selectedType;
     private String selectedEvent;
 
-    private String gameTime;
-    private String eventTypeName;
-    private int eventIcon;
-    private String eventName;
-
     private GameModel game;
 
     private ToActivityListener callback;
-    private OnEventCreatedListener eventCallback;
 
     private ImageView iconType;
     private TextView textType;
@@ -180,7 +168,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
-        eventCallback = (OnEventCreatedListener) getActivity();
     }
 
     @Override
@@ -382,15 +369,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                         selectionArgs,
                         null
                 );
-            case LOADER_NOTIFICATION:
-                return new CursorLoader(
-                        getContext(),
-                        DataProvider.NOTIFICATION_URI,
-                        NotificationTable.ALL_COLUMNS,
-                        NotificationTable.COLUMN_GAME + "=" + game.getGameId(),
-                        null,
-                        null
-                );
             default:
                 return null;
         }
@@ -403,7 +381,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         switch (loader.getId()){
             case LOADER_TYPE:
                 iconType.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName()));
-                eventTypeName = data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME));
                 textType.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 game.setTypeName(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)));
                 break;
@@ -412,9 +389,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 lightBar.setMax(MAX_LIGHT - minLight);
                 lightText.setText(String.valueOf(minLight));
                 String iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
-                eventIcon = getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)),"drawable",getContext().getPackageName());
                 iconGame.setImageResource(getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
-                eventName = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME));
                 textGame.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 game.setEventIcon(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)));
                 game.setEventName(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)));
@@ -544,10 +519,19 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             minimumTime.setTime(notifyTime.getTime());
             minimumTime.add(Calendar.MINUTE, -10);
 
-            gameTime = getBungieTime(date, time);
+            String gameTime = getBungieTime(date, time);
 
             //Log.w(TAG, "MinimumTime: " + minimumTime.get(Calendar.HOUR_OF_DAY) + ":" + minimumTime.get(Calendar.MINUTE) + ":00");
             //Log.w(TAG, "NotifyTime: " + notifyTime.get(Calendar.HOUR_OF_DAY) + ":" + notifyTime.get(Calendar.MINUTE) + ":00");
+
+            String bungieId = callback.getBungieId();
+            String userName = callback.getUserName();
+            game.setCreatorName(userName);
+            game.setCreatorId(bungieId);
+            game.setTime(gameTime);
+            game.setInscriptions(1);
+            game.setStatus(GameTable.STATUS_NEW);
+            game.setJoined(true);
 
             if (now.getTimeInMillis() <= minimumTime.getTimeInMillis()) {
                 Bundle bundle = new Bundle();
@@ -555,39 +539,11 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 bundle.putInt(ServerService.EVENT_TAG, Integer.parseInt(selectedEvent));
                 bundle.putString(ServerService.TIME_TAG, gameTime);
                 bundle.putInt(ServerService.LIGHT_TAG, minLight);
+                bundle.putSerializable(ServerService.GAME_TAG, game);
                 callback.runServerService(bundle);
             } else Toast.makeText(getContext(), getResources().getString(R.string.match_must_created) + " " + minimumIntTime + " " + getResources().getString(R.string.minutes_advance), Toast.LENGTH_SHORT).show();
 
         } else Toast.makeText(getContext(), R.string.when_play, Toast.LENGTH_SHORT).show();
-
-    }
-
-    public void createLocalEvent(int serverId){
-
-        String date = dateText.getText().toString();
-        String time = timeText.getText().toString();
-
-        Calendar notifyTime = getNotifyTime();
-
-        timeText.setText(time);
-        gameTime = getBungieTime(date, time);
-        String bungieId = callback.getBungieId();
-        String userName = callback.getUserName();
-
-        setAlarmNotification(notifyTime, serverId, eventName, eventTypeName, eventIcon);
-
-        callback.onDataLoaded();
-        Toast.makeText(getContext(), R.string.create_match_success, Toast.LENGTH_SHORT).show();
-
-        game.setGameId(serverId);
-        game.setCreatorName(userName);
-        game.setCreatorId(bungieId);
-        game.setTime(gameTime);
-        game.setInscriptions(1);
-        game.setStatus(GameTable.STATUS_NEW);
-        game.setJoined(true);
-
-        eventCallback.onEventCreated(game);
 
     }
 
@@ -601,56 +557,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         minimumIntTime = (alarmTime*-1) + 10;
 
         return notifyTime;
-    }
-
-    private void setAlarmNotification(Calendar notifyTime, int gameId, String title, String typeName, int typeIcon) {
-
-        int firstId = 0;
-        int secondId = 0;
-
-        if (notifyTime.getTimeInMillis() == insertedDate.getTimeInMillis()){
-            ContentValues values = new ContentValues();
-            values.put(NotificationTable.COLUMN_GAME, gameId);
-            values.put(NotificationTable.COLUMN_EVENT, title);
-            values.put(NotificationTable.COLUMN_TYPE, typeName);
-            values.put(NotificationTable.COLUMN_ICON, typeIcon);
-            values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(notifyTime));
-            values.put(NotificationTable.COLUMN_GAME_TIME, DateUtils.calendarToString(insertedDate));
-            Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
-            if (uri != null) {
-                firstId = Integer.parseInt(uri.getLastPathSegment());
-            } else Log.w(TAG, "Notification cannot be created");
-            values.clear();
-        } else {
-            ContentValues values = new ContentValues();
-            values.put(NotificationTable.COLUMN_GAME, gameId);
-            values.put(NotificationTable.COLUMN_EVENT, title);
-            values.put(NotificationTable.COLUMN_TYPE, typeName);
-            values.put(NotificationTable.COLUMN_ICON, typeIcon);
-            values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(notifyTime));
-            values.put(NotificationTable.COLUMN_GAME_TIME, DateUtils.calendarToString(insertedDate));
-            Uri uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
-            if (uri != null) {
-                firstId = Integer.parseInt(uri.getLastPathSegment());
-            } else Log.w(TAG, "Notification cannot be created");
-            values.clear();
-
-            values = new ContentValues();
-            values.put(NotificationTable.COLUMN_GAME, gameId);
-            values.put(NotificationTable.COLUMN_EVENT, title);
-            values.put(NotificationTable.COLUMN_TYPE, typeName);
-            values.put(NotificationTable.COLUMN_ICON, typeIcon);
-            values.put(NotificationTable.COLUMN_TIME, DateUtils.calendarToString(insertedDate));
-            values.put(NotificationTable.COLUMN_GAME_TIME, DateUtils.calendarToString(insertedDate));
-            uri = getContext().getContentResolver().insert(DataProvider.NOTIFICATION_URI, values);
-            if (uri != null) {
-                secondId = Integer.parseInt(uri.getLastPathSegment());
-            } else Log.w(TAG, "Notification cannot be created");
-            values.clear();
-        }
-
-        callback.registerAlarmTask(notifyTime, firstId, insertedDate, secondId);
-
     }
 
     private String getBungieTime(String date, String time) {

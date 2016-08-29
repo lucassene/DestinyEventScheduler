@@ -26,16 +26,16 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.utils.DateUtils;
+
+import java.util.Calendar;
 
 public class NotificationService extends IntentService {
 
     private static final String TAG = "NotificationService";
 
-    private int notificationId;
-
-    private String gameId;
-
-    private int notificationCount;
+    //private int notificationId;
+    //private int notificationCount;
 
     public NotificationService() {
         super(NotificationService.class.getName());
@@ -43,7 +43,9 @@ public class NotificationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        getNotificationInfo();
+        int notificationId = intent.getIntExtra(AlarmReceiver.NOTIFY_ID, 0);
+        Log.w(TAG, "notificationId: " + notificationId);
+        getNotificationInfo(notificationId);
     }
 
     @Override
@@ -58,40 +60,33 @@ public class NotificationService extends IntentService {
         Log.w(TAG, "NotificationService destroyed");
     }
 
-    private void getNotificationInfo() {
-        Cursor cursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, null, null,NotificationTable.COLUMN_TIME + " ASC");
-        if (cursor != null && cursor.moveToFirst()){
-            Log.w(TAG, "Notificação encontrada, abrindo...");
-            notificationId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
-            String title = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_EVENT));
-            title = getString(getResources().getIdentifier(title,"string",getPackageName()));
-            int iconId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ICON));
-            String typeName = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TYPE));
-            typeName = getString(getResources().getIdentifier(typeName,"string",getPackageName()));
-            gameId = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME));
-            cursor.close();
-
-            cursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, NotificationTable.COLUMN_GAME + "=" + gameId, null, NotificationTable.COLUMN_TIME + " ASC");
+    private void getNotificationInfo(int notificationId) {
+        if (notificationId != 0){
+            Cursor cursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, NotificationTable.COLUMN_ID + "=" + notificationId, null,NotificationTable.COLUMN_TIME + " ASC");
             if (cursor != null && cursor.moveToFirst()){
-                notificationCount = cursor.getCount();
-                Log.w(TAG, "Encontrado " + notificationCount + " notificações para o gameId " + gameId);
+                Log.w(TAG, "Notificação encontrada, abrindo...");
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_EVENT));
+                title = getString(getResources().getIdentifier(title,"string",getPackageName()));
+                String iconId = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ICON));
+                String typeName = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TYPE));
+                typeName = getString(getResources().getIdentifier(typeName,"string",getPackageName()));
+                Calendar gameTime = DateUtils.stringToDate(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME_TIME)));
+                String notifyTime = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TIME));
                 cursor.close();
-            }
+                makeNotification(title, iconId, typeName, gameTime, notifyTime, notificationId);
 
-            makeNotification(title, iconId, typeName);
-
-        } else Log.w(TAG, "Nenhuma Notificação foi encontrada.");
-
+            } else Log.w(TAG, "Nenhuma Notificação foi encontrada.");
+        }
     }
 
-    private void makeNotification(String title, int iconId, String typeName) {
+    private void makeNotification(String title, String iconId, String typeName, Calendar gameTime, String notifyTime, int notificationId) {
 
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
 
         if (sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false)){
 
             Intent nIntent = new Intent(getApplicationContext(), DrawerActivity.class);
-            nIntent.putExtra("notification",1);
+            nIntent.putExtra("notification",notificationId);
             nIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             nIntent.setAction(String.valueOf(notificationId));
             PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), notificationId, nIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -101,9 +96,22 @@ public class NotificationService extends IntentService {
             nBuilder.setSmallIcon(R.drawable.ic_event_validate);
             nBuilder.setLargeIcon(getLargeIcon(iconId));
             nBuilder.setContentTitle(title);
-            if (notificationCount > 1) {
-                nBuilder.setContentText(getString(R.string.event_begin_in) + sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0) + getString(R.string.minutes));
-            } else nBuilder.setContentText(getString(R.string.your_match_of) + typeName + getString(R.string.will_begin_soon));
+            if (notifyTime.equals(DateUtils.calendarToString(gameTime))){
+                nBuilder.setContentText(getString(R.string.your_match_of) + typeName + getString(R.string.will_begin_soon));
+            } else {
+                Calendar now = Calendar.getInstance();
+                //Log.w(TAG, "now: " + now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND));
+                long diffMs = gameTime.getTimeInMillis() - now.getTimeInMillis();
+                long diffSec = diffMs / 1000;
+                long timeDiff = (diffSec / 60) + 1;
+                //Log.w(TAG, "timeDiff: " + timeDiff);
+                String min;
+                if (timeDiff > 1){
+                    min = getString(R.string.minutes);
+                } else min = getString(R.string.minute);
+                String nMsg = getString(R.string.event_begin_in) + String.valueOf(timeDiff) + min;
+                nBuilder.setContentText(nMsg);
+            }
             nBuilder.setTicker(getString(R.string.match_begin));
             setPriority(nBuilder);
             nBuilder.setContentIntent(pIntent);
@@ -120,7 +128,7 @@ public class NotificationService extends IntentService {
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.notify(0, nBuilder.build());
 
-            deleteShowedNotification();
+            deleteShowedNotification(notificationId);
             this.stopSelf();
 
         } else {
@@ -139,18 +147,18 @@ public class NotificationService extends IntentService {
         nBuilder.setPriority(Notification.PRIORITY_DEFAULT);
     }
 
-    private void deleteShowedNotification() {
+    private void deleteShowedNotification(int notificationId) {
         getContentResolver().delete(DataProvider.NOTIFICATION_URI,NotificationTable.COLUMN_ID + "=" + notificationId,null);
         Log.w(TAG, "Notification created, and then deleted!");
     }
 
-    private Bitmap getLargeIcon(int iconId){
+    private Bitmap getLargeIcon(String iconId){
 
-        if (iconId == R.drawable.ic_trials){
-            BitmapDrawable bD = (BitmapDrawable) ContextCompat.getDrawable(getApplicationContext(), iconId);
+        if (iconId.equals("ic_osiris")){
+            BitmapDrawable bD = (BitmapDrawable) ContextCompat.getDrawable(this, getResources().getIdentifier(iconId,"drawable",getPackageName()));
             return bD.getBitmap();
         } else {
-            Drawable smallIcon = ContextCompat.getDrawable(getApplicationContext(),iconId);
+            Drawable smallIcon = ContextCompat.getDrawable(this, getResources().getIdentifier(iconId,"drawable",getPackageName()));
             BitmapDrawable bD = (BitmapDrawable) smallIcon;
             Bitmap bigIcon = bD.getBitmap();
             Bitmap finalIcon = Bitmap.createBitmap(bigIcon.getWidth(), bigIcon.getHeight(), bigIcon.getConfig());

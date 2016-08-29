@@ -23,8 +23,7 @@
                 android:layout_width="59dp"
                 android:layout_height="match_parent"
                 android:scaleType="fitStart"
-                android:layout_marginLeft="5dp"
-                android:src="@drawable/default_profile_img"/>
+                android:layout_marginLeft="5dp" />
 
             <ProgressBar
                 android:id="@+id/progress_bar"
@@ -86,14 +85,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/evaluations"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/tabIndicatorColor"
                     android:layout_marginTop="@dimen/global_padding"/>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
-                    android:background="@color/textColorPrimary"
+                    android:background="@color/tabIndicatorColor"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="8dp"/>
 
@@ -154,7 +152,8 @@
                     android:layout_height="wrap_content"
                     android:footerDividersEnabled="false"
                     android:overScrollFooter="@android:color/transparent"
-                    android:focusable="false"/>
+                    android:focusable="false"
+                    android:clickable="false"/>
 
             </LinearLayout>
 
@@ -168,14 +167,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/events"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/tabIndicatorColor"
                     android:layout_marginTop="@dimen/global_padding"/>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
-                    android:background="@color/textColorPrimary"
+                    android:background="@color/tabIndicatorColor"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="8dp"/>
 
@@ -236,7 +234,8 @@
                     android:layout_height="wrap_content"
                     android:footerDividersEnabled="false"
                     android:overScrollFooter="@android:color/transparent"
-                    android:focusable="false"/>
+                    android:focusable="false"
+                    android:clickable="false" />
 
             </LinearLayout>
 
@@ -252,14 +251,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/game_type_label"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@android:color/white"
+                android:textColor="@color/tabIndicatorColor"
                 android:layout_marginTop="@dimen/global_padding"/>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="@color/textColorPrimary"
+                android:background="@color/tabIndicatorColor"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="8dp"/>
 
@@ -321,7 +319,8 @@
                 android:layout_height="wrap_content"
                 android:footerDividersEnabled="false"
                 android:overScrollFooter="@android:color/transparent"
-                android:focusable="false"/>
+                android:focusable="false"
+                android:clickable="false"/>
 
         </LinearLayout>
 
@@ -329,14 +328,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/favorite_game"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@android:color/white"
+            android:textColor="@color/tabIndicatorColor"
             android:layout_marginTop="@dimen/global_padding"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/textColorPrimary"
+            android:background="@color/tabIndicatorColor"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="8dp"/>
 

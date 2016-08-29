@@ -113,7 +113,11 @@ public class DetailHistoryAdapter extends BaseAdapter {
         }
         xp = xp + (likes * Integer.parseInt(MemberTable.LIKE_MODIFIER));
         xp = xp - (dislikes * Integer.parseInt(MemberTable.DISLIKE_MODIFIER));
-        return "+ " + String.valueOf(xp) + " " + context.getString(R.string.xp);
+        String prefix;
+        if (xp >= 0){
+            prefix = "+ ";
+        } else prefix = "- ";
+        return prefix + String.valueOf(xp) + " " + context.getString(R.string.xp);
     }
 
     private class EntryViewHolder {

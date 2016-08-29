@@ -10,26 +10,23 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.NotificationTable;
-import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.NotificationModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 public class UpdateNotificationsService extends IntentService {
 
     private static final String TAG = "UpdateNotifyService";
 
     public static final String NOTIFY_RUNNING = "updateNotify";
-
-    public static final String GAME_HEADER = "gameList";
 
     private ArrayList<NotificationModel> notificationList;
 
@@ -49,7 +46,6 @@ public class UpdateNotificationsService extends IntentService {
 
         previousTime = intent.getIntExtra("previousTime",15);
         previousCheck = intent.getBooleanExtra("previousCheck",true);
-        List<GameModel> gameList = (List<GameModel>) intent.getSerializableExtra(GAME_HEADER);
         Log.w(TAG, "previousCheck: " + previousCheck);
 
         //String[] projection = {NotificationTable.getQualifiedColumn(NotificationTable.COLUMN_ID), NotificationTable.COLUMN_GAME, NotificationTable.COLUMN_TIME, NotificationTable.COLUMN_TYPE, NotificationTable.COLUMN_EVENT, NotificationTable.COLUMN_ICON, GameTable.COLUMN_TIME};
@@ -181,8 +177,11 @@ public class UpdateNotificationsService extends IntentService {
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (requestId != 0){
             Intent sIntent = new Intent(this, AlarmReceiver.class);
+            sIntent.putExtra(AlarmReceiver.NOTIFY_ID, requestId);
             PendingIntent psIntent = PendingIntent.getBroadcast(this, requestId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            alarm.set(AlarmManager.RTC_WAKEUP, notifyTime.getTimeInMillis(), psIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                alarm.setExact(AlarmManager.RTC_WAKEUP, notifyTime.getTimeInMillis(), psIntent);
+            } else alarm.set(AlarmManager.RTC_WAKEUP, notifyTime.getTimeInMillis(), psIntent);
         }
         Log.w(TAG, "Alarm for request Id " + requestId + " created");
     }

@@ -439,7 +439,7 @@
     <string name="events">Eventos</string>
     <string name="favorite_game">Jogo favorito</string>
     <string name="games">Jogos</string>
-    <string name="played">Jogados</string>
+    <string name="played">Jogado</string>
     <string name="value">Valor</string>
     <string name="default_title">Novo no pedaço</string>
     <string name="bungie_net_error_msg">Resposta incorreta de Bungie.net. Por favor, tente novamente mais tarde.</string>
@@ -507,5 +507,6 @@
     <string name="fail_member_data">Não foi possível obter as informações do membro. Por favor cheque sua conexão com a internet e tente novamente.</string>
     <string name="inferno_sup">Inferno Supremacia</string>
     <string name="no_evaluations_received">Nenhuma avaliação recebida.</string>
+    <string name="minute">" minuto"</string>
 
 </resources>

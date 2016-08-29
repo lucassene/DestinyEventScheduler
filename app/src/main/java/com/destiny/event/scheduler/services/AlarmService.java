@@ -68,6 +68,7 @@ public class AlarmService extends IntentService {
         long time = Long.parseLong(notifyTime);
         Intent intent = new Intent(this, AlarmReceiver.class);
         intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
+        intent.putExtra(AlarmReceiver.NOTIFY_ID, notifyId);
         PendingIntent pIntent = PendingIntent.getBroadcast(this, notifyId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarm.set(AlarmManager.RTC_WAKEUP, time, pIntent);

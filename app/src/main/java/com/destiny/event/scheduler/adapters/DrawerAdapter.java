@@ -32,7 +32,6 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
     private String items[];
     private TypedArray icons;
     private String sections[];
-    private String header;
     private String clanIcon;
     private String clanName;
     private String clanDesc;
@@ -85,12 +84,11 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
         }
     }
 
-    public DrawerAdapter(Context context, String header, String[] sections, TypedArray icons, String[] items, String clanIcon, String clanName, String clanDesc, String clanBanner) {
+    public DrawerAdapter(Context context, String[] sections, String[] items, String clanIcon, String clanName, String clanDesc, String clanBanner) {
         callback = (ToActivityListener) context;
         this.context = context;
         this.sections = sections;
-        this.header = header;
-        this.icons = icons;
+        this.icons = context.getResources().obtainTypedArray(R.array.menu_icons);
         this.items = items;
         this.clanDesc = clanDesc;
         this.clanIcon = clanIcon;
@@ -104,20 +102,16 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
         switch (viewType){
             case TYPE_ITEM:
                 View vItem = layoutInflater.inflate(R.layout.drawer_item_layout, parent, false);
-                ViewHolder vhItem = new ViewHolder(vItem, viewType);
-                return vhItem;
+                return new ViewHolder(vItem, viewType);
             case TYPE_HEADER:
                 View vHeader = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_header_layout, parent, false);
-                ViewHolder vhHeader = new ViewHolder(vHeader, viewType);
-                return vhHeader;
+                return new ViewHolder(vHeader, viewType);
             case TYPE_SECTION:
                 View vSection = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_section_layout, parent, false);
-                ViewHolder vhSection = new ViewHolder(vSection, viewType);
-                return vhSection;
+                return new ViewHolder(vSection, viewType);
             case TYPE_SELECTED:
                 View vSelected = layoutInflater.inflate(R.layout.drawer_item_layout, parent, false);
-                ViewHolder vhSelected = new ViewHolder(vSelected, viewType);
-                return vhSelected;
+                return new ViewHolder(vSelected, viewType);
         }
         return null;
     }

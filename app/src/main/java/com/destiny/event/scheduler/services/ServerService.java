@@ -120,6 +120,7 @@ public class ServerService extends IntentService {
     private ArrayList<GameModel> gameList;
     private ArrayList<MemberModel> memberList;
     private MemberModel member;
+    private int type;
 
     public ServerService() {
         super(ServerService.class.getName());
@@ -148,7 +149,7 @@ public class ServerService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        int type = intent.getIntExtra(REQUEST_TAG, 0);
+        type = intent.getIntExtra(REQUEST_TAG, 0);
         Log.w(TAG, "Request Tag: " + type);
         ResultReceiver receiver;
         if (intent.hasExtra(RECEIVER_TAG)){
@@ -330,7 +331,7 @@ public class ServerService extends IntentService {
 
     private void sendGameData(ResultReceiver receiver, ArrayList<GameModel> gameList) {
         Bundle bundle = new Bundle();
-        bundle.putInt(REQUEST_TAG, TYPE_ALL_GAMES);
+        bundle.putInt(REQUEST_TAG, type);
         bundle.putSerializable(GAME_TAG, gameList);
         receiver.send(STATUS_FINISHED, bundle);
     }
@@ -338,6 +339,7 @@ public class ServerService extends IntentService {
     private void sendIntData(ResultReceiver receiver, int data) {
         Bundle bundle = new Bundle();
         bundle.putInt(INT_TAG, data);
+        bundle.putInt(REQUEST_TAG, type);
         receiver.send(STATUS_FINISHED, bundle);
     }
 
@@ -522,7 +524,6 @@ public class ServerService extends IntentService {
             member.setDislikes(jMember.getInt("dislikes"));
             member.setGamesCreated(jMember.getInt("gamesCreated"));
             member.setGamesPlayed(jMember.getInt("gamesPlayed"));
-
             member.setEvaluationsMade(jResponse.getInt("evaluationsMade"));
 
             JSONArray jTypes = jResponse.getJSONArray("playedTypes");
@@ -537,19 +538,23 @@ public class ServerService extends IntentService {
             }
             member.setTypesPlayed(typeList);
 
-            JSONObject jFavorite = jResponse.getJSONObject("favoriteEvent");
             EventModel event = new EventModel();
-            event.setTimesPlayed(jFavorite.getInt("timesPlayed"));
-            JSONObject jEvent = jFavorite.getJSONObject("event");
-            event.setEventId(jEvent.getInt("id"));
-            event.setEventName(jEvent.getString("name"));
-            event.setEventIcon(jEvent.getString("icon"));
             EventTypeModel favType = new EventTypeModel();
-            JSONObject jFavType = jEvent.getJSONObject("eventType");
-            favType.setTypeId(jFavType.getInt("id"));
-            favType.setTypeName(jFavType.getString("name"));
-            favType.setTypeIcon(jFavType.getString("icon"));
-            event.setEventType(favType);
+            if (jResponse.isNull("favoriteEvent")){
+                event.setEventId(0);
+            } else {
+                JSONObject jFavorite = jResponse.getJSONObject("favoriteEvent");
+                event.setTimesPlayed(jFavorite.getInt("timesPlayed"));
+                JSONObject jEvent = jFavorite.getJSONObject("event");
+                event.setEventId(jEvent.getInt("id"));
+                event.setEventName(jEvent.getString("name"));
+                event.setEventIcon(jEvent.getString("icon"));
+                JSONObject jFavType = jEvent.getJSONObject("eventType");
+                favType.setTypeId(jFavType.getInt("id"));
+                favType.setTypeName(jFavType.getString("name"));
+                favType.setTypeIcon(jFavType.getString("icon"));
+                event.setEventType(favType);
+            }
             member.setFavoriteEvent(event);
 
             return NO_ERROR;

@@ -42,7 +42,6 @@ public class MyStatsFragment extends Fragment{
     TextView titleText;
     TextView memberLevel;
     ProgressBar progressBar;
-    //TextView xpText;
     ListView evaluationLegends;
     ListView eventsLegends;
     ListView gameLegends;
@@ -92,7 +91,6 @@ public class MyStatsFragment extends Fragment{
         userName = (TextView) v.findViewById(R.id.primary_text);
         memberLevel = (TextView) v.findViewById(R.id.member_level);
         progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
-        //xpText = (TextView) v.findViewById(R.id.xp_text);
         titleText = (TextView) v.findViewById(R.id.title_text);
         favIcon = (ImageView) v.findViewById(R.id.game_icon);
         favTitle = (TextView) v.findViewById(R.id.game_title);
@@ -103,12 +101,18 @@ public class MyStatsFragment extends Fragment{
 
         evaluationLegends = (ListView) v.findViewById(R.id.evaluation_list);
         evaluationLegends.setFocusable(false);
+        evaluationLegends.setClickable(false);
+        evaluationLegends.setEnabled(false);
         emptyEval = (TextView) v.findViewById(R.id.empty_eval_chart);
         eventsLegends = (ListView) v.findViewById(R.id.events_list);
         eventsLegends.setFocusable(false);
+        eventsLegends.setClickable(false);
+        eventsLegends.setEnabled(false);
         emptyEvents = (TextView) v.findViewById(R.id.empty_events_chart);
         gameLegends = (ListView) v.findViewById(R.id.games_list);
         gameLegends.setFocusable(false);
+        gameLegends.setClickable(false);
+        gameLegends.setEnabled(false);
         emptyGame = (TextView) v.findViewById(R.id.empty_game_chart);
 
         likeHeaderLayout = (LinearLayout) v.findViewById(R.id.like_chart_header);
@@ -117,7 +121,8 @@ public class MyStatsFragment extends Fragment{
 
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int chartHeight = metrics.widthPixels - 164;
+        //int chartHeight = metrics.widthPixels - 164;
+        int chartHeight = metrics.widthPixels -264;
 
         eventsChart = (PieChart) v.findViewById(R.id.events_chart);
         eventsChart.setMinimumHeight(chartHeight);
@@ -171,9 +176,7 @@ public class MyStatsFragment extends Fragment{
             memberLevel.setText(StringUtils.parseString(MemberTable.getMemberLevel(xp)));
             progressBar.setMax(MemberTable.getExpNeeded(xp));
             progressBar.setProgress(xp);
-            //String xpTxt = xp + " / " + MemberTable.getExpNeeded(xp);
-            //xpText.setText(xpTxt);
-            if (member.getFavoriteEvent() == null){
+            if (member.getFavoriteEvent().getEventId() == 0){
                 titleText.setText(getString(R.string.default_title));
             } else { titleText.setText(MemberTable.getMemberTitle(getActivity(), xp, member.getFavoriteEvent().getEventId())); }
 
@@ -225,7 +228,8 @@ public class MyStatsFragment extends Fragment{
                 gameHeaderLayout.setVisibility(View.GONE);
             }
 
-            if (member.getFavoriteEvent() != null){
+            Log.w(TAG, "favoriteEvent: " + member.getFavoriteEvent().getEventId());
+            if (member.getFavoriteEvent().getEventId() != 0){
                 favEmpty.setVisibility(View.GONE);
                 favLayout.setVisibility(View.VISIBLE);
                 favIcon.setImageResource(getContext().getResources().getIdentifier(member.getFavoriteEvent().getEventIcon(),"drawable",getContext().getPackageName()));
