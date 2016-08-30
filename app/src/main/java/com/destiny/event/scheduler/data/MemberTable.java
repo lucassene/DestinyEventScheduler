@@ -23,9 +23,7 @@ public class MemberTable {
     public static final String COLUMN_CREATED = "games_created";
     public static final String COLUMN_PLAYED = "games_played";
     public static final String COLUMN_TITLE = "member_favoriteid";
-    //public static final String COLUMN_SINCE = "member_since";
 
-    //public static final String POINTS_COLUMNS = "((" + COLUMN_LIKES + "*1.0)/(" + COLUMN_CREATED + "+" + COLUMN_PLAYED + "))*100+(" + COLUMN_CREATED + "*0.5)-" + COLUMN_DISLIKES;
     public static final String LIKE_MODIFIER = "16";
     public static final String CREATOR_MODIFIER = "64";
     public static final String PLAYED_MODIFIER = "48";

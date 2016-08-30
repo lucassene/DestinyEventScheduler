@@ -48,8 +48,6 @@ public class UpdateNotificationsService extends IntentService {
         previousCheck = intent.getBooleanExtra("previousCheck",true);
         Log.w(TAG, "previousCheck: " + previousCheck);
 
-        //String[] projection = {NotificationTable.getQualifiedColumn(NotificationTable.COLUMN_ID), NotificationTable.COLUMN_GAME, NotificationTable.COLUMN_TIME, NotificationTable.COLUMN_TYPE, NotificationTable.COLUMN_EVENT, NotificationTable.COLUMN_ICON, GameTable.COLUMN_TIME};
-
         try {
             cursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, null, null, NotificationTable.COLUMN_TIME + " ASC");
             if (cursor != null && cursor.moveToFirst()){

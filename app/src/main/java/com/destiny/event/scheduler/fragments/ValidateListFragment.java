@@ -8,11 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.GameAdapter;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -27,11 +25,6 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
     private ToActivityListener callback;
 
     GameAdapter gameAdapter;
-
-    View headerView;
-
-    TextView sectionTitle;
-
     private List<GameModel> gameList;
 
     @Override
@@ -56,13 +49,7 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.validate_list_layout, container, false);
-
-        headerView = inflater.inflate(R.layout.list_section_layout, null);
-
-        sectionTitle = (TextView) headerView.findViewById(R.id.section_title);
-
-        return v;
+        return inflater.inflate(R.layout.validate_list_layout, container, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -72,16 +59,10 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
 
         callback.onSelectedFragment(2);
 
-        sectionTitle.setText(R.string.games_available);
-
         if (gameList == null){
-            gameList = callback.getGameList(GameTable.STATUS_DONE);
+            gameList = callback.getGameList(GameModel.STATUS_DONE);
         }
         onGamesLoaded(gameList);
-
-        if (headerView != null) {
-            this.getListView().addHeaderView(headerView);
-        }
     }
 
     @Override
@@ -93,10 +74,7 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        if (position > 0) {
-            int newPos = position - 1;
-            callback.onGameSelected(gameList.get(newPos), TAG);
-        }
+            callback.onGameSelected(gameList.get(position), TAG);
     }
 
 
@@ -113,13 +91,14 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
                 this.gameList = gameList;
                 gameAdapter = new GameAdapter(getActivity(), gameList);
                 setListAdapter(gameAdapter);
+                gameAdapter.notifyDataSetChanged();
             } else Log.w(TAG, "listView null ou size 0");
         } else {
             Log.w(TAG, "adapter já existia");
             if (gameList != null) {
                 this.gameList = gameList;
-                setListAdapter(gameAdapter);
                 gameAdapter.setGameList(gameList);
+                setListAdapter(gameAdapter);
                 gameAdapter.notifyDataSetChanged();
             } else Log.w(TAG, "listView null");
         }

@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.GameAdapter;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -92,7 +91,7 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
-        gameList = callback.getGameList(GameTable.STATUS_VALIDATED);
+        gameList = callback.getGameList(GameModel.STATUS_VALIDATED);
         if (savedInstanceState != null && savedInstanceState.containsKey("listView")){
             gameList = (List<GameModel>) savedInstanceState.getSerializable("listView");
             onGamesLoaded(gameList);

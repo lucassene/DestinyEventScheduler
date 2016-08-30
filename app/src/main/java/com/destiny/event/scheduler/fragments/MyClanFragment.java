@@ -39,7 +39,6 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     private static final int LOADER_MEMBERS = 50;
     private static final int LOADER_CLAN = 40;
 
-    //private static final String DATE_ORDER_BY = MemberTable.COLUMN_SINCE + " ASC";
     private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME + " COLLATE NOCASE ASC";
     private static final String POINTS_ORDER_BY = MemberTable.COLUMN_EXP + " DESC";
     private String orderBy;

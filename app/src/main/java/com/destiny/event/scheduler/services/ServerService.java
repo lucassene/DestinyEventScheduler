@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.models.EvaluationModel;
 import com.destiny.event.scheduler.models.EventModel;
 import com.destiny.event.scheduler.models.EventTypeModel;
@@ -243,7 +242,7 @@ public class ServerService extends IntentService {
                 } else sendGameData(receiver, gameList);
                 break;
             case TYPE_HISTORY_GAMES:
-                url = SERVER_BASE_URL + GAME_ENDPOINT + "?" + STATUS_PARAM + String.valueOf(GameTable.STATUS_VALIDATED);
+                url = SERVER_BASE_URL + GAME_ENDPOINT + "?" + STATUS_PARAM + String.valueOf(GameModel.STATUS_VALIDATED);
                 error = requestServer(receiver, type, url, null);
                 if (error != NO_ERROR) {
                     sendError(receiver, error);

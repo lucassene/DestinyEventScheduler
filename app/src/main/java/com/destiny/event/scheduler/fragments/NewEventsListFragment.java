@@ -8,11 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.GameAdapter;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -24,12 +22,7 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
 
     public static final String TAG = "NewEventsListFragment";
 
-   GameAdapter gameAdapter;
-
-    View headerView;
-
-    TextView sectionTitle;
-
+    GameAdapter gameAdapter;
     private ToActivityListener callback;
 
     private List<GameModel> gameList;
@@ -56,10 +49,7 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.new_list_layout, container, false);
-        headerView = inflater.inflate(R.layout.list_section_layout, null);
-        sectionTitle = (TextView) headerView.findViewById(R.id.section_title);
-        return v;
+        return inflater.inflate(R.layout.new_list_layout, container, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -69,16 +59,10 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
 
         callback.onSelectedFragment(0);
 
-        sectionTitle.setText(R.string.games_available);
-
         if (gameList == null){
-            gameList = callback.getGameList(GameTable.STATUS_NEW);
+            gameList = callback.getGameList(GameModel.STATUS_NEW);
         }
         onGamesLoaded(gameList);
-
-        if (headerView != null){
-            this.getListView().addHeaderView(headerView);
-        }
     }
 
     @Override
@@ -89,10 +73,7 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        if (position > 0){
-            int newPos = position - 1;
-            callback.onGameSelected(gameList.get(newPos), TAG);
-        }
+            callback.onGameSelected(gameList.get(position), TAG);
     }
 
     @Override

@@ -8,11 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.GameAdapter;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -25,10 +23,6 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
     public static final String TAG = "ScheduledListFragment";
 
    GameAdapter gameAdapter;
-
-    View headerView;
-
-    TextView sectionTitle;
 
     private ToActivityListener callback;
 
@@ -56,10 +50,7 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.scheduled_list_layout, container, false);
-        headerView = inflater.inflate(R.layout.list_section_layout, null);
-        sectionTitle = (TextView) headerView.findViewById(R.id.section_title);
-        return v;
+        return inflater.inflate(R.layout.scheduled_list_layout, container, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -68,17 +59,10 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
         super.onViewCreated(view, savedInstanceState);
 
         callback.onSelectedFragment(1);
-
-        sectionTitle.setText(R.string.scheduled_games);
-
         if (gameList == null){
-            gameList = callback.getGameList(GameTable.STATUS_SCHEDULED);
+            gameList = callback.getGameList(GameModel.STATUS_SCHEDULED);
         }
         onGamesLoaded(gameList);
-
-        if (headerView != null){
-            this.getListView().addHeaderView(headerView);
-        }
     }
 
     @Override
@@ -89,10 +73,7 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        if (position > 0){
-            int newPos = position - 1;
-            callback.onGameSelected(gameList.get(newPos), TAG);
-        }
+            callback.onGameSelected(gameList.get(position), TAG);
     }
 
     @Override

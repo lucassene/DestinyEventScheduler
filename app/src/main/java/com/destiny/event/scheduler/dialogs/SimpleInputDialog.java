@@ -51,6 +51,7 @@ public class SimpleInputDialog extends DialogFragment {
         listener = (FromDialogListener) getFragmentManager().findFragmentByTag(fragment);
 
         dialog.setTitle(title);
+        dialog.setMessage(getString(R.string.enter_value));
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.input_dialog_layout, null);

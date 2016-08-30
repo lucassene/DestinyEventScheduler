@@ -100,11 +100,10 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
         super.onViewCreated(view, savedInstanceState);
         historyEntries = new ArrayList<>();
         adapter = new DetailHistoryAdapter(getContext(), historyEntries);
-        getListView().setAdapter(adapter);
-
         if (headerView != null){
             this.getListView().addHeaderView(headerView, null, false);
         }
+        getListView().setAdapter(adapter);
         getGameData();
     }
 

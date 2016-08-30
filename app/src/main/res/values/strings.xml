@@ -178,14 +178,11 @@
 
     <string-array name="table_names">
         <item>Clan</item>
-        <item>Entry</item>
         <item>Event</item>
         <item>Event Type</item>
-        <item>Game</item>
         <item>LoggedUser</item>
         <item>Member</item>
         <item>Notification</item>
-        <item>Evaluation</item>
         <item>SavedImages</item>
     </string-array>
 
@@ -489,7 +486,7 @@
     <string name="no_evaluations">No evaluations?</string>
     <string name="no_evaluations_dialog_msg">No guardian was evaluated, validate anyway?</string>
     <string name="validation">Validation</string>
-    <string name="validation_dialog_msg">After validation, this event will be availabe for other guardians evaluate each other.</string>
+    <string name="validation_dialog_msg">After validation, this event will be available for other guardians evaluate each other.</string>
     <string name="deleting_match">Deleting event</string>
     <string name="deleting_match_dialog_msg">This event will no longer be available to anyone after this.</string>
     <string name="at">" at "</string>
@@ -520,7 +517,7 @@
     <string name="match_must_created">The event must be created with at least</string>
     <string name="minutes_advance">minutes in advance</string>
     <string name="create_match_success">Success! Event created.</string>
-    <string name="when_play">When do you wanna play?</string>
+    <string name="when_play">When do you want to play?</string>
     <string name="evaluations">Evaluations</string>
     <string name="games">Games</string>
     <string name="events">Events</string>
@@ -596,6 +593,8 @@
     <string name="fail_member_data">Can\'t get member data. Please check your internet connection and try again.</string>
     <string name="no_evaluations_received">No evaluations received.</string>
     <string name="minute">" minute"</string>
+    <string name="played_plural">Played</string>
+    <string name="enter_value">Please enter the required value:</string>
 
 
 </resources>

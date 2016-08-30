@@ -3,14 +3,8 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/bg"
-        android:scaleType="centerCrop"
-        android:alpha=".7"/>
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
@@ -26,35 +20,45 @@
             android:gravity="center_horizontal"
             android:layout_margin="@dimen/image_margin"/>
 
-        <TextView
-            android:id="@+id/login_title"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/buttons_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/tx_login"
-            android:layout_marginBottom="@dimen/text_margin"
-            android:layout_marginTop="42dp"/>
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:visibility="gone">
 
-        <Button
-            android:id="@+id/btn_psn"
-            android:layout_width="260dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="@dimen/button_margin"
-            android:layout_marginTop="@dimen/button_margin"
-            android:text="@string/psn"
-            android:gravity="left|center"
-            android:drawableLeft="@drawable/ic_psn"
-            android:background="@drawable/psn_button_bg"
-            android:onClick="callWebView"/>
+            <TextView
+                android:id="@+id/login_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tx_login"
+                android:layout_marginBottom="@dimen/text_margin"
+                android:layout_marginTop="42dp"/>
 
-        <Button
-            android:id="@+id/btn_live"
-            android:layout_width="260dp"
-            android:layout_height="50dp"
-            android:text="@string/live"
-            android:gravity="left|center"
-            android:drawableLeft="@drawable/ic_live"
-            android:background="@drawable/live_button_bg"
-            android:onClick="callWebView"/>
+            <Button
+                android:id="@+id/btn_psn"
+                android:layout_width="260dp"
+                android:layout_height="50dp"
+                android:layout_marginBottom="@dimen/button_margin"
+                android:layout_marginTop="@dimen/button_margin"
+                android:text="@string/psn"
+                android:gravity="left|center"
+                android:drawableLeft="@drawable/ic_psn"
+                android:background="@drawable/psn_button_bg"
+                android:onClick="callWebView"/>
+
+            <Button
+                android:id="@+id/btn_live"
+                android:layout_width="260dp"
+                android:layout_height="50dp"
+                android:text="@string/live"
+                android:gravity="left|center"
+                android:drawableLeft="@drawable/ic_live"
+                android:background="@drawable/live_button_bg"
+                android:onClick="callWebView"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -64,7 +68,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:visibility="gone"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="21dp"
         android:layout_marginRight="16dp"/>
 
 </FrameLayout>

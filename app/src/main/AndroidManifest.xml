@@ -58,11 +58,6 @@
             android:enabled="true">
         </service>
 
-        <service android:name=".services.TitleService"
-            android:exported="false"
-            android:enabled="true">
-        </service>
-
         <service android:name=".services.UpdateNotificationsService"
             android:exported="false"
             android:enabled="true">

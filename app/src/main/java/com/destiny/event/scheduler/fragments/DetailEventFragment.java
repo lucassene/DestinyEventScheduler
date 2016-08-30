@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.DetailEventAdapter;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
@@ -122,14 +121,14 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
             Calendar now = Calendar.getInstance();
             if (DateUtils.stringToDate(game.getTime()).getTimeInMillis() > now.getTimeInMillis()){
                 switch (game.getStatus()){
-                    case GameTable.STATUS_NEW:
+                    case GameModel.STATUS_NEW:
                         if (game.isJoined()){
                             if (game.getCreatorId().equals(callback.getBungieId())){
                                 joinButton.setText(R.string.delete);
                             } else joinButton.setText(R.string.leave);
                         } else joinButton.setText(R.string.join);
                         break;
-                    case GameTable.STATUS_WAITING:
+                    case GameModel.STATUS_WAITING:
                         if (game.getCreatorId().equals(callback.getBungieId())){
                             joinButton.setText(R.string.validate);
                         } else {
@@ -137,7 +136,7 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
                             joinButton.setEnabled(false);
                         }
                         break;
-                    case GameTable.STATUS_VALIDATED:
+                    case GameModel.STATUS_VALIDATED:
                         joinButton.setText(R.string.evaluate);
                         break;
                 }
@@ -193,12 +192,10 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
 
         entryList = new ArrayList<>();
         detailAdapter = new DetailEventAdapter(getContext(), entryList, game.getMaxGuardians());
-        getListView().setAdapter(detailAdapter);
-
         if (headerView != null){
-            this.getListView().addHeaderView(headerView, null, false);
+            getListView().addHeaderView(headerView, null, false);
         }
-
+        getListView().setAdapter(detailAdapter);
         getGameData();
 
     }
@@ -285,8 +282,8 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
 
     private int getStatus() {
         if (game.isJoined()) {
-            return GameTable.STATUS_SCHEDULED;
-        } else return GameTable.STATUS_NEW;
+            return GameModel.STATUS_SCHEDULED;
+        } else return GameModel.STATUS_NEW;
     }
 
     @Override
@@ -319,7 +316,7 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
         int gS = game.getStatus();
 
         Calendar now = Calendar.getInstance();
-        if (now.getTimeInMillis() > eventCalendar.getTimeInMillis() && gS == GameTable.STATUS_SCHEDULED){
+        if (now.getTimeInMillis() > eventCalendar.getTimeInMillis() && gS == GameModel.STATUS_SCHEDULED){
             dialogThread();
         } else {
             if (entryList.size()==0){
@@ -345,8 +342,8 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
 
             int status;
             if (game.isJoined()){
-                status = GameTable.STATUS_SCHEDULED;
-            } else status = GameTable.STATUS_NEW;
+                status = GameModel.STATUS_SCHEDULED;
+            } else status = GameModel.STATUS_NEW;
 
             if (isUpdateNeeded) { callback.updateGameEntries(status, game.getGameId(), entryList.size()); }
             String sg = entryList.size() + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;

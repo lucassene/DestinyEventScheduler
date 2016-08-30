@@ -4,6 +4,15 @@
     android:layout_height="match_parent"
     android:layout_gravity="center">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/subheaderHeight"
+        android:id="@+id/section_title"
+        android:textColor="@color/psnColor"
+        android:gravity="center_vertical"
+        android:text="@string/scheduled_games"
+        android:textSize="@dimen/secondaryTextSize" />
+
     <ListView
         android:id="@id/android:list"
         android:layout_width="match_parent"

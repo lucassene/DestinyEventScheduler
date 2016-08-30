@@ -13,9 +13,7 @@ import android.widget.TextView;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.MemberTable;
-import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.ImageUtils;
 import com.destiny.event.scheduler.utils.StringUtils;
 
@@ -51,38 +49,9 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
             case R.layout.member_list_item_layout:
                 getMembers(view, context, cursor);
                 break;
-            case R.layout.game_list_item_layout:
-                getGames(view, context, cursor);
-                break;
-            case R.layout.done_game_item:
-                getDoneGames(view, context, cursor);
-                break;
         }
 
     }
-
-    private void getDoneGames(View view, Context context, Cursor cursor) {
-
-        ImageView gameIcon = (ImageView) view.findViewById(R.id.game_image);
-        TextView gameTitle = (TextView) view.findViewById(R.id.primary_text);
-        TextView gameCreator = (TextView) view.findViewById(R.id.secondary_text);
-        TextView gameType = (TextView) view.findViewById(R.id.type_text);
-        ImageView statusImg = (ImageView) view.findViewById(R.id.status_img);
-
-        gameIcon.setImageResource(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", context.getPackageName()));
-        gameTitle.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", context.getPackageName()));
-        gameType.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)), "string", context.getPackageName()));
-
-        String creator = context.getResources().getString(R.string.created_by) + " " + cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_CREATOR_NAME));
-        gameCreator.setText(creator);
-
-        String gameStatus = cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_STATUS));
-        if (gameStatus.equals(GameTable.STATUS_WAITING)){
-            statusImg.setImageResource(R.drawable.ic_waiting);
-        } else statusImg.setImageResource(R.drawable.ic_done);
-
-    }
-
 
     private void getEvents(View view, Context context, Cursor cursor) {
 
@@ -105,34 +74,6 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
 
         title.setText(context.getResources().getIdentifier(textName, "string", context.getPackageName()));
         icon.setImageResource(context.getResources().getIdentifier(iconName, "drawable", context.getPackageName()));
-
-    }
-
-    private void getGames(View view, Context context, Cursor cursor) {
-
-        ImageView gameIcon = (ImageView) view.findViewById(R.id.game_image);
-        TextView gameTitle = (TextView) view.findViewById(R.id.primary_text);
-        TextView gameCreator = (TextView) view.findViewById(R.id.secondary_text);
-        TextView gameDate = (TextView) view.findViewById(R.id.game_date);
-        TextView gameTime = (TextView) view.findViewById(R.id.game_time);
-        TextView gameMax = (TextView) view.findViewById(R.id.game_max);
-        TextView gameInsc = (TextView) view.findViewById(R.id.game_actual);
-        TextView gameType = (TextView) view.findViewById(R.id.type_text);
-
-        gameIcon.setImageResource(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_ICON)), "drawable", context.getPackageName()));
-        gameTitle.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_NAME)), "string", context.getPackageName()));
-        gameType.setText(context.getResources().getIdentifier(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)), "string", context.getPackageName()));
-
-        String creator = context.getResources().getString(R.string.created_by) + " " + cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_CREATOR_NAME));
-        gameCreator.setText(creator);
-
-        gameDate.setText(DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-        gameTime.setText(DateUtils.getTime(cursor.getString(cursor.getColumnIndexOrThrow(GameTable.COLUMN_TIME))));
-        int max = cursor.getInt(cursor.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS));
-        String maxS = " / " + max;
-        gameMax.setText(maxS);
-        int insc = cursor.getInt(cursor.getColumnIndexOrThrow(GameTable.COLUMN_INSCRIPTIONS));
-        gameInsc.setText(String.valueOf(insc));
 
     }
 
@@ -159,8 +100,6 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
         title.setText(memberTitle);
 
-        //String sinceString = DateUtils.onBungieDate(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_SINCE)));
-        //memberSince.setText(sinceString);
     }
 
     @Override

@@ -21,7 +21,6 @@ import android.widget.Toast;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.ValidationAdapter;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
@@ -158,7 +157,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     private void prepareViews() {
         Log.w(TAG, "Game Status: " + game.getStatus());
         switch (game.getStatus()){
-            case GameTable.STATUS_WAITING:
+            case GameModel.STATUS_WAITING:
                 Log.w(TAG, "getBungieId: " + callback.getBungieId());
                 if (game.getCreatorId().equals(callback.getBungieId())){
                     validateButton.setVisibility(View.VISIBLE);
@@ -173,7 +172,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
                 }
                 callback.setToolbarTitle(getString(R.string.validate_event_title));
                 break;
-            case GameTable.STATUS_VALIDATED:
+            case GameModel.STATUS_VALIDATED:
                 validateButton.setEnabled(true);
                 validateButton.setText(R.string.evaluate);
                 validateButton.setVisibility(View.VISIBLE);
@@ -456,7 +455,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
             if (footerView != null){
                 this.getListView().addFooterView(footerView);
             }
-            if (isUpdateNeeded) { callback.updateGameEntries(GameTable.STATUS_DONE, game.getGameId(), memberList.size()); }
+            if (isUpdateNeeded) { callback.updateGameEntries(GameModel.STATUS_DONE, game.getGameId(), memberList.size()); }
             setAdapter(memberList);
         }
     }

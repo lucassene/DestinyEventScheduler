@@ -655,11 +655,6 @@ public class BungieService extends IntentService {
             getIconList(false);
             iconsList.removeAll(savedIcons);
             downloadImages();
-
-/*            //Log.w(TAG, "Iniciando TitleService...");
-            Intent titleIntent = new Intent(getApplicationContext(),TitleService.class);
-            titleIntent.putStringArrayListExtra("membershipList",memberList);
-            startService(titleIntent);*/
             return NO_ERROR;
         }
 

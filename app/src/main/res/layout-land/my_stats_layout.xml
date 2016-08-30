@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/global_padding"
+    android:paddingRight="@dimen/global_padding"
+    android:paddingEnd="@dimen/global_padding"
+    android:orientation="vertical"
+    android:scrollbarStyle="outsideOverlay">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight">
+
+            <ImageView
+                android:id="@+id/profile_pic"
+                android:layout_width="59dp"
+                android:layout_height="match_parent"
+                android:scaleType="fitStart"
+                android:layout_marginLeft="5dp" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="false"
+                style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_alignLeft="@id/profile_pic"/>
+
+            <LinearLayout
+                android:id="@+id/profile_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_toRightOf="@id/profile_pic"
+                android:layout_alignTop="@id/profile_pic"
+                android:paddingLeft="8dp">
+
+                <TextView
+                    android:id="@+id/primary_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/colorAccent"/>
+
+                <TextView
+                    android:id="@+id/title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/member_level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@id/profile_pic"
+                android:textSize="46sp"
+                android:textColor="@android:color/white"
+                android:alpha="0.8" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/evaluations"
+                    android:textColor="@color/tabIndicatorColor"
+                    android:layout_marginTop="@dimen/global_padding"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/tabIndicatorColor"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3">
+
+                        <TextView
+                            android:id="@+id/empty_eval_chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/listItemHeight"
+                            android:gravity="center"
+                            android:text="@string/no_evaluations_received"
+                            android:visibility="gone"
+                            android:alpha=".75"/>
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/evaluation_chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:focusable="false"/>
+
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:id="@+id/likes_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:orientation="vertical"
+                        android:paddingTop="16dp">
+
+                        <LinearLayout
+                            android:id="@+id/like_chart_header"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingTop="16dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:text=""
+                                android:gravity="center_horizontal"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/value"
+                                android:gravity="center_horizontal"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="%"
+                                android:gravity="center_horizontal"/>
+
+                        </LinearLayout>
+
+                        <ListView
+                            android:id="@+id/evaluation_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:footerDividersEnabled="false"
+                            android:overScrollFooter="@android:color/transparent"
+                            android:focusable="false"
+                            android:clickable="false"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/events"
+                    android:textColor="@color/tabIndicatorColor"
+                    android:layout_marginTop="@dimen/global_padding"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/tabIndicatorColor"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3">
+
+                        <TextView
+                            android:id="@+id/empty_events_chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/listItemHeight"
+                            android:gravity="center"
+                            android:text="@string/no_events_played"
+                            android:visibility="gone"
+                            android:alpha=".75"/>
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/events_chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:focusable="false"/>
+
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:id="@+id/games_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:orientation="vertical"
+                        android:paddingTop="16dp">
+
+                        <LinearLayout
+                            android:id="@+id/event_chart_header"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingTop="16dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:text=""
+                                android:gravity="center_horizontal"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/value"
+                                android:gravity="center_horizontal"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="%"
+                                android:gravity="center_horizontal"/>
+
+                        </LinearLayout>
+
+                        <ListView
+                            android:id="@+id/events_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:footerDividersEnabled="false"
+                            android:overScrollFooter="@android:color/transparent"
+                            android:focusable="false"
+                            android:clickable="false" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/game_type_label"
+                android:textColor="@color/tabIndicatorColor"
+                android:layout_marginTop="@dimen/global_padding"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/tabIndicatorColor"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3">
+
+                    <TextView
+                        android:id="@+id/empty_game_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/listItemHeight"
+                        android:gravity="center"
+                        android:text="@string/no_events_played"
+                        android:visibility="gone"
+                        android:alpha=".75"/>
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/game_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"/>
+
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/type_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:orientation="vertical"
+                    android:paddingTop="16dp">
+
+                    <LinearLayout
+                        android:id="@+id/game_chart_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="16dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:text=""
+                            android:gravity="center_horizontal"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/value"
+                            android:gravity="center_horizontal"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="%"
+                            android:gravity="center_horizontal"/>
+
+                    </LinearLayout>
+
+                    <ListView
+                        android:id="@+id/games_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:footerDividersEnabled="false"
+                        android:overScrollFooter="@android:color/transparent"
+                        android:focusable="false"
+                        android:clickable="false"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/favorite_game"
+            android:textColor="@color/tabIndicatorColor"
+            android:layout_marginTop="@dimen/global_padding"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/tabIndicatorColor"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight">
+
+            <TextView
+                android:id="@+id/empty_fav"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/no_events_played"
+                android:gravity="center"
+                android:visibility="gone"
+                android:alpha=".75"/>
+
+            <RelativeLayout
+                android:id="@+id/fav_layout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/listItemHeight">
+
+                <ImageView
+                    android:id="@+id/game_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitStart"
+                    android:gravity="center"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="6dp"/>
+
+                <LinearLayout
+                    android:id="@+id/fav_text_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingLeft="8dp"
+                    android:layout_toRightOf="@id/game_icon"
+                    android:layout_alignTop="@id/game_icon">
+
+                    <TextView
+                        android:id="@+id/game_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/colorAccent"/>
+
+                    <TextView
+                        android:id="@+id/game_type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignBottom="@id/fav_text_layout">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/played"
+                        android:alpha="0.5"/>
+
+                    <TextView
+                        android:id="@+id/fav_game_played"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                         android:alpha=".5"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </FrameLayout>
+
+
+    </LinearLayout>
+
+</ScrollView>

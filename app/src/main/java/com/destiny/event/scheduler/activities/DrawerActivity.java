@@ -44,7 +44,6 @@ import com.destiny.event.scheduler.adapters.DrawerAdapter;
 import com.destiny.event.scheduler.adapters.ViewPagerAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.DBHelper;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.NotificationTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
@@ -148,7 +147,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private String clanOrderBy;
 
-    private int isNewScheduledOrValidated = GameTable.STATUS_NEW;
+    private int isNewScheduledOrValidated = GameModel.STATUS_NEW;
     private boolean hasScheduledGames = true;
     private boolean hasValidatedGames = true;
 
@@ -288,8 +287,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         } else
                             Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
                     } else Log.w(TAG, "bungieIdList is empty!");
-                } else if ( getOpenedFragment() instanceof MyNewProfileFragment){
-                    if (memberProfile != null){
+                } else if (getOpenedFragment() instanceof MyNewProfileFragment) {
+                    if (memberProfile != null) {
                         Log.w(TAG, "opened Fragment: " + getOpenedFragment().toString());
                         Bundle bundle = new Bundle();
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_PROFILE);
@@ -351,21 +350,21 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void onBackPressed() {
         if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else if (!isServerServiceRunning() || !isBungieServiceRunning()){
+        } else if (!isServerServiceRunning() || !isBungieServiceRunning()) {
             if (fragmentTag == null) {
                 finish();
             } else if (openedFragmentType == FRAGMENT_TYPE_WITHOUT_BACKSTACK) {
                 openMainActivity(null);
                 switch (isNewScheduledOrValidated) {
-                    case GameTable.STATUS_NEW:
+                    case GameModel.STATUS_NEW:
                         viewPager.setCurrentItem(0);
                         break;
-                    case GameTable.STATUS_SCHEDULED:
+                    case GameModel.STATUS_SCHEDULED:
                         if (hasScheduledGames) {
                             viewPager.setCurrentItem(1);
                         } else viewPager.setCurrentItem(0);
                         break;
-                    case GameTable.STATUS_VALIDATED:
+                    case GameModel.STATUS_VALIDATED:
                         if (hasValidatedGames) {
                             viewPager.setCurrentItem(2);
                         } else viewPager.setCurrentItem(0);
@@ -385,7 +384,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
     }
 
-    private Fragment getOpenedFragment(){
+    private Fragment getOpenedFragment() {
         return fm.findFragmentById(R.id.content_frame);
     }
 
@@ -420,22 +419,23 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @SuppressWarnings("unchecked")
-    private void readyAllLists(Bundle savedInstanceState){
+    private void readyAllLists(Bundle savedInstanceState) {
         allGameList = new ArrayList<>();
         allGameList.addAll((ArrayList<GameModel>) savedInstanceState.getSerializable("allGameList"));
         if (allGameList != null) {
-            newGameList = getGamesFromList(GameTable.STATUS_NEW);
+            newGameList = getGamesFromList(GameModel.STATUS_NEW);
             if (newEventsListener != null) newEventsListener.onGamesLoaded(newGameList);
 
-            scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
-            if (scheduledEventsListener != null) scheduledEventsListener.onGamesLoaded(scheduledGameList);
+            scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
+            if (scheduledEventsListener != null)
+                scheduledEventsListener.onGamesLoaded(scheduledGameList);
 
-            doneGameList = getGamesFromList(GameTable.STATUS_DONE);
+            doneGameList = getGamesFromList(GameModel.STATUS_DONE);
             if (doneEventsListener != null) doneEventsListener.onGamesLoaded(doneGameList);
 
-            searchGameList = getGamesFromList(GameTable.STATUS_AVAILABLE);
-            validatedGameList = getGamesFromList(GameTable.STATUS_VALIDATED);
-            joinedGameList = getGamesFromList(GameTable.STATUS_JOINED);
+            searchGameList = getGamesFromList(GameModel.STATUS_AVAILABLE);
+            validatedGameList = getGamesFromList(GameModel.STATUS_VALIDATED);
+            joinedGameList = getGamesFromList(GameModel.STATUS_JOINED);
         }
         entryList = (ArrayList<MemberModel>) savedInstanceState.getSerializable("entryList");
         historyEntries = (ArrayList<MemberModel>) savedInstanceState.getSerializable("historyEntries");
@@ -478,7 +478,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         ft.commit();
         fragmentTag = tag;
         //Toast.makeText(this, "openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
-        if (tag.equals("profile")){ memberProfile = null; }
+        if (tag.equals("profile")) {
+            memberProfile = null;
+        }
         openedFragment = fragment;
         rAdapter.notifyDataSetChanged();
         invalidateOptionsMenu();
@@ -551,29 +553,29 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         bundle.putString("origin", tag);
         bundle.putSerializable("game", game);
 
-        switch (game.getStatus()){
-            case GameTable.STATUS_NEW:
+        switch (game.getStatus()) {
+            case GameModel.STATUS_NEW:
                 fragment = new DetailEventFragment();
-                if (game.isJoined()){
-                    isNewScheduledOrValidated = GameTable.STATUS_SCHEDULED;
-                } else isNewScheduledOrValidated = GameTable.STATUS_NEW;
+                if (game.isJoined()) {
+                    isNewScheduledOrValidated = GameModel.STATUS_SCHEDULED;
+                } else isNewScheduledOrValidated = GameModel.STATUS_NEW;
                 break;
-            case GameTable.STATUS_WAITING:
-                isNewScheduledOrValidated = GameTable.STATUS_VALIDATED;
+            case GameModel.STATUS_WAITING:
+                isNewScheduledOrValidated = GameModel.STATUS_VALIDATED;
                 fragment = new DetailValidationFragment();
                 break;
-            case GameTable.STATUS_VALIDATED:
-                if (!game.isEvaluated()){
-                    isNewScheduledOrValidated = GameTable.STATUS_VALIDATED;
+            case GameModel.STATUS_VALIDATED:
+                if (!game.isEvaluated()) {
+                    isNewScheduledOrValidated = GameModel.STATUS_VALIDATED;
                     fragment = new DetailValidationFragment();
                 } else {
-                    isNewScheduledOrValidated = GameTable.STATUS_VALIDATED;
+                    isNewScheduledOrValidated = GameModel.STATUS_VALIDATED;
                     fragment = new DetailHistoryFragment();
                 }
                 break;
             default:
                 fragment = new DetailEventFragment();
-                isNewScheduledOrValidated = GameTable.STATUS_NEW;
+                isNewScheduledOrValidated = GameModel.STATUS_NEW;
                 break;
         }
 
@@ -610,7 +612,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
             intent.putExtra(AlarmReceiver.NOTIFY_ID, firstId);
             PendingIntent pIntent = PendingIntent.getBroadcast(this, firstId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 alarm.setExact(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
             } else alarm.set(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
             Log.w(TAG, "requestId: " + firstId + " registered!");
@@ -621,9 +623,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             sIntent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
             sIntent.putExtra(AlarmReceiver.NOTIFY_ID, secondId);
             PendingIntent psIntent = PendingIntent.getBroadcast(this, secondId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 alarm.setExact(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
-            } else alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
+            } else
+                alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
             Log.w(TAG, "requestId: " + secondId + " registered!");
         }
 
@@ -704,7 +707,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         openMainActivity(null);
         allGameList.add(game);
         scheduledGameList.add(game);
-        if (scheduledEventsListener != null){
+        if (scheduledEventsListener != null) {
             scheduledEventsListener.onGamesLoaded(scheduledGameList);
         }
         viewPager.setCurrentItem(1);
@@ -720,7 +723,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Calendar notifyTime = getNotifyTime(gameTime);
         Log.w(TAG, "gameTime: " + game.getTime() + " and notifyTime: " + DateUtils.calendarToString(notifyTime));
 
-        if (notifyTime.getTimeInMillis() == gameTime.getTimeInMillis()){
+        if (notifyTime.getTimeInMillis() == gameTime.getTimeInMillis()) {
             ContentValues values = new ContentValues();
             values.put(NotificationTable.COLUMN_GAME, game.getGameId());
             values.put(NotificationTable.COLUMN_EVENT, game.getEventName());
@@ -769,8 +772,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Calendar notifyTime = Calendar.getInstance();
         notifyTime.setTime(gameTime.getTime());
         SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0)*-1;
-        notifyTime.add(Calendar.MINUTE,alarmTime);
+        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0) * -1;
+        notifyTime.add(Calendar.MINUTE, alarmTime);
         return notifyTime;
     }
 
@@ -801,9 +804,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             if (bundle.containsKey(ServerService.EVALUATIONS_TAG))
                 intent.putParcelableArrayListExtra(ServerService.EVALUATIONS_TAG, bundle.getParcelableArrayList(ServerService.EVALUATIONS_TAG));
             if (bundle.containsKey(ServerService.PROFILE_TAG))
-                intent.putExtra(ServerService.PROFILE_TAG,bundle.getString(ServerService.PROFILE_TAG));
+                intent.putExtra(ServerService.PROFILE_TAG, bundle.getString(ServerService.PROFILE_TAG));
 
-            if(bundle.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_CREATE_GAME){
+            if (bundle.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_CREATE_GAME) {
                 toCreateGame = (GameModel) bundle.getSerializable(ServerService.GAME_TAG);
             }
 
@@ -822,7 +825,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void getGameEntries(int gameId) {
-        if (entryList == null){
+        if (entryList == null) {
             Log.w(TAG, "entryList is null");
             if (NetworkUtils.checkConnection(this)) {
                 if (!isServerServiceRunning()) {
@@ -835,7 +838,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 Toast.makeText(this, getString(R.string.check_connection), Toast.LENGTH_SHORT).show();
             }
         } else {
-            if (userDataListener != null){
+            if (userDataListener != null) {
                 userDataListener.onEntriesLoaded(entryList, false);
             } else Log.w(TAG, "userDataListener is null");
         }
@@ -843,10 +846,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void getGameHistory(int gameId) {
-        if (historyEntries == null){
+        if (historyEntries == null) {
             Log.w(TAG, "historyEntries is null");
-            if (NetworkUtils.checkConnection(this)){
-                if (!isServerServiceRunning()){
+            if (NetworkUtils.checkConnection(this)) {
+                if (!isServerServiceRunning()) {
                     Bundle bundle = new Bundle();
                     bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_HISTORY);
                     bundle.putInt(ServerService.GAMEID_TAG, gameId);
@@ -856,7 +859,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 Toast.makeText(this, getString(R.string.check_connection), Toast.LENGTH_SHORT).show();
             }
         } else {
-            if (userDataListener != null){
+            if (userDataListener != null) {
                 userDataListener.onEntriesLoaded(historyEntries, false);
             }
         }
@@ -865,24 +868,24 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void updateGameStatus(GameModel game, int status) {
         switch (status) {
-            case GameTable.STATUS_NEW:
+            case GameModel.STATUS_NEW:
                 for (int i = 0; i < allGameList.size(); i++) {
                     if (game.getGameId() == allGameList.get(i).getGameId()) {
                         allGameList.remove(i);
                         break;
                     }
                 }
-                newGameList = getGamesFromList(GameTable.STATUS_NEW);
+                newGameList = getGamesFromList(GameModel.STATUS_NEW);
                 break;
-            case GameTable.STATUS_SCHEDULED:
+            case GameModel.STATUS_SCHEDULED:
                 for (int i = 0; i < allGameList.size(); i++) {
                     if (allGameList.get(i).getGameId() == game.getGameId()) {
-                        allGameList.get(i).setStatus(GameTable.STATUS_WAITING);
+                        allGameList.get(i).setStatus(GameModel.STATUS_WAITING);
                         break;
                     }
                 }
-                scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
-                getContentResolver().delete(DataProvider.NOTIFICATION_URI, NotificationTable.COLUMN_GAME + "=" + game.getGameId(),null);
+                scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
+                getContentResolver().delete(DataProvider.NOTIFICATION_URI, NotificationTable.COLUMN_GAME + "=" + game.getGameId(), null);
                 closeFragment();
                 break;
         }
@@ -890,21 +893,21 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void updateGameEntries(int status, int gameId, int entries) {
-        for (int i=0;i<allGameList.size();i++){
-            if (allGameList.get(i).getGameId() == gameId){
+        for (int i = 0; i < allGameList.size(); i++) {
+            if (allGameList.get(i).getGameId() == gameId) {
                 allGameList.get(i).setInscriptions(entries);
                 break;
             }
         }
-        switch (status){
-            case GameTable.STATUS_DONE:
-                doneGameList = getGamesFromList(GameTable.STATUS_DONE);
+        switch (status) {
+            case GameModel.STATUS_DONE:
+                doneGameList = getGamesFromList(GameModel.STATUS_DONE);
                 break;
-            case GameTable.STATUS_SCHEDULED:
-                scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
+            case GameModel.STATUS_SCHEDULED:
+                scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
                 break;
-            case GameTable.STATUS_NEW:
-                newGameList = getGamesFromList(GameTable.STATUS_NEW);
+            case GameModel.STATUS_NEW:
+                newGameList = getGamesFromList(GameModel.STATUS_NEW);
                 break;
         }
     }
@@ -1266,16 +1269,18 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void onPositiveClick(String input, int type) {
-        if (type == MyAlertDialog.LOGOFF_DIALOG){
+        if (type == MyAlertDialog.LOGOFF_DIALOG) {
             onLogoff();
         }
     }
 
     @Override
-    public void onDateSent(Calendar date) {    }
+    public void onDateSent(Calendar date) {
+    }
 
     @Override
-    public void onTimeSent(int hour, int minute) {    }
+    public void onTimeSent(int hour, int minute) {
+    }
 
     @Override
     public void onLogoff() {
@@ -1298,10 +1303,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void onItemSelected(String type, String entry, int value) {    }
+    public void onItemSelected(String type, String entry, int value) {
+    }
 
     @Override
-    public void onMultiItemSelected(boolean[] items) {    }
+    public void onMultiItemSelected(boolean[] items) {
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -1348,7 +1355,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 }
                 break;
             case ServerService.STATUS_FINISHED:
-                if (resultData.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_CREATE_GAME){
+                if (resultData.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_CREATE_GAME) {
                     toCreateGame.setGameId(resultData.getInt(ServerService.INT_TAG));
                     onEventCreated(toCreateGame);
                 }
@@ -1408,11 +1415,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                                 }
                                 break;
                         }
-                        newGameList = getGamesFromList(GameTable.STATUS_NEW);
-                        scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
+                        newGameList = getGamesFromList(GameModel.STATUS_NEW);
+                        scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
                         closeFragment();
-                        if (newEventsListener != null) { newEventsListener.onGamesLoaded(newGameList); }
-                        if (scheduledEventsListener != null) { scheduledEventsListener.onGamesLoaded(scheduledGameList); }
+                        if (newEventsListener != null) {
+                            newEventsListener.onGamesLoaded(newGameList);
+                        }
+                        if (scheduledEventsListener != null) {
+                            scheduledEventsListener.onGamesLoaded(scheduledGameList);
+                        }
                     } else {
                         entryList = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
                         userDataListener.onEntriesLoaded(entryList, true);
@@ -1423,9 +1434,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     if (resultData.containsKey(ServerService.REQUEST_TAG) && resultData.containsKey(ServerService.INT_TAG)) {
                         for (int i = 0; i < allGameList.size(); i++) {
                             if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
-                                switch (resultData.getInt(ServerService.REQUEST_TAG)){
+                                switch (resultData.getInt(ServerService.REQUEST_TAG)) {
                                     case ServerService.TYPE_VALIDATE_GAME:
-                                        allGameList.get(i).setStatus(GameTable.STATUS_VALIDATED);
+                                        allGameList.get(i).setStatus(GameModel.STATUS_VALIDATED);
                                         allGameList.get(i).setEvaluated(true);
                                         break;
                                     case ServerService.TYPE_DELETE_GAME:
@@ -1437,16 +1448,18 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                                 }
                             }
                         }
-                        doneGameList = getGamesFromList(GameTable.STATUS_DONE);
+                        doneGameList = getGamesFromList(GameModel.STATUS_DONE);
                         closeFragment();
-                        if (doneEventsListener != null) { doneEventsListener.onGamesLoaded(doneGameList); }
+                        if (doneEventsListener != null) {
+                            doneEventsListener.onGamesLoaded(doneGameList);
+                        }
                     } else {
                         entryList = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
                         userDataListener.onEntriesLoaded(entryList, true);
                         if (!isLocalServiceRunning() && entryList != null) updateMembers(entryList);
                     }
                 }
-                if (getOpenedFragment() instanceof DetailHistoryFragment){
+                if (getOpenedFragment() instanceof DetailHistoryFragment) {
                     historyEntries = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
                     userDataListener.onEntriesLoaded(historyEntries, true);
                 }
@@ -1456,37 +1469,37 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     allGameList.addAll((ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG));
 
                     if (allGameList != null) {
-                        newGameList = getGamesFromList(GameTable.STATUS_NEW);
+                        newGameList = getGamesFromList(GameModel.STATUS_NEW);
                         if (newGameList != null && newEventsListener != null) {
                             updateNewGamesListPref();
                             newEventsListener.onGamesLoaded(newGameList);
                         } else Log.w(TAG, "newGameList is null");
 
-                        scheduledGameList = getGamesFromList(GameTable.STATUS_SCHEDULED);
+                        scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
                         if (scheduledGameList != null && scheduledEventsListener != null) {
                             scheduledEventsListener.onGamesLoaded(scheduledGameList);
                             if (!isNotifyServiceRunning()) updateNotifications(scheduledGameList);
                         } else Log.w(TAG, "scheduledGameList is null");
 
-                        doneGameList = getGamesFromList(GameTable.STATUS_DONE);
+                        doneGameList = getGamesFromList(GameModel.STATUS_DONE);
                         if (doneGameList != null && doneEventsListener != null) {
                             doneEventsListener.onGamesLoaded(doneGameList);
                         } else Log.w(TAG, "doneGameList is null");
 
-                        searchGameList = getGamesFromList(GameTable.STATUS_NEW);
-                        joinedGameList = getGamesFromList(GameTable.STATUS_JOINED);
-                        validatedGameList = getGamesFromList(GameTable.STATUS_VALIDATED);
+                        searchGameList = getGamesFromList(GameModel.STATUS_NEW);
+                        joinedGameList = getGamesFromList(GameModel.STATUS_JOINED);
+                        validatedGameList = getGamesFromList(GameModel.STATUS_VALIDATED);
                     }
                 }
-                if (resultData.containsKey(ServerService.PROFILE_TAG)){
+                if (resultData.containsKey(ServerService.PROFILE_TAG)) {
                     MemberModel member = (MemberModel) resultData.getSerializable(ServerService.PROFILE_TAG);
-                    if (member != null){
+                    if (member != null) {
                         Log.w(TAG, "member " + member.getName() + " sent by ServerService");
                         memberProfile = member;
                         ArrayList<MemberModel> mList = new ArrayList<>();
                         mList.add(member);
                         updateMembers(mList);
-                        if (getOpenedFragment() instanceof MyNewProfileFragment){
+                        if (getOpenedFragment() instanceof MyNewProfileFragment) {
                             MyNewProfileFragment frag = (MyNewProfileFragment) getOpenedFragment();
                             frag.onMemberLoaded(member, true);
                         }
@@ -1502,25 +1515,27 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         ArrayList<Integer> selectedIds = new ArrayList<>();
         SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         String gameIds = "";
-        ArrayList<GameModel> gameList = getGamesFromList(GameTable.STATUS_NEW);
+        ArrayList<GameModel> gameList = getGamesFromList(GameModel.STATUS_NEW);
 
-        if (gameList != null && gameList.size() >0){
+        if (gameList != null && gameList.size() > 0) {
             int typeIds[] = getResources().getIntArray(R.array.event_type_ids);
             for (int typeId : typeIds) {
                 boolean b = sharedPrefs.getBoolean(String.valueOf(typeId), false);
-                if (b) { selectedIds.add(typeId); }
+                if (b) {
+                    selectedIds.add(typeId);
+                }
             }
 
-            for (int i=0;i<gameList.size();i++){
-                for (int x=0;x<selectedIds.size();x++){
+            for (int i = 0; i < gameList.size(); i++) {
+                for (int x = 0; x < selectedIds.size(); x++) {
                     Log.w(TAG, "Comparing game.typeId: " + gameList.get(i).getTypeId() + " with selectedTypeId: " + selectedIds.get(x));
-                    if (gameList.get(i).getTypeId() == selectedIds.get(x)){
+                    if (gameList.get(i).getTypeId() == selectedIds.get(x)) {
                         gameIds = gameIds + String.valueOf(gameList.get(i).getGameId()) + ",";
                     }
                 }
             }
 
-            if (!gameIds.equals("")){
+            if (!gameIds.equals("")) {
                 Log.w(TAG, "Saving string: " + gameIds);
                 SharedPreferences.Editor editor = sharedPrefs.edit();
                 editor.putString(DrawerActivity.NEW_GAMES_PREF, gameIds);
@@ -1532,7 +1547,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private void updateNotifications(ArrayList<GameModel> scheduledGameList) {
         SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        if (sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false)){
+        if (sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false)) {
             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, CreateNotificationService.class);
             intent.putExtra(CreateNotificationService.GAME_HEADER, scheduledGameList);
             startService(intent);
@@ -1551,15 +1566,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void registerNewGamesAlarm() {
         SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        if (sharedPrefs.getBoolean(NEW_NOTIFY_PREF,false)){
+        if (sharedPrefs.getBoolean(NEW_NOTIFY_PREF, false)) {
             int interval = sharedPrefs.getInt(NEW_NOTIFY_TIME_PREF, DEFAULT_INTERVAL);
             Intent intent = new Intent(this, AlarmReceiver.class);
             intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
-            intent.putExtra("memberId",bungieId);
-            intent.putExtra("platformId",platformId);
+            intent.putExtra("memberId", bungieId);
+            intent.putExtra("platformId", platformId);
             PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(),interval, pIntent);
+            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pIntent);
             Log.w(TAG, "New game alarm registered in an interval of " + interval + " millis");
         }
     }
@@ -1568,8 +1583,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void deleteNewGamesAlarm() {
         Intent intent = new Intent(this, AlarmReceiver.class);
         intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
-        intent.putExtra("memberId",bungieId);
-        intent.putExtra("platformId",platformId);
+        intent.putExtra("memberId", bungieId);
+        intent.putExtra("platformId", platformId);
         PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarm.cancel(pIntent);
@@ -1584,10 +1599,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private ArrayList<GameModel> getJoinedGames(ArrayList<GameModel> gameList) {
         ArrayList<GameModel> result = new ArrayList<>();
-        for (int i=0;i<gameList.size();i++){
-            if (gameList.get(i).isJoined() && !gameList.get(i).isEvaluated()){
-                if (gameList.get(i).getStatus() == 2){
-                    if (!gameList.get(i).getCreatorId().equals(bungieId)){
+        for (int i = 0; i < gameList.size(); i++) {
+            if (gameList.get(i).isJoined() && !gameList.get(i).isEvaluated()) {
+                if (gameList.get(i).getStatus() == 2) {
+                    if (!gameList.get(i).getCreatorId().equals(bungieId)) {
                         result.add(gameList.get(i));
                     }
                 } else {
@@ -1603,23 +1618,23 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         ArrayList<GameModel> result = new ArrayList<>();
         if (allGameList != null) {
             switch (type) {
-                case GameTable.STATUS_NEW:
-                case GameTable.STATUS_AVAILABLE:
+                case GameModel.STATUS_NEW:
+                case GameModel.STATUS_AVAILABLE:
                     for (int i = 0; i < allGameList.size(); i++) {
-                        if (allGameList.get(i).getStatus() == GameTable.STATUS_NEW && !allGameList.get(i).isJoined()) {
+                        if (allGameList.get(i).getStatus() == GameModel.STATUS_NEW && !allGameList.get(i).isJoined()) {
                             result.add(allGameList.get(i));
                         }
                     }
                     Collections.sort(result, new GameComparator());
                     return result;
-                case GameTable.STATUS_SCHEDULED:
+                case GameModel.STATUS_SCHEDULED:
                     for (int i = 0; i < allGameList.size(); i++) {
-                        if (allGameList.get(i).getStatus() == GameTable.STATUS_NEW && allGameList.get(i).isJoined()) {
+                        if (allGameList.get(i).getStatus() == GameModel.STATUS_NEW && allGameList.get(i).isJoined()) {
                             result.add(allGameList.get(i));
                         }
                     }
                     return result;
-                case GameTable.STATUS_DONE:
+                case GameModel.STATUS_DONE:
                     for (int i = 0; i < allGameList.size(); i++) {
                         if (allGameList.get(i).getStatus() > 0 && allGameList.get(i).isJoined() && !allGameList.get(i).isEvaluated()) {
                             result.add(allGameList.get(i));
@@ -1627,7 +1642,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     }
                     Collections.sort(result, new GameComparator());
                     return result;
-                case GameTable.STATUS_VALIDATED:
+                case GameModel.STATUS_VALIDATED:
                     for (int i = 0; i < allGameList.size(); i++) {
                         if (allGameList.get(i).getStatus() == 2 && allGameList.get(i).isJoined() && allGameList.get(i).isEvaluated()) {
                             result.add(allGameList.get(i));
@@ -1635,11 +1650,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     }
                     Collections.sort(result, new GameComparator());
                     return result;
-                case GameTable.STATUS_JOINED:
-                    for (int i=0;i<allGameList.size();i++){
-                        if (allGameList.get(i).isJoined() && !allGameList.get(i).isEvaluated()){
-                            if (allGameList.get(i).getStatus() == 2){
-                                if (!allGameList.get(i).getCreatorId().equals(bungieId)){
+                case GameModel.STATUS_JOINED:
+                    for (int i = 0; i < allGameList.size(); i++) {
+                        if (allGameList.get(i).isJoined() && !allGameList.get(i).isEvaluated()) {
+                            if (allGameList.get(i).getStatus() == 2) {
+                                if (!allGameList.get(i).getCreatorId().equals(bungieId)) {
                                     result.add(allGameList.get(i));
                                 }
                             } else {

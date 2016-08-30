@@ -117,43 +117,52 @@
                 </FrameLayout>
 
                 <LinearLayout
-                    android:id="@+id/like_chart_header"
+                    android:id="@+id/likes_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="16dp">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:id="@+id/like_chart_header"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:text=""
-                        android:gravity="center_horizontal"/>
+                        android:orientation="horizontal"
+                        android:paddingTop="16dp">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/value"
-                        android:gravity="center_horizontal"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:text=""
+                            android:gravity="center_horizontal"/>
 
-                    <TextView
-                        android:layout_width="0dp"
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/value"
+                            android:gravity="center_horizontal"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="%"
+                            android:gravity="center_horizontal"/>
+
+                    </LinearLayout>
+
+                    <ListView
+                        android:id="@+id/evaluation_list"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="%"
-                        android:gravity="center_horizontal"/>
+                        android:footerDividersEnabled="false"
+                        android:overScrollFooter="@android:color/transparent"
+                        android:focusable="false"
+                        android:clickable="false"/>
+
 
                 </LinearLayout>
-
-                <ListView
-                    android:id="@+id/evaluation_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:footerDividersEnabled="false"
-                    android:overScrollFooter="@android:color/transparent"
-                    android:focusable="false"
-                    android:clickable="false"/>
 
             </LinearLayout>
 
@@ -199,43 +208,51 @@
                 </FrameLayout>
 
                 <LinearLayout
-                    android:id="@+id/event_chart_header"
+                    android:id="@+id/games_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="16dp">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:id="@+id/event_chart_header"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:text=""
-                        android:gravity="center_horizontal"/>
+                        android:orientation="horizontal"
+                        android:paddingTop="16dp">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/value"
-                        android:gravity="center_horizontal"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:text=""
+                            android:gravity="center_horizontal"/>
 
-                    <TextView
-                        android:layout_width="0dp"
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/value"
+                            android:gravity="center_horizontal"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="%"
+                            android:gravity="center_horizontal"/>
+
+                    </LinearLayout>
+
+                    <ListView
+                        android:id="@+id/events_list"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="%"
-                        android:gravity="center_horizontal"/>
+                        android:footerDividersEnabled="false"
+                        android:overScrollFooter="@android:color/transparent"
+                        android:focusable="false"
+                        android:clickable="false" />
 
                 </LinearLayout>
-
-                <ListView
-                    android:id="@+id/events_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:footerDividersEnabled="false"
-                    android:overScrollFooter="@android:color/transparent"
-                    android:focusable="false"
-                    android:clickable="false" />
 
             </LinearLayout>
 
@@ -280,47 +297,54 @@
                     android:layout_height="wrap_content"
                     android:focusable="false"/>
 
-
             </FrameLayout>
 
             <LinearLayout
-                android:id="@+id/game_chart_header"
+                android:id="@+id/type_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="16dp">
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:id="@+id/game_chart_header"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:text=""
-                    android:gravity="center_horizontal"/>
+                    android:orientation="horizontal"
+                    android:paddingTop="16dp">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/value"
-                    android:gravity="center_horizontal"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text=""
+                        android:gravity="center_horizontal"/>
 
-                <TextView
-                    android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/value"
+                        android:gravity="center_horizontal"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="%"
+                        android:gravity="center_horizontal"/>
+
+                </LinearLayout>
+
+                <ListView
+                    android:id="@+id/games_list"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="%"
-                    android:gravity="center_horizontal"/>
+                    android:footerDividersEnabled="false"
+                    android:overScrollFooter="@android:color/transparent"
+                    android:focusable="false"
+                    android:clickable="false"/>
 
             </LinearLayout>
-
-            <ListView
-                android:id="@+id/games_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:footerDividersEnabled="false"
-                android:overScrollFooter="@android:color/transparent"
-                android:focusable="false"
-                android:clickable="false"/>
 
         </LinearLayout>
 

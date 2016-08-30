@@ -2,41 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/global_padding"
-    android:gravity="center">
+    android:background="@drawable/app_bg">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerVertical="true"
+        android:padding="@dimen/global_padding">
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/bg"
-            android:scaleType="centerCrop"
-            android:alpha=".7"/>
-
-    </FrameLayout>
-
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_app"
-        android:layout_margin="@dimen/image_margin"
-        android:layout_gravity="center"
-        android:layout_centerVertical="true"/>
-
-        <TextView
-            android:id="@+id/login_title"
-            android:layout_width="wrap_content"
+            android:id="@+id/logo"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/tx_login"
-            android:layout_marginLeft="@dimen/text_margin"
-            android:layout_toEndOf="@+id/logo"
-            android:layout_toRightOf="@+id/logo"
-            android:layout_alignTop="@+id/logo"
-            />
+            android:layout_weight="2"
+            android:src="@drawable/ic_app"
+            android:layout_gravity="center" />
+
+        <LinearLayout
+            android:id="@+id/buttons_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/global_padding"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/login_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tx_login"/>
 
             <Button
                 android:id="@+id/btn_psn"
@@ -63,5 +59,19 @@
                 android:drawableLeft="@drawable/ic_live"
                 android:background="@drawable/live_button_bg"
                 android:onClick="callWebView"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="21dp"
+        android:layout_marginRight="@dimen/global_padding"
+        android:visibility="gone"/>
 
 </RelativeLayout>

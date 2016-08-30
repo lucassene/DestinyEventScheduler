@@ -1,6 +1,7 @@
 package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
@@ -63,6 +64,10 @@ public class MyStatsFragment extends Fragment{
     LinearLayout eventHeaderLayout;
     LinearLayout gameHeaderLayout;
 
+    LinearLayout likesLayout;
+    LinearLayout gamesLayout;
+    LinearLayout typesLayout;
+
     private MemberModel member;
 
     PieChart eventsChart;
@@ -98,6 +103,9 @@ public class MyStatsFragment extends Fragment{
         favCount = (TextView) v.findViewById(R.id.fav_game_played);
         favEmpty = (TextView) v.findViewById(R.id.empty_fav);
         favLayout = (RelativeLayout) v.findViewById(R.id.fav_layout);
+        likesLayout = (LinearLayout) v.findViewById(R.id.likes_layout);
+        gamesLayout = (LinearLayout) v.findViewById(R.id.games_layout);
+        typesLayout = (LinearLayout) v.findViewById(R.id.type_layout);
 
         evaluationLegends = (ListView) v.findViewById(R.id.evaluation_list);
         evaluationLegends.setFocusable(false);
@@ -121,8 +129,12 @@ public class MyStatsFragment extends Fragment{
 
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        //int chartHeight = metrics.widthPixels - 164;
-        int chartHeight = metrics.widthPixels -264;
+        int chartHeight;
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            chartHeight = metrics.widthPixels - 264;
+        } else {
+            chartHeight = metrics.widthPixels - 694;
+        }
 
         eventsChart = (PieChart) v.findViewById(R.id.events_chart);
         eventsChart.setMinimumHeight(chartHeight);
@@ -187,11 +199,13 @@ public class MyStatsFragment extends Fragment{
                 emptyEval.setVisibility(View.GONE);
                 likesChart.setVisibility(View.VISIBLE);
                 likeHeaderLayout.setVisibility(View.VISIBLE);
+                likesLayout.setVisibility(View.VISIBLE);
                 setLikesChart(likes, dislikes);
             } else {
                 emptyEval.setVisibility(View.VISIBLE);
                 likesChart.setVisibility(View.GONE);
                 likeHeaderLayout.setVisibility(View.GONE);
+                likesLayout.setVisibility(View.GONE);
             }
 
             int created = member.getGamesCreated();
@@ -201,17 +215,20 @@ public class MyStatsFragment extends Fragment{
                 emptyEvents.setVisibility(View.GONE);
                 eventsChart.setVisibility(View.VISIBLE);
                 eventHeaderLayout.setVisibility(View.VISIBLE);
+                gamesLayout.setVisibility(View.VISIBLE);
                 setEventChart(created, played);
             } else {
                 emptyEvents.setVisibility(View.VISIBLE);
                 eventsChart.setVisibility(View.GONE);
                 eventHeaderLayout.setVisibility(View.GONE);
+                gamesLayout.setVisibility(View.GONE);
             }
 
             if (member.getTypesPlayed().size() > 0){
                 emptyGame.setVisibility(View.GONE);
                 gamesChart.setVisibility(View.VISIBLE);
                 gameHeaderLayout.setVisibility(View.VISIBLE);
+                typesLayout.setVisibility(View.VISIBLE);
                 ArrayList<String> labels = new ArrayList<>();
                 ArrayList<Integer> values = new ArrayList<>();
                 for(int i=0;i<member.getTypesPlayed().size();i++){
@@ -226,6 +243,7 @@ public class MyStatsFragment extends Fragment{
                 emptyGame.setVisibility(View.VISIBLE);
                 gamesChart.setVisibility(View.GONE);
                 gameHeaderLayout.setVisibility(View.GONE);
+                typesLayout.setVisibility(View.GONE);
             }
 
             Log.w(TAG, "favoriteEvent: " + member.getFavoriteEvent().getEventId());
@@ -394,7 +412,7 @@ public class MyStatsFragment extends Fragment{
         }
         if (played>0) {
             labels.add("");
-            titles.add(getResources().getString(R.string.played));
+            titles.add(getString(R.string.played_plural));
             total++;
         }
 

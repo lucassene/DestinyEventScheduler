@@ -23,11 +23,8 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.DBViewerCursorAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
-import com.destiny.event.scheduler.data.EntryTable;
-import com.destiny.event.scheduler.data.EvaluationTable;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.NotificationTable;
@@ -44,10 +41,7 @@ public class DBViewerFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int LOGGED_USER = 30;
     private static final int CLAN = 40;
     private static final int MEMBER = 50;
-    private static final int GAME = 60;
-    private static final int ENTRY = 70;
     private static final int NOTIFICATION = 80;
-    private static final int EVALUATION = 90;
     private static final int SAVED_IMAGES = 110;
 
     private DBViewerCursorAdapter adapter;
@@ -140,62 +134,41 @@ public class DBViewerFragment extends Fragment implements LoaderManager.LoaderCa
                 projection = ClanTable.ALL_COLUMNS;
                 break;
             case 1:
-                selectedTable = EntryTable.TABLE_NAME;
-                selectedLoader = ENTRY;
-                selectedUri = DataProvider.ALL_ENTRIES_URI;
-                to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4};
-                projection = EntryTable.ALL_COLUMNS;
-                break;
-            case 2:
                 selectedTable = EventTable.TABLE_NAME;
                 selectedLoader = EVENT;
                 selectedUri = DataProvider.EVENT_URI;
                 to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5, R.id.txt6};
                 projection = EventTable.ALL_COLUMNS;
                 break;
-            case 3:
+            case 2:
                 selectedTable = EventTypeTable.TABLE_NAME;
                 selectedLoader = EVENT_TYPE;
                 selectedUri = DataProvider.EVENT_TYPE_URI;
                 to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3};
                 projection = EventTypeTable.ALL_COLUMNS;
                 break;
-            case 4:
-                selectedTable = GameTable.TABLE_NAME;
-                selectedLoader = GAME;
-                selectedUri = DataProvider.ALL_GAME_URI;
-                to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5, R.id.txt6, R.id.txt7, R.id.txt8, R.id.txt9};
-                projection = GameTable.ALL_COLUMNS;
-                break;
-            case 5:
+            case 3:
                 selectedTable = LoggedUserTable.TABLE_NAME;
                 selectedLoader = LOGGED_USER;
                 selectedUri = DataProvider.LOGGED_USER_URI;
                 to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5};
                 projection = LoggedUserTable.ALL_COLUMNS;
                 break;
-            case 6:
+            case 4:
                 selectedTable = MemberTable.TABLE_NAME;
                 selectedLoader = MEMBER;
                 selectedUri = DataProvider.MEMBER_URI;
                 to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5, R.id.txt6, R.id.txt7, R.id.txt8, R.id.txt9, R.id.txt10};
                 projection = MemberTable.ALL_COLUMNS;
                 break;
-            case 7:
+            case 5:
                 selectedTable = NotificationTable.TABLE_NAME;
                 selectedLoader = NOTIFICATION;
                 selectedUri = DataProvider.NOTIFICATION_URI;
                 to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5, R.id.txt6, R.id.txt7};
                 projection = NotificationTable.ALL_COLUMNS;
                 break;
-            case 8:
-                selectedTable = EvaluationTable.TABLE_NAME;
-                selectedLoader = EVALUATION;
-                selectedUri = DataProvider.EVALUATION_URI;
-                to = new int[] {R.id.txt1, R.id.txt2, R.id.txt3, R.id.txt4, R.id.txt5};
-                projection = EvaluationTable.ALL_COLUMNS;
-                break;
-            case 9:
+            case 6:
                 selectedTable = SavedImagesTable.TABLE_NAME;
                 selectedLoader = SAVED_IMAGES;
                 selectedUri = DataProvider.SAVED_IMAGES_URI;

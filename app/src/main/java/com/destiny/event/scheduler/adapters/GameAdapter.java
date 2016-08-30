@@ -73,9 +73,8 @@ public class GameAdapter extends BaseAdapter implements Filterable {
         viewHolder.typeName.setText(context.getResources().getIdentifier(currentGame.getTypeName(),"string",context.getPackageName()));
         String creatorName = context.getString(R.string.created_by) + " " + currentGame.getCreatorName();
         viewHolder.creatorName.setText(creatorName);
-        String insc = currentGame.getInscriptions() + "/";
+        String insc = currentGame.getInscriptions() + "/" + currentGame.getMaxGuardians();
         viewHolder.inscriptions.setText(insc);
-        viewHolder.maxGuardians.setText(String.valueOf(currentGame.getMaxGuardians()));
         viewHolder.time.setText(DateUtils.getTime(currentGame.getTime()));
         viewHolder.date.setText(DateUtils.onBungieDate(currentGame.getTime()));
 
@@ -94,7 +93,6 @@ public class GameAdapter extends BaseAdapter implements Filterable {
         TextView typeName;
         TextView creatorName;
         TextView inscriptions;
-        TextView maxGuardians;
         TextView time;
         TextView date;
 
@@ -103,8 +101,7 @@ public class GameAdapter extends BaseAdapter implements Filterable {
             eventName = (TextView) item.findViewById(R.id.primary_text);
             typeName = (TextView) item.findViewById(R.id.type_text);
             creatorName = (TextView) item.findViewById(R.id.secondary_text);
-            inscriptions = (TextView) item.findViewById(R.id.game_actual);
-            maxGuardians = (TextView) item.findViewById(R.id.game_max);
+            inscriptions = (TextView) item.findViewById(R.id.game_max);
             time = (TextView) item.findViewById(R.id.game_time);
             date = (TextView) item.findViewById(R.id.game_date);
         }

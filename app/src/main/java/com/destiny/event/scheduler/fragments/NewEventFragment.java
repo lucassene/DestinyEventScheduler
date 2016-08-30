@@ -27,7 +27,6 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.EventTable;
 import com.destiny.event.scheduler.data.EventTypeTable;
-import com.destiny.event.scheduler.data.GameTable;
 import com.destiny.event.scheduler.dialogs.MyDatePickerDialog;
 import com.destiny.event.scheduler.dialogs.MyTimePickerDialog;
 import com.destiny.event.scheduler.dialogs.SimpleInputDialog;
@@ -530,7 +529,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             game.setCreatorId(bungieId);
             game.setTime(gameTime);
             game.setInscriptions(1);
-            game.setStatus(GameTable.STATUS_NEW);
+            game.setStatus(GameModel.STATUS_NEW);
             game.setJoined(true);
 
             if (now.getTimeInMillis() <= minimumTime.getTimeInMillis()) {

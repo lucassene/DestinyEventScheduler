@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class MedalsAdapter extends BaseAdapter{
 
-    private static final String TAG = "GameAdapter";
+    private static final String TAG = "MedalsAdapter";
 
     private Context context;
     private ArrayList<MedalModel> medalsList;

@@ -508,5 +508,7 @@
     <string name="inferno_sup">Inferno Supremacia</string>
     <string name="no_evaluations_received">Nenhuma avaliação recebida.</string>
     <string name="minute">" minuto"</string>
+    <string name="played_plural">Jogados</string>
+    <string name="enter_value">Por favor digite o valor desejado:</string>
 
 </resources>

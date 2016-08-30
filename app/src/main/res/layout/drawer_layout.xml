@@ -4,20 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/drawer_layout"
-    android:elevation="7dp">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/bg"
-            android:scaleType="centerCrop"
-            android:alpha=".7"/>
-
-    </FrameLayout>
+    android:elevation="7dp"
+    android:background="@drawable/app_bg">
 
     <LinearLayout
         android:layout_width="match_parent"

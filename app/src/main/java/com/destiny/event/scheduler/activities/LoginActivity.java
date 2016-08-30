@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,6 +49,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     Button liveButton;
     TextView loginTitle;
     ProgressBar progressBar;
+    LinearLayout buttonsLayout;
 
     private String bungieId;
     private String userName;
@@ -69,7 +71,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         liveButton = (Button) findViewById(R.id.btn_live);
         loginTitle = (TextView) findViewById(R.id.login_title);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        buttonsLayout = (LinearLayout) findViewById(R.id.buttons_layout);
 
+        buttonsLayout.setVisibility(View.GONE);
         loginTitle.setVisibility(View.GONE);
         psnButton.setVisibility(View.GONE);
         liveButton.setVisibility(View.GONE);
@@ -183,6 +187,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
             loginTitle.setVisibility(View.VISIBLE);
             psnButton.setVisibility(View.VISIBLE);
             liveButton.setVisibility(View.VISIBLE);
+            buttonsLayout.setVisibility(View.VISIBLE);
         }
 
     }
@@ -295,12 +300,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 loginTitle.setVisibility(View.VISIBLE);
                 psnButton.setVisibility(View.VISIBLE);
                 liveButton.setVisibility(View.VISIBLE);
+                buttonsLayout.setVisibility(View.VISIBLE);
                 break;
             case BungieService.ERROR_AUTH:
                 CookiesUtils.clearCookies();
                 loginTitle.setVisibility(View.VISIBLE);
                 psnButton.setVisibility(View.VISIBLE);
                 liveButton.setVisibility(View.VISIBLE);
+                buttonsLayout.setVisibility(View.VISIBLE);
                 break;
         }
     }

@@ -3,20 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/bg"
-            android:scaleType="centerCrop"
-            android:alpha=".7"/>
-
-    </FrameLayout>
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg">
 
     <LinearLayout
         android:id="@+id/linear_layout"
