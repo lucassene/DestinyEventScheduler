@@ -164,7 +164,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
         previousNewPrefs = sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
         previousNewTime = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF,DrawerActivity.DEFAULT_INTERVAL);
-        previousNewTime = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF,DrawerActivity.DEFAULT_INTERVAL);
+        newNewTime = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF,DrawerActivity.DEFAULT_INTERVAL);
         newNewPrefs = sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
 
         checkChanged = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);

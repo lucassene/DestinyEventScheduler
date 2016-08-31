@@ -210,6 +210,11 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
     }
 
     @Override
+    public void onMembersUpdated() {
+
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("listView", (Serializable) gameList);

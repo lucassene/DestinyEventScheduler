@@ -110,4 +110,9 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
 
     }
 
+    @Override
+    public void onMembersUpdated() {
+
+    }
+
 }

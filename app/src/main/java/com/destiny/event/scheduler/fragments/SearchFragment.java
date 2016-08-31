@@ -202,6 +202,11 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     }
 
     @Override
+    public void onMembersUpdated() {
+
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("listView", (Serializable) gameList);

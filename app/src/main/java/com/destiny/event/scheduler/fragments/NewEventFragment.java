@@ -10,6 +10,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -60,18 +62,17 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     private ImageView iconType;
     private TextView textType;
-
     private ImageView iconGame;
     private TextView textGame;
-
     private TextView lightText;
     private SeekBar lightBar;
     private int minLight;
-
     private EditText dateText;
     private EditText timeText;
-
     private Button createButton;
+    private EditText commentText;
+    private TextView chartCount;
+    private int chars = 60;
 
     private SimpleInputDialog dialog;
 
@@ -193,8 +194,30 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         dateText = (EditText) v.findViewById(R.id.date_text);
         timeText = (EditText) v.findViewById(R.id.time_text);
 
-        createButton = (Button) v.findViewById(R.id.btn_gravar);
+        commentText = (EditText) v.findViewById(R.id.comment_text);
+        commentText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                chars =  60 - commentText.getText().length();
+                chartCount.setText(String.valueOf(chars));
+                if (commentText.getText().length() > 60){
+                    createButton.setEnabled(false);
+                } else {
+                    if (hasDate && hasTime){
+                        createButton.setEnabled(true);
+                    }
+                }
+            }
+        });
+        chartCount = (TextView) v.findViewById(R.id.char_count);
+
+        createButton = (Button) v.findViewById(R.id.btn_gravar);
         createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

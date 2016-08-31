@@ -466,6 +466,13 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     }
 
     @Override
+    public void onMembersUpdated() {
+        if (adapter != null){
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("historyEntries",entryList);

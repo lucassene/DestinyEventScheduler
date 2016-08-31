@@ -31,8 +31,9 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/type" />
+                android:layout_height="32dp"
+                android:text="@string/type"
+                android:gravity="center_vertical"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -80,9 +81,10 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="32dp"
                 android:text="@string/game_label"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -90,33 +92,33 @@
                 android:background="@drawable/border_background"
                 android:layout_marginTop="8dp">
 
-                    <RelativeLayout
-                        android:id="@+id/game_list"
-                        xmlns:android="http://schemas.android.com/apk/res/android"
+                <RelativeLayout
+                    android:id="@+id/game_list"
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/listItemHeight"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingLeft="8dp">
+
+                    <ImageView
+                        android:id="@+id/game_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_centerVertical="true"/>
+
+                    <TextView
+                        android:id="@+id/game_text"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/listItemHeight"
-                        android:focusable="true"
-                        android:clickable="true"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:paddingLeft="8dp">
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:paddingLeft="@dimen/primaryTextLeftPadding"
+                        android:paddingStart="@dimen/primaryTextLeftPadding"
+                        android:textSize="18sp"/>
 
-                        <ImageView
-                            android:id="@+id/game_icon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_centerVertical="true"/>
-
-                        <TextView
-                            android:id="@+id/game_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:paddingLeft="@dimen/primaryTextLeftPadding"
-                            android:paddingStart="@dimen/primaryTextLeftPadding"
-                            android:textSize="18sp"/>
-
-                    </RelativeLayout>
+                </RelativeLayout>
 
             </FrameLayout>
 
@@ -129,7 +131,8 @@
             android:textColor="@color/psnColor"
             android:textSize="@dimen/secondaryTextSize"
             android:text="@string/date_time_section"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"/>
 
         <LinearLayout
             android:orientation="horizontal"
@@ -180,7 +183,7 @@
             android:text="@string/specs"
             android:gravity="center_vertical"/>
 
-       <RelativeLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/global_padding">
@@ -212,6 +215,7 @@
                     android:layout_height="@dimen/listItemHeight"
                     android:layout_weight="1"
                     android:text="200"
+                    android:alpha="0.60"
                     android:gravity="center"
                     android:id="@+id/light_min_text"
                     android:focusable="true"
@@ -220,16 +224,48 @@
 
             </LinearLayout>
 
-       </RelativeLayout>
+        </RelativeLayout>
 
-            <Button
-                android:layout_width="260dp"
-                android:layout_height="50dp"
-                android:id="@+id/btn_gravar"
-                android:text="@string/new_event_button"
-                android:background="@drawable/button_style"
-                android:layout_gravity="center_horizontal"
-                />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheaderHeight"
+            android:textColor="@color/psnColor"
+            android:textSize="@dimen/secondaryTextSize"
+            android:text="@string/optional_comment"
+            android:gravity="center_vertical"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/comment_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:maxLength="70"
+                android:singleLine="true"/>
+
+            <TextView
+                android:id="@+id/char_count"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="60"
+                android:alpha="0.60"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="260dp"
+            android:layout_height="50dp"
+            android:id="@+id/btn_gravar"
+            android:text="@string/new_event_button"
+            android:background="@drawable/button_style"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"/>
 
     </LinearLayout>
 

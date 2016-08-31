@@ -230,6 +230,23 @@
         <item>Número de inscursões realizadas</item>
     </string-array>
 
+    <string-array name="game_status_id">
+        <item>status:all</item>
+        <item>status:0</item>
+        <item>status:1</item>
+        <item>status:2</item>
+    </string-array>
+
+    <string-array name="table_names">
+        <item>Clan</item>
+        <item>Event</item>
+        <item>Event Type</item>
+        <item>LoggedUser</item>
+        <item>Member</item>
+        <item>Notification</item>
+        <item>SavedImages</item>
+    </string-array>
+
     <string name="refresh_lists">Atualizar listas</string>
     <string name="game_type_label">Tipo de jogo</string>
     <string name="max_guardians_label">Mínimo de guardiões</string>
@@ -497,7 +514,6 @@
     <string name="wrath_hard">A Ira da Máquina - DIFÍCIL</string>
     <string name="wrath_normal">A Ira da Máquina - NORMAL</string>
     <string name="wretched">O Olho Miserável</string>
-    <string name="perfected"></string>
     <string name="xp">EXP</string>
     <string name="hour">" hora"</string>
     <string name="hours">" horas"</string>
@@ -510,5 +526,7 @@
     <string name="minute">" minuto"</string>
     <string name="played_plural">Jogados</string>
     <string name="enter_value">Por favor digite o valor desejado:</string>
+    <string name="comment">Comentário </string>
+    <string name="optional_comment">Comentário opcional</string>
 
 </resources>

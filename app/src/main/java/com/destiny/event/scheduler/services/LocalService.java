@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.destiny.event.scheduler.activities.DrawerActivity;
@@ -22,6 +24,7 @@ public class LocalService extends IntentService {
     private static final String TAG = "LocalService";
 
     public static final int TYPE_UPDATE_MEMBERS = 1;
+    public static final int STATUS_FINISHED = 310;
 
     public static final String REQUEST_HEADER = "request";
     public static final String MEMBERS_HEADER = "memberList";
@@ -29,6 +32,8 @@ public class LocalService extends IntentService {
 
     private static final String BASE_IMAGE_URL = "http://www.bungie.net";
     public static final String RUNNING_SERVICE = "localRunning";
+
+    private ResultReceiver receiver;
 
     public LocalService() {
         super(LocalService.class.getName());
@@ -57,6 +62,10 @@ public class LocalService extends IntentService {
     @SuppressWarnings("unchecked")
     @Override
     protected void onHandleIntent(Intent intent) {
+
+        if (intent.hasExtra(ServerService.RECEIVER_TAG)){
+            receiver = intent.getParcelableExtra(ServerService.RECEIVER_TAG);
+        } else receiver = null;
 
         int request = intent.getIntExtra(REQUEST_HEADER, 0);
 
@@ -87,6 +96,7 @@ public class LocalService extends IntentService {
             }
             downloadIcons(memberList, iconList);
             updateOrInsert(memberList, localIdList, clanId);
+            receiver.send(STATUS_FINISHED, Bundle.EMPTY);
         } catch (Exception e){
             e.printStackTrace();
         } finally {

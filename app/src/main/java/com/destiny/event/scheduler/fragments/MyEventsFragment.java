@@ -200,6 +200,11 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     @Override
+    public void onMembersUpdated() {
+
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("listView", (Serializable) gameList);

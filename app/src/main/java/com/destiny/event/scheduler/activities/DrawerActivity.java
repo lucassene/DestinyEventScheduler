@@ -780,9 +780,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public boolean runServerService(Bundle bundle) {
         if (NetworkUtils.checkConnection(this)) {
-            //if (!isServerServiceRunning()){
             onLoadingData();
-            mReceiver = new RequestResultReceiver(new Handler());
+            if (mReceiver == null) mReceiver = new RequestResultReceiver(new Handler());
             mReceiver.setReceiver(this);
             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ServerService.class);
             intent.putExtra(ServerService.REQUEST_TAG, bundle.getInt(ServerService.REQUEST_TAG));
@@ -1334,6 +1333,14 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 bundle.putString("posButton", getString(R.string.got_it));
                 showAlertDialog(bundle);
                 break;
+            case LocalService.STATUS_FINISHED:
+                Log.w(TAG, "LocalService finished! Calling onMembersUpdated()");
+                if (getOpenedFragment() instanceof DetailEventFragment || getOpenedFragment() instanceof DetailValidationFragment){
+                    if (userDataListener != null){
+                        userDataListener.onMembersUpdated();
+                    }
+                }
+                break;
             case ServerService.STATUS_ERROR:
                 progress.setVisibility(View.GONE);
                 int error = resultData.getInt(ServerService.ERROR_TAG);
@@ -1556,7 +1563,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void updateMembers(List<MemberModel> list) {
+        if (mReceiver == null) mReceiver = new RequestResultReceiver(new Handler());
+        mReceiver.setReceiver(this);
         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, LocalService.class);
+        intent.putExtra(ServerService.RECEIVER_TAG, mReceiver);
         intent.putExtra(LocalService.REQUEST_HEADER, LocalService.TYPE_UPDATE_MEMBERS);
         intent.putExtra(LocalService.MEMBERS_HEADER, (Serializable) list);
         intent.putExtra(LocalService.CLAN_HEADER, clanId);

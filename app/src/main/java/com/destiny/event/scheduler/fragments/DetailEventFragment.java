@@ -363,6 +363,13 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
     }
 
     @Override
+    public void onMembersUpdated() {
+        if (detailAdapter != null){
+            detailAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("entryList",entryList);

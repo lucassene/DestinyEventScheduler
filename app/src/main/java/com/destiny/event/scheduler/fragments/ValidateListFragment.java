@@ -114,4 +114,9 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
 
     }
 
+    @Override
+    public void onMembersUpdated() {
+
+    }
+
 }

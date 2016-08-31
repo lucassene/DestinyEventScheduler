@@ -165,6 +165,13 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
 
     }
 
+    @Override
+    public void onMembersUpdated() {
+        if (adapter != null){
+            adapter.notifyDataSetChanged();
+        }
+    }
+
     private void setAdapter(List<MemberModel> entries) {
         setListAdapter(null);
         adapter = new DetailHistoryAdapter(getContext(),entries);

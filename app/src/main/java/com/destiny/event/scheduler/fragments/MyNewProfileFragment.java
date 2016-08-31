@@ -150,6 +150,11 @@ public class MyNewProfileFragment extends Fragment implements UserDataListener {
         } else emptyText.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void onMembersUpdated() {
+
+    }
+
     public MemberModel getMember(){
         return member;
     }
