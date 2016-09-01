@@ -164,10 +164,6 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                 msg = getString(R.string.network);
                 text.setText(msg);
                 break;
-/*            case BungieService.STATUS_PARTY:
-                msg = getString(R.string.creating_db);
-                text.setText(msg);
-                break;*/
             case BungieService.STATUS_FINISHED:
                 if (errorCode != BungieService.NO_ERROR){
                     showAlertDialog();
@@ -208,6 +204,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                 bundle.putString("posButton", getString(R.string.got_it));
                 break;
             case BungieService.ERROR_CURRENT_USER:
+            case BungieService.ERROR_AUTH:
                 bundle.putString("title",getString(R.string.error));
                 bundle.putString("msg",getString(R.string.error_bungie_auth));
                 bundle.putString("posButton",getString(R.string.got_it));

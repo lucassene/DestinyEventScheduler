@@ -26,6 +26,7 @@ public class GameModel implements Serializable {
     private int minLight;
     private int inscriptions;
     private int status;
+    private String comment;
     private boolean joined;
     private boolean evaluated;
 
@@ -147,5 +148,13 @@ public class GameModel implements Serializable {
 
     public void setEvaluated(boolean evaluated) {
         this.evaluated = evaluated;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

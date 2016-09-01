@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.GameAdapter;
@@ -27,6 +28,8 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
     private ToActivityListener callback;
 
     private List<GameModel> gameList;
+
+    TextView sectionTitle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,7 +53,9 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.scheduled_list_layout, container, false);
+        View v = inflater.inflate(R.layout.scheduled_list_layout, container, false);
+        sectionTitle = (TextView) v.findViewById(R.id.section_title);
+        return v;
     }
 
     @SuppressWarnings("unchecked")
@@ -87,6 +92,9 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
             if (gameList != null){
                 this.gameList = gameList;
                 gameAdapter = new GameAdapter(getActivity(), gameList);
+                if (gameAdapter.getCount() == 0){
+                    sectionTitle.setVisibility(View.GONE);
+                } else sectionTitle.setVisibility(View.VISIBLE);
                 setListAdapter(gameAdapter);
             } else Log.w(TAG, "listView null ou size 0");
         } else {
@@ -96,6 +104,9 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
                 setListAdapter(gameAdapter);
                 gameAdapter.setGameList(gameList);
                 gameAdapter.notifyDataSetChanged();
+                if (gameAdapter.getCount() == 0){
+                    sectionTitle.setVisibility(View.GONE);
+                } else sectionTitle.setVisibility(View.VISIBLE);
             } else Log.w(TAG, "listView null");
         }
     }

@@ -105,7 +105,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
         if (callback.getOrderBy() != null){
             orderBy = callback.getOrderBy();
-        } else orderBy = NAME_ORDER_BY;
+        } else orderBy = POINTS_ORDER_BY;
 
         switch (orderBy){
             case NAME_ORDER_BY:

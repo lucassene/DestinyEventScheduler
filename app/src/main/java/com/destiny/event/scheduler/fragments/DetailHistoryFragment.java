@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,6 +23,7 @@ import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.utils.DateUtils;
+import com.destiny.event.scheduler.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,8 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
     TextView eventType;
     TextView eventName;
     TextView sectionTitle;
-
+    LinearLayout commentLayout;
+    TextView comment;
     TextView date;
     TextView time;
     TextView light;
@@ -77,6 +80,8 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
         eventType = (TextView) includedView.findViewById(R.id.secondary_text);
         eventName = (TextView) includedView.findViewById(R.id.primary_text);
 
+        commentLayout = (LinearLayout) headerView.findViewById(R.id.comment_layout);
+        comment = (TextView) headerView.findViewById(R.id.comment_text);
         date = (TextView) headerView.findViewById(R.id.date);
         time = (TextView) headerView.findViewById(R.id.time);
         light = (TextView) headerView.findViewById(R.id.light);
@@ -130,6 +135,10 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
         eventType.setText(getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
 
         String gameTime = game.getTime();
+        if (game.getComment() != null && StringUtils.isEmptyOrWhiteSpaces(game.getComment())){
+            commentLayout.setVisibility(View.VISIBLE);
+            comment.setText(game.getComment());
+        } else commentLayout.setVisibility(View.GONE);
         date.setText(DateUtils.onBungieDate(gameTime));
         time.setText(DateUtils.getTime(gameTime));
         light.setText(String.valueOf(game.getMinLight()));

@@ -26,7 +26,6 @@ public class MembersAdapter extends SimpleCursorAdapter {
     private Cursor c;
     private final LayoutInflater inflater;
     private int max;
-    private int maxPassed = 0;
 
     private static final int VIEW_TYPE_NORMAL = 0;
     private static final int VIEW_TYPE_CREATOR = 1;
@@ -60,7 +59,6 @@ public class MembersAdapter extends SimpleCursorAdapter {
     private void getWaitSection(View view, Context context) {
         TextView section = (TextView) view.findViewById(R.id.section_wait_list);
         section.setText(context.getResources().getString(R.string.wait_list));
-        maxPassed = 1;
     }
 
 

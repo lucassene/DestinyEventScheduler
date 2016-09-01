@@ -375,31 +375,6 @@ public class MyStatsFragment extends Fragment{
 
     }
 
-    private void setListHeight(ListView list) {
-        int numberOfItems = list.getAdapter().getCount();
-        int dividersHeight = list.getDividerHeight() * numberOfItems - 1;
-
-        ViewGroup.LayoutParams params = list.getLayoutParams();
-        params.height = (numberOfItems * (int) getResources().getDimension(R.dimen.smallItemHeight)) + dividersHeight;
-        list.setLayoutParams(params);
-        list.requestLayout();
-    }
-
-    private int getPercent(int position, ArrayList<Entry> yValues) {
-
-        int total =0;
-
-        for (int i=0;i<yValues.size();i++){
-            total = total + (int) yValues.get(i).getVal();
-        }
-
-        float result = (100 * yValues.get(position).getVal())/((float)total);
-
-        return Math.round(result);
-
-    }
-
-
     private void setEventChart(int created, int played) {
         int total = 0;
         ArrayList<String> labels = new ArrayList<>();
@@ -451,11 +426,34 @@ public class MyStatsFragment extends Fragment{
             setListHeight(eventsLegends);
 
         }
+    }
+
+    private void setListHeight(ListView list) {
+        int numberOfItems = list.getAdapter().getCount();
+        int dividersHeight = list.getDividerHeight() * numberOfItems - 1;
+
+        ViewGroup.LayoutParams params = list.getLayoutParams();
+        params.height = (numberOfItems * (int) getResources().getDimension(R.dimen.smallItemHeight)) + dividersHeight;
+        list.setLayoutParams(params);
+        list.requestLayout();
+    }
+
+    private int getPercent(int position, ArrayList<Entry> yValues) {
+
+        int total =0;
+
+        for (int i=0;i<yValues.size();i++){
+            total = total + (int) yValues.get(i).getVal();
+        }
+
+        float result = (100 * yValues.get(position).getVal())/((float)total);
+
+        return Math.round(result);
 
     }
 
     public int getBiggest(int value1, int value2){
-        if (value1 >= value2){
+        if (value1 >= value2 || (value1 == 0 || value2 == 0)){
             return 0;
         } else return 1;
     }

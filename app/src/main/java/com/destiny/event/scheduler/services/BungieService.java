@@ -370,14 +370,7 @@ public class BungieService extends IntentService {
                 if (statusCode == 200) {
                     InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     getCurrentBungieAccountResponse = convertInputStreamToString(inputStream);
-                    //Log.w(TAG, "API Key: " + BuildConfig.API_KEY);
-                    //Log.w(TAG, "X-CSRF: " + xcsrf);
-                    //Log.w(TAG, "Cookies: " + cookie);
-                    //Log.w(TAG, "getCurrentBungieAccount: " + getCurrentBungieAccountResponse);
-
-                    if (getCurrentBungieAccountResponse != null) {
-                        return NO_ERROR;
-                    }
+                    return parseCurrentBungieAccount(receiver);
                 } else {
                     Log.w(TAG, "Response Code do JSON diferente de 200 (GetCurrentBungieAccount");
                     return ERROR_RESPONSE_CODE;
@@ -393,8 +386,6 @@ public class BungieService extends IntentService {
             e.printStackTrace();
             return ERROR_HTTP_REQUEST;
         }
-
-        return NO_ERROR;
 
     }
 

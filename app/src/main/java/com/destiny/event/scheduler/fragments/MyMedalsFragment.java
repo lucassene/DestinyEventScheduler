@@ -64,7 +64,7 @@ public class MyMedalsFragment extends ListFragment {
         String[] nameList = getActivity().getResources().getStringArray(R.array.medal_names);
         String[] descList = getActivity().getResources().getStringArray(R.array.medal_desc);
 
-        for (int i=0;i<6;i++){
+        for (int i=0;i<8;i++){
             MedalModel model = new MedalModel();
             model.setName(nameList[i]);
             model.setDesc(descList[i]);
@@ -82,14 +82,20 @@ public class MyMedalsFragment extends ListFragment {
                     model.setValue(member.getEvaluationsMade());
                     break;
                 case 3:
-                    model.setValue(countEventType(2));
+                    model.setValue(member.getLikes());
                     break;
                 case 4:
+                    model.setValue(member.getDislikes());
+                    break;
+                case 5:
+                    model.setValue(countEventType(2));
+                    break;
+                case 6:
                     int value = countEventType(7);
                     value = value + countEventType(8);
                     model.setValue(value);
                     break;
-                case 5:
+                case 7:
                     model.setValue(countEventType(5));
                     break;
             }

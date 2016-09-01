@@ -302,6 +302,8 @@
         <item>@drawable/ic_created_medal</item>
         <item>@drawable/ic_played_medal</item>
         <item>@drawable/ic_eval_medal</item>
+        <item>@drawable/ic_like_medal</item>
+        <item>@drawable/ic_dislike_medal</item>
         <item>@drawable/ic_crucible_medal</item>
         <item>@drawable/ic_strike_medal</item>
         <item>@drawable/ic_raid_medal</item>
@@ -311,6 +313,8 @@
         <item>My game, my rules</item>
         <item>Player</item>
         <item>Eye of the beholder</item>
+        <item>The beloved one</item>
+        <item>Hated or feared?</item>
         <item>No pain, no gain</item>
         <item>Striker</item>
         <item>Space cowboy</item>
@@ -320,6 +324,8 @@
         <item>Number of created events</item>
         <item>Number of played events</item>
         <item>Evaluations made</item>
+        <item>Number of likes received</item>
+        <item>Number of dislikes received</item>
         <item>Crucible events played</item>
         <item>Strike events played</item>
         <item>Raid events played</item>
@@ -445,7 +451,7 @@
     <string name="participation_points">Participation Points:</string>
     <string name="final_equation">The final equation that involves all this previous stats.</string>
     <string name="leaving">Are you leaving guardian?</string>
-    <string name="oblivion">Be aware that all your data will be deleted.</string>
+    <string name="oblivion">Be aware that your app settings will be lost.</string>
     <string name="leave">Leave</string>
     <string name="nevermind">Cancel</string>
     <string name="event_details">DETAILS</string>
@@ -524,9 +530,9 @@
     <string name="no_icon_msg">For security reasons, some guardians choose not to show their face. For these, we will use a default photo, okay?</string>
     <string name="got_it">Got it</string>
     <string name="error">Error</string>
-    <string name="some_problem_msg">Some problem occurred. Please check bungie.net website and try again later.</string>
+    <string name="some_problem_msg">An error has occurred. Please check bungie.net and try again later.</string>
     <string name="no_connection_msg">No connection found. Please connect to the internet or try again later.</string>
-    <string name="bungie_net_error_msg">Incorrect response from Bungie.net. Please try again later.</string>
+    <string name="bungie_net_error_msg">Incorrect response from bungie.net. Please try again later.</string>
     <string name="no_clan_msg">Sorry guardian, but is needed that you join a clan to use this app.</string>
     <string name="no_events_played">No events played</string>
     <string name="times">times</string>
@@ -545,7 +551,7 @@
     <string name="creating_db">Creating fake database</string>
     <string name="default_username">username</string>
     <string name="menu_new_event">New event</string>
-    <string name="network">Establishing networking</string>
+    <string name="network">Establishing contacts network</string>
     <string name="new_tab_header">NEW</string>
     <string name="pictures">Analyzing images</string>
     <string name="prior_entries">Verifying previous entries</string>
@@ -591,6 +597,7 @@
     <string name="enter_value">Please enter the required value:</string>
     <string name="optional_comment">Optional comment</string>
     <string name="comment">Comment</string>
+    <string name="for_evaluation">For evaluate</string>
 
 
 </resources>

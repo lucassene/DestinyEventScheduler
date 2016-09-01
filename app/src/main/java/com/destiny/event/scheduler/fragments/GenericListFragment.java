@@ -3,7 +3,6 @@ package com.destiny.event.scheduler.fragments;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -27,9 +26,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
 
     private String title;
     private String tableName;
-    private String gameType;
-
-    private Fragment fragment;
+    private int gameType;
 
     private ToActivityListener callback;
 
@@ -94,8 +91,8 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
         if (bundle != null){
             title = bundle.getString("title");
             tableName = bundle.getString("table");
-            if (bundle.getString("type")!=null){
-                gameType = bundle.getString("type");
+            if (bundle.getInt("type") != 0){
+                gameType = bundle.getInt("type");
             }
         }
     }
@@ -142,7 +139,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
                 break;
             case 20:
                 projection = new String[] {EventTable.COLUMN_ID, EventTable.COLUMN_NAME, EventTable.COLUMN_ICON, EventTable.COLUMN_TYPE};
-                selectionArgs = new String[] {gameType};
+                selectionArgs = new String[] {String.valueOf(gameType)};
                 cursorLoader = new CursorLoader(getActivity(),
                         DataProvider.EVENT_URI,
                         projection,
@@ -163,7 +160,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
 
         if (loader.getId()==20){
             data.moveToFirst();
-            gameType = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_TYPE));
+            gameType = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_TYPE));
         }
 
         callback.onDataLoaded();

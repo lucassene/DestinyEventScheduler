@@ -216,6 +216,8 @@
         <item>Criador</item>
         <item>Jogador</item>
         <item>O olho que tudo vê</item>
+        <item>Querido guardião</item>
+        <item>Odiado ou temido?</item>
         <item>Sem dor, sem ganho</item>
         <item>Assaltante</item>
         <item>Cowboy do espaço</item>
@@ -225,6 +227,8 @@
         <item>Número de eventos criados</item>
         <item>Número de eventos jogados</item>
         <item>Avaliações feitas</item>
+        <item>Número de curtidas recebidas</item>
+        <item>Número de não curtidas recebidas</item>
         <item>Partidas de crisol disputadas</item>
         <item>Número de assaltos realizados</item>
         <item>Número de inscursões realizadas</item>
@@ -387,7 +391,7 @@
     <string name="scheduled_games">Eventos agendados</string>
     <string name="leave">Sair</string>
     <string name="leaving">Você está saindo guardião?</string>
-    <string name="oblivion">Esteja ciente de que todas suas informações serão apagadas.</string>
+    <string name="oblivion">Esteja ciente de que as configurações do app serão perdidas.</string>
     <string name="nevermind">Cancelar</string>
     <string name="event_details">DETALHES</string>
     <string name="of">de</string>
@@ -459,14 +463,14 @@
     <string name="played">Jogado</string>
     <string name="value">Valor</string>
     <string name="default_title">Novo no pedaço</string>
-    <string name="bungie_net_error_msg">Resposta incorreta de Bungie.net. Por favor, tente novamente mais tarde.</string>
+    <string name="bungie_net_error_msg">Resposta incorreta de bungie.net. Por favor, tente novamente mais tarde.</string>
     <string name="error">Erro</string>
     <string name="got_it">Entendi</string>
     <string name="just_warning">Só um aviso...</string>
     <string name="no_connection_msg">Nenhuma conexão encontrada. Por favor conecte-se à internet ou tente novamente mais tarde.</string>
     <string name="no_icon_msg">Por motivo de segurança, alguns guardiões optam por não mostrar seus rosto. Para esses, usaremos uma foto padrão, ok?</string>
     <string name="problem_bungie_net">Problema ao conectar com Bungie.net</string>
-    <string name="some_problem_msg">Algum problema ocorreu. Por favor, verifique o site bungie.net e tente novamente mais tarde.</string>
+    <string name="some_problem_msg">Um erro ocorreu. Por favor, verifique o site bungie.net e tente novamente mais tarde.</string>
     <string name="no_clan_msg">Desculpe guardião, mas é necessário que você esteja em um clã para usar este aplicativo.</string>
     <string name="no_events_played">Nenhum evento jogado</string>
     <string name="times">vezes</string>
@@ -528,5 +532,6 @@
     <string name="enter_value">Por favor digite o valor desejado:</string>
     <string name="comment">Comentário </string>
     <string name="optional_comment">Comentário opcional</string>
+    <string name="for_evaluation">Para avaliar</string>
 
 </resources>

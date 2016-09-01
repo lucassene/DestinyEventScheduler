@@ -54,7 +54,8 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     ImageView eventIcon;
     TextView eventType;
     TextView eventName;
-
+    LinearLayout commentLayout;
+    TextView comment;
     TextView time;
     CheckBox checkBox;
     LinearLayout checkLayout;
@@ -112,6 +113,8 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         eventType = (TextView) includedView.findViewById(R.id.secondary_text);
         eventName = (TextView) includedView.findViewById(R.id.primary_text);
 
+        commentLayout = (LinearLayout) headerView.findViewById(R.id.comment_layout);
+        comment = (TextView) headerView.findViewById(R.id.comment_text);
         time = (TextView) headerView.findViewById(R.id.time_text);
         checkBox = (CheckBox) headerView.findViewById(R.id.confirm_check);
         checkLayout = (LinearLayout) headerView.findViewById(R.id.checkbox_layout);
@@ -181,6 +184,9 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
                 status = STATUS_VALIDATED;
                 break;
         }
+        if (game.getComment() == null || game.getComment().length() == 0){
+            commentLayout.setVisibility(View.GONE);
+        } else commentLayout.setVisibility(View.VISIBLE);
     }
 
     public void changeListStatus(){
@@ -419,6 +425,9 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         eventIcon.setImageResource(getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
         eventName.setText(getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
         eventType.setText(getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
+        if (game.getComment() != null && game.getComment().length() > 0){
+            comment.setText(game.getComment());
+        }
         String date = DateUtils.onBungieDate(game.getTime());
         String hour = DateUtils.getTime(game.getTime());
         String timeString = date + getResources().getString(R.string.at) + hour;

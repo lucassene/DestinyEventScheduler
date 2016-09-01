@@ -790,12 +790,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             intent.putExtra(ServerService.PLATFORM_TAG, platformId);
             intent.putExtra(ServerService.CLAN_TAG, clanId);
 
-            if (bundle.containsKey(ServerService.EVENT_TAG))
-                intent.putExtra(ServerService.EVENT_TAG, bundle.getInt(ServerService.EVENT_TAG));
-            if (bundle.containsKey(ServerService.TIME_TAG))
-                intent.putExtra(ServerService.TIME_TAG, bundle.getString(ServerService.TIME_TAG));
-            if (bundle.containsKey(ServerService.LIGHT_TAG))
-                intent.putExtra(ServerService.LIGHT_TAG, bundle.getInt(ServerService.LIGHT_TAG));
+            if (bundle.containsKey(ServerService.GAME_TAG)) intent.putExtra(ServerService.GAME_TAG, bundle.getSerializable(ServerService.GAME_TAG));
             if (bundle.containsKey(ServerService.GAMEID_TAG))
                 intent.putExtra(ServerService.GAMEID_TAG, bundle.getInt(ServerService.GAMEID_TAG));
             if (bundle.containsKey(ServerService.ENTRY_TAG))
@@ -1322,6 +1317,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     MyClanFragment frag = (MyClanFragment) openedFragment;
                     frag.refreshData();
                 }
+                onDataLoaded();
                 break;
             case BungieService.STATUS_ERROR:
                 Log.w(TAG, "Error on BungieService");
@@ -1332,6 +1328,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 bundle.putString("msg", getString(R.string.unable_update_clan));
                 bundle.putString("posButton", getString(R.string.got_it));
                 showAlertDialog(bundle);
+                onDataLoaded();
                 break;
             case LocalService.STATUS_FINISHED:
                 Log.w(TAG, "LocalService finished! Calling onMembersUpdated()");
@@ -1340,6 +1337,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         userDataListener.onMembersUpdated();
                     }
                 }
+                onDataLoaded();
                 break;
             case ServerService.STATUS_ERROR:
                 progress.setVisibility(View.GONE);
@@ -1360,17 +1358,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         showAlertDialog(dialogBundle);
                         break;
                 }
+                onDataLoaded();
                 break;
             case ServerService.STATUS_FINISHED:
                 if (resultData.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_CREATE_GAME) {
                     toCreateGame.setGameId(resultData.getInt(ServerService.INT_TAG));
                     onEventCreated(toCreateGame);
                 }
-/*                if (getOpenedFragment() instanceof NewEventFragment) {
-                    NewEventFragment frag = (NewEventFragment) openedFragment;
-                    int gameId = resultData.getInt(ServerService.INT_TAG);
-                    frag.createLocalEvent(gameId);
-                }*/
                 if (getOpenedFragment() instanceof SearchFragment) {
                     if (userDataListener != null) {
                         searchGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
@@ -1651,6 +1645,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         }
                     }
                     Collections.sort(result, new GameComparator());
+                    Collections.sort(result, new DoneGameComparator());
                     return result;
                 case GameModel.STATUS_VALIDATED:
                     for (int i = 0; i < allGameList.size(); i++) {
@@ -1709,8 +1704,20 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         return sharedPrefs.getBoolean(CreateNotificationService.RUNNING_SERVICE, false);
     }
 
-    public class GameComparator implements Comparator<GameModel> {
+    public class DoneGameComparator implements Comparator<GameModel>{
+        @Override
+        public int compare(GameModel game1, GameModel game2) {
+            int statusCompare = game1.getStatus() -  game2.getStatus();
+            return statusCompare;
+/*            if (statusCompare != 0){
+                return statusCompare;
+            } else {
+                return (int) (DateUtils.stringToDate(game1.getTime()).getTimeInMillis() - DateUtils.stringToDate(game2.getTime()).getTimeInMillis());
+            }*/
+        }
+    }
 
+    public class GameComparator implements Comparator<GameModel> {
         @Override
         public int compare(GameModel game1, GameModel game2) {
             return (int) (DateUtils.stringToDate(game1.getTime()).getTimeInMillis() - DateUtils.stringToDate(game2.getTime()).getTimeInMillis());

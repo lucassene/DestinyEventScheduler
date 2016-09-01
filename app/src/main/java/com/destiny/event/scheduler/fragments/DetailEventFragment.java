@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +35,7 @@ import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
+import com.destiny.event.scheduler.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -55,7 +57,8 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
     ImageView eventIcon;
     TextView eventType;
     TextView eventName;
-
+    LinearLayout commentLayout;
+    TextView comment;
     TextView date;
     TextView time;
     TextView light;
@@ -100,6 +103,8 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
         eventType = (TextView) includedView.findViewById(R.id.secondary_text);
         eventName = (TextView) includedView.findViewById(R.id.primary_text);
 
+        commentLayout = (LinearLayout) headerView.findViewById(R.id.comment_layout);
+        comment = (TextView) headerView.findViewById(R.id.comment_text);
         date = (TextView) headerView.findViewById(R.id.date);
         time = (TextView) headerView.findViewById(R.id.time);
         light = (TextView) headerView.findViewById(R.id.light);
@@ -305,6 +310,10 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
 
         String gameTime = game.getTime();
         eventCalendar = DateUtils.stringToDate(gameTime);
+        if (game.getComment() != null && StringUtils.isEmptyOrWhiteSpaces(game.getComment())){
+            commentLayout.setVisibility(View.VISIBLE);
+            comment.setText(game.getComment());
+        } else commentLayout.setVisibility(View.GONE);
         date.setText(DateUtils.onBungieDate(gameTime));
         time.setText(DateUtils.getTime(gameTime));
         light.setText(String.valueOf(game.getMinLight()));

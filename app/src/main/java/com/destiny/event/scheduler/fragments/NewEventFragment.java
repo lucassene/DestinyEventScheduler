@@ -53,8 +53,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     private static final int MAX_LIGHT = 400;
 
-    private String selectedType;
-    private String selectedEvent;
+    private int selectedType;
+    private int selectedEvent;
 
     private GameModel game;
 
@@ -87,26 +87,26 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        selectedType = "2";
-        selectedEvent = "4";
+        selectedType = 2;
+        selectedEvent = 4;
 
         if (savedInstanceState != null){
-            selectedType = String.valueOf(savedInstanceState.getInt("id"));
-            selectedType = String.valueOf(savedInstanceState.getInt("Type"));
+            selectedEvent = savedInstanceState.getInt("id");
+            selectedType = savedInstanceState.getInt("Type");
         }
 
         Bundle bundle = getArguments();
         if (bundle != null){
             switch (bundle.getString("Table")){
                 case EventTypeTable.TABLE_NAME:
-                    selectedType = String.valueOf(bundle.getLong("id"));
+                    selectedType = bundle.getInt("id");
                     callEventList();
                     checkGame(selectedType);
                     initLoader(LOADER_TYPE);
                     break;
                 case EventTable.TABLE_NAME:
-                    selectedEvent = String.valueOf(bundle.getLong("id"));
-                    selectedType = String.valueOf(bundle.getString("Type"));
+                    selectedEvent = bundle.getInt("id");
+                    selectedType = bundle.getInt("Type");
             }
         }
 
@@ -117,8 +117,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("id", Integer.parseInt(selectedEvent));
-        outState.putInt("Type", Integer.parseInt(selectedType));
+        outState.putInt("id", selectedEvent);
+        outState.putInt("Type", selectedType);
     }
 
     @Override
@@ -133,31 +133,31 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
-    private void checkGame(String selectedType) {
+    private void checkGame(int selectedType) {
         switch (selectedType){
-            case "1":
-                selectedEvent = "1";
+            case 1:
+                selectedEvent = 1;
                 break;
-            case "2":
-                selectedEvent = "4";
+            case 2:
+                selectedEvent = 4;
                 break;
-            case "3":
-                selectedEvent = "26";
+            case 3:
+                selectedEvent = 26;
                 break;
-            case "4":
-                selectedEvent = "32";
+            case 4:
+                selectedEvent = 32;
                 break;
-            case "5":
-                selectedEvent = "38";
+            case 5:
+                selectedEvent = 38;
                 break;
-            case "6":
-                selectedEvent = "46";
+            case 6:
+                selectedEvent = 46;
                 break;
-            case "7":
-                selectedEvent = "48";
+            case 7:
+                selectedEvent = 4;
                 break;
-            case "8":
-                selectedEvent = "65";
+            case 8:
+                selectedEvent = 65;
                 break;
         }
     }
@@ -251,7 +251,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getContext().getResources().getString(R.string.choose_type));
-                bundle.putString("selected", selectedType);
+                bundle.putInt("selected", selectedType);
                 bundle.putString("table", EventTypeTable.TABLE_NAME);
                 bundle.putString("tag",getTag());
                 callback.loadNewFragment(fragment, bundle, "type");
@@ -322,8 +322,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         Bundle bundle = new Bundle();
         bundle.putString("title", getContext().getResources().getString(R.string.choose_game));
         bundle.putString("table", EventTable.TABLE_NAME);
-        bundle.putString("selected", selectedEvent);
-        bundle.putString("type", selectedType);
+        bundle.putInt("selected", selectedEvent);
+        bundle.putInt("type", selectedType);
         bundle.putString("tag", getTag());
         callback.loadNewFragment(fragment, bundle, "game");
     }
@@ -371,7 +371,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         switch (id){
             case LOADER_TYPE:
                 projection = EventTypeTable.ALL_COLUMNS;
-                selectionArgs = new String[] {selectedType};
+                selectionArgs = new String[] {String.valueOf(selectedType)};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.EVENT_TYPE_URI,
@@ -382,7 +382,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 );
             case LOADER_EVENT:
                 projection = EventTable.ALL_COLUMNS;
-                selectionArgs = new String[] {selectedEvent};
+                selectionArgs = new String[] {String.valueOf(selectedEvent)};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.EVENT_URI,
@@ -507,7 +507,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onEventTypeSent(String id) {
-        selectedType = id;
+        selectedType = Integer.parseInt(id);
         checkGame(selectedType);
         initLoader(LOADER_TYPE);
         callEventList();
@@ -517,7 +517,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onEventGameSent(String id) {
-        selectedEvent = id;
+        selectedEvent = Integer.parseInt(id);
         checkIfIsOk();
         initLoader(LOADER_EVENT);
         initLoader(LOADER_TYPE);
@@ -550,17 +550,20 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             String userName = callback.getUserName();
             game.setCreatorName(userName);
             game.setCreatorId(bungieId);
+            game.setEventId(selectedEvent);
+            game.setTypeId(selectedType);
             game.setTime(gameTime);
             game.setInscriptions(1);
+            game.setMinLight(minLight);
             game.setStatus(GameModel.STATUS_NEW);
+            if (commentText.getText().length() != 0){
+                game.setComment(commentText.getText().toString());
+            } else game.setComment("");
             game.setJoined(true);
 
             if (now.getTimeInMillis() <= minimumTime.getTimeInMillis()) {
                 Bundle bundle = new Bundle();
                 bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_CREATE_GAME);
-                bundle.putInt(ServerService.EVENT_TAG, Integer.parseInt(selectedEvent));
-                bundle.putString(ServerService.TIME_TAG, gameTime);
-                bundle.putInt(ServerService.LIGHT_TAG, minLight);
                 bundle.putSerializable(ServerService.GAME_TAG, game);
                 callback.runServerService(bundle);
             } else Toast.makeText(getContext(), getResources().getString(R.string.match_must_created) + " " + minimumIntTime + " " + getResources().getString(R.string.minutes_advance), Toast.LENGTH_SHORT).show();

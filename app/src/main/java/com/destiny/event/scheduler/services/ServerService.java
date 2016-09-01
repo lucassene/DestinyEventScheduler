@@ -70,6 +70,7 @@ public class ServerService extends IntentService {
     public static final String EVENT_TAG = "eventId";
     public static final String TIME_TAG = "time";
     public static final String LIGHT_TAG = "minLight";
+    public static final String COMMENT_TAG = "comment";
     public static final String RECEIVER_TAG = "receiver";
     public static final String INT_TAG = "intData";
     public static final String GAME_TAG = "gameList";
@@ -167,9 +168,7 @@ public class ServerService extends IntentService {
                 break;
             case TYPE_CREATE_GAME:
                 bundle.clear();
-                bundle.putInt(EVENT_TAG, intent.getIntExtra(EVENT_TAG, 0));
-                bundle.putString(TIME_TAG, intent.getStringExtra(TIME_TAG));
-                bundle.putInt(LIGHT_TAG, intent.getIntExtra(LIGHT_TAG, 0));
+                bundle.putSerializable(GAME_TAG, intent.getSerializableExtra(GAME_TAG));
                 url = SERVER_BASE_URL + GAME_ENDPOINT;
                 error = requestServer(receiver, type, url, bundle);
                 if (error != NO_ERROR){
@@ -656,6 +655,7 @@ public class ServerService extends IntentService {
                 game.setMinLight(jGame.getInt("light"));
                 game.setInscriptions(jGame.getInt("inscriptions"));
                 game.setStatus(jGame.getInt("status"));
+                if (!jGame.isNull("comment")) { game.setComment(jGame.getString("comment")); }
                 game.setJoined(getBoolean(jGame.getString("joined")));
                 game.setEvaluated(getBoolean(jGame.getString("evaluated")));
                 gameList.add(game);
@@ -713,7 +713,7 @@ public class ServerService extends IntentService {
         urlConnection.setRequestProperty("Content-Type", "application/json");
         urlConnection.setRequestProperty("Accept", "application/json");
 
-        JSONObject gameJSON = createCreateGameJSON(bundle.getInt(EVENT_TAG), bundle.getString(TIME_TAG), bundle.getInt(LIGHT_TAG));
+        JSONObject gameJSON = createCreateGameJSON(bundle);
         OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
         writer.write(gameJSON.toString());
         writer.flush();
@@ -779,14 +779,16 @@ public class ServerService extends IntentService {
         return json;
     }
 
-    private JSONObject createCreateGameJSON(int eventId, String time, int minLight) throws JSONException {
+    private JSONObject createCreateGameJSON(Bundle bundle) throws JSONException {
+        GameModel game = (GameModel) bundle.getSerializable(GAME_TAG);
         JSONObject json = new JSONObject();
         JSONObject jEvent = new JSONObject();
-        jEvent.put("id",eventId);
+        jEvent.put("id", game.getEventId());
         json.put("event",jEvent);
-        json.put("time",time);
-        json.put("light",minLight);
+        json.put("time", game.getTime());
+        json.put("light", game.getMinLight());
         json.put("status",0);
+        json.put("comment", game.getComment());
         Log.w(TAG, "GameJSON: " + json.toString());
         return json;
     }

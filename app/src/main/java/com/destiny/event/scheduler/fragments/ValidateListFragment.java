@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.adapters.GameAdapter;
+import com.destiny.event.scheduler.adapters.DoneGamesAdapter;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -24,7 +24,7 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
 
     private ToActivityListener callback;
 
-    GameAdapter gameAdapter;
+    DoneGamesAdapter gameAdapter;
     private List<GameModel> gameList;
 
     @Override
@@ -89,7 +89,7 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
             Log.w(TAG, "adapter estava null");
             if (gameList != null) {
                 this.gameList = gameList;
-                gameAdapter = new GameAdapter(getActivity(), gameList);
+                gameAdapter = new DoneGamesAdapter(getActivity(), gameList, getStartPos(gameList, GameModel.STATUS_WAITING), getStartPos(gameList, GameModel.STATUS_VALIDATED));
                 setListAdapter(gameAdapter);
                 gameAdapter.notifyDataSetChanged();
             } else Log.w(TAG, "listView null ou size 0");
@@ -98,10 +98,21 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
             if (gameList != null) {
                 this.gameList = gameList;
                 gameAdapter.setGameList(gameList);
+                gameAdapter.setStartPositions(getStartPos(gameList, GameModel.STATUS_WAITING), getStartPos(gameList, GameModel.STATUS_VALIDATED));
                 setListAdapter(gameAdapter);
                 gameAdapter.notifyDataSetChanged();
             } else Log.w(TAG, "listView null");
         }
+    }
+
+    private int getStartPos(List<GameModel> gameList, int gameStatus) {
+        int pos = -1;
+        for (int i=0;i<gameList.size();i++){
+            if (gameList.get(i).getStatus() == gameStatus){
+                return i;
+            }
+        }
+        return pos;
     }
 
     @Override
