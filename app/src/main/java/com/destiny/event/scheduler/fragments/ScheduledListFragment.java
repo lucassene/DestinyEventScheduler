@@ -62,12 +62,11 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         callback.onSelectedFragment(1);
-        if (gameList == null){
-            gameList = callback.getGameList(GameModel.STATUS_SCHEDULED);
+        gameList = callback.getGameList(GameModel.STATUS_SCHEDULED);
+        if (gameList != null){
+            onGamesLoaded(gameList);
         }
-        onGamesLoaded(gameList);
     }
 
     @Override

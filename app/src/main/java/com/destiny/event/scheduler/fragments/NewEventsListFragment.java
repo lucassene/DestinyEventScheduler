@@ -61,13 +61,11 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         callback.onSelectedFragment(0);
-
-        if (gameList == null){
-            gameList = callback.getGameList(GameModel.STATUS_NEW);
+        gameList = callback.getGameList(GameModel.STATUS_NEW);
+        if (gameList != null){
+            onGamesLoaded(gameList);
         }
-        onGamesLoaded(gameList);
     }
 
     @Override

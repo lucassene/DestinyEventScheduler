@@ -40,7 +40,8 @@ public interface ToActivityListener {
     public boolean runServerService(Bundle bundle);
     public List<GameModel> getGameList(int type);
     public void getGameEntries(int gameId);
-    public void getGameHistory(int gameId);
+    public void getHistoryEntries(int gameId);
+    public List<GameModel> getHistoryGames();
     public void updateGameStatus(GameModel game, int status);
     public void updateGameEntries(int status, int gameId, int entries);
     public void updateMembers(List<MemberModel> list);

@@ -171,7 +171,7 @@ public class BungieService extends IntentService {
                         } else {
                             insertClan();
                             downloadImages();
-                            Log.w(TAG, "Inserting clanMembers data");
+                            Log.w(TAG, "Inserting clanMembers data. MemberList size: " + membersModelList.size());
                             for (int i=0;i<membersModelList.size();i++){
                                 insertClanMember(membersModelList.get(i));
                             }
@@ -370,7 +370,7 @@ public class BungieService extends IntentService {
                 if (statusCode == 200) {
                     InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     getCurrentBungieAccountResponse = convertInputStreamToString(inputStream);
-                    return parseCurrentBungieAccount(receiver);
+                    return NO_ERROR;
                 } else {
                     Log.w(TAG, "Response Code do JSON diferente de 200 (GetCurrentBungieAccount");
                     return ERROR_RESPONSE_CODE;
@@ -572,12 +572,12 @@ public class BungieService extends IntentService {
                         JSONArray jArray = new JSONArray(response);
                         for (int i=0;i<jArray.length();i++){
                             memberList.add(jArray.getString(i));
-                            Log.w(TAG, "added member: " + jArray.getString(i));
+                            //Log.w(TAG, "added member: " + jArray.getString(i));
                         }
                         int error;
                         if (actualMemberList != null){
                             memberList.add(membershipId);
-                            Log.w(TAG, "added member: " + membershipId);
+                            //Log.w(TAG, "added member: " + membershipId);
                             error = parseNewMembers(memberList);
                         } else error = parseMembersOfClan(memberList);
                         if (error == NO_ERROR){
@@ -796,10 +796,10 @@ public class BungieService extends IntentService {
         values.put(MemberTable.COLUMN_CREATED, member.getGamesCreated());
         values.put(MemberTable.COLUMN_PLAYED, member.getGamesPlayed());
         if (member.isInsert()){
-            Log.w(TAG, "Inserting member " + member.getMembershipId() + " ...");
+            Log.w(TAG, "Inserting member " + member.getName() + " ...");
             getContentResolver().insert(DataProvider.MEMBER_URI, values);
         } else {
-            Log.w(TAG, "Updating member " + member.getMembershipId() + " ...");
+            Log.w(TAG, "Updating member " + member.getName() + " ...");
             getContentResolver().update(DataProvider.MEMBER_URI, values,MemberTable.COLUMN_MEMBERSHIP + "=" + member.getMembershipId(),null);
         }
 

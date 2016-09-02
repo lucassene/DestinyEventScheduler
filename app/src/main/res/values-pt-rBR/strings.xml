@@ -106,8 +106,8 @@
     <string-array name="game_status">
         <item>Todos</item>
         <item>Agendados</item>
-        <item>Esperando por Validação</item>
-        <item>Validados</item>
+        <item>Esperando por validação</item>
+        <item>Para avaliar</item>
     </string-array>
 
     <string-array name="pref_time_list_entries">

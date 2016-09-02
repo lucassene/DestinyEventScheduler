@@ -108,13 +108,13 @@ public class MyNewProfileFragment extends Fragment implements UserDataListener {
         super.onAttach(context);
         setHasOptionsMenu(true);
         callback = (ToActivityListener) getActivity();
-        //callback.registerUserDataListener(this);
+        callback.registerUserDataListener(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //callback.deleteUserDataListener(this);
+        callback.deleteUserDataListener(this);
     }
 
     @Override
@@ -122,7 +122,6 @@ public class MyNewProfileFragment extends Fragment implements UserDataListener {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
         callback.setToolbarTitle(getString(R.string.my_profile));
-        callback.deleteUserDataListener(this);
         getActivity().getMenuInflater().inflate(R.menu.home_menu, menu);
     }
 

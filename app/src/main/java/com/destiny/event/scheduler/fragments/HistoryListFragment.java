@@ -91,7 +91,7 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
-        gameList = callback.getGameList(GameModel.STATUS_VALIDATED);
+        gameList = callback.getHistoryGames();
         if (savedInstanceState != null && savedInstanceState.containsKey("listView")){
             gameList = (List<GameModel>) savedInstanceState.getSerializable("listView");
             onGamesLoaded(gameList);

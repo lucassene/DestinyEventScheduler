@@ -159,8 +159,8 @@
     <string-array name="game_status">
         <item>All</item>
         <item>Scheduled</item>
-        <item>Waiting for Validation</item>
-        <item>Validated</item>
+        <item>Waiting for validation</item>
+        <item>For evaluate</item>
     </string-array>
 
     <string-array name="game_status_id">

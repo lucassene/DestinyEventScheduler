@@ -11,7 +11,8 @@
         android:textColor="@color/psnColor"
         android:gravity="center_vertical"
         android:text="@string/scheduled_games"
-        android:textSize="@dimen/secondaryTextSize" />
+        android:textSize="@dimen/secondaryTextSize"
+        android:visibility="gone"/>
 
     <ListView
         android:id="@id/android:list"

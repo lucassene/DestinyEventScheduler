@@ -31,6 +31,7 @@ import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.DateUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
+import com.destiny.event.scheduler.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -425,7 +426,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         eventIcon.setImageResource(getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
         eventName.setText(getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
         eventType.setText(getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
-        if (game.getComment() != null && game.getComment().length() > 0){
+        if (game.getComment() != null && !StringUtils.isEmptyOrWhiteSpaces(game.getComment())){
             comment.setText(game.getComment());
         }
         String date = DateUtils.onBungieDate(game.getTime());

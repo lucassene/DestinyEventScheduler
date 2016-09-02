@@ -43,7 +43,6 @@ import com.destiny.event.scheduler.utils.NetworkUtils;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-
 public class NewEventFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener, FromActivityListener {
 
     private static final String TAG = "NewEventFragment";
@@ -310,8 +309,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         initLoader(LOADER_EVENT);
         initLoader(LOADER_TYPE);
 
-        createButton.setEnabled(false);
-        createButton.setText(R.string.waiting_data);
+        checkIfIsOk();
 
         return v;
     }
@@ -338,7 +336,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void checkIfIsOk(){
-        if (hasDate && hasTime){
+        if (hasDate && hasTime && commentText.getText().length() < 60){
             createButton.setEnabled(true);
             createButton.setText(R.string.new_event_button);
         } else {
@@ -415,7 +413,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 textGame.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
                 game.setEventIcon(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)));
                 game.setEventName(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)));
-                game.setMinLight(minLight);
                 game.setMaxGuardians(data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS)));
                 break;
         }
@@ -430,7 +427,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onPositiveClick(String input, int type) {
-
         switch (type){
             case FromDialogListener.LIGHT_TYPE:
                 lightText.setText(input);
@@ -438,23 +434,16 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 lightBar.setProgress(min);
                 break;
         }
-
-
     }
 
     @Override
     public void onDateSent(Calendar date) {
-
         insertedDate = date;
-
-        //Log.w(TAG, "Entrada de Date: " + insertedDate.get(Calendar.DAY_OF_MONTH) + "/" + insertedDate.get(Calendar.MONTH) + "/" + insertedDate.get(Calendar.YEAR));
-
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", getResources().getConfiguration().locale);
         String finalDate = sdf.format(date.getTime());
         dateText.setText(finalDate);
         hasDate = true;
         checkIfIsOk();
-
     }
 
     @Override
@@ -476,8 +465,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             insertedDate.set(Calendar.SECOND, 0);
         }
 
-        //Log.w(TAG, "Entrada de Time: " + insertedDate.get(Calendar.HOUR_OF_DAY) + ":" + insertedDate.get(Calendar.MINUTE) + ":00");
-
         String hourOfTheDay = String.valueOf(hour);
         String min = String.valueOf(minute);
         if (hourOfTheDay.length() == 1) hourOfTheDay = "0" + hourOfTheDay;
@@ -491,19 +478,13 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onLogoff() {
-
-    }
+    public void onLogoff() {}
 
     @Override
-    public void onItemSelected(String type, String entry, int value) {
-    }
+    public void onItemSelected(String type, String entry, int value) {}
 
     @Override
-    public void onMultiItemSelected(boolean[] items) {
-
-    }
-
+    public void onMultiItemSelected(boolean[] items) {}
 
     @Override
     public void onEventTypeSent(String id) {
@@ -511,22 +492,17 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         checkGame(selectedType);
         initLoader(LOADER_TYPE);
         callEventList();
-        //checkGame(id);
-        //getLoaderManager().restartLoader(LOADER_EVENT, null, this);
     }
 
     @Override
     public void onEventGameSent(String id) {
         selectedEvent = Integer.parseInt(id);
-        checkIfIsOk();
         initLoader(LOADER_EVENT);
         initLoader(LOADER_TYPE);
     }
 
     @Override
-    public void onOrderBySet(String orderBy) {
-
-    }
+    public void onOrderBySet(String orderBy) { }
 
     private void createNewEvent() {
 
@@ -543,9 +519,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
             String gameTime = getBungieTime(date, time);
 
-            //Log.w(TAG, "MinimumTime: " + minimumTime.get(Calendar.HOUR_OF_DAY) + ":" + minimumTime.get(Calendar.MINUTE) + ":00");
-            //Log.w(TAG, "NotifyTime: " + notifyTime.get(Calendar.HOUR_OF_DAY) + ":" + notifyTime.get(Calendar.MINUTE) + ":00");
-
             String bungieId = callback.getBungieId();
             String userName = callback.getUserName();
             game.setCreatorName(userName);
@@ -554,7 +527,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             game.setTypeId(selectedType);
             game.setTime(gameTime);
             game.setInscriptions(1);
-            game.setMinLight(minLight);
+            game.setMinLight(lightBar.getProgress());
             game.setStatus(GameModel.STATUS_NEW);
             if (commentText.getText().length() != 0){
                 game.setComment(commentText.getText().toString());
@@ -592,7 +565,6 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         String hour = time.substring(0,time.indexOf(" "));
         String minute = time.substring(time.lastIndexOf(" ")+1, time.length());
 
-        //Log.w(TAG, "Bungie Time: " + year + "-" + month + "-" + day + "T" + time);
         return year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00";
 
     }

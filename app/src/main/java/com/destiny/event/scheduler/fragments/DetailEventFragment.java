@@ -310,7 +310,7 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
 
         String gameTime = game.getTime();
         eventCalendar = DateUtils.stringToDate(gameTime);
-        if (game.getComment() != null && StringUtils.isEmptyOrWhiteSpaces(game.getComment())){
+        if (game.getComment() != null && !StringUtils.isEmptyOrWhiteSpaces(game.getComment())){
             commentLayout.setVisibility(View.VISIBLE);
             comment.setText(game.getComment());
         } else commentLayout.setVisibility(View.GONE);

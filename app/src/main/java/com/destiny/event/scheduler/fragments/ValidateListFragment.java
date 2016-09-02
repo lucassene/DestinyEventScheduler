@@ -56,13 +56,11 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         callback.onSelectedFragment(2);
-
-        if (gameList == null){
-            gameList = callback.getGameList(GameModel.STATUS_DONE);
+        gameList = callback.getGameList(GameModel.STATUS_DONE);
+        if (gameList != null){
+            onGamesLoaded(gameList);
         }
-        onGamesLoaded(gameList);
     }
 
     @Override

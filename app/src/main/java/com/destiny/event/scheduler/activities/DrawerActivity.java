@@ -185,8 +185,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         setContentView(R.layout.drawer_layout);
 
-        //progress.setProgress(10);
-
         progress = (ProgressBar) findViewById(R.id.progress_bar);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -223,7 +221,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (selectedTabFragment != 0) viewPager.setCurrentItem(selectedTabFragment);
 
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            //Log.w("DrawerActivity", "Fragment BackStack Count: " + String.valueOf(getSupportFragmentManager().getBackStackEntryCount()));
             tabLayout.setViewPager(null);
             viewPager.setAdapter(null);
         }
@@ -237,17 +234,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             bungieId = savedInstanceState.getString("bungieId");
             openedFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
             readyAllLists(savedInstanceState);
-            //Toast.makeText(this, "FragmentType: " + openedFragmentType + " FragmentTag: " + fragmentTag, Toast.LENGTH_SHORT).show();
         }
-
-        getClanData();
-        getLoggedUserData();
     }
 
     private void getLoggedUserData() {
         onLoadingData();
         getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
-
     }
 
     private void getClanData() {
@@ -295,6 +287,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         bundle.putString(ServerService.PROFILE_TAG, memberProfile.getMembershipId());
                         runServerService(bundle);
                     }
+                } else if (getOpenedFragment() instanceof  HistoryListFragment){
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_HISTORY_GAMES);
+                    runServerService(bundle);
                 } else refreshLists();
         }
         return super.onOptionsItemSelected(item);
@@ -337,21 +333,25 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(DrawerActivity.FOREGROUND_PREF, true);
         editor.apply();
+
+        getClanData();
+        getLoggedUserData();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         openMainActivity(null);
-        refreshLists();
+        if (intent.hasExtra("notification")){
+            refreshLists();
+        }
     }
 
     @Override
     public void onBackPressed() {
         if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else if (!isServerServiceRunning() || !isBungieServiceRunning()) {
-            if (fragmentTag == null) {
+        } else if (fragmentTag == null) {
                 finish();
             } else if (openedFragmentType == FRAGMENT_TYPE_WITHOUT_BACKSTACK) {
                 openMainActivity(null);
@@ -373,15 +373,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         viewPager.setCurrentItem(0);
                         break;
                 }
-                //Toast.makeText(this, "openedFragment: " + fragmentTag, Toast.LENGTH_SHORT).show();
             } else {
                 super.onBackPressed();
                 openedFragment = fm.findFragmentById(R.id.content_frame);
                 if (openedFragment != null) fragmentTag = openedFragment.getTag();
-                //Toast.makeText(this, "openedFragment: " + openedFragment.getClass().getName(), Toast.LENGTH_SHORT).show();
-                //openedFragmentType = FRAGMENT_TYPE_WITHOUT_BACKSTACK;
             }
-        }
     }
 
     private Fragment getOpenedFragment() {
@@ -404,6 +400,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("allGameList", allGameList);
+        outState.putSerializable("validatedGameList", validatedGameList);
         outState.putString("fragTag", fragmentTag);
         outState.putInt("fragType", openedFragmentType);
         outState.putSerializable("entryList", entryList);
@@ -434,9 +431,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             if (doneEventsListener != null) doneEventsListener.onGamesLoaded(doneGameList);
 
             searchGameList = getGamesFromList(GameModel.STATUS_AVAILABLE);
-            validatedGameList = getGamesFromList(GameModel.STATUS_VALIDATED);
             joinedGameList = getGamesFromList(GameModel.STATUS_JOINED);
         }
+        validatedGameList = (ArrayList<GameModel>) savedInstanceState.getSerializable("validatedGameList");
         entryList = (ArrayList<MemberModel>) savedInstanceState.getSerializable("entryList");
         historyEntries = (ArrayList<MemberModel>) savedInstanceState.getSerializable("historyEntries");
         memberProfile = (MemberModel) savedInstanceState.getSerializable("memberProfile");
@@ -839,7 +836,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void getGameHistory(int gameId) {
+    public void getHistoryEntries(int gameId) {
         if (historyEntries == null) {
             Log.w(TAG, "historyEntries is null");
             if (NetworkUtils.checkConnection(this)) {
@@ -857,6 +854,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 userDataListener.onEntriesLoaded(historyEntries, false);
             }
         }
+    }
+
+    @Override
+    public List<GameModel> getHistoryGames() {
+        return validatedGameList;
     }
 
     @Override
@@ -1339,6 +1341,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 }
                 onDataLoaded();
                 break;
+            case ServerService.STATUS_RUNNING:
+                onLoadingData();
+                break;
             case ServerService.STATUS_ERROR:
                 progress.setVisibility(View.GONE);
                 int error = resultData.getInt(ServerService.ERROR_TAG);
@@ -1361,154 +1366,158 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 onDataLoaded();
                 break;
             case ServerService.STATUS_FINISHED:
-                if (resultData.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_CREATE_GAME) {
-                    toCreateGame.setGameId(resultData.getInt(ServerService.INT_TAG));
-                    onEventCreated(toCreateGame);
-                }
-                if (getOpenedFragment() instanceof SearchFragment) {
-                    if (userDataListener != null) {
-                        searchGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
-                        userDataListener.onGamesLoaded(searchGameList);
-                    }
-                }
-                if (getOpenedFragment() instanceof MyEventsFragment) {
-                    if (userDataListener != null) {
-                        ArrayList<GameModel> gameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
-                        joinedGameList = getJoinedGames(gameList);
-                        userDataListener.onGamesLoaded(joinedGameList);
-                    }
-                }
-                if (getOpenedFragment() instanceof HistoryListFragment) {
-                    Log.w(TAG, "fragment instance of HistoryListFragment");
-                    if (userDataListener != null) {
+                switch (resultData.getInt(ServerService.REQUEST_TAG)) {
+                    case ServerService.TYPE_CREATE_GAME:
+                        toCreateGame.setGameId(resultData.getInt(ServerService.INT_TAG));
+                        onEventCreated(toCreateGame);
+                        break;
+                    case ServerService.TYPE_HISTORY_GAMES:
+                        validatedGameList = new ArrayList<>();
                         validatedGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
-                        userDataListener.onGamesLoaded(validatedGameList);
-                    } else Log.w(TAG, "validatedEventListener is null");
-                }
-                if (getOpenedFragment() instanceof DetailEventFragment) {
-                    Log.w(TAG, "DetailEventFragment is the opened Fragment");
-                    if (resultData.containsKey(ServerService.REQUEST_TAG) && resultData.containsKey(ServerService.INT_TAG)) {
-                        switch (resultData.getInt(ServerService.REQUEST_TAG)) {
-                            case ServerService.TYPE_JOIN_GAME:
-                                for (int i = 0; i < allGameList.size(); i++) {
-                                    if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
-                                        allGameList.get(i).setJoined(true);
-                                        allGameList.get(i).setInscriptions(allGameList.get(i).getInscriptions() + 1);
-                                        break;
-                                    }
-                                }
+                        if (userDataListener != null && getOpenedFragment() instanceof HistoryListFragment) {
+                            userDataListener.onGamesLoaded(validatedGameList);
+                        }
+                        break;
+                    case ServerService.TYPE_NEW_GAMES:
+                        searchGameList = new ArrayList<>();
+                        searchGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
+                        if (userDataListener != null && getOpenedFragment() instanceof SearchFragment) {
+                            userDataListener.onGamesLoaded(searchGameList);
+                        }
+                        break;
+                    case ServerService.TYPE_JOINED_GAMES:
+                        joinedGameList = new ArrayList<>();
+                        joinedGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
+                        if (userDataListener != null && getOpenedFragment() instanceof MyEventsFragment) {
+                            userDataListener.onGamesLoaded(joinedGameList);
+                        }
+                        break;
+                    case ServerService.TYPE_JOIN_GAME:
+                        for (int i = 0; i < allGameList.size(); i++) {
+                            if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
+                                allGameList.get(i).setJoined(true);
+                                allGameList.get(i).setInscriptions(allGameList.get(i).getInscriptions() + 1);
                                 break;
-                            case ServerService.TYPE_LEAVE_GAME:
-                                for (int i = 0; i < allGameList.size(); i++) {
-                                    if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
-                                        allGameList.get(i).setJoined(false);
-                                        allGameList.get(i).setInscriptions(allGameList.get(i).getInscriptions() - 1);
-                                        break;
-                                    }
-                                }
-                                break;
-                            case ServerService.TYPE_DELETE_GAME:
-                                for (int i = 0; i < allGameList.size(); i++) {
-                                    if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
-                                        allGameList.remove(i);
-                                        break;
-                                    }
-                                }
-                                break;
+                            }
                         }
                         newGameList = getGamesFromList(GameModel.STATUS_NEW);
                         scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
                         closeFragment();
-                        if (newEventsListener != null) {
-                            newEventsListener.onGamesLoaded(newGameList);
-                        }
-                        if (scheduledEventsListener != null) {
-                            scheduledEventsListener.onGamesLoaded(scheduledGameList);
-                        }
-                    } else {
-                        entryList = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
-                        userDataListener.onEntriesLoaded(entryList, true);
-                        if (!isLocalServiceRunning() && entryList != null) updateMembers(entryList);
-                    }
-                }
-                if (getOpenedFragment() instanceof DetailValidationFragment) {
-                    if (resultData.containsKey(ServerService.REQUEST_TAG) && resultData.containsKey(ServerService.INT_TAG)) {
+                        updateGameList(newEventsListener, newGameList);
+                        updateGameList(scheduledEventsListener, scheduledGameList);
+                        break;
+                    case ServerService.TYPE_LEAVE_GAME:
                         for (int i = 0; i < allGameList.size(); i++) {
                             if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
-                                switch (resultData.getInt(ServerService.REQUEST_TAG)) {
-                                    case ServerService.TYPE_VALIDATE_GAME:
-                                        allGameList.get(i).setStatus(GameModel.STATUS_VALIDATED);
-                                        allGameList.get(i).setEvaluated(true);
-                                        break;
-                                    case ServerService.TYPE_DELETE_GAME:
-                                        allGameList.remove(i);
-                                        break;
-                                    case ServerService.TYPE_EVALUATE_GAME:
-                                        allGameList.get(i).setEvaluated(true);
-                                        break;
-                                }
+                                allGameList.get(i).setJoined(false);
+                                allGameList.get(i).setInscriptions(allGameList.get(i).getInscriptions() - 1);
+                                break;
+                            }
+                        }
+                        newGameList = getGamesFromList(GameModel.STATUS_NEW);
+                        scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
+                        closeFragment();
+                        updateGameList(newEventsListener, newGameList);
+                        updateGameList(scheduledEventsListener, scheduledGameList);
+                        break;
+                    case ServerService.TYPE_DELETE_GAME:
+                        for (int i = 0; i < allGameList.size(); i++) {
+                            if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
+                                allGameList.remove(i);
+                                break;
+                            }
+                        }
+                        newGameList = getGamesFromList(GameModel.STATUS_NEW);
+                        scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
+                        doneGameList = getGamesFromList(GameModel.STATUS_DONE);
+                        closeFragment();
+                        updateGameList(newEventsListener, newGameList);
+                        updateGameList(scheduledEventsListener, scheduledGameList);
+                        updateGameList(doneEventsListener, doneGameList);
+                        break;
+                    case ServerService.TYPE_GAME_ENTRIES:
+                        entryList = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
+                        if (userDataListener != null)
+                            userDataListener.onEntriesLoaded(entryList, true);
+                        if (!isLocalServiceRunning() && entryList != null) updateMembers(entryList);
+                        break;
+                    case ServerService.TYPE_VALIDATE_GAME:
+                        for (int i = 0; i < allGameList.size(); i++) {
+                            if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
+                                allGameList.get(i).setStatus(GameModel.STATUS_VALIDATED);
+                                allGameList.get(i).setEvaluated(true);
                             }
                         }
                         doneGameList = getGamesFromList(GameModel.STATUS_DONE);
                         closeFragment();
-                        if (doneEventsListener != null) {
-                            doneEventsListener.onGamesLoaded(doneGameList);
+                        updateGameList(doneEventsListener, doneGameList);
+                        break;
+                    case ServerService.TYPE_EVALUATE_GAME:
+                        for (int i = 0; i < allGameList.size(); i++) {
+                            if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
+                                allGameList.get(i).setEvaluated(true);
+                                break;
+                            }
                         }
-                    } else {
-                        entryList = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
-                        userDataListener.onEntriesLoaded(entryList, true);
-                        if (!isLocalServiceRunning() && entryList != null) updateMembers(entryList);
-                    }
-                }
-                if (getOpenedFragment() instanceof DetailHistoryFragment) {
-                    historyEntries = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
-                    userDataListener.onEntriesLoaded(historyEntries, true);
-                }
-                if (resultData.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_ALL_GAMES) {
-                    Log.w(TAG, "No fragments open. Refreshing main lists");
-                    allGameList = new ArrayList<>();
-                    allGameList.addAll((ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG));
-
-                    if (allGameList != null) {
-                        newGameList = getGamesFromList(GameModel.STATUS_NEW);
-                        if (newGameList != null && newEventsListener != null) {
-                            updateNewGamesListPref();
-                            newEventsListener.onGamesLoaded(newGameList);
-                        } else Log.w(TAG, "newGameList is null");
-
-                        scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
-                        if (scheduledGameList != null && scheduledEventsListener != null) {
-                            scheduledEventsListener.onGamesLoaded(scheduledGameList);
-                            if (!isNotifyServiceRunning()) updateNotifications(scheduledGameList);
-                        } else Log.w(TAG, "scheduledGameList is null");
-
                         doneGameList = getGamesFromList(GameModel.STATUS_DONE);
-                        if (doneGameList != null && doneEventsListener != null) {
-                            doneEventsListener.onGamesLoaded(doneGameList);
-                        } else Log.w(TAG, "doneGameList is null");
-
-                        searchGameList = getGamesFromList(GameModel.STATUS_NEW);
-                        joinedGameList = getGamesFromList(GameModel.STATUS_JOINED);
-                        validatedGameList = getGamesFromList(GameModel.STATUS_VALIDATED);
-                    }
-                }
-                if (resultData.containsKey(ServerService.PROFILE_TAG)) {
-                    MemberModel member = (MemberModel) resultData.getSerializable(ServerService.PROFILE_TAG);
-                    if (member != null) {
-                        Log.w(TAG, "member " + member.getName() + " sent by ServerService");
-                        memberProfile = member;
-                        ArrayList<MemberModel> mList = new ArrayList<>();
-                        mList.add(member);
-                        updateMembers(mList);
-                        if (getOpenedFragment() instanceof MyNewProfileFragment) {
-                            MyNewProfileFragment frag = (MyNewProfileFragment) getOpenedFragment();
-                            frag.onMemberLoaded(member, true);
+                        closeFragment();
+                        updateGameList(doneEventsListener, doneGameList);
+                        break;
+                    case ServerService.TYPE_HISTORY:
+                        historyEntries = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
+                        if (userDataListener != null && getOpenedFragment() instanceof DetailHistoryFragment) {
+                            userDataListener.onEntriesLoaded(historyEntries, true);
                         }
-                    }
+                        break;
+                    case ServerService.TYPE_ALL_GAMES:
+                        Log.w(TAG, "No fragments open. Refreshing main lists");
+                        allGameList = new ArrayList<>();
+                        allGameList.addAll((ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG));
+
+                        if (allGameList != null) {
+                            newGameList = getGamesFromList(GameModel.STATUS_NEW);
+                            if (newGameList != null && newEventsListener != null) {
+                                updateNewGamesListPref();
+                                newEventsListener.onGamesLoaded(newGameList);
+                            } else Log.w(TAG, "newGameList is null");
+
+                            scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
+                            if (scheduledGameList != null && scheduledEventsListener != null) {
+                                scheduledEventsListener.onGamesLoaded(scheduledGameList);
+                                if (!isNotifyServiceRunning())
+                                    updateNotifications(scheduledGameList);
+                            } else Log.w(TAG, "scheduledGameList is null");
+
+                            doneGameList = getGamesFromList(GameModel.STATUS_DONE);
+                            if (doneGameList != null && doneEventsListener != null) {
+                                doneEventsListener.onGamesLoaded(doneGameList);
+                            } else Log.w(TAG, "doneGameList is null");
+
+                            searchGameList = getGamesFromList(GameModel.STATUS_NEW);
+                            joinedGameList = getGamesFromList(GameModel.STATUS_JOINED);
+                        }
+                        break;
+                    case ServerService.TYPE_PROFILE:
+                        MemberModel member = (MemberModel) resultData.getSerializable(ServerService.PROFILE_TAG);
+                        if (member != null) {
+                            Log.w(TAG, "member " + member.getName() + " sent by ServerService");
+                            memberProfile = member;
+                            ArrayList<MemberModel> mList = new ArrayList<>();
+                            mList.add(member);
+                            if (!isLocalServiceRunning()) updateMembers(mList);
+                            if (userDataListener != null && getOpenedFragment() instanceof MyNewProfileFragment) {
+                               userDataListener.onMemberLoaded(memberProfile, false);
+                            }
+                        }
+                        break;
                 }
                 onDataLoaded();
                 break;
         }
+    }
+
+    private void updateGameList(UserDataListener listener, ArrayList<GameModel> list) {
+        if (listener != null) listener.onGamesLoaded(list);
     }
 
     private void updateNewGamesListPref() {
@@ -1601,23 +1610,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         return memberProfile;
     }
 
-    private ArrayList<GameModel> getJoinedGames(ArrayList<GameModel> gameList) {
-        ArrayList<GameModel> result = new ArrayList<>();
-        for (int i = 0; i < gameList.size(); i++) {
-            if (gameList.get(i).isJoined() && !gameList.get(i).isEvaluated()) {
-                if (gameList.get(i).getStatus() == 2) {
-                    if (!gameList.get(i).getCreatorId().equals(bungieId)) {
-                        result.add(gameList.get(i));
-                    }
-                } else {
-                    result.add(gameList.get(i));
-                }
-            }
-        }
-        Collections.sort(result, new GameComparator());
-        return result;
-    }
-
     private ArrayList<GameModel> getGamesFromList(int type) {
         ArrayList<GameModel> result = new ArrayList<>();
         if (allGameList != null) {
@@ -1707,13 +1699,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public class DoneGameComparator implements Comparator<GameModel>{
         @Override
         public int compare(GameModel game1, GameModel game2) {
-            int statusCompare = game1.getStatus() -  game2.getStatus();
-            return statusCompare;
-/*            if (statusCompare != 0){
-                return statusCompare;
-            } else {
-                return (int) (DateUtils.stringToDate(game1.getTime()).getTimeInMillis() - DateUtils.stringToDate(game2.getTime()).getTimeInMillis());
-            }*/
+            return game1.getStatus() -  game2.getStatus();
         }
     }
 

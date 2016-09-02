@@ -52,6 +52,7 @@ public class ServerService extends IntentService {
 
     private static final String STATUS_PARAM = "status=";
     private static final String JOINED_PARAM = "joined=";
+    private static final String EVALUATED_PARAM = "evaluated=";
 
     private static final String MEMBER_HEADER = "membership";
     private static final String PLATFORM_HEADER = "platform";
@@ -67,10 +68,6 @@ public class ServerService extends IntentService {
     public static final String MEMBER_TAG = "memberId";
     public static final String PROFILE_TAG = "profile";
     public static final String PLATFORM_TAG = "platformId";
-    public static final String EVENT_TAG = "eventId";
-    public static final String TIME_TAG = "time";
-    public static final String LIGHT_TAG = "minLight";
-    public static final String COMMENT_TAG = "comment";
     public static final String RECEIVER_TAG = "receiver";
     public static final String INT_TAG = "intData";
     public static final String GAME_TAG = "gameList";
@@ -81,7 +78,7 @@ public class ServerService extends IntentService {
     public static final String CLASS_TAG = "class";
     public static final String EXCEPTION_TAG = "exception";
 
-    public static final int STATUS_RUNNING = 0;
+    public static final int STATUS_RUNNING = 200;
     public static final int STATUS_FINISHED = 210;
     public static final int STATUS_ERROR = 2404;
 
@@ -241,7 +238,7 @@ public class ServerService extends IntentService {
                 } else sendGameData(receiver, gameList);
                 break;
             case TYPE_HISTORY_GAMES:
-                url = SERVER_BASE_URL + GAME_ENDPOINT + "?" + STATUS_PARAM + String.valueOf(GameModel.STATUS_VALIDATED);
+                url = SERVER_BASE_URL + GAME_ENDPOINT + "?" + STATUS_PARAM + String.valueOf(GameModel.STATUS_VALIDATED) + "&" + JOINED_PARAM + "true&" + EVALUATED_PARAM + "true";
                 error = requestServer(receiver, type, url, null);
                 if (error != NO_ERROR) {
                     sendError(receiver, error);
@@ -310,6 +307,7 @@ public class ServerService extends IntentService {
 
     private void sendMemberData(ResultReceiver receiver, MemberModel member) {
         Bundle bundle = new Bundle();
+        bundle.putInt(REQUEST_TAG, type);
         bundle.putSerializable(PROFILE_TAG, member);
         receiver.send(STATUS_FINISHED, bundle);
     }
@@ -323,6 +321,7 @@ public class ServerService extends IntentService {
 
     private void sendEntryData(ResultReceiver receiver, ArrayList<MemberModel> memberList) {
         Bundle bundle = new Bundle();
+        bundle.putInt(REQUEST_TAG, type);
         bundle.putSerializable(ENTRY_TAG, memberList);
         receiver.send(STATUS_FINISHED, bundle);
     }
@@ -631,7 +630,7 @@ public class ServerService extends IntentService {
     }
 
     private int parseGames(String response){
-        Log.w(TAG, "GetNewGames response: " + response);
+        Log.w(TAG, "getGames response: " + response);
         JSONArray jResponse;
         gameList = new ArrayList<>();
         try {

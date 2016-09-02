@@ -150,7 +150,7 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
 
         if (historyEntries == null || historyEntries.size() == 0){
             Log.w(TAG, "historyEntries size = 0");
-            callback.getGameHistory(game.getGameId());
+            callback.getHistoryEntries(game.getGameId());
         } else {
             Log.w(TAG, "historyEntries size > 0");
             onEntriesLoaded(historyEntries, false);
