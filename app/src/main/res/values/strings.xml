@@ -24,10 +24,10 @@
     <string-array name="menu_item">
         <item>Main</item>
         <item>Create event</item>
-        <item>Search events</item>
+        <item>Search event</item>
         <item>My events</item>
         <item>History</item>
-        <item>My elan</item>
+        <item>My clan</item>
         <item>My stats</item>
         <item>Settings</item>
         <item>About</item>
@@ -598,6 +598,9 @@
     <string name="optional_comment">Optional comment</string>
     <string name="comment">Comment</string>
     <string name="for_evaluation">For evaluate</string>
+    <string name="help"><![CDATA[Help & More]]></string>
+    <string name="visit_website">Visit our website to learn more</string>
+    <string name="website">http://destinyscheduler.wordpress.com/</string>
 
 
 </resources>

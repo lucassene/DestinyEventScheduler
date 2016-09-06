@@ -50,14 +50,14 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
+            android:layout_weight="2"
             android:text="@string/date"
             android:paddingBottom="@dimen/paddingBottomLabelText" />
 
         <TextView
             android:id="@+id/date"
             android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:gravity="end"
             android:layout_height="wrap_content"
             android:text="24/03/2016"
@@ -75,7 +75,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
+            android:layout_weight="2"
             android:text="@string/time"
             android:paddingBottom="@dimen/paddingBottomLabelText" />
 
@@ -83,7 +83,7 @@
             android:id="@+id/time"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:gravity="end"
             android:text="11:38"
             android:textSize="@dimen/secondaryTextSize"/>
@@ -112,7 +112,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
+            android:layout_weight="2"
             android:text="@string/min_light"
             android:paddingBottom="@dimen/paddingBottomLabelText" />
 
@@ -137,7 +137,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
+            android:layout_weight="2"
             android:text="@string/guardians"
             android:paddingBottom="@dimen/paddingBottomLabelText" />
 

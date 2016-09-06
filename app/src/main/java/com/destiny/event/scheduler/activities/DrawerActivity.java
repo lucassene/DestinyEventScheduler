@@ -117,6 +117,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
     public static final int FRAGMENT_TYPE_WITH_BACKSTACK = 1;
 
+    public static final int TYPE_EMAIL_INTENT = 1;
+    public static final int TYPE_BROWSER_INTENT = 2;
+
     RecyclerView rView;
     RecyclerView.Adapter rAdapter;
     RecyclerView.LayoutManager rLayoutManager;
@@ -399,6 +402,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putInt("selectedItem", selectedDrawerItem);
         outState.putSerializable("allGameList", allGameList);
         outState.putSerializable("validatedGameList", validatedGameList);
         outState.putString("fragTag", fragmentTag);
@@ -412,6 +416,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        selectedDrawerItem = savedInstanceState.getInt("selectedItem");
         readyAllLists(savedInstanceState);
     }
 
@@ -456,7 +461,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         tabLayout.setViewPager(viewPager);
         selectedDrawerItem = 1;
         rAdapter.notifyDataSetChanged();
-        //viewPager.setCurrentItem(1);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -990,7 +994,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         MainSettingsFragment fragment = new MainSettingsFragment();
         prepareFragmentHolder(fragment, child, null, "config");
         return true;
-
     }
 
     private boolean openAboutFragment(View child) {
@@ -1094,19 +1097,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void prepareDrawerMenu() {
 
         String[] items = getResources().getStringArray(R.array.menu_item);
-        //TypedArray icons = getResources().obtainTypedArray(R.array.menu_icons);
-
         String[] sections = getResources().getStringArray(R.array.menu_section);
 
-        selectedDrawerItem = 1;
+        if (selectedDrawerItem < 1) selectedDrawerItem = 1;
         rView = (RecyclerView) findViewById(R.id.drawer_view);
         rAdapter = new DrawerAdapter(this, sections, items, clanIcon, clanName, clanDesc, clanBanner);
         rView.setAdapter(rAdapter);
         rLayoutManager = new LinearLayoutManager(this);
         rView.setLayoutManager(rLayoutManager);
-
         fm = getSupportFragmentManager();
-        //fm.addOnBackStackChangedListener(this);
 
         final GestureDetector gestureDetector = new GestureDetector(DrawerActivity.this, new GestureDetector.SimpleOnGestureListener() {
             @Override
@@ -1162,7 +1161,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             break;
                         case 11:
                             selectedDrawerItem = 11;
-                            openDBViewerFragment(child);
+                            openAboutFragment(child);
                             break;
                         case 12:
                             selectedDrawerItem = 12;
@@ -1219,7 +1218,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             selectedDrawerItem = 12;
                             return showLogOffDialog(child);
                     }
-                    return true;
+                    return false;
                 }
                 return false;
             }
@@ -1446,6 +1445,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
                                 allGameList.get(i).setStatus(GameModel.STATUS_VALIDATED);
                                 allGameList.get(i).setEvaluated(true);
+                                validatedGameList.add(allGameList.get(i));
+                                Collections.sort(validatedGameList,new GameComparator());
                             }
                         }
                         doneGameList = getGamesFromList(GameModel.STATUS_DONE);
@@ -1456,6 +1457,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         for (int i = 0; i < allGameList.size(); i++) {
                             if (allGameList.get(i).getGameId() == resultData.getInt(ServerService.INT_TAG)) {
                                 allGameList.get(i).setEvaluated(true);
+                                validatedGameList.add(allGameList.get(i));
+                                Collections.sort(validatedGameList,new GameComparator());
                                 break;
                             }
                         }
@@ -1608,6 +1611,20 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public MemberModel getMemberProfile() {
         return memberProfile;
+    }
+
+    @Override
+    public void callAndroidIntent(int type, String text) {
+        switch (type){
+            case TYPE_BROWSER_INTENT:
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(text));
+                startActivity(intent);
+                break;
+            case TYPE_EMAIL_INTENT:
+                Intent eIntent = new Intent(Intent.ACTION_SENDTO,Uri.parse("mailto:" + text));
+                startActivity(eIntent);
+                break;
+        }
     }
 
     private ArrayList<GameModel> getGamesFromList(int type) {

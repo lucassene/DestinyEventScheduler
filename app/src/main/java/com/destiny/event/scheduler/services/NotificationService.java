@@ -154,7 +154,7 @@ public class NotificationService extends IntentService {
 
     private Bitmap getLargeIcon(String iconId){
 
-        if (iconId.equals("ic_osiris")){
+        if (iconId.equals("ic_trials")){
             BitmapDrawable bD = (BitmapDrawable) ContextCompat.getDrawable(this, getResources().getIdentifier(iconId,"drawable",getPackageName()));
             return bD.getBitmap();
         } else {

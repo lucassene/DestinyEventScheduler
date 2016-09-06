@@ -10,13 +10,17 @@
         android:gravity="center_vertical"
         android:textSize="13sp"
         android:text="@string/application"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/listItemHeight"
         android:orientation="vertical"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp">
 
         <TextView
             android:layout_width="match_parent"
@@ -41,13 +45,16 @@
         android:gravity="center_vertical"
         android:textSize="13sp"
         android:text="@string/developers"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp"/>
 
     <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="@dimen/listItemHeight"
     android:orientation="vertical"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+        android:paddingLeft="8dp">
 
     <TextView
         android:layout_width="match_parent"
@@ -69,7 +76,9 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/listItemHeight"
         android:orientation="vertical"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp">
 
         <TextView
             android:layout_width="match_parent"
@@ -94,13 +103,20 @@
         android:gravity="center_vertical"
         android:textSize="13sp"
         android:text="@string/contact"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp"/>
 
     <LinearLayout
+        android:id="@+id/email_layout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/listItemHeight"
         android:orientation="vertical"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp">
 
         <TextView
             android:layout_width="match_parent"
@@ -113,6 +129,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/email"
+            android:textSize="13sp"
+            android:alpha="0.75"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/help_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/listItemHeight"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/visit_website"
             android:textSize="13sp"
             android:alpha="0.75"/>
 

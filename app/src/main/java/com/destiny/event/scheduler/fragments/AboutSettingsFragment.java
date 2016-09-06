@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
@@ -16,6 +17,9 @@ import com.destiny.event.scheduler.interfaces.ToActivityListener;
 public class AboutSettingsFragment extends Fragment {
 
     private ToActivityListener callback;
+
+    LinearLayout emailLayout;
+    LinearLayout helpLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,6 +30,22 @@ public class AboutSettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.about_settings_layout, container, false);
+        emailLayout = (LinearLayout) v.findViewById(R.id.email_layout);
+        helpLayout = (LinearLayout) v.findViewById(R.id.help_layout);
+
+        emailLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.callAndroidIntent(DrawerActivity.TYPE_EMAIL_INTENT, getString(R.string.email));
+            }
+        });
+
+        helpLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.callAndroidIntent(DrawerActivity.TYPE_BROWSER_INTENT, getString(R.string.website));
+            }
+        });
 
         return v;
     }

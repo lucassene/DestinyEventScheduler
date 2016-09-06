@@ -238,7 +238,7 @@ public class ServerService extends IntentService {
                 } else sendGameData(receiver, gameList);
                 break;
             case TYPE_HISTORY_GAMES:
-                url = SERVER_BASE_URL + GAME_ENDPOINT + "?" + STATUS_PARAM + String.valueOf(GameModel.STATUS_VALIDATED) + "&" + JOINED_PARAM + "true&" + EVALUATED_PARAM + "true";
+                url = SERVER_BASE_URL + GAME_ENDPOINT + HISTORY_ENDPOINT;
                 error = requestServer(receiver, type, url, null);
                 if (error != NO_ERROR) {
                     sendError(receiver, error);

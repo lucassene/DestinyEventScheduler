@@ -121,7 +121,7 @@ public class MemberTable {
             if (prefix.equals("a")){
                 return getLevelTitle(context, xp) + " " + title.substring(title.indexOf(":")+1,title.length());
             } else if (prefix.equals("b")){
-                return title + " " + getLevelTitle(context, xp);
+                return title.substring(title.indexOf(":")+1,title.length()) + " " + getLevelTitle(context, xp);
             } else return "Error";
         }
     }

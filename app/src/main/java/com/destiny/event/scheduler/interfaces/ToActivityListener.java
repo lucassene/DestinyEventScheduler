@@ -48,4 +48,5 @@ public interface ToActivityListener {
     public void registerNewGamesAlarm();
     public void deleteNewGamesAlarm();
     public MemberModel getMemberProfile();
+    public void callAndroidIntent(int type, String text);
 }
