@@ -2,102 +2,102 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-basement\9.4.0\jars\classes.jar"
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.4.0\jars\classes.jar"
         jumboMode="false"
-        revision="23.0.2"
-        sha1="618485fef3ebe12127f7622abbc9b5b39057b5c2">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-basement-9.4.0_b722b817efb4a0bcc0a1fd61017f076480fcb84e.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-base\9.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="3dee4ce5844d39d843d503fb8fe04e51e5bfffac">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-base-9.4.0_0cb0e7ff707a469f63260676892f9c02d21d15a5.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-appindexing\9.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="c10df7344e31161852c20bb8143fc37319aa10ec">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-appindexing-9.4.0_da18ef3190a5790516d72b96496381e12b86b0c8.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="ec75036c3c52e451d0cde50a5aedaf5fd32354a0">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-recyclerview-v7-23.4.0_1e9c29063cb59e855e1db0b35ae17306fe6e70be.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\design\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="5326d9a850d491714fef8cbfaa9ea3416f0bf0d2">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-design-23.4.0_9f30a2310e5a7611ae4ed281761dc8b0bc98d978.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.4.0\support-annotations-23.4.0.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="ffbe55fdb2bb456b1485831706a9eac3300bb6b8">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\support-annotations-23.4.0_a160ab4c4b4965d75da70792fd181401ebd307d6.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\.gradle\caches\modules-2\files-2.1\com.github.PhilJay\MPAndroidChart\v2.2.3\f474798fde03291398b1a016118b9809a79550b7\MPAndroidChart-v2.2.3.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="f474798fde03291398b1a016118b9809a79550b7">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\MPAndroidChart-v2.2.3_05df6a7436db3cb51008a5aec91c37f639dfd03a.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="c2c594cace5d83a3227b2b6e658ecbfd586d3ed9">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-support-vector-drawable-23.4.0_2c40ed158fdec59a50f8d1b55d3233ee673005c9.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="de4db3785756bfb0915a9f59a9b3f2fea7407be4">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-animated-vector-drawable-23.4.0_b1a977a2b9e4af62997fbe150493e03cbb33725a.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-tasks\9.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="8a36d229011e75f0caef408e1adf0d3fd4d94e02">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-tasks-9.4.0_60b66e186f82585a8a8799f8808c238e1d4f387b.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.firebase\firebase-common\9.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="18b5697c65c4fe5b7381613b8b8ae9ac52e26fa7">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.google.firebase-firebase-common-9.4.0_8e77f022b6d1d6997ea5ce8e0bc6d36898553cb5.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="67bd36ee9340ec7c254108936ad16b24bed160cc">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-support-v4-23.4.0_0665aa66f7d3d49f4add5134c0bfd289c8de104b.jar" />
-    </item>
-    <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
+        revision="23.0.3"
         sha1="548f06de403a9409f00554b3ee12a9fdea0e236c">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-23.4.0_041b890f512302eb4072f743d647098eb315527f.jar" />
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-23.4.0_f29732b00eda3aa791962fe9c866d4fe43840287.jar" />
     </item>
     <item
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.4.0\jars\libs\internal_impl-23.4.0.jar"
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.firebase\firebase-common\9.4.0\jars\classes.jar"
         jumboMode="false"
-        revision="23.0.2"
+        revision="23.0.3"
+        sha1="18b5697c65c4fe5b7381613b8b8ae9ac52e26fa7">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.google.firebase-firebase-common-9.4.0_2f2280fcf5f3fd5a52c9557b701803b5461602d6.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\.gradle\caches\modules-2\files-2.1\com.github.PhilJay\MPAndroidChart\v2.2.3\f474798fde03291398b1a016118b9809a79550b7\MPAndroidChart-v2.2.3.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="f474798fde03291398b1a016118b9809a79550b7">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\MPAndroidChart-v2.2.3_c4defba33851b26a9f7118f34ded7f2fc7beffe5.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\23.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="de4db3785756bfb0915a9f59a9b3f2fea7407be4">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-animated-vector-drawable-23.4.0_661637a2498012c7d2b98d0eb1542969edcdc065.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.4.0\support-annotations-23.4.0.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="ffbe55fdb2bb456b1485831706a9eac3300bb6b8">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\support-annotations-23.4.0_c68f7e08f571982c6e7464a7e8037212c3d1463e.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.4.0\jars\libs\internal_impl-23.4.0.jar"
+        jumboMode="false"
+        revision="23.0.3"
         sha1="ea3c07504d2c8f4b13aa17c45c1b68ed9c1c3674">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\internal_impl-23.4.0_94a457fc6cbdc396c341398e528483828a832573.jar" />
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\internal_impl-23.4.0_58a87e885bcb73a3fabbe63ca9cab099fdf65f1d.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-tasks\9.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="8a36d229011e75f0caef408e1adf0d3fd4d94e02">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-tasks-9.4.0_63570fa99e967abec544dff18e6bf08497cf56e6.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-appindexing\9.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="c10df7344e31161852c20bb8143fc37319aa10ec">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-appindexing-9.4.0_202ea6362176745f4c6ff6be784936fe0818974e.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\design\23.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="5326d9a850d491714fef8cbfaa9ea3416f0bf0d2">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-design-23.4.0_79ba3247d4014e4f85ef3c22d510450377796ce4.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-basement\9.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="618485fef3ebe12127f7622abbc9b5b39057b5c2">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-basement-9.4.0_bd606796bc4af2925f5bffb88d0f2ed6097b5fb6.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="67bd36ee9340ec7c254108936ad16b24bed160cc">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-support-v4-23.4.0_4892d670c3c0389921f21bb05c1c203118955b47.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-base\9.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="3dee4ce5844d39d843d503fb8fe04e51e5bfffac">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-base-9.4.0_ab3a771f8f70a3add03b00db72efcc7f25d23406.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="ec75036c3c52e451d0cde50a5aedaf5fd32354a0">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-recyclerview-v7-23.4.0_7df3a444c715b59dedd23f38202eddb0da5b5c6f.jar" />
+    </item>
+    <item
+        jar="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\23.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="c2c594cace5d83a3227b2b6e658ecbfd586d3ed9">
+        <dex dex="C:\Users\Lucas\Documents\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\debug\com.android.support-support-vector-drawable-23.4.0_87cf39420280711dcc7ea8cdd7b2b1da3bb6f2c2.jar" />
     </item>
 
 </items>

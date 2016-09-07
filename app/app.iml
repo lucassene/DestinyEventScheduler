@@ -133,5 +133,6 @@
     <orderEntry type="library" exported="" name="play-services-tasks-9.4.0" level="project" />
     <orderEntry type="library" exported="" name="MPAndroidChart-v2.2.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.12" level="project" />
+    <orderEntry type="library" exported="" name="android-android-23" level="project" />
   </component>
 </module>

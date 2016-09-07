@@ -533,5 +533,7 @@
     <string name="comment">Comentário </string>
     <string name="optional_comment">Comentário opcional</string>
     <string name="for_evaluation">Para avaliar</string>
+    <string name="help"><![CDATA[Ajuda & Mais]]></string>
+    <string name="visit_website">Visite nosso site para saber mais</string>
 
 </resources>

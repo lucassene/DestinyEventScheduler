@@ -377,8 +377,8 @@
     <string name="will">The Will of Crota</string>
     <string name="winter">Winter\'s Run</string>
     <string name="wretched">Wretched Eye</string>
-    <string name="heist" translatable="false">Abomination Heist</string>
-    <string name="perfected" translatable="false">Sepiks Perfected</string>
+    <string name="heist">Abomination Heist</string>
+    <string name="perfected">Sepiks Perfected</string>
 
     <string name="nightfall">Nightfall</string>
     <string name="weekly">Weekly Heroic Strike</string>
@@ -400,7 +400,7 @@
     <string name="mars">Patrol Mars</string>
     <string name="moon">Patrol the Moon</string>
     <string name="venus">Patrol Venus</string>
-    <string name="plaguelands" translatable="false">Patrol the Plaguelands</string>
+    <string name="plaguelands">Patrol the Plaguelands</string>
     
     <string name="prison28">Prison of Elders - 28</string>
     <string name="prison32">Prison of Elders - 32</string>
@@ -599,8 +599,8 @@
     <string name="comment">Comment</string>
     <string name="for_evaluation">For evaluate</string>
     <string name="help"><![CDATA[Help & More]]></string>
-    <string name="visit_website">Visit our website to learn more</string>
-    <string name="website">http://destinyscheduler.wordpress.com/</string>
+    <string name="visit_website">Visit our website to know more</string>
+    <string name="website" translatable="false">http://destinyscheduler.wordpress.com/</string>
 
 
 </resources>

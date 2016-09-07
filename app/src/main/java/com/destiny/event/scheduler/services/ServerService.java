@@ -431,6 +431,7 @@ public class ServerService extends IntentService {
                                     Log.w(TAG, "MemberList error: " + err);
                                     if (err == NO_ERROR){
                                         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, LocalService.class);
+                                        intent.putExtra(LocalService.RECEIVER_HEADER, receiver);
                                         intent.putExtra(LocalService.REQUEST_HEADER, LocalService.TYPE_UPDATE_MEMBERS);
                                         intent.putExtra(LocalService.MEMBERS_HEADER, memberList);
                                         intent.putExtra(LocalService.CLAN_HEADER, clanId);

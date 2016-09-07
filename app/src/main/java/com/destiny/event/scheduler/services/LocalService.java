@@ -26,6 +26,7 @@ public class LocalService extends IntentService {
     public static final int TYPE_UPDATE_MEMBERS = 1;
     public static final int STATUS_FINISHED = 310;
 
+    public static final String RECEIVER_HEADER = "receiver";
     public static final String REQUEST_HEADER = "request";
     public static final String MEMBERS_HEADER = "memberList";
     public static final String CLAN_HEADER = "clanId";
@@ -63,8 +64,8 @@ public class LocalService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        if (intent.hasExtra(ServerService.RECEIVER_TAG)){
-            receiver = intent.getParcelableExtra(ServerService.RECEIVER_TAG);
+        if (intent.hasExtra(RECEIVER_HEADER)){
+            receiver = intent.getParcelableExtra(RECEIVER_HEADER);
         } else receiver = null;
 
         int request = intent.getIntExtra(REQUEST_HEADER, 0);
