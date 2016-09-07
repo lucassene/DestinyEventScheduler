@@ -707,7 +707,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public void onEventCreated(GameModel game) {
         openMainActivity(null);
+        if (allGameList == null) allGameList = new ArrayList<>();
         allGameList.add(game);
+        if (scheduledGameList == null) scheduledGameList = new ArrayList<>();
         scheduledGameList.add(game);
         if (scheduledEventsListener != null) {
             scheduledEventsListener.onGamesLoaded(scheduledGameList);
@@ -1681,11 +1683,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     Collections.sort(result, new GameComparator());
                     return result;
                 default:
-                    return null;
+                    return new ArrayList<>();
             }
         } else {
             Log.w(TAG, "gameList is null");
-            return null;
+            return new ArrayList<>();
         }
     }
 

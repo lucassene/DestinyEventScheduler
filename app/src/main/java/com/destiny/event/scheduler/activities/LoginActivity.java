@@ -73,7 +73,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         buttonsLayout = (LinearLayout) findViewById(R.id.buttons_layout);
 
-        buttonsLayout.setVisibility(View.GONE);
+        if (buttonsLayout != null) {
+            buttonsLayout.setVisibility(View.GONE);
+        }
         loginTitle.setVisibility(View.GONE);
         psnButton.setVisibility(View.GONE);
         liveButton.setVisibility(View.GONE);

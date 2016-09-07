@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -19,7 +20,10 @@ import android.util.Log;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
+import com.destiny.event.scheduler.data.LoggedUserTable;
+import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.models.GameModel;
+import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import org.json.JSONArray;
@@ -77,11 +81,19 @@ public class NewGameNotificationService extends IntentService {
 
         previousGames = getPreviousGamesList(sharedPrefs.getString(DrawerActivity.NEW_GAMES_PREF,""));
 
-        memberId = intent.getStringExtra("memberId");
-        platformId = intent.getIntExtra("platformId",0);
-
-        requestServer();
-
+        Cursor cursor = null;
+        try{
+            cursor = getContentResolver().query(DataProvider.LOGGED_USER_URI, LoggedUserTable.ALL_COLUMNS, null, null, null);
+            if (cursor != null && cursor.moveToFirst()){
+                memberId = cursor.getString(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
+                platformId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
+                requestServer();
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+            Log.w(TAG, "cursor is null.");
+            stopSelf();
+        }
     }
 
     @Override
@@ -173,7 +185,6 @@ public class NewGameNotificationService extends IntentService {
         Bitmap finalIcon = Bitmap.createBitmap(bigIcon.getWidth(), bigIcon.getHeight(), bigIcon.getConfig());
         Canvas canvas = new Canvas(finalIcon);
         Paint paint = new Paint();
-        //paint.setColorFilter(new PorterDuffColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP));
         canvas.drawBitmap(bigIcon,0,0,paint);
         return finalIcon;
     }
