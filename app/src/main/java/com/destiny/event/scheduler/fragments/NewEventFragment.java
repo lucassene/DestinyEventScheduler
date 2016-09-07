@@ -527,7 +527,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             game.setTypeId(selectedType);
             game.setTime(gameTime);
             game.setInscriptions(1);
-            game.setMinLight(lightBar.getProgress());
+            game.setMinLight(lightBar.getProgress() + minLight);
             game.setStatus(GameModel.STATUS_NEW);
             if (commentText.getText().length() != 0){
                 game.setComment(commentText.getText().toString());
