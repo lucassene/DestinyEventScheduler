@@ -73,7 +73,13 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
         }
 
         title.setText(context.getResources().getIdentifier(textName, "string", context.getPackageName()));
-        icon.setImageResource(context.getResources().getIdentifier(iconName, "drawable", context.getPackageName()));
+        int resId = context.getResources().getIdentifier(iconName, "drawable", context.getPackageName());
+        if (resId != 0){
+            icon.setImageResource(resId);
+        } else {
+            Log.w(TAG, "Drawable not found.");
+            icon.setImageResource(R.drawable.ic_missing);
+        }
 
     }
 

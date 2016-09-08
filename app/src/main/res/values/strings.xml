@@ -601,6 +601,7 @@
     <string name="help"><![CDATA[Help & More]]></string>
     <string name="visit_website">Visit our website to know more</string>
     <string name="website" translatable="false">http://destinyscheduler.wordpress.com/</string>
+    <string name="version_code" translatable="false">1.02</string>
 
 
 </resources>

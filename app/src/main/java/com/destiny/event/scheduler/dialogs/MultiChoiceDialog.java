@@ -3,6 +3,7 @@ package com.destiny.event.scheduler.dialogs;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -17,15 +18,12 @@ public class MultiChoiceDialog extends DialogFragment implements DialogInterface
     private FromDialogListener listener;
 
     private boolean[] checkedItems;
-    private String[] eventList;
-    private int[] eventIdList;
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         String title = "";
-        eventList = getResources().getStringArray(R.array.event_types);
-        eventIdList = getResources().getIntArray(R.array.event_type_ids);
 
         Bundle bundle = getArguments();
 
@@ -62,20 +60,6 @@ public class MultiChoiceDialog extends DialogFragment implements DialogInterface
     @Override
     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
         checkedItems[which] = isChecked;
-        Log.w(TAG, "Event (" + eventIdList[which] + ") " + eventList[which] + " foi marcado como " + isChecked);
-        getCounts();
-    }
-
-    private void getCounts() {
-        int trues = 0;
-        int total = 0;
-        int falses = 0;
-        for (int i=0;i<checkedItems.length;i++){
-            if (checkedItems[i]){
-                trues ++;
-            } else falses++;
-            total++;
-        }
-        //Toast.makeText(getContext(), "Total: " + total + " True: " + trues + " False: " + falses, Toast.LENGTH_SHORT).show();
+        //Log.w(TAG, "Event (" + eventIdList[which] + ") " + eventList[which] + " foi marcado como " + isChecked);
     }
 }

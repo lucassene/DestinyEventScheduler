@@ -32,7 +32,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="1.01"
+            android:text="@string/version_code"
             android:textSize="13sp"
             android:alpha="0.75"/>
 

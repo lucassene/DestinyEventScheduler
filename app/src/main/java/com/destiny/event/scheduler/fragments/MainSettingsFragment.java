@@ -243,6 +243,18 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         for (int i=0;i<map.size();i++){
             checkedItems[i] = map.get(ids[i]);
         }
+        if (!hasSomeTrue(checkedItems)){
+            checkedItems = new boolean[] {true, true, true, true, true, true, true, true, true};
+        }
+    }
+
+    private boolean hasSomeTrue(boolean[] items){
+        for (boolean item : items) {
+            if (item) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private int getSelectedTime() {
