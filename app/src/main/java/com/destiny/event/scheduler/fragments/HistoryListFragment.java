@@ -200,7 +200,7 @@ public class HistoryListFragment extends Fragment implements AdapterView.OnItemS
     }
 
     @Override
-    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded) {
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId) {
 
     }
 

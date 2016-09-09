@@ -269,7 +269,7 @@
     <string name="guardians_participating">Guardiões participando</string>
     <string name="join">Participar</string>
     <string name="min_light">Luz mínima</string>
-    <string name="participants_guardians">Guardiões participantes</string>
+    <string name="participants_guardians">Guardiões inscritos</string>
     <string name="specs">Especificações</string>
     <string name="time">Horário</string>
     <string name="wait_list">Lista de espera</string>
@@ -538,5 +538,6 @@
     <string name="heist">Golpe da Abominação</string>
     <string name="perfected">Sepiks Aperfeiçoado</string>
     <string name="plaguelands">Patrulhe as Terras Adoecidas</string>
+    <string name="unknown">Desconhecido</string>
 
 </resources>

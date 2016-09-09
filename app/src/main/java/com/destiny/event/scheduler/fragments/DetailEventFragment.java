@@ -304,9 +304,9 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
 
     private void getGameData() {
 
-        eventIcon.setImageResource(getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
-        eventName.setText(getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
-        eventType.setText(getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
+        setViewIcon(eventIcon, getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
+        setViewText(eventName, getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
+        setViewText(eventType, getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
 
         String gameTime = game.getTime();
         eventCalendar = DateUtils.stringToDate(gameTime);
@@ -333,10 +333,28 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
                 getMembers(game.getGameId());
             } else {
                 Log.w(TAG, "entryList size > 0");
-                onEntriesLoaded(entryList, false);
+                onEntriesLoaded(entryList, false, game.getGameId());
             }
         }
 
+    }
+
+    private void setViewText(TextView view, int resId){
+        if (resId != 0){
+            view.setText(resId);
+        } else {
+            Log.w(TAG, "String resource not found.");
+            view.setText(R.string.unknown);
+        }
+    }
+
+    private void setViewIcon(ImageView view, int resId){
+        if (resId != 0){
+            view.setImageResource(resId);
+        } else {
+            Log.w(TAG, "Drawable resource not found.");
+            view.setImageResource(R.drawable.ic_missing);
+        }
     }
 
     private void getMembers(int gameId) {
@@ -344,25 +362,29 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
     }
 
     @Override
-    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded){
-        if (entryList != null){
-            Log.w(TAG, "entryList size: " + entryList.size());
-            this.entryList = (ArrayList<MemberModel>) entryList;
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId){
+        if (gameId == game.getGameId()){
+            if (entryList != null){
+                Log.w(TAG, "entryList size: " + entryList.size());
+                this.entryList = (ArrayList<MemberModel>) entryList;
 
-            int status;
-            if (game.isJoined()){
-                status = GameModel.STATUS_SCHEDULED;
-            } else status = GameModel.STATUS_NEW;
+                int status;
+                if (game.isJoined()){
+                    status = GameModel.STATUS_SCHEDULED;
+                } else status = GameModel.STATUS_NEW;
 
-            if (isUpdateNeeded) { callback.updateGameEntries(status, game.getGameId(), entryList.size()); }
-            String sg = entryList.size() + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
-            guardians.setText(sg);
-            setAdapter(this.entryList, maxGuardians);
-            if (footerView != null){
-                this.getListView().addFooterView(footerView);
+                if (isUpdateNeeded) { callback.updateGameEntries(status, game.getGameId(), entryList.size()); }
+                String sg = entryList.size() + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
+                guardians.setText(sg);
+                setAdapter(this.entryList, maxGuardians);
+                if (footerView != null){
+                    this.getListView().addFooterView(footerView);
+                }
+            } else {
+                Log.w(TAG, "entryList is null");
             }
         } else {
-            Log.w(TAG, "entryList is null");
+            callback.getGameEntries(game.getGameId());
         }
     }
 

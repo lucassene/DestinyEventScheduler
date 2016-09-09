@@ -138,7 +138,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:text="@string/guardians"
+            android:text="@string/participants_guardians"
             android:paddingBottom="@dimen/paddingBottomLabelText" />
 
         <TextView
@@ -159,7 +159,7 @@
         android:id="@+id/section_guardians"
         android:gravity="center_vertical"
         android:textSize="@dimen/secondaryTextSize"
-        android:text="@string/guardians_participating"
+        android:text="@string/guardians"
         android:layout_below="@id/linear_guardians"
         android:textColor="@color/psnColor"
         android:layout_marginTop="8dp"/>

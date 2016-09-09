@@ -180,7 +180,8 @@ public class ServerService extends IntentService {
                 } else sendGameData(receiver, gameList);
                 break;
             case TYPE_GAME_ENTRIES:
-                if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
+                gameId = intent.getIntExtra(GAMEID_TAG, -1);
+                if (gameId != -1){
                     url = SERVER_BASE_URL + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1) + ENTRIES_ENDPOINT;
                     bundle.clear();
                     bundle.putInt(GAMEID_TAG, intent.getIntExtra(GAMEID_TAG, -1));
@@ -270,7 +271,8 @@ public class ServerService extends IntentService {
                 } else sendError(receiver, ERROR_INCORRECT_REQUEST);
                 break;
             case TYPE_HISTORY:
-                if (intent.getIntExtra(GAMEID_TAG, -1) != -1){
+                gameId = intent.getIntExtra(GAMEID_TAG, -1);
+                if (gameId != -1){
                     url = SERVER_BASE_URL + GAME_ENDPOINT + "/" + intent.getIntExtra(GAMEID_TAG, -1) + HISTORY_ENDPOINT;
                     bundle.clear();
                     bundle.putInt(GAMEID_TAG, intent.getIntExtra(GAMEID_TAG, -1));
@@ -322,6 +324,7 @@ public class ServerService extends IntentService {
     private void sendEntryData(ResultReceiver receiver, ArrayList<MemberModel> memberList) {
         Bundle bundle = new Bundle();
         bundle.putInt(REQUEST_TAG, type);
+        bundle.putInt(GAMEID_TAG, gameId);
         bundle.putSerializable(ENTRY_TAG, memberList);
         receiver.send(STATUS_FINISHED, bundle);
     }

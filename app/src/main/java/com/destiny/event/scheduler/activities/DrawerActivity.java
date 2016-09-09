@@ -837,7 +837,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             }
         } else {
             if (userDataListener != null) {
-                userDataListener.onEntriesLoaded(entryList, false);
+                userDataListener.onEntriesLoaded(entryList, false, gameId);
             } else Log.w(TAG, "userDataListener is null");
         }
     }
@@ -858,7 +858,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             }
         } else {
             if (userDataListener != null) {
-                userDataListener.onEntriesLoaded(historyEntries, false);
+                userDataListener.onEntriesLoaded(historyEntries, false, gameId);
             }
         }
     }
@@ -1437,7 +1437,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     case ServerService.TYPE_GAME_ENTRIES:
                         entryList = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
                         if (userDataListener != null)
-                            userDataListener.onEntriesLoaded(entryList, true);
+                            userDataListener.onEntriesLoaded(entryList, true, resultData.getInt(ServerService.GAMEID_TAG));
                         if (!isLocalServiceRunning() && entryList != null) updateMembers(entryList);
                         break;
                     case ServerService.TYPE_VALIDATE_GAME:
@@ -1473,7 +1473,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     case ServerService.TYPE_HISTORY:
                         historyEntries = (ArrayList<MemberModel>) resultData.getSerializable(ServerService.ENTRY_TAG);
                         if (userDataListener != null && getOpenedFragment() instanceof DetailHistoryFragment) {
-                            userDataListener.onEntriesLoaded(historyEntries, true);
+                            userDataListener.onEntriesLoaded(historyEntries, true, resultData.getInt(ServerService.GAMEID_TAG));
                         }
                         break;
                     case ServerService.TYPE_ALL_GAMES:

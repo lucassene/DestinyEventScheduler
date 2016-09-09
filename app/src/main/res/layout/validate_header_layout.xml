@@ -99,8 +99,7 @@
         android:id="@+id/section_guardians"
         android:gravity="center_vertical"
         android:textSize="@dimen/secondaryTextSize"
-        android:text="@string/participants_guardians"
-        android:layout_below="@id/linear_guardians"
+        android:text="@string/guardians"
         android:textColor="@color/psnColor" />
 
 

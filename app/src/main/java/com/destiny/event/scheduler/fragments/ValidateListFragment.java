@@ -114,7 +114,7 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
     }
 
     @Override
-    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded) {
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId) {
 
     }
 

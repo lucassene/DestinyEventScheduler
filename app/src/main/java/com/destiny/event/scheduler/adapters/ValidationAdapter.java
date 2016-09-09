@@ -85,6 +85,7 @@ public class ValidationAdapter extends BaseAdapter {
         } catch (IOException e) {
             Log.w(TAG, "Image not found");
             e.printStackTrace();
+            vViewHolder.memberIcon.setImageResource(R.drawable.ic_missing);
         }
         vViewHolder.memberChecked = currentMember.isChecked();
 

@@ -192,7 +192,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     }
 
     @Override
-    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded) {
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId) {
 
     }
 

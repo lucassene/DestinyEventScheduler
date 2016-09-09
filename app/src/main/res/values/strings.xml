@@ -76,7 +76,7 @@
     <string name="guardians">Guardians</string>
     <string name="guardians_participating">Guardians participating</string>
     <string name="join">Join</string>
-    <string name="participants_guardians">Participants guardians</string>
+    <string name="participants_guardians">Enrolled guardians</string>
     <string name="created_by">Created by</string>
     <string name="scheduled_games">Scheduled events</string>
 
@@ -480,7 +480,7 @@
     <string name="will_begin_soon">" will begin soon..."</string>
     <string name="matches">Events</string>
     <string name="confirm_match">Confirm event</string>
-    <string name="uncheck_match_not_happened">Uncheck if this event do not happened</string>
+    <string name="uncheck_match_not_happened">Uncheck if this event did not happen</string>
     <string name="no_guardians">No other guardians</string>
     <string name="no_guardians_dialog_msg">There is only you in this events, it will be deleted if you proceed.</string>
     <string name="no_evaluations">No evaluations?</string>
@@ -602,6 +602,7 @@
     <string name="visit_website">Visit our website to know more</string>
     <string name="website" translatable="false">http://destinyscheduler.wordpress.com/</string>
     <string name="version_code" translatable="false">1.02</string>
+    <string name="unknown">Unknown</string>
 
 
 </resources>

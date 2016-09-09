@@ -190,7 +190,7 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     @Override
-    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded) {
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId) {
 
     }
 

@@ -130,12 +130,12 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
     }
 
     private void getGameData() {
-        eventIcon.setImageResource(getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
-        eventName.setText(getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
-        eventType.setText(getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
+        setViewIcon(eventIcon, getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
+        setViewText(eventName, getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
+        setViewText(eventType, getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
 
         String gameTime = game.getTime();
-        if (game.getComment() != null && StringUtils.isEmptyOrWhiteSpaces(game.getComment())){
+        if (game.getComment() != null && !StringUtils.isEmptyOrWhiteSpaces(game.getComment())){
             commentLayout.setVisibility(View.VISIBLE);
             comment.setText(game.getComment());
         } else commentLayout.setVisibility(View.GONE);
@@ -153,19 +153,41 @@ public class DetailHistoryFragment extends ListFragment implements UserDataListe
             callback.getHistoryEntries(game.getGameId());
         } else {
             Log.w(TAG, "historyEntries size > 0");
-            onEntriesLoaded(historyEntries, false);
+            onEntriesLoaded(historyEntries, false, game.getGameId());
         }
 
     }
 
+    private void setViewText(TextView view, int resId){
+        if (resId != 0){
+            view.setText(resId);
+        } else {
+            Log.w(TAG, "String resource not found.");
+            view.setText(R.string.unknown);
+        }
+    }
+
+    private void setViewIcon(ImageView view, int resId){
+        if (resId != 0){
+            view.setImageResource(resId);
+        } else {
+            Log.w(TAG, "Drawable resource not found.");
+            view.setImageResource(R.drawable.ic_missing);
+        }
+    }
+
     @Override
-    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded) {
-        if (entryList != null){
-            Log.w(TAG, "historyEntries size: " + entryList.size());
-            this.historyEntries = (ArrayList<MemberModel>) entryList;
-            String sg = entryList.size() + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
-            guardians.setText(sg);
-            setAdapter(this.historyEntries);
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId) {
+        if (gameId == game.getGameId()){
+            if (entryList != null){
+                Log.w(TAG, "historyEntries size: " + entryList.size());
+                this.historyEntries = (ArrayList<MemberModel>) entryList;
+                String sg = entryList.size() + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
+                guardians.setText(sg);
+                setAdapter(this.historyEntries);
+            }
+        } else {
+            callback.getHistoryEntries(game.getGameId());
         }
     }
 

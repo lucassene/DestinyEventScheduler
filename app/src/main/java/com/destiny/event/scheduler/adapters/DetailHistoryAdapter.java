@@ -93,6 +93,7 @@ public class DetailHistoryAdapter extends BaseAdapter {
             viewHolder.iconPath.setImageBitmap(ImageUtils.loadImage(context,ImageUtils.getIconName(currentMember.getIconPath())));
         } catch (IOException e) {
             e.printStackTrace();
+            viewHolder.iconPath.setImageResource(R.drawable.ic_missing);
         }
         viewHolder.memberName.setText(currentMember.getName());
         int xp = MemberTable.getMemberXP(currentMember.getLikes(), currentMember.getDislikes(), currentMember.getGamesPlayed(), currentMember.getGamesCreated());

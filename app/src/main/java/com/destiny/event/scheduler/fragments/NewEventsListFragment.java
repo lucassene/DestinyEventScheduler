@@ -110,7 +110,7 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
     }
 
     @Override
-    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded) {
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId) {
 
     }
 

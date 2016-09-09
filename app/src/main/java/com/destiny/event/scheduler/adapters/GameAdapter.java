@@ -68,9 +68,9 @@ public class GameAdapter extends BaseAdapter implements Filterable {
         }
 
         GameModel currentGame = getItem(position);
-        viewHolder.icon.setImageResource(context.getResources().getIdentifier(currentGame.getEventIcon(),"drawable",context.getPackageName()));
-        viewHolder.eventName.setText(context.getResources().getIdentifier(currentGame.getEventName(),"string",context.getPackageName()));
-        viewHolder.typeName.setText(context.getResources().getIdentifier(currentGame.getTypeName(),"string",context.getPackageName()));
+        setViewIcon(viewHolder.icon,context.getResources().getIdentifier(currentGame.getEventIcon(),"drawable",context.getPackageName()));
+        setViewText(viewHolder.eventName,context.getResources().getIdentifier(currentGame.getEventName(),"string",context.getPackageName()));
+        setViewText(viewHolder.typeName,context.getResources().getIdentifier(currentGame.getTypeName(),"string",context.getPackageName()));
         String creatorName = context.getString(R.string.created_by) + " " + currentGame.getCreatorName();
         viewHolder.creatorName.setText(creatorName);
         String insc = currentGame.getInscriptions() + "/" + currentGame.getMaxGuardians();
@@ -79,6 +79,24 @@ public class GameAdapter extends BaseAdapter implements Filterable {
         viewHolder.date.setText(DateUtils.onBungieDate(currentGame.getTime()));
 
         return convertView;
+    }
+
+    private void setViewText(TextView view, int resId){
+        if (resId != 0){
+            view.setText(resId);
+        } else {
+            Log.w(TAG, "String resource not found.");
+            view.setText(R.string.unknown);
+        }
+    }
+
+    private void setViewIcon(ImageView view, int resId){
+        if (resId != 0){
+            view.setImageResource(resId);
+        } else {
+            Log.w(TAG, "Drawable resource not found.");
+            view.setImageResource(R.drawable.ic_missing);
+        }
     }
 
     @Override

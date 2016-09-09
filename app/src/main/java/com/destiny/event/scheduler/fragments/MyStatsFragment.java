@@ -250,11 +250,9 @@ public class MyStatsFragment extends Fragment{
             if (member.getFavoriteEvent().getEventId() != 0){
                 favEmpty.setVisibility(View.GONE);
                 favLayout.setVisibility(View.VISIBLE);
-                favIcon.setImageResource(getContext().getResources().getIdentifier(member.getFavoriteEvent().getEventIcon(),"drawable",getContext().getPackageName()));
-                int name = getResources().getIdentifier(member.getFavoriteEvent().getEventName(),"string",getContext().getPackageName());
-                favTitle.setText(name);
-                name = getResources().getIdentifier(member.getFavoriteEvent().getEventType().getTypeName(),"string",getContext().getPackageName());
-                favType.setText(name);
+                setViewIcon(favIcon, getContext().getResources().getIdentifier(member.getFavoriteEvent().getEventIcon(),"drawable",getContext().getPackageName()));
+                setViewText(favTitle, getContext().getResources().getIdentifier(member.getFavoriteEvent().getEventName(),"string",getContext().getPackageName()));
+                setViewText(favType, getContext().getResources().getIdentifier(member.getFavoriteEvent().getEventType().getTypeName(),"string",getContext().getPackageName()));
                 int count = member.getFavoriteEvent().getTimesPlayed();
                 String countText;
                 if (count == 1){
@@ -277,6 +275,24 @@ public class MyStatsFragment extends Fragment{
             gameHeaderLayout.setVisibility(View.GONE);
             favEmpty.setVisibility(View.VISIBLE);
             favLayout.setVisibility(View.GONE);
+        }
+    }
+
+    private void setViewText(TextView view, int resId){
+        if (resId != 0){
+            view.setText(resId);
+        } else {
+            Log.w(TAG, "String resource not found.");
+            view.setText(R.string.unknown);
+        }
+    }
+
+    private void setViewIcon(ImageView view, int resId){
+        if (resId != 0){
+            view.setImageResource(resId);
+        } else {
+            Log.w(TAG, "Drawable resource not found.");
+            view.setImageResource(R.drawable.ic_missing);
         }
     }
 
