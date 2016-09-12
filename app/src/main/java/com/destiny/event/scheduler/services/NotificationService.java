@@ -34,9 +34,6 @@ public class NotificationService extends IntentService {
 
     private static final String TAG = "NotificationService";
 
-    //private int notificationId;
-    //private int notificationCount;
-
     public NotificationService() {
         super(NotificationService.class.getName());
     }

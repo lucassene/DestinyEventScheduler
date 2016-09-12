@@ -26,7 +26,7 @@ public class LoggedUserTable {
             + COLUMN_MEMBERSHIP
             + " TEXT NOT NULL, "
             + COLUMN_CLAN
-            + " TEXT NOT NULL, "
+            + " INTEGER NOT NULL, "
             + COLUMN_PLATFORM
             + " INTEGER NOT NULL"
             + ");";

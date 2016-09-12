@@ -239,9 +239,12 @@
         <item>a:from Hell</item> //11
         <item>a:from Hell</item> //12
         <item>a:from Hell</item> //13
+        <item>a:from Hell</item> //14
+        <item>a:from Hell</item> //15
         <item>b:Iron</item> //14
         <item>a:of Mayhem</item> //15
         <item>a:of Mayhem</item> //16
+        <item>a:of Mayhem</item> //17
         <item>b:Rift</item> //17
         <item>a:Lone</item> //18
         <item>a:of Relics</item> //19
@@ -344,6 +347,8 @@
     <string name="control">Control</string>
     <string name="doubles">Doubles</string>
     <string name="elimination">Elimination</string>
+    <string name="inferno1">Inferno Rumble</string>
+    <string name="inferno2">Inferno Doubles</string>
     <string name="inferno3">Inferno 3v3</string>
     <string name="inferno6">Inferno 6v6</string>
     <string name="inferno_sup">Inferno Supremacy</string>
@@ -603,6 +608,10 @@
     <string name="website" translatable="false">http://destinyscheduler.wordpress.com/</string>
     <string name="version_code" translatable="false">1.02</string>
     <string name="unknown">Unknown</string>
+    <string name="close_app">CLOSE APP</string>
+    <string name="update">UPDATE NOW</string>
+    <string name="update_needed">WARNING</string>
+    <string name="update_later">UPDATE LATER</string>
 
 
 </resources>

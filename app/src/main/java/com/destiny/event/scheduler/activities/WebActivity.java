@@ -27,24 +27,6 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
 
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-/*        WebView webview = (WebView) findViewById(R.id.webview);
-
-        webview.setHorizontalScrollBarEnabled(true);
-        webview.getSettings().setLoadWithOverviewMode(true);
-        webview.getSettings().setUseWideViewPort(true);
-        webview.getSettings().setBuiltInZoomControls(true);
-        webview.getSettings().setDisplayZoomControls(false);*/
-
-/*        WebSettings webSettings = webview.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webview.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return false;
-            }
-        });*/
-
         Intent intent = getIntent();
         url = intent.getStringExtra("url");
 

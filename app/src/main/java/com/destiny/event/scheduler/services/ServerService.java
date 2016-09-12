@@ -15,6 +15,7 @@ import com.destiny.event.scheduler.models.EventModel;
 import com.destiny.event.scheduler.models.EventTypeModel;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
+import com.destiny.event.scheduler.models.NoticeModel;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import org.json.JSONArray;
@@ -49,6 +50,7 @@ public class ServerService extends IntentService {
     private static final String PROFILE_ENDPOINT = "/profile";
     private static final String EXCEPTION_ENDPOINT = "log-app";
     private static final String MEMBERLIST_ENDPOINT = "member/list";
+    private static final String NOTICE_ENDPOINT = "notice";
 
     private static final String STATUS_PARAM = "status=";
     private static final String JOINED_PARAM = "joined=";
@@ -77,6 +79,10 @@ public class ServerService extends IntentService {
     public static final String CLAN_TAG = "clanId";
     public static final String CLASS_TAG = "class";
     public static final String EXCEPTION_TAG = "exception";
+    public static final String DEVICE_TAG = "deviceName";
+    public static final String ANDROID_TAG = "androidVersion";
+    public static final String APP_TAG = "appVersion";
+    public static final String NOTICE_TAG = "notice";
 
     public static final int STATUS_RUNNING = 200;
     public static final int STATUS_FINISHED = 210;
@@ -97,6 +103,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_PROFILE = 13;
     public static final int TYPE_EXCEPTION = 14;
     public static final int TYPE_CLAN_MEMBERS = 15;
+    public static final int TYPE_NOTICE = 16;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -118,6 +125,7 @@ public class ServerService extends IntentService {
     private ArrayList<MemberModel> memberList;
     private MemberModel member;
     private int type;
+    private NoticeModel notice;
 
     public ServerService() {
         super(ServerService.class.getName());
@@ -302,9 +310,23 @@ public class ServerService extends IntentService {
                     requestServer(receiver, type, url, bundle);
                 }
                 break;
+            case TYPE_NOTICE:
+                url = SERVER_BASE_URL + NOTICE_ENDPOINT;
+                error = requestServer(receiver, type, url, null);
+                if (error != NO_ERROR){
+                    sendError(receiver, error);
+                } else sendNotice(receiver, notice);
+                break;
         }
         this.stopSelf();
 
+    }
+
+    private void sendNotice(ResultReceiver receiver, NoticeModel notice) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(REQUEST_TAG, type);
+        bundle.putSerializable(NOTICE_TAG, notice);
+        receiver.send(STATUS_FINISHED, bundle);
     }
 
     private void sendMemberData(ResultReceiver receiver, MemberModel member) {
@@ -393,6 +415,9 @@ public class ServerService extends IntentService {
                     case TYPE_CLAN_MEMBERS:
                         urlConnection = createMemberListRequest(urlConnection, bundle);
                         break;
+                    case TYPE_NOTICE:
+                        urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
+                        break;
                 }
 
                 int statusCode;
@@ -450,6 +475,9 @@ public class ServerService extends IntentService {
                                 case TYPE_CLAN_MEMBERS:
                                     error = parseMembers(response);
                                     return error;
+                                case TYPE_NOTICE:
+                                    error = parseNotice(response);
+                                    return error;
                                 default:
                                     return NO_ERROR;
                             }
@@ -473,6 +501,23 @@ public class ServerService extends IntentService {
             e.printStackTrace();
             Log.w(TAG, "Error in HTTP request");
             return ERROR_HTTP_REQUEST;
+        }
+    }
+
+    private int parseNotice(String response) {
+        Log.w(TAG, "getNotice response: " + response);
+        notice = new NoticeModel();
+        try {
+            JSONObject jNotice = new JSONObject(response);
+            notice.setId(jNotice.getInt("id"));
+            notice.setUrl(jNotice.getString("url"));
+            notice.setMessage(jNotice.getString("message"));
+            notice.setVersionCode(jNotice.getInt("versionCode"));
+            notice.setForceUpdate(jNotice.getBoolean("forceUpdate"));
+            return NO_ERROR;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return ERROR_JSON;
         }
     }
 

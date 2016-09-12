@@ -26,6 +26,8 @@
             android:name="com.destiny.event.scheduler.activities.WebActivity"
             android:noHistory="true"
             android:theme="@android:style/Theme.Holo.Dialog.NoActionBar" />
+        <activity android:name=".activities.NoticeActivity"
+            android:noHistory="true"/>
         <activity
             android:name="com.destiny.event.scheduler.activities.DrawerActivity"
             android:launchMode="singleTop">

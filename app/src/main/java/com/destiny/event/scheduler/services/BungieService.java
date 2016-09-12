@@ -80,6 +80,7 @@ public class BungieService extends IntentService {
     public static final String XCSRF_EXTRA = "x-csrf";
     public static final String PLATFORM_EXTRA = "platform";
     public static final String MEMBERSHIP_EXTRA = "membershipId";
+    public static final String CLAN_EXTRA = "clanId";
 
     private static final String KEY_HEADER = "x-api-key";
     private static final String COOKIE_HEADER = "cookie";

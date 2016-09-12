@@ -21,14 +21,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.destiny.event.scheduler.BuildConfig;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.data.DBHelper;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.dialogs.MyAlertDialog;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
+import com.destiny.event.scheduler.models.NoticeModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.BungieService;
 import com.destiny.event.scheduler.services.RequestResultReceiver;
+import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.CookiesUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
@@ -53,6 +56,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
     private String bungieId;
     private String userName;
+    private int platformId;
 
     private int selectedPlatform;
 
@@ -73,13 +77,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         buttonsLayout = (LinearLayout) findViewById(R.id.buttons_layout);
 
-        if (buttonsLayout != null) {
-            buttonsLayout.setVisibility(View.GONE);
-        }
-        loginTitle.setVisibility(View.GONE);
-        psnButton.setVisibility(View.GONE);
-        liveButton.setVisibility(View.GONE);
-
         getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
 
     }
@@ -87,6 +84,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (buttonsLayout != null) {
+            buttonsLayout.setVisibility(View.GONE);
+        }
+
         if (isBungieServiceRunning()){
             Intent intent = new Intent(this, PrepareActivity.class);
             startActivity(intent);
@@ -158,7 +160,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
         switch (id) {
             case URL_LOADER_USER:
-                projection = new String[]{LoggedUserTable.COLUMN_ID, LoggedUserTable.COLUMN_MEMBERSHIP, LoggedUserTable.COLUMN_NAME, LoggedUserTable.COLUMN_PLATFORM};
+                projection = LoggedUserTable.ALL_COLUMNS;
                 return new CursorLoader(
                         this,
                         DataProvider.LOGGED_USER_URI,
@@ -180,25 +182,38 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                     if (data.getCount() > 0) {
                         bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
                         userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
-                        int platform = data.getInt(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
-                        isClanMember(bungieId, platform);
+                        platformId = data.getInt(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
+                        String clanId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_CLAN));
+                        getNotice(bungieId, platformId, clanId);
                     }
                     break;
             }
         } else{
-            loginTitle.setVisibility(View.VISIBLE);
-            psnButton.setVisibility(View.VISIBLE);
-            liveButton.setVisibility(View.VISIBLE);
             buttonsLayout.setVisibility(View.VISIBLE);
         }
 
     }
 
-    private void isClanMember(String bungieId, int platform) {
-
-        if (mReceiver == null){
+    private void getNotice(String bungieId, int platform, String clanId) {
+        if (mReceiver == null) {
             mReceiver = new RequestResultReceiver(new Handler());
             mReceiver.setReceiver(this);
+        }
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ServerService.class);
+            intent.putExtra(ServerService.REQUEST_TAG, ServerService.TYPE_NOTICE);
+            intent.putExtra(ServerService.PLATFORM_TAG, platform);
+            intent.putExtra(ServerService.MEMBER_TAG, bungieId);
+            intent.putExtra(ServerService.RECEIVER_TAG, mReceiver);
+            intent.putExtra(ServerService.CLAN_TAG, clanId);
+            startService(intent);
+    }
+
+    private void isClanMember(String bungieId, int platform) {
+
+        if (mReceiver == null) {
+            mReceiver = new RequestResultReceiver(new Handler());
+            mReceiver.setReceiver(this);
+        }
             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
             intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_VERIFY_MEMBER);
             intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
@@ -214,8 +229,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 intent.putExtra(BungieService.XCSRF_EXTRA, xcsrf);
                 startService(intent);
             } else Log.w(TAG, "Cookies or X-CSRF are null");
-        }
-
     }
 
     @Override
@@ -226,6 +239,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     public void onReceiveResult(int resultCode, Bundle resultData) {
         switch (resultCode){
             case BungieService.STATUS_RUNNING:
+            case ServerService.STATUS_RUNNING:
                 progressBar.setVisibility(View.VISIBLE);
                 break;
             case BungieService.STATUS_ERROR:
@@ -245,10 +259,38 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                     callDrawerActivity();
                 }
                 break;
+            case ServerService.STATUS_ERROR:
+                Log.w(TAG, "Error connecting with server (" + resultData.getInt(ServerService.ERROR_TAG)+").");
+                isClanMember(bungieId, platformId);
+                break;
+            case ServerService.STATUS_FINISHED:
+                if (resultData.getInt(ServerService.REQUEST_TAG) == ServerService.TYPE_NOTICE){
+                    NoticeModel notice = (NoticeModel) resultData.getSerializable(ServerService.NOTICE_TAG);
+                    if (notice != null){
+                        if (notice.getVersionCode() > BuildConfig.VERSION_CODE){
+                            callUpdateActivity(notice);
+                        } else isClanMember(bungieId, platformId);
+                    } else {
+                        Log.w(TAG, "Notice is null.");
+                        isClanMember(bungieId, platformId);
+                    }
+                } else isClanMember(bungieId, platformId);
+                break;
             default:
                 callDrawerActivity();
                 break;
         }
+    }
+
+    private void callUpdateActivity(NoticeModel notice) {
+        progressBar.setVisibility(View.GONE);
+        Intent intent = new Intent(this, NoticeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("notice",notice);
+        intent.putExtra("bungieId",bungieId);
+        intent.putExtra("userName",userName);
+        startActivity(intent);
+        finish();
     }
 
     private void callDrawerActivity(){
@@ -299,16 +341,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 DBHelper database = new DBHelper(getApplicationContext());
                 SQLiteDatabase db = database.getWritableDatabase();
                 database.onUpgrade(db, 0, 0);
-                loginTitle.setVisibility(View.VISIBLE);
-                psnButton.setVisibility(View.VISIBLE);
-                liveButton.setVisibility(View.VISIBLE);
                 buttonsLayout.setVisibility(View.VISIBLE);
                 break;
             case BungieService.ERROR_AUTH:
                 CookiesUtils.clearCookies();
-                loginTitle.setVisibility(View.VISIBLE);
-                psnButton.setVisibility(View.VISIBLE);
-                liveButton.setVisibility(View.VISIBLE);
                 buttonsLayout.setVisibility(View.VISIBLE);
                 break;
         }

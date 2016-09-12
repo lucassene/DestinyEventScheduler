@@ -153,9 +153,12 @@
         <item>a:do Inferno</item> //11
         <item>a:do Inferno</item> //12
         <item>a:do Inferno</item> //13
+        <item>a:do Inferno</item> //14
+        <item>a:do Inferno</item> //15
         <item>a:de Ferro</item> //14
         <item>a:do Caos</item> //15
         <item>a:do Caos</item> //16
+        <item>a:do Caos</item> //17
         <item>a:da Fissura</item> //17
         <item>a:da Solidão</item> //18
         <item>a:das Relíquias</item> //19
@@ -405,7 +408,7 @@
     <string name="game_status">Estado de evento</string>
     <string name="my_events">MEUS EVENTOS</string>
     <string name="no_games_status">Sem eventos nesse estado.</string>
-    <string name="delete_dialog_msg">Excluir esse evento é irreversível, ela não ficará mais disponível para ninguém depois disso.</string>
+    <string name="delete_dialog_msg">Excluir esse evento é irreversível, ele não ficará mais disponível para ninguém depois disso.</string>
     <string name="delete_dialog_title">Excluir esse evento?</string>
     <string name="join_dialog_title">Participar, sim?</string>
     <string name="join_dialog_msg">Você será adicionado à este evento e uma notificação será criada de acordo com as suas configurações de preferência.</string>
@@ -537,7 +540,13 @@
     <string name="visit_website">Visite nosso site para saber mais</string>
     <string name="heist">Golpe da Abominação</string>
     <string name="perfected">Sepiks Aperfeiçoado</string>
-    <string name="plaguelands">Patrulhe as Terras Adoecidas</string>
+    <string name="plaguelands">Patrulhe as Terras Pestíferas</string>
     <string name="unknown">Desconhecido</string>
+    <string name="close_app">FECHAR APP</string>
+    <string name="update">ATUALIZAR AGORA</string>
+    <string name="update_later">ATUALIZAR DEPOIS</string>
+    <string name="update_needed">AVISO</string>
+    <string name="inferno1">Inferno: Briga</string>
+    <string name="inferno2">Inferno: Duplas</string>
 
 </resources>

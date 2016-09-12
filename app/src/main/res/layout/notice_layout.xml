@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/global_padding"
+    android:background="@drawable/app_bg">
+
+    <include layout="@layout/toolbar_layout" android:id="@+id/toolbar"/>
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/textColorPrimary"
+        android:layout_below="@id/toolbar"/>
+
+    <TextView
+        android:id="@+id/notice_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_below="@id/line"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <WebView
+        android:id="@+id/notice_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="42dp"
+        android:padding="@dimen/global_padding"
+        android:layout_below="@id/notice_message">
+
+    </WebView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/button_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="@string/close_app"
+            android:textColor="@color/colorAccent"
+            android:gravity="center"
+            android:padding="8dp"
+            android:focusable="true"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"/>
+
+        <TextView
+            android:id="@+id/button_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="@string/update"
+            android:textColor="@color/colorAccent"
+            android:gravity="center"
+            android:padding="8dp"
+            android:focusable="true"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"/>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

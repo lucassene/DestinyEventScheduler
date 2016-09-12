@@ -35,8 +35,6 @@ public class DestinyWebView extends WebView {
         init();
     }
 
-
-
     @TargetApi(21)
     public DestinyWebView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);

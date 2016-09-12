@@ -614,7 +614,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
             intent.putExtra(AlarmReceiver.NOTIFY_ID, firstId);
             PendingIntent pIntent = PendingIntent.getBroadcast(this, firstId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                Log.w(TAG, "Code M: " + Build.VERSION_CODES.M);
+                alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,firstNotification.getTimeInMillis(),pIntent);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 alarm.setExact(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
             } else alarm.set(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
             Log.w(TAG, "requestId: " + firstId + " registered!");
@@ -625,10 +628,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             sIntent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
             sIntent.putExtra(AlarmReceiver.NOTIFY_ID, secondId);
             PendingIntent psIntent = PendingIntent.getBroadcast(this, secondId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                Log.w(TAG, "Code M: " + Build.VERSION_CODES.M);
+                alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,secondNotification.getTimeInMillis(),psIntent);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 alarm.setExact(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
-            } else
-                alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
+            } else alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
             Log.w(TAG, "requestId: " + secondId + " registered!");
         }
 
@@ -1594,7 +1599,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             intent.putExtra("platformId", platformId);
             PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pIntent);
+            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, pIntent);
             Log.w(TAG, "New game alarm registered in an interval of " + interval + " millis");
         }
     }
