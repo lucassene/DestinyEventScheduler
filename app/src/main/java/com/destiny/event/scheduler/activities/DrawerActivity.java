@@ -188,6 +188,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         setContentView(R.layout.drawer_layout);
 
+        //Locale lang = Resources.getSystem().getConfiguration().locale;
+
         progress = (ProgressBar) findViewById(R.id.progress_bar);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -981,9 +983,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openMyProfileFragment(View child) {
-        if (openedFragment instanceof MyNewProfileFragment && memberProfile.getMembershipId().equals(bungieId)) {
-            drawerLayout.closeDrawers();
-            return false;
+        if (memberProfile != null){
+            if (openedFragment instanceof MyNewProfileFragment && memberProfile.getMembershipId().equals(bungieId)) {
+                drawerLayout.closeDrawers();
+                return false;
+            }
         }
         selectedDrawerItem = 8;
         MyNewProfileFragment fragment = new MyNewProfileFragment();

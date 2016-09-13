@@ -7,17 +7,9 @@
     <color name="lineColor">#F57C00</color>
     <color name="psnColor">#0288D1</color>
     <color name="liveColor">#388E3C</color>
-    <color name="redFilter">#F44336</color>
-    <color name="navigationBarColor">#212121</color>
     <color name="tabIndicatorColor">#9E9E9E</color>
-    <color name="background_dark">#ffffff</color>
-    <color name="primary_text_material_dark">#000000</color>
     <color name="colorButtonNormal">#1976D2</color>
-    <color name="colorToolbarTitle">#FFFFFF</color>
-    <color name="colorTextButton">#FFFFFF</color>
     <color name="primary_text_material_light">#ffffff</color>
     <color name="toolbarBackground">#757575</color>
     <color name="colorButtonEnabled">#9900bd4e</color>
-    <color name="colorSelectedItem">#616161</color>
-    <color name="colorMenuBackground">#8b8e93</color>
 </resources>

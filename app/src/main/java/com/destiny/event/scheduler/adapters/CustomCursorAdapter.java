@@ -63,16 +63,16 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
 
         switch (code) {
             case 10:
-                textName = cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME));
+                textName = EventTypeTable.getName(context, cursor);
                 iconName = cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON));
                 break;
             case 20:
-                textName = cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_NAME));
+                textName = EventTable.getName(context, cursor);
                 iconName = cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
                 break;
         }
 
-        title.setText(context.getResources().getIdentifier(textName, "string", context.getPackageName()));
+        title.setText(textName);
         int resId = context.getResources().getIdentifier(iconName, "drawable", context.getPackageName());
         if (resId != 0){
             icon.setImageResource(resId);

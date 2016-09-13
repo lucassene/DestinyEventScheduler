@@ -52,21 +52,14 @@
         <item>O T H E R</item>
     </string-array>
 
-    <string name="def_clan_desc">"Here goes Clan\'s description"</string>
-    <string name="def_clan_header">Clan\'s name</string>
     <string name="empty_new_events">There is no new events to play right now.</string>
     <string name="empty_scheduled_list">You don\'t have any scheduled event.</string>
-    <string name="menu">Menu</string>
     <string name="refresh_lists">Refresh lists</string>
     <string name="game_type_label">Game type</string>
     <string name="game_label">Game</string>
-    <string name="date_label">Date</string>
-    <string name="time_label">Time</string>
-    <string name="max_guardians_label">Min guardians</string>
     <string name="min_light_label">Min light</string>
     <string name="new_event_button">CREATE EVENT</string>
     <string name="validate_event_title">VALIDATION</string>
-    <string name="event_confirmation">This event happened?</string>
     <string name="search_title">SEARCH</string>
     <string name="date_time_section">Date and time</string>
     <string name="date">Date</string>
@@ -74,7 +67,6 @@
     <string name="specs">Specs</string>
     <string name="min_light">Min light</string>
     <string name="guardians">Guardians</string>
-    <string name="guardians_participating">Guardians participating</string>
     <string name="join">Join</string>
     <string name="participants_guardians">Enrolled guardians</string>
     <string name="created_by">Created by</string>
@@ -88,23 +80,7 @@
     <string name="games_available">Events available</string>
     <string name="members">Members</string>
     <string name="order_by">Order by</string>
-    <string name="games_played">Events played</string>
-    <string name="sort_by">Sort by</string>
-    <string name="system">System</string>
     <string name="my_profile">PROFILE</string>
-    <string name="joined_events">Joined events:</string>
-    <string name="events_created">Events created:</string>
-    <string name="member_since">Member since:</string>
-
-    <string name="court">Court of Oryx</string>
-    <string name="crucible">Crucible</string>
-    <string name="patrol">Patrol</string>
-    <string name="prison">Prison of Elders</string>
-    <string name="raid">Raid</string>
-    <string name="story">Story</string>
-    <string name="strike">Strike</string>
-    <string name="strike_list">Strike List</string>
-    <string name="srl" translatable="false">SRL</string>
 
     <string-array name="event_types">
         <item>Court of Oryx</item>
@@ -336,134 +312,27 @@
 
     <string name="default_title">New on the block</string>
 
-    <string name="tier1">Reciprocate Rune</string>
-    <string name="tier2">Stolen Rune</string>
-    <string name="tier3">Antiquated Rune</string>
-
-    <string name="clash">Clash</string>
-    <string name="classic3">Classic 3v3</string>
-    <string name="classic6">Classic 6v6</string>
-    <string name="classic1">Classic Rumble</string>
-    <string name="control">Control</string>
-    <string name="doubles">Doubles</string>
-    <string name="elimination">Elimination</string>
-    <string name="inferno1">Inferno Rumble</string>
-    <string name="inferno2">Inferno Doubles</string>
-    <string name="inferno3">Inferno 3v3</string>
-    <string name="inferno6">Inferno 6v6</string>
-    <string name="inferno_sup">Inferno Supremacy</string>
-    <string name="iron_banner">Iron Banner</string>
-    <string name="mayhem_clash">Mayhem Clash</string>
-    <string name="mayhem_rumble">Mayhem Rumble</string>
-    <string name="rift">Rift</string>
-    <string name="rumble">Rumble</string>
-    <string name="salvage">Salvage</string>
-    <string name="skirmish">Skirmish</string>
-    <string name="trials">Trials of Osiris</string>
-    <string name="zone_control">Zone Control</string>
-    <string name="srl_race">SRL Race</string>
-    <string name="supremacy1">Supremacy FFA</string>
-    <string name="supremacy3">Supremacy 3v3</string>
-    <string name="supremacy6">Supremacy 6v6</string>
-    <string name="mayhem_supremacy">Mayhem Supremacy</string>
-
-    <string name="malok">Blighted Chalice</string>
-    <string name="valus">Cerberus Vae III</string>
-    <string name="dust">Dust Palace</string>
-    <string name="echo">Echo Chamber</string>
-    <string name="saber">Fallen S.A.B.E.R.</string>
-    <string name="shield">Shield Brothers</string>
-    <string name="devils">The Devil\'s Lair</string>
-    <string name="nexus">The Nexus</string>
-    <string name="shadow">The Shadow Thief</string>
-    <string name="pits">The Summoning Pits</string>
-    <string name="sunless">The Sunless Cell</string>
-    <string name="mind">The Undying Mind</string>
-    <string name="will">The Will of Crota</string>
-    <string name="winter">Winter\'s Run</string>
-    <string name="wretched">Wretched Eye</string>
-    <string name="heist">Abomination Heist</string>
-    <string name="perfected">Sepiks Perfected</string>
-
-    <string name="nightfall">Nightfall</string>
-    <string name="weekly">Weekly Heroic Strike</string>
-    <string name="heroic">Heroic Strike</string>
-    <string name="vanguard">Vanguard Strike</string>
-    <string name="legacy">Legacy Strike</string>
-    
-    <string name="crota_normal">Crota\'s End - NORMAL</string>
-    <string name="crota_hard">Crota\'s End - HARD</string>
-    <string name="king_normal">King\'s Fall - NORMAL</string>
-    <string name="king_hard">King\'s Fall - HARD</string>
-    <string name="vault_normal">Vault of Glass - NORMAL</string>
-    <string name="vault_hard">Vault of Glass - HARD</string>
-    <string name="wrath_normal">Wrath of the Machine - NORMAL</string>
-    <string name="wrath_hard">Wrath of the Machine - HARD</string>
-
-    <string name="cosmodrome">Patrol the Cosmodrome</string>
-    <string name="dreadnaught">Patrol the Dreadnaught</string>
-    <string name="mars">Patrol Mars</string>
-    <string name="moon">Patrol the Moon</string>
-    <string name="venus">Patrol Venus</string>
-    <string name="plaguelands">Patrol the Plaguelands</string>
-    
-    <string name="prison28">Prison of Elders - 28</string>
-    <string name="prison32">Prison of Elders - 32</string>
-    <string name="prison34">Prison of Elders - 34</string>
-    <string name="prison35">Skola\'s Revenge</string>
-    <string name="prison41">Prison of Elders - 41</string>
-    <string name="prison42">Challenge of Elders</string>
-
-    <string name="story_normal">Regular Story</string>
-    <string name="story_heroic">Daily Heroic Story</string>
-
     <string name="choose_type">Choose the game type:</string>
     <string name="choose_game">Choose the game mode:</string>
-    <string name="event_type_title">Game type list</string>
     <string name="type">Type</string>
     <string name="game_info">Game info</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
-    <string name="values_between1">"Value between 2 and "</string>
     <string name="value_between2">"Value between "</string>
     <string name="and320">" and 400"</string>
-    <string name="prepare_label1">Looking for your documents</string>
-    <string name="prepare_label2">Have you been here?</string>
-    <string name="prepare_label3">Taking a picture</string>
-    <string name="prepare_label4">Searching for your friends</string>
-    <string name="prepare_label5">Inviting them to the welcome party</string>
-    <string name="prepare_label6">Done! </string>
-    <string name="begin_yes">Begin, yes?</string>
     <string name="connection_needed_login">Internet connection needed for log in.</string>
     <string name="prepare_title">Preparing your arrival</string>
-    <string name="prepare_msg1">Can you wait just a little please? Turns out there is too many Guardians in this universe…</string>
     <string name="prepare_msg2">\tDon\'t worry, it only takes a bit longer on the first login.</string>
     <string name="my_clan_empty">Oops! Did we forget to invite some guardians?</string>
-    <string name="date_you_join">The day you joined</string>
-    <string name="date_member_join1">The day</string>
-    <string name="date_member_join2">joined</string>
-    <string name="games_created">Events created:</string>
-    <string name="games_created_by_you">Number of events created by you.</string>
-    <string name="games_created_by_member">Number of eventos created by</string>
-    <string name="games_played2">Events played:</string>
-    <string name="games_played_you">Number of events played by you.</string>
-    <string name="games_played_by_member">Number of events played by</string>
-    <string name="games_played_by_member2">, not including his own.</string>
     <string name="likes">Likes</string>
-    <string name="good_and_helpful_friends">Guardians likes good and helpful friends.</string>
     <string name="dislikes">Dislikes</string>
-    <string name="guardians_with_bad_aim">But they don\'t like those with bad aim.</string>
-    <string name="participation_points">Participation Points:</string>
-    <string name="final_equation">The final equation that involves all this previous stats.</string>
     <string name="leaving">Are you leaving guardian?</string>
     <string name="oblivion">Be aware that your app settings will be lost.</string>
     <string name="leave">Leave</string>
     <string name="nevermind">Cancel</string>
     <string name="event_details">DETAILS</string>
     <string name="of">of</string>
-    <string name="empty_game">Oops! Is this event empty?</string>
     <string name="search_empty_list">Looks like no one wants to play this kind of game...</string>
-    <string name="no_match_type">Have you created one event of this type?</string>
     <string name="delete">Delete</string>
     <string name="validate">Validate</string>
     <string name="waiting_validation">Waiting for validation</string>
@@ -476,11 +345,9 @@
     <string name="delete_dialog_title">Delete this event?</string>
     <string name="delete_dialog_msg">Deleting this event is irreversible, it won\'t be available to no one after this.</string>
     <string name="join_dialog_title">Join, yes?</string>
-    <string name="join_dialog_msg">You will be added to this event and a notification will be created according to your preference settings.</string>
+    <string name="join_dialog_msg">You will be added to this event.</string>
     <string name="join_full_dialog_msg">This event is already full, you will be added to the waiting list. </string>
-    <string name="wait_list">Wait List</string>
-    <string name="data_refreshed">All data refreshed!</string>
-    <string name="notification_match_begin">The event will begin soon...</string>
+    <string name="wait_list">Wait list</string>
     <string name="your_match_of">"Your match of "</string>
     <string name="will_begin_soon">" will begin soon..."</string>
     <string name="matches">Events</string>
@@ -499,15 +366,10 @@
     <string name="matches_played">Events played</string>
     <string name="email" translatable="false">lsgrandchamp@gmail.com</string>
     <string name="contact">Contact</string>
-    <string name="creator">Creator</string>
     <string name="version">Version</string>
     <string name="about">ABOUT</string>
-    <string name="more_info">More information about this app</string>
     <string name="on">On</string>
     <string name="sounds">Sounds</string>
-    <string name="other">Other</string>
-    <string name="pref_list_text">Game type you want to be notified</string>
-    <string name="preferences">Preferences</string>
     <string name="notifications">Notifications</string>
     <string name="new_notify_text">Notifies new events created</string>
     <string name="off">Off</string>
@@ -518,20 +380,17 @@
     <string name="on_time">On time</string>
     <string name="games_selected">items selected</string>
     <string name="no_game_selected">No items selected</string>
-    <string name="none">No</string>
     <string name="match_must_created">The event must be created with at least</string>
     <string name="minutes_advance">minutes in advance</string>
-    <string name="create_match_success">Success! Event created.</string>
     <string name="when_play">When do you want to play?</string>
     <string name="evaluations">Evaluations</string>
-    <string name="games">Games</string>
     <string name="events">Events</string>
     <string name="favorite_game">Favorite game</string>
     <string name="created">Created</string>
     <string name="played">Played</string>
     <string name="value">Value</string>
     <string name="problem_bungie_net">Problem connecting to Bungie.net</string>
-    <string name="just_warning">Just a warning...</string>
+    <string name="just_warning">Just a warning ...</string>
     <string name="no_icon_msg">For security reasons, some guardians choose not to show their face. For these, we will use a default photo, okay?</string>
     <string name="got_it">Got it</string>
     <string name="error">Error</string>
@@ -540,8 +399,6 @@
     <string name="bungie_net_error_msg">Incorrect response from bungie.net. Please try again later.</string>
     <string name="no_clan_msg">Sorry guardian, but is needed that you join a clan to use this app.</string>
     <string name="no_events_played">No events played</string>
-    <string name="times">times</string>
-    <string name="new_guardian">New on the block</string>
     <string name="email_title" translatable="false">E-mail</string>
     <string name="server_side">Server side</string>
     <string name="fernando" translatable="false">Fernando Rufino Fontoura</string>
@@ -552,16 +409,9 @@
     <string name="empty_validate_event">You don\'t have any event to evaluate or validate.</string>
     <string name="error_bungie_auth">Error with Bungie autentication. Please check bungie.net and try again later.</string>
     <string name="allies">Looking for allies</string>
-    <string name="back_desc">Back</string>
-    <string name="creating_db">Creating fake database</string>
-    <string name="default_username">username</string>
     <string name="menu_new_event">New event</string>
     <string name="network">Establishing contacts network</string>
-    <string name="new_tab_header">NEW</string>
-    <string name="pictures">Analyzing images</string>
     <string name="prior_entries">Verifying previous entries</string>
-    <string name="scheduled_tab_header">SCHEDULED</string>
-    <string name="validate_tab_header">VALIDATE</string>
     <string name="vanguard_data">Obtaining Vanguard data</string>
     <string name="no_evaluation">No guardian was evaluated, confirm?</string>
     <string name="confirm_evaluation">Confirm evaluation?</string>
@@ -577,15 +427,10 @@
     <string name="my_clan">MY CLAN</string>
     <string name="waiting_data">WAITING DATA</string>
     <string name="oops" translatable="false">Oops!</string>
-    <string name="event_happened">Looks like this event already happen.</string>
-    <string name="level_up">Level up!</string>
-    <string name="level_msg_1">"You achieved level "</string>
-    <string name="title_msg">"And become "</string>
-    <string name="no_event">You have not played any event of this type.</string>
+    <string name="event_happened">Looks like this event already happened.</string>
     <string name="no_event_all">You have not played any event yet guardian.</string>
     <string name="one_time">time</string>
     <string name="more_times">times</string>
-    <string name="clan_updated">Clan data updated!</string>
     <string name="credentials_expired">Your credentials have expired. Please login again to continue.</string>
     <string name="unable_update_clan">Unable to update clan data now. Please try again later.</string>
     <string name="server_error_msg">Problem connecting to server. Please try again later.</string>
@@ -599,7 +444,7 @@
     <string name="no_evaluations_received">No evaluations received.</string>
     <string name="minute">" minute"</string>
     <string name="played_plural">Played</string>
-    <string name="enter_value">Please enter the required value:</string>
+    <string name="enter_value">Please enter the desired value:</string>
     <string name="optional_comment">Optional comment</string>
     <string name="comment">Comment</string>
     <string name="for_evaluation">For evaluate</string>

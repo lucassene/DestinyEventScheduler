@@ -118,7 +118,7 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 break;
             case EventTable.TABLE_NAME:
                 lbl1.setText(EventTable.COLUMN_ID);
-                lbl2.setText(EventTable.COLUMN_NAME);
+                lbl2.setText(EventTable.COLUMN_EN);
                 lbl3.setText(EventTable.COLUMN_ICON);
                 lbl4.setText(EventTable.COLUMN_TYPE);
                 lbl5.setText(EventTable.COLUMN_LIGHT);
@@ -129,7 +129,7 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 lbl10.setVisibility(View.GONE);
                 lbl11.setVisibility(View.GONE);
                 txt1.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_ID)));
-                txt2.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_NAME)));
+                txt2.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_EN)));
                 txt3.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_ICON)));
                 txt4.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_TYPE)));
                 txt5.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT)));
@@ -142,7 +142,7 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 break;
             case EventTypeTable.TABLE_NAME:
                 lbl1.setText(EventTypeTable.COLUMN_ID);
-                lbl2.setText(EventTypeTable.COLUMN_NAME);
+                lbl2.setText(EventTypeTable.COLUMN_EN);
                 lbl3.setText(EventTypeTable.COLUMN_ICON);
                 lbl4.setVisibility(View.GONE);
                 lbl5.setVisibility(View.GONE);
@@ -153,7 +153,7 @@ public class DBViewerCursorAdapter extends SimpleCursorAdapter {
                 lbl10.setVisibility(View.GONE);
                 lbl11.setVisibility(View.GONE);
                 txt1.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_ID)));
-                txt2.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)));
+                txt2.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_EN)));
                 txt3.setText(cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)));
                 txt4.setVisibility(View.GONE);
                 txt5.setVisibility(View.GONE);

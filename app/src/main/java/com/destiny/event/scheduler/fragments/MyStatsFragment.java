@@ -232,7 +232,7 @@ public class MyStatsFragment extends Fragment{
                 ArrayList<String> labels = new ArrayList<>();
                 ArrayList<Integer> values = new ArrayList<>();
                 for(int i=0;i<member.getTypesPlayed().size();i++){
-                    String text = getResources().getString(getResources().getIdentifier(member.getTypesPlayed().get(i).getTypeName(),"string",getContext().getPackageName()));
+                    String text = member.getTypesPlayed().get(i).getTypeName();
                     labels.add(text);
                     int value = member.getTypesPlayed().get(i).getTimesPlayed();
                     values.add(value);
@@ -251,8 +251,8 @@ public class MyStatsFragment extends Fragment{
                 favEmpty.setVisibility(View.GONE);
                 favLayout.setVisibility(View.VISIBLE);
                 setViewIcon(favIcon, getContext().getResources().getIdentifier(member.getFavoriteEvent().getEventIcon(),"drawable",getContext().getPackageName()));
-                setViewText(favTitle, getContext().getResources().getIdentifier(member.getFavoriteEvent().getEventName(),"string",getContext().getPackageName()));
-                setViewText(favType, getContext().getResources().getIdentifier(member.getFavoriteEvent().getEventType().getTypeName(),"string",getContext().getPackageName()));
+                favTitle.setText(member.getFavoriteEvent().getEventName());
+                favType.setText(member.getFavoriteEvent().getEventType().getTypeName());
                 int count = member.getFavoriteEvent().getTimesPlayed();
                 String countText;
                 if (count == 1){

@@ -141,22 +141,25 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 selectedEvent = 4;
                 break;
             case 3:
-                selectedEvent = 26;
+                selectedEvent = 24;
                 break;
             case 4:
-                selectedEvent = 32;
+                selectedEvent = 29;
                 break;
             case 5:
-                selectedEvent = 38;
+                selectedEvent = 35;
                 break;
             case 6:
-                selectedEvent = 46;
+                selectedEvent = 41;
                 break;
             case 7:
-                selectedEvent = 4;
+                selectedEvent = 43;
                 break;
             case 8:
-                selectedEvent = 65;
+                selectedEvent = 57;
+                break;
+            case 9:
+                selectedEvent = 62;
                 break;
         }
     }
@@ -400,24 +403,33 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         data.moveToFirst();
         switch (loader.getId()){
             case LOADER_TYPE:
-                iconType.setImageResource(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName()));
-                textType.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)),"string",getContext().getPackageName()));
-                game.setTypeName(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_NAME)));
+                setViewIcon(iconType,getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName()));
+                textType.setText(EventTypeTable.getName(getContext(), data));
+                game.setTypeName(textType.getText().toString());
                 break;
             case LOADER_EVENT:
                 minLight = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT));
                 lightBar.setMax(MAX_LIGHT - minLight);
                 lightText.setText(String.valueOf(minLight));
                 String iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
-                iconGame.setImageResource(getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
-                textGame.setText(getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)),"string",getContext().getPackageName()));
+                setViewIcon(iconGame,getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
+                textGame.setText(EventTable.getName(getContext(),data));
                 game.setEventIcon(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)));
-                game.setEventName(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_NAME)));
+                game.setEventName(textGame.getText().toString());
                 game.setMaxGuardians(data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS)));
                 break;
         }
         callback.onDataLoaded();
 
+    }
+
+    private void setViewIcon(ImageView view, int resId){
+        if (resId != 0){
+            view.setImageResource(resId);
+        } else {
+            Log.w(TAG, "Drawable resource not found.");
+            view.setImageResource(R.drawable.ic_missing);
+        }
     }
 
     @Override

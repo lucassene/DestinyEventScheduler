@@ -91,7 +91,7 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
                 this.gameList = gameList;
                 gameAdapter = new GameAdapter(getActivity(), gameList);
                 if (gameAdapter.getCount() == 0){
-                    sectionTitle.setVisibility(View.GONE);
+                    if (sectionTitle != null) sectionTitle.setVisibility(View.GONE);
                 } else sectionTitle.setVisibility(View.VISIBLE);
                 setListAdapter(gameAdapter);
             } else Log.w(TAG, "listView null ou size 0");

@@ -110,19 +110,6 @@ public class ValidationAdapter extends BaseAdapter {
                 vViewHolder.memberRating.setImageResource(R.drawable.ic_error);
             }
 
-/*        if (vViewHolder.memberChecked){
-            convertView.setAlpha(1.0f);
-        } else convertView.setAlpha(0.3f);*/
-
-/*        checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CheckBox check = (CheckBox) v;
-                SimpleMemberModel member = (SimpleMemberModel) check.getTag();
-                member.setChecked(check.isChecked());
-            }
-        });*/
-
         return convertView;
     }
 

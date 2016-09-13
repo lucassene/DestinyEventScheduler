@@ -305,8 +305,8 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
     private void getGameData() {
 
         setViewIcon(eventIcon, getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
-        setViewText(eventName, getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
-        setViewText(eventType, getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
+        eventName.setText(game.getEventName());
+        eventType.setText(game.getTypeName());
 
         String gameTime = game.getTime();
         eventCalendar = DateUtils.stringToDate(gameTime);
@@ -337,15 +337,6 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
             }
         }
 
-    }
-
-    private void setViewText(TextView view, int resId){
-        if (resId != 0){
-            view.setText(resId);
-        } else {
-            Log.w(TAG, "String resource not found.");
-            view.setText(R.string.unknown);
-        }
     }
 
     private void setViewIcon(ImageView view, int resId){

@@ -1,6 +1,8 @@
 package com.destiny.event.scheduler.data;
 
 
+import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -8,18 +10,23 @@ public class EventTypeTable {
 
     public static final String TABLE_NAME = "event_type";
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_NAME = "type_name";
+    public static final String COLUMN_EN = "en";
+    public static final String COLUMN_PT = "pt";
+    public static final String COLUMN_ES = "es";
     public static final String COLUMN_ICON = "type_icon";
 
-    public static final String[] ALL_COLUMNS = {COLUMN_NAME, COLUMN_ICON, COLUMN_ID};
-    public static final String[] VIEW_COLUMNS = {COLUMN_NAME, COLUMN_ICON};
+    public static final String[] ALL_COLUMNS = {COLUMN_EN, COLUMN_PT, COLUMN_ICON, COLUMN_ID};
 
     private static final String TABLE_CREATE = "CREATE TABLE "
             + TABLE_NAME
             + "("
             + COLUMN_ID
             + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_NAME
+            + COLUMN_EN
+            + " TEXT NOT NULL, "
+            + COLUMN_PT
+            + " TEXT NOT NULL, "
+            + COLUMN_ES
             + " TEXT NOT NULL, "
             + COLUMN_ICON
             + " TEXT NOT NULL"
@@ -28,15 +35,15 @@ public class EventTypeTable {
     public static void onCreate(SQLiteDatabase db){
         db.execSQL(TABLE_CREATE);
         Log.e("EventType Table", "EventType table created");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'court', 'ic_court');"); //1
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'crucible', 'ic_crucible');"); //2
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'patrol', 'ic_patrol');"); //3
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'prison', 'ic_prison');"); //4
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'raid', 'ic_raid');"); //5
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'story', 'ic_story');"); //6
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'strike', 'ic_strike');"); //7
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'strike_list', 'ic_strike');"); //8
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_NAME + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'srl', 'ic_srl');"); //9
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Court of Oryx', 'Corte de Oryx', 'Corte de Oryx', 'ic_court');"); //1
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Crucible', 'Crisol', 'El Crisol', 'ic_crucible');"); //2
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Patrol', 'Patrulha', 'Patrulla', 'ic_patrol');"); //3
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Prison of Elders', 'Prisão dos Anciões', 'El Presidio de los Ancianos', 'ic_elders');"); //4
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Raid', 'Incursão', 'Incursión', 'ic_raid');"); //5
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Story', 'História', 'Historia', 'ic_story');"); //6
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Strike', 'Assalto', 'Asalto', 'ic_strike');"); //7
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Strike List', 'Lista de Assaltos', 'Lista de Asaltos', 'ic_strike');"); //8
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'SRL', 'SRL', 'SRL', 'ic_srl');"); //9
     }
 
     public static void onUpdate(SQLiteDatabase db, int oldVersion, int newVersion){
@@ -55,6 +62,17 @@ public class EventTypeTable {
 
     public static String getAliasExpression(String column){
         return getQualifiedColumn(column) + " AS " + getAliasColumn(column);
+    }
+
+    public static String getName(Context context, Cursor cursor){
+        switch (context.getResources().getSystem().getConfiguration().locale.getLanguage()){
+            case "pt":
+                return cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_PT));
+            case "es":
+                return cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_ES));
+            default:
+                return cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_EN));
+        }
     }
 
 

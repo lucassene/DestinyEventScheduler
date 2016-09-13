@@ -68,14 +68,14 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
         titleView.setText(title);
         switch (tableName){
             case EventTypeTable.TABLE_NAME:
-                from = new String[] {EventTypeTable.COLUMN_NAME, EventTypeTable.COLUMN_ICON};
+                from = new String[] {EventTypeTable.COLUMN_EN, EventTypeTable.COLUMN_PT, EventTypeTable.COLUMN_ES, EventTypeTable.COLUMN_ICON};
                 to = new int[] {R.id.primary_text, R.id.icon};
                 getLoaderManager().initLoader(10, null, this);
                 adapter = new CustomCursorAdapter(getContext(), R.layout.event_list_item_layout, null, from, to, 0, 10);
                 setListAdapter(adapter);
                 break;
             case EventTable.TABLE_NAME:
-                from = new String[] {EventTable.COLUMN_NAME, EventTable.COLUMN_ICON};
+                from = new String[] {EventTable.COLUMN_EN, EventTable.COLUMN_PT, EventTable.COLUMN_ES, EventTable.COLUMN_ICON};
                 to = new int[] {R.id.primary_text, R.id.icon};
                 getLoaderManager().initLoader(20, null, this);
                 adapter = new CustomCursorAdapter(getContext(), R.layout.event_list_item_layout, null, from, to, 0, 20);
@@ -128,24 +128,24 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
 
         switch (id){
             case 10:
-                projection = new String[] {EventTypeTable.COLUMN_ID, EventTypeTable.COLUMN_NAME, EventTypeTable.COLUMN_ICON};
+                projection = new String[] {EventTypeTable.COLUMN_ID, EventTypeTable.COLUMN_EN, EventTypeTable.COLUMN_PT, EventTypeTable.COLUMN_ES, EventTypeTable.COLUMN_ICON};
                 cursorLoader = new CursorLoader(
                         getActivity(),
                         DataProvider.EVENT_TYPE_URI,
                         projection,
                         null,
                         null,
-                        null);
+                        getContext().getResources().getSystem().getConfiguration().locale.getLanguage() + " ASC");
                 break;
             case 20:
-                projection = new String[] {EventTable.COLUMN_ID, EventTable.COLUMN_NAME, EventTable.COLUMN_ICON, EventTable.COLUMN_TYPE};
+                projection = new String[] {EventTable.COLUMN_ID, EventTable.COLUMN_EN, EventTable.COLUMN_PT, EventTable.COLUMN_ES, EventTable.COLUMN_ICON, EventTable.COLUMN_TYPE};
                 selectionArgs = new String[] {String.valueOf(gameType)};
                 cursorLoader = new CursorLoader(getActivity(),
                         DataProvider.EVENT_URI,
                         projection,
                         EventTable.COLUMN_TYPE + "=?",
                         selectionArgs,
-                        null);
+                        getContext().getResources().getSystem().getConfiguration().locale.getLanguage() + " ASC");
                 break;
             default:
                 cursorLoader = null;

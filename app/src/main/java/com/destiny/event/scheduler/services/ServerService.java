@@ -593,11 +593,11 @@ public class ServerService extends IntentService {
                 event.setTimesPlayed(jFavorite.getInt("timesPlayed"));
                 JSONObject jEvent = jFavorite.getJSONObject("event");
                 event.setEventId(jEvent.getInt("id"));
-                event.setEventName(jEvent.getString("name"));
+                event.setEventName(jEvent.getString(getLanguageString()));
                 event.setEventIcon(jEvent.getString("icon"));
                 JSONObject jFavType = jEvent.getJSONObject("eventType");
                 favType.setTypeId(jFavType.getInt("id"));
-                favType.setTypeName(jFavType.getString("name"));
+                favType.setTypeName(jFavType.getString(getLanguageString()));
                 favType.setTypeIcon(jFavType.getString("icon"));
                 event.setEventType(favType);
             }
@@ -693,12 +693,12 @@ public class ServerService extends IntentService {
                 game.setCreatorName(jCreator.getString("name"));
                 JSONObject jEvent = jGame.getJSONObject("event");
                 game.setEventId(jEvent.getInt("id"));
-                game.setEventName(jEvent.getString("name"));
+                game.setEventName(jEvent.getString(getLanguageString()));
                 game.setEventIcon(jEvent.getString("icon"));
                 game.setMaxGuardians(jEvent.getInt("maxGuardians"));
                 JSONObject jType = jEvent.getJSONObject("eventType");
                 game.setTypeId(jType.getInt("id"));
-                game.setTypeName(jType.getString("name"));
+                game.setTypeName(jType.getString(getLanguageString()));
                 game.setTime(jGame.getString("time"));
                 game.setMinLight(jGame.getInt("light"));
                 game.setInscriptions(jGame.getInt("inscriptions"));
@@ -713,6 +713,14 @@ public class ServerService extends IntentService {
             return ERROR_JSON;
         }
         return NO_ERROR;
+    }
+
+    private String getLanguageString() {
+        String lang = getResources().getSystem().getConfiguration().locale.toString();
+        if (!lang.equals("en") && !lang.equals("pt") && !lang.equals("es")){
+            lang = "en";
+        }
+        return lang;
     }
 
     private boolean getBoolean(String joined) {

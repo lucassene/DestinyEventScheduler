@@ -69,8 +69,8 @@ public class GameAdapter extends BaseAdapter implements Filterable {
 
         GameModel currentGame = getItem(position);
         setViewIcon(viewHolder.icon,context.getResources().getIdentifier(currentGame.getEventIcon(),"drawable",context.getPackageName()));
-        setViewText(viewHolder.eventName,context.getResources().getIdentifier(currentGame.getEventName(),"string",context.getPackageName()));
-        setViewText(viewHolder.typeName,context.getResources().getIdentifier(currentGame.getTypeName(),"string",context.getPackageName()));
+        viewHolder.eventName.setText(currentGame.getEventName());
+        viewHolder.typeName.setText(currentGame.getTypeName());
         String creatorName = context.getString(R.string.created_by) + " " + currentGame.getCreatorName();
         viewHolder.creatorName.setText(creatorName);
         String insc = currentGame.getInscriptions() + "/" + currentGame.getMaxGuardians();
@@ -79,15 +79,6 @@ public class GameAdapter extends BaseAdapter implements Filterable {
         viewHolder.date.setText(DateUtils.onBungieDate(currentGame.getTime()));
 
         return convertView;
-    }
-
-    private void setViewText(TextView view, int resId){
-        if (resId != 0){
-            view.setText(resId);
-        } else {
-            Log.w(TAG, "String resource not found.");
-            view.setText(R.string.unknown);
-        }
     }
 
     private void setViewIcon(ImageView view, int resId){

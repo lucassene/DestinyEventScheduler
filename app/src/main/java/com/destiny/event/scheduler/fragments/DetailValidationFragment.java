@@ -424,8 +424,8 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
 
     private void getGameData() {
         setViewIcon(eventIcon, getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
-        setViewText(eventName, getContext().getResources().getIdentifier(game.getEventName(),"string",getContext().getPackageName()));
-        setViewText(eventType, getContext().getResources().getIdentifier(game.getTypeName(),"string",getContext().getPackageName()));
+        eventName.setText(game.getEventName());
+        eventType.setText(game.getTypeName());
         if (game.getComment() != null && !StringUtils.isEmptyOrWhiteSpaces(game.getComment())){
             comment.setText(game.getComment());
         }
@@ -436,15 +436,6 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         if (entryList.size()==0){
             getMembers(game.getGameId());
         } else onEntriesLoaded(entryList, false, game.getGameId());
-    }
-
-    private void setViewText(TextView view, int resId){
-        if (resId != 0){
-            view.setText(resId);
-        } else {
-            Log.w(TAG, "String resource not found.");
-            view.setText(R.string.unknown);
-        }
     }
 
     private void setViewIcon(ImageView view, int resId){
