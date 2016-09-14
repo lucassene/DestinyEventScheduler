@@ -403,5 +403,6 @@
     <string name="update">ATUALIZAR AGORA</string>
     <string name="update_later">ATUALIZAR DEPOIS</string>
     <string name="update_needed">AVISO</string>
+    <string name="no_event_msg">Não foi possível criar esse evento. Por favor atualize este aplicativo.</string>
 
 </resources>

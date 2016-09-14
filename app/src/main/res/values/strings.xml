@@ -28,7 +28,7 @@
         <item>My events</item>
         <item>History</item>
         <item>My clan</item>
-        <item>My stats</item>
+        <item>My profile</item>
         <item>Settings</item>
         <item>About</item>
         <item>Logout</item>
@@ -451,12 +451,13 @@
     <string name="help"><![CDATA[Help & More]]></string>
     <string name="visit_website">Visit our website to know more</string>
     <string name="website" translatable="false">http://destinyscheduler.wordpress.com/</string>
-    <string name="version_code" translatable="false">1.02</string>
     <string name="unknown">Unknown</string>
     <string name="close_app">CLOSE APP</string>
     <string name="update">UPDATE NOW</string>
     <string name="update_needed">WARNING</string>
     <string name="update_later">UPDATE LATER</string>
+    <string name="no_event_msg">Can\'t create this event. Please update this app.</string>
+    <string name="version_code" translatable="false">1.03</string>
 
 
 </resources>

@@ -80,7 +80,7 @@ public class ServerService extends IntentService {
     public static final String CLASS_TAG = "class";
     public static final String EXCEPTION_TAG = "exception";
     public static final String DEVICE_TAG = "deviceName";
-    public static final String ANDROID_TAG = "androidVersion";
+    public static final String ANDROID_TAG = "apiNumber";
     public static final String APP_TAG = "appVersion";
     public static final String NOTICE_TAG = "notice";
 
@@ -114,6 +114,7 @@ public class ServerService extends IntentService {
     public static final int ERROR_INCORRECT_RESPONSE = 60;
     public static final int ERROR_JSON = 70;
     public static final int ERROR_INCORRECT_GAMEID = 80;
+    public static final int ERROR_NO_EVENT = 90;
 
     public static final String RUNNING_SERVICE = "serverRunning";
 
@@ -307,6 +308,9 @@ public class ServerService extends IntentService {
                     bundle.clear();
                     bundle.putString(CLASS_TAG, intent.getStringExtra(CLASS_TAG));
                     bundle.putString(EXCEPTION_TAG, intent.getStringExtra(EXCEPTION_TAG));
+                    bundle.putInt(ANDROID_TAG, intent.getIntExtra(ANDROID_TAG, 0));
+                    bundle.putInt(APP_TAG, intent.getIntExtra(APP_TAG,0));
+                    bundle.putString(DEVICE_TAG, intent.getStringExtra(DEVICE_TAG));
                     requestServer(receiver, type, url, bundle);
                 }
                 break;
@@ -490,6 +494,10 @@ public class ServerService extends IntentService {
                         return ERROR_NULL_RESPONSE;
                     }
                 } else {
+                    if (statusCode == 500 && type == TYPE_CREATE_GAME){
+                        Log.w(TAG, "Responde code equals 500.");
+                        return ERROR_NO_EVENT;
+                    }
                     Log.w(TAG, "Response code different than 200");
                     return ERROR_RESPONSE_CODE;
                 }
@@ -699,6 +707,7 @@ public class ServerService extends IntentService {
                 JSONObject jType = jEvent.getJSONObject("eventType");
                 game.setTypeId(jType.getInt("id"));
                 game.setTypeName(jType.getString(getLanguageString()));
+                game.setTypeIcon(jType.getString("icon"));
                 game.setTime(jGame.getString("time"));
                 game.setMinLight(jGame.getInt("light"));
                 game.setInscriptions(jGame.getInt("inscriptions"));
@@ -716,11 +725,12 @@ public class ServerService extends IntentService {
     }
 
     private String getLanguageString() {
-        String lang = getResources().getSystem().getConfiguration().locale.toString();
-        if (!lang.equals("en") && !lang.equals("pt") && !lang.equals("es")){
-            lang = "en";
-        }
-        return lang;
+        String lang = getResources().getSystem().getConfiguration().locale.getLanguage();
+        if (lang.equals("pt")){
+            return lang;
+        } else if (lang.equals("es")){
+            return lang;
+        } else return "en";
     }
 
     private boolean getBoolean(String joined) {
@@ -755,7 +765,7 @@ public class ServerService extends IntentService {
         urlConnection.setRequestProperty("Content-Type", "application/json");
         urlConnection.setRequestProperty("Accept", "application/json");
 
-        JSONObject gameJSON = createExceptionJSON(bundle.getString(CLASS_TAG), bundle.getString(EXCEPTION_TAG));
+        JSONObject gameJSON = createExceptionJSON(bundle);
         OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
         writer.write(gameJSON.toString());
         writer.flush();
@@ -818,10 +828,13 @@ public class ServerService extends IntentService {
         return urlConnection;
     }
 
-    private JSONObject createExceptionJSON(String className, String exception) throws JSONException {
+    private JSONObject createExceptionJSON(Bundle bundle) throws JSONException {
         JSONObject json = new JSONObject();
-        json.put("exception", exception);
-        json.put("class", className);
+        json.put("exception", bundle.getString(EXCEPTION_TAG));
+        json.put("class", bundle.getString(CLASS_TAG));
+        json.put("androidVersion", bundle.getInt(ANDROID_TAG,0));
+        json.put("versionCode", bundle.getInt(APP_TAG, 0));
+        json.put("deviceName", bundle.getString(DEVICE_TAG));
         Log.w(TAG, "ExceptionJSON: " + json.toString());
         return json;
     }

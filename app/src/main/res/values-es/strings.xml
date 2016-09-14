@@ -118,7 +118,6 @@
     <string name="on">On</string>
     <string name="on_time">A tiempo</string>
     <string name="one_time">vez</string>
-    <string name="oops" translatable="false"></string>
     <string name="open_menu">Abrir menú</string>
     <string name="optional_comment">Comentario opcional</string>
     <string name="order_by">Ordenar por</string>
@@ -167,4 +166,193 @@
     <string name="will_begin_soon">" comenzará pronto ..."</string>
     <string name="xp">EXP</string>
     <string name="your_match_of">"Su partido de "</string>
+    <string name="no_event_msg">No se pudo crear este evento. Por favor, actualice esta aplicación.</string>
+
+    <string-array name="tab_titles">
+        <item>recientes</item>
+        <item>programados</item>
+        <item>terminados</item>
+    </string-array>
+
+    <string-array name="profile_tab_titles">
+        <item>estadísticas</item>
+        <item>medallas</item>
+    </string-array>
+
+    <string-array name="menu_item">
+        <item>Principal</item>
+        <item>Crear evento</item>
+        <item>Buscar evento</item>
+        <item>Mis eventos</item>
+        <item>Historia</item>
+        <item>Mi clan</item>
+        <item>Mi perfil</item>
+        <item>Ajustes</item>
+        <item>Sobre</item>
+        <item>Cerrar sesión</item>
+    </string-array>
+
+    <array name="menu_icons">
+        <item>@drawable/ic_home</item>
+        <item>@drawable/ic_event_new</item>
+        <item>@drawable/ic_event_search</item>
+        <item>@drawable/ic_my_events</item>
+        <item>@drawable/ic_event_history</item>
+        <item>@drawable/ic_clan</item>
+        <item>@drawable/ic_person</item>
+        <item>@drawable/ic_settings</item>
+        <item>@drawable/ic_help</item>
+        <item>@drawable/ic_exit</item>
+    </array>
+
+    <string-array name="menu_section">
+        <item>D A T O S</item>
+        <item>O T R O</item>
+    </string-array>
+
+    <string-array name="clan_order_by">
+        <item>Nombre</item>
+        <item>Nivel</item>
+    </string-array>
+
+    <string-array name="event_types">
+        <item>Corte de Oryx</item>
+        <item>El Crisol</item>
+        <item>Patrulla</item>
+        <item>El Presidio de los Ancianos</item>
+        <item>Incursión</item>
+        <item>Historia</item>
+        <item>Asalto</item>
+        <item>Lista de Asalto</item>
+        <item>SRL</item>
+    </string-array>
+
+    <integer-array name="event_type_ids">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </integer-array>
+
+    <string-array name="spinner_types">
+        <item>Todos</item>
+        <item>Corte de Oryx</item>
+        <item>El Crisol</item>
+        <item>Patrulla</item>
+        <item>El Presidio de los Ancianos</item>
+        <item>Incursión</item>
+        <item>Historia</item>
+        <item>Asalto</item>
+        <item>Lista de Asalto</item>
+        <item>SRL</item>
+    </string-array>
+
+    <string-array name="type_ids">
+        <item>type:all</item>
+        <item>type:court</item>
+        <item>type:crucible</item>
+        <item>type:patrol</item>
+        <item>type:prison</item>
+        <item>type:raid</item>
+        <item>type:story</item>
+        <item>type:strike</item>
+        <item>type:strike_list</item>
+        <item>type:srl</item>
+    </string-array>
+
+    <string-array name="game_status">
+        <item>Todos</item>
+        <item>Programados</item>
+        <item>Esperando la validación</item>
+        <item>Para evaluar</item>
+    </string-array>
+
+    <string-array name="game_status_id">
+        <item>status:all</item>
+        <item>status:0</item>
+        <item>status:1</item>
+        <item>status:2</item>
+    </string-array>
+
+    <string-array name="table_names">
+        <item>Clan</item>
+        <item>Event</item>
+        <item>Event Type</item>
+        <item>LoggedUser</item>
+        <item>Member</item>
+        <item>Notification</item>
+        <item>SavedImages</item>
+    </string-array>
+
+    <string-array name="pref_time_list_entries">
+        <item>30 minutos</item>
+        <item>15 minutos</item>
+        <item>10 minutos</item>
+        <item>5 minutos</item>
+        <item>A tiempo</item>
+    </string-array>
+
+    <integer-array name="pref_time_list_values">
+        <item>30</item>
+        <item>15</item>
+        <item>10</item>
+        <item>5</item>
+        <item>0</item>
+    </integer-array>
+
+    <string-array name="pref_new_time_list_entries">
+        <item>6 horas</item>
+        <item>2 horas</item>
+        <item>1 hora</item>
+        <item>30 minutos</item>
+        <item>10 minutos</item>
+    </string-array>
+
+    <integer-array name="pref_new_time_list_values">
+        <item>21600000</item>
+        <item>7200000</item>
+        <item>3600000</item>
+        <item>1800000</item>
+        <item>600000</item>
+    </integer-array>
+
+    <array name="medals_icons">
+        <item>@drawable/ic_created_medal</item>
+        <item>@drawable/ic_played_medal</item>
+        <item>@drawable/ic_eval_medal</item>
+        <item>@drawable/ic_like_medal</item>
+        <item>@drawable/ic_dislike_medal</item>
+        <item>@drawable/ic_crucible_medal</item>
+        <item>@drawable/ic_strike_medal</item>
+        <item>@drawable/ic_raid_medal</item>
+    </array>
+
+    <string-array name="medal_names">
+        <item>Mi juego, mis reglas</item>
+        <item>Jugador</item>
+        <item>El ojo que todo lo ve</item>
+        <item>El amado</item>
+        <item>Odiado o temido?</item>
+        <item>Sin dolor no hay ganancia</item>
+        <item>Ariete</item>
+        <item>Vaquero del espacio</item>
+    </string-array>
+
+    <string-array name="medal_desc">
+        <item>Número de eventos creados</item>
+        <item>Número de eventos jugados</item>
+        <item>Evaluaciones hechas</item>
+        <item>Número de gustos recibido</item>
+        <item>Número de disgustos recibido</item>
+        <item>Eventos de Crisol jugados</item>
+        <item>Eventos de Asalto jugados</item>
+        <item>Eventos de Incursión jugados</item>
+    </string-array>
+
+
 </resources>

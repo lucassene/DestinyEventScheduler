@@ -423,7 +423,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
     }
 
     private void getGameData() {
-        setViewIcon(eventIcon, getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()));
+        setViewIcon(eventIcon, getContext().getResources().getIdentifier(game.getEventIcon(),"drawable",getContext().getPackageName()),game.getTypeIcon());
         eventName.setText(game.getEventName());
         eventType.setText(game.getTypeName());
         if (game.getComment() != null && !StringUtils.isEmptyOrWhiteSpaces(game.getComment())){
@@ -438,12 +438,18 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         } else onEntriesLoaded(entryList, false, game.getGameId());
     }
 
-    private void setViewIcon(ImageView view, int resId){
+    private void setViewIcon(ImageView view, int resId, String typeIcon){
         if (resId != 0){
             view.setImageResource(resId);
         } else {
-            Log.w(TAG, "Drawable resource not found.");
-            view.setImageResource(R.drawable.ic_missing);
+            int typeRes = getContext().getResources().getIdentifier(typeIcon,"drawable",getContext().getPackageName());
+            if (typeRes != 0){
+                Log.w(TAG, "Event icon not found. Using Type icon instead");
+                view.setImageResource(typeRes);
+            } else{
+                Log.w(TAG, "Drawable resource not found.");
+                view.setImageResource(R.drawable.ic_missing);
+            }
         }
     }
 

@@ -68,7 +68,7 @@ public class GameAdapter extends BaseAdapter implements Filterable {
         }
 
         GameModel currentGame = getItem(position);
-        setViewIcon(viewHolder.icon,context.getResources().getIdentifier(currentGame.getEventIcon(),"drawable",context.getPackageName()));
+        setViewIcon(viewHolder.icon,context.getResources().getIdentifier(currentGame.getEventIcon(),"drawable",context.getPackageName()),currentGame.getTypeIcon());
         viewHolder.eventName.setText(currentGame.getEventName());
         viewHolder.typeName.setText(currentGame.getTypeName());
         String creatorName = context.getString(R.string.created_by) + " " + currentGame.getCreatorName();
@@ -81,12 +81,18 @@ public class GameAdapter extends BaseAdapter implements Filterable {
         return convertView;
     }
 
-    private void setViewIcon(ImageView view, int resId){
+    private void setViewIcon(ImageView view, int resId, String typeIcon){
         if (resId != 0){
             view.setImageResource(resId);
         } else {
-            Log.w(TAG, "Drawable resource not found.");
-            view.setImageResource(R.drawable.ic_missing);
+            int typeRes = context.getResources().getIdentifier(typeIcon,"drawable",context.getPackageName());
+            if (typeRes != 0){
+                Log.w(TAG, "Event icon not found. Using Type icon instead");
+                view.setImageResource(typeRes);
+            } else{
+                Log.w(TAG, "Drawable resource not found.");
+                view.setImageResource(R.drawable.ic_missing);
+            }
         }
     }
 

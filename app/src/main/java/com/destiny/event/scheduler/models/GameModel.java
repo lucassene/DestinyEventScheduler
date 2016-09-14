@@ -22,6 +22,7 @@ public class GameModel implements Serializable {
     private int maxGuardians;
     private int typeId;
     private String typeName;
+    private String typeIcon;
     private String time;
     private int minLight;
     private int inscriptions;
@@ -156,5 +157,13 @@ public class GameModel implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getTypeIcon() {
+        return typeIcon;
+    }
+
+    public void setTypeIcon(String typeIcon) {
+        this.typeIcon = typeIcon;
     }
 }

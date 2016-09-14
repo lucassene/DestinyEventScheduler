@@ -1360,6 +1360,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         progress.setVisibility(View.GONE);
                         Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
                         break;
+                    case ServerService.ERROR_NO_EVENT:
+                        progress.setVisibility(View.GONE);
+                        Bundle dialog = new Bundle();
+                        dialog.putInt("type", MyAlertDialog.ALERT_DIALOG);
+                        dialog.putString("title", getString(R.string.error));
+                        dialog.putString("msg", getString(R.string.no_event_msg));
+                        dialog.putString("posButton", getString(R.string.got_it));
+                        showAlertDialog(dialog);
+                        break;
                     default:
                         progress.setVisibility(View.GONE);
                         Bundle dialogBundle = new Bundle();

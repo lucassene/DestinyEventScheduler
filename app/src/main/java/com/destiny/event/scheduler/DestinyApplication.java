@@ -61,7 +61,7 @@ public class DestinyApplication extends Application {
         Log.w(TAG, "Device name: " + getDeviceName());
         intent.putExtra(ServerService.ANDROID_TAG, Build.VERSION.SDK_INT);
         Log.w(TAG, "API number: " + Build.VERSION.SDK_INT);
-        intent.putExtra(ServerService.APP_TAG, BuildConfig.VERSION_NAME);
+        intent.putExtra(ServerService.APP_TAG, BuildConfig.VERSION_CODE);
         Log.w(TAG, "App version: " + BuildConfig.VERSION_CODE);
         intent.putExtra(ServerService.EXCEPTION_TAG, errorMessage);
         startService(intent);
