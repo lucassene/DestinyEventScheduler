@@ -1,21 +1,28 @@
 package com.destiny.event.scheduler.services;
 
 import android.app.IntentService;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
+import com.destiny.event.scheduler.data.EventTable;
+import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.models.EvaluationModel;
 import com.destiny.event.scheduler.models.EventModel;
 import com.destiny.event.scheduler.models.EventTypeModel;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.models.NoticeModel;
+import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
 import org.json.JSONArray;
@@ -32,6 +39,7 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.TimeZone;
 
 public class ServerService extends IntentService {
@@ -51,10 +59,11 @@ public class ServerService extends IntentService {
     private static final String EXCEPTION_ENDPOINT = "log-app";
     private static final String MEMBERLIST_ENDPOINT = "member/list";
     private static final String NOTICE_ENDPOINT = "notice";
+    private static final String EVENTS_ENDPOINT = "events";
 
     private static final String STATUS_PARAM = "status=";
     private static final String JOINED_PARAM = "joined=";
-    private static final String EVALUATED_PARAM = "evaluated=";
+    private static final String INITIAL_PARAM = "?initialId=";
 
     private static final String MEMBER_HEADER = "membership";
     private static final String PLATFORM_HEADER = "platform";
@@ -83,6 +92,7 @@ public class ServerService extends IntentService {
     public static final String ANDROID_TAG = "apiNumber";
     public static final String APP_TAG = "appVersion";
     public static final String NOTICE_TAG = "notice";
+    public static final String EVENT_LIST_TAG = "eventList";
 
     public static final int STATUS_RUNNING = 200;
     public static final int STATUS_FINISHED = 210;
@@ -104,6 +114,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_EXCEPTION = 14;
     public static final int TYPE_CLAN_MEMBERS = 15;
     public static final int TYPE_NOTICE = 16;
+    public static final int TYPE_NEW_EVENTS = 17;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -115,6 +126,7 @@ public class ServerService extends IntentService {
     public static final int ERROR_JSON = 70;
     public static final int ERROR_INCORRECT_GAMEID = 80;
     public static final int ERROR_NO_EVENT = 90;
+    public static final int ERROR_INSERT = 100;
 
     public static final String RUNNING_SERVICE = "serverRunning";
 
@@ -321,6 +333,13 @@ public class ServerService extends IntentService {
                     sendError(receiver, error);
                 } else sendNotice(receiver, notice);
                 break;
+            case TYPE_NEW_EVENTS:
+                url = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + intent.getIntExtra(EVENT_LIST_TAG,999);
+                error = requestServer(receiver, type, url, null);
+                if (error != NO_ERROR){
+                    sendError(receiver, error);
+                }
+                break;
         }
         this.stopSelf();
 
@@ -395,6 +414,7 @@ public class ServerService extends IntentService {
                     case TYPE_JOINED_GAMES:
                     case TYPE_HISTORY_GAMES:
                     case TYPE_HISTORY:
+                    case TYPE_NEW_EVENTS:
                         urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
                         break;
                     case TYPE_JOIN_GAME:
@@ -443,7 +463,7 @@ public class ServerService extends IntentService {
                                 case TYPE_NEW_GAMES:
                                 case TYPE_JOINED_GAMES:
                                 case TYPE_HISTORY_GAMES:
-                                    error = parseGames(response);
+                                    error = parseGames(receiver, response);
                                     if (error != NO_ERROR){
                                         return error;
                                     } else return NO_ERROR;
@@ -482,6 +502,9 @@ public class ServerService extends IntentService {
                                 case TYPE_NOTICE:
                                     error = parseNotice(response);
                                     return error;
+                                case TYPE_NEW_EVENTS:
+                                    error = parseNewEvents(response);
+                                    return error;
                                 default:
                                     return NO_ERROR;
                             }
@@ -510,6 +533,124 @@ public class ServerService extends IntentService {
             Log.w(TAG, "Error in HTTP request");
             return ERROR_HTTP_REQUEST;
         }
+    }
+
+    private int parseNewEvents(String response) {
+        Log.w(TAG, "getNewEvents response: " + response);
+        int err = NO_ERROR;
+        try{
+            JSONArray jArray = new JSONArray(response);
+            for (int i=0;i<jArray.length();i++){
+                JSONObject jEvent = jArray.getJSONObject(i);
+                EventModel e = new EventModel();
+                EventTypeModel eT = new EventTypeModel();
+                e.setEventId(jEvent.getInt("id"));
+                e.setEventIcon(jEvent.getString("icon"));
+                e.setMinLight(jEvent.getInt("minLight"));
+                e.setMaxGuardians(jEvent.getInt("maxGuardians"));
+
+                JSONObject jType = jEvent.getJSONObject("eventType");
+                eT.setTypeId(jType.getInt("id"));
+                eT.setTypeIcon(jType.getString("icon"));
+                eT.setEnName(jType.getString("en"));
+                eT.setPtName(jType.getString("pt"));
+                eT.setEsName(jType.getString("es"));
+
+                e.setEventType(eT);
+                e.setEnName(jEvent.getString("en"));
+                e.setPtName(jEvent.getString("pt"));
+                e.setEsName(jEvent.getString("es"));
+                err = insertEvent(e);
+            }
+            return err;
+        } catch (JSONException e){
+            e.printStackTrace();
+            return ERROR_JSON;
+        }
+    }
+
+    private int insertEvent(EventModel e) {
+        try{
+            Log.w(TAG, "Inserting event (" + e.getEnName() + ")");
+            ArrayList<Integer> typeList = new ArrayList<>();
+            int maxType = getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).getInt(DrawerActivity.TYPE_PREF, 999);
+            ContentValues values = new ContentValues();
+            values.put(EventTable.COLUMN_ID,e.getEventId());
+            values.put(EventTable.COLUMN_EN, e.getEnName());
+            values.put(EventTable.COLUMN_PT, e.getPtName());
+            values.put(EventTable.COLUMN_ES, e.getEsName());
+            values.put(EventTable.COLUMN_ICON, e.getEventIcon());
+            if (e.getEventType().getTypeId() > maxType){
+                boolean insert = true;
+                for (int i=0;i<typeList.size();i++){
+                    if (typeList.get(i) == e.getEventType().getTypeId()){
+                        insert = false;
+                        break;
+                    }
+                }
+                if (insert){
+                    typeList.add(e.getEventType().getTypeId());
+                    insertType(e.getEventType());
+                }
+            }
+            values.put(EventTable.COLUMN_TYPE, e.getEventType().getTypeId());
+            values.put(EventTable.COLUMN_LIGHT, e.getMinLight());
+            values.put(EventTable.COLUMN_GUARDIANS, e.getMaxGuardians());
+            Uri uri = getContentResolver().insert(DataProvider.EVENT_URI,values);
+            if (uri != null){
+                SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                editor.putInt(DrawerActivity.EVENT_PREF,getDBEventsCount());
+                editor.apply();
+            }
+            values.clear();
+            return NO_ERROR;
+        }catch (Exception exc){
+            exc.printStackTrace();
+            return ERROR_INSERT;
+        }
+    }
+
+    private void insertType(EventTypeModel eventType) {
+        Log.w(TAG, "Inserting eventType (" + eventType.getEnName() + ")");
+        ContentValues values = new ContentValues();
+        values.put(EventTypeTable.COLUMN_ID, eventType.getTypeId());
+        values.put(EventTypeTable.COLUMN_EN, eventType.getEnName());
+        values.put(EventTypeTable.COLUMN_PT, eventType.getPtName());
+        values.put(EventTypeTable.COLUMN_ES, eventType.getEsName());
+        values.put(EventTypeTable.COLUMN_ICON, eventType.getTypeIcon());
+        Uri uri = getContentResolver().insert(DataProvider.EVENT_TYPE_URI, values);
+        if (uri != null){
+            SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+            editor.putInt(DrawerActivity.TYPE_PREF,getDBTypesCount());
+            editor.apply();
+        }
+        values.clear();
+    }
+
+    private int getDBEventsCount() {
+        Cursor cursor = null;
+        try{
+            cursor = getContentResolver().query(DataProvider.EVENT_URI,EventTable.ALL_COLUMNS,null,null,null);
+            if (cursor != null){
+                return cursor.getCount();
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+        return 999;
+    }
+
+    private int getDBTypesCount() {
+        Cursor cursor = null;
+        try{
+            cursor = getContentResolver().query(DataProvider.EVENT_TYPE_URI,EventTypeTable.ALL_COLUMNS,null,null,null);
+            if (cursor != null){
+                return cursor.getCount();
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+        return 999;
     }
 
     private int parseNotice(String response) {
@@ -545,14 +686,12 @@ public class ServerService extends IntentService {
                 member.setDislikes(jMember.getInt("dislikes"));
                 member.setGamesCreated(jMember.getInt("gamesCreated"));
                 member.setGamesPlayed(jMember.getInt("gamesPlayed"));
-                EventModel event = new EventModel();
-                if (jMember.isNull("favoriteEvent")){
-                    event.setEventId(0);
+                if (jMember.isNull("memberTitle")){
+                    member.setTitle(getString(R.string.default_title));
                 } else {
-                    JSONObject jFavorite = jMember.getJSONObject("favoriteEvent");
-                    event.setEventId(jFavorite.getInt("id"));
+                    JSONObject jTitle = jMember.getJSONObject("memberTitle");
+                    member.setTitle(jTitle.getString(getLanguageString()));
                 }
-                member.setFavoriteEvent(event);
                 member.setInsert(true);
                 memberList.add(member);
             }
@@ -591,6 +730,12 @@ public class ServerService extends IntentService {
                 typeList.add(type);
             }
             member.setTypesPlayed(typeList);
+            if (jMember.isNull("memberTitle")){
+                member.setTitle(getString(R.string.default_title));
+            } else {
+                JSONObject jTitle = jMember.getJSONObject("memberTitle");
+                member.setTitle(jTitle.getString(getLanguageString()));
+            }
 
             EventModel event = new EventModel();
             EventTypeModel favType = new EventTypeModel();
@@ -632,14 +777,12 @@ public class ServerService extends IntentService {
                 member.setIconPath(jEntry.getString("icon"));
                 member.setLikes(jEntry.getInt("totalLikes"));
                 member.setDislikes(jEntry.getInt("totalDislikes"));
-                member.setTitle(getString(R.string.default_title));
-                EventModel event = new EventModel();
-                if (jEntry.isNull("favoriteEvent")){
-                    event.setEventId(0);
+                if (jEntry.isNull("memberTitle")){
+                    member.setTitle(getString(R.string.default_title));
                 } else {
-                    event.setEventId(jEntry.getInt("favoriteEvent"));
+                    JSONObject jTitle = jEntry.getJSONObject("memberTitle");
+                    member.setTitle(jTitle.getString(getLanguageString()));
                 }
-                member.setFavoriteEvent(event);
                 memberList.add(member);
             }
         } catch (JSONException e){
@@ -669,14 +812,12 @@ public class ServerService extends IntentService {
                 member.setGamesPlayed(jMember.getInt("gamesPlayed"));
                 member.setLvl(jMember.getInt("likes"),jMember.getInt("dislikes"),jMember.getInt("gamesPlayed"),jMember.getInt("gamesCreated"));
                 member.setEntryTime(jEntry.getString("time"));
-                EventModel event = new EventModel();
-                if (jMember.isNull("favoriteEvent")){
-                    event.setEventId(0);
+                if (jMember.isNull("memberTitle")){
+                    member.setTitle(getString(R.string.default_title));
                 } else {
-                    JSONObject jFavorite = jMember.getJSONObject("favoriteEvent");
-                    event.setEventId(jFavorite.getInt("id"));
+                    JSONObject jTitle = jMember.getJSONObject("memberTitle");
+                    member.setTitle(jTitle.getString(getLanguageString()));
                 }
-                member.setFavoriteEvent(event);
                 memberList.add(member);
             }
         } catch (JSONException e){
@@ -686,10 +827,12 @@ public class ServerService extends IntentService {
         return NO_ERROR;
     }
 
-    private int parseGames(String response){
+    private int parseGames(ResultReceiver receiver, String response){
         Log.w(TAG, "getGames response: " + response);
         JSONArray jResponse;
         gameList = new ArrayList<>();
+        ArrayList<Integer> eventIdList = new ArrayList<>();
+        int maxEvent = getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).getInt(DrawerActivity.EVENT_PREF, 999);
         try {
             jResponse = new JSONArray(response);
             for (int i=0;i<jResponse.length();i++){
@@ -701,6 +844,9 @@ public class ServerService extends IntentService {
                 game.setCreatorName(jCreator.getString("name"));
                 JSONObject jEvent = jGame.getJSONObject("event");
                 game.setEventId(jEvent.getInt("id"));
+                if (game.getEventId() > maxEvent){
+                    eventIdList.add(game.getEventId());
+                }
                 game.setEventName(jEvent.getString(getLanguageString()));
                 game.setEventIcon(jEvent.getString("icon"));
                 game.setMaxGuardians(jEvent.getInt("maxGuardians"));
@@ -717,6 +863,13 @@ public class ServerService extends IntentService {
                 game.setEvaluated(getBoolean(jGame.getString("evaluated")));
                 gameList.add(game);
             }
+            Collections.sort(eventIdList, new EventComparator());
+            if (eventIdList.size()>0){
+                Log.w(TAG, "New event found. Inserting...");
+                int id = eventIdList.get(0)-1;
+                String url = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + id;
+                requestServer(receiver, TYPE_NEW_EVENTS, url, null);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
             return ERROR_JSON;
@@ -725,12 +878,16 @@ public class ServerService extends IntentService {
     }
 
     private String getLanguageString() {
-        String lang = getResources().getSystem().getConfiguration().locale.getLanguage();
-        if (lang.equals("pt")){
-            return lang;
-        } else if (lang.equals("es")){
-            return lang;
-        } else return "en";
+        getResources();
+        String lang = Resources.getSystem().getConfiguration().locale.getLanguage();
+        switch (lang) {
+            case "pt":
+                return lang;
+            case "es":
+                return lang;
+            default:
+                return "en";
+        }
     }
 
     private boolean getBoolean(String joined) {
@@ -851,14 +1008,16 @@ public class ServerService extends IntentService {
     private JSONObject createCreateGameJSON(Bundle bundle) throws JSONException {
         GameModel game = (GameModel) bundle.getSerializable(GAME_TAG);
         JSONObject json = new JSONObject();
-        JSONObject jEvent = new JSONObject();
-        jEvent.put("id", game.getEventId());
-        json.put("event",jEvent);
-        json.put("time", game.getTime());
-        json.put("light", game.getMinLight());
-        json.put("status",0);
-        json.put("comment", game.getComment());
-        Log.w(TAG, "GameJSON: " + json.toString());
+        if (game != null){
+            JSONObject jEvent = new JSONObject();
+            jEvent.put("id", game.getEventId());
+            json.put("event",jEvent);
+            json.put("time", game.getTime());
+            json.put("light", game.getMinLight());
+            json.put("status",0);
+            json.put("comment", game.getComment());
+            Log.w(TAG, "GameJSON: " + json.toString());
+        }
         return json;
     }
 
@@ -917,4 +1076,10 @@ public class ServerService extends IntentService {
         return result;
     }
 
+    private class EventComparator implements java.util.Comparator<Integer> {
+        @Override
+        public int compare(Integer i1, Integer i2) {
+            return i2 -i1;
+        }
+    }
 }

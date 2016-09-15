@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
-import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.utils.ImageUtils;
 
@@ -105,8 +104,7 @@ public class DetailEventAdapter extends BaseAdapter {
             viewHolder.iconPath.setImageResource(R.drawable.ic_missing);
         }
         viewHolder.memberName.setText(currentMember.getName());
-        int xp = MemberTable.getMemberXP(currentMember.getLikes(), currentMember.getDislikes(), currentMember.getGamesPlayed(), currentMember.getGamesCreated());
-        viewHolder.memberTitle.setText(MemberTable.getMemberTitle(context, xp, currentMember.getFavoriteEvent().getEventId()));
+        viewHolder.memberTitle.setText(currentMember.getTitle());
         viewHolder.memberLvl.setText(currentMember.getLvl());
 
         return convertView;

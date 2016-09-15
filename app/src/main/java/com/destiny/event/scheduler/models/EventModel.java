@@ -6,7 +6,12 @@ public class EventModel implements Serializable{
 
     private int eventId;
     private String eventName;
+    private String enName;
+    private String esName;
+    private String ptName;
     private String eventIcon;
+    private int minLight;
+    private int maxGuardians;
     private EventTypeModel eventType;
     private int timesPlayed;
 
@@ -48,5 +53,45 @@ public class EventModel implements Serializable{
 
     public void setTimesPlayed(int timesPlayed) {
         this.timesPlayed = timesPlayed;
+    }
+
+    public String getEnName() {
+        return enName;
+    }
+
+    public void setEnName(String enName) {
+        this.enName = enName;
+    }
+
+    public String getEsName() {
+        return esName;
+    }
+
+    public void setEsName(String esName) {
+        this.esName = esName;
+    }
+
+    public int getMaxGuardians() {
+        return maxGuardians;
+    }
+
+    public void setMaxGuardians(int maxGuardians) {
+        this.maxGuardians = maxGuardians;
+    }
+
+    public int getMinLight() {
+        return minLight;
+    }
+
+    public void setMinLight(int minLight) {
+        this.minLight = minLight;
+    }
+
+    public String getPtName() {
+        return ptName;
+    }
+
+    public void setPtName(String ptName) {
+        this.ptName = ptName;
     }
 }

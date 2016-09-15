@@ -5,19 +5,25 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.text.Html;
 import android.util.Log;
 
 import com.destiny.event.scheduler.BuildConfig;
+import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.ClanTable;
+import com.destiny.event.scheduler.data.EventTable;
+import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.data.LoggedUserTable;
 import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.data.SavedImagesTable;
 import com.destiny.event.scheduler.models.EventModel;
+import com.destiny.event.scheduler.models.EventTypeModel;
 import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.ImageUtils;
@@ -38,6 +44,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 
 public class BungieService extends IntentService {
 
@@ -49,6 +56,8 @@ public class BungieService extends IntentService {
     private static final String CLAN_ENDPOINT = "clan";
     private static final String MEMBERS_ENDPOINT = "members";
     private static final String MEMBERLIST_ENDPOINT = "member/list";
+    private static final String EVENTS_ENDPOINT = "events";
+    private static final String INITIAL_PARAM = "?initialId=";
 
     private static final String SERVER_MEMBER_HEADER = "membership";
     private static final String SERVER_PLATFORM_HEADER = "platform";
@@ -73,6 +82,7 @@ public class BungieService extends IntentService {
     public static final int STATUS_VERIFY = 12;
     public static final int STATUS_FRIENDS = 14;
     public static final int STATUS_PARTY = 15;
+    public static final int STATUS_EVENTS = 16;
 
     public static final String COOKIE_EXTRA = "cookies";
     public static final String REQUEST_EXTRA = "request";
@@ -85,6 +95,7 @@ public class BungieService extends IntentService {
     private static final String KEY_HEADER = "x-api-key";
     private static final String COOKIE_HEADER = "cookie";
     private static final String XCSRF_HEADER = "x-csrf";
+    private static final String TIMEZONE_HEADER = "zoneid";
 
     public static final String ERROR_TAG = "error";
     public static final int NO_ERROR = 0;
@@ -113,11 +124,7 @@ public class BungieService extends IntentService {
     private String clanIcon = "";
     private String clanBanner = "";
 
-    private int userCreated;
-    private int userPlayed;
-    private int userLikes;
-    private int userDislikes;
-    private EventModel userFavoriteEvent;
+    private String userIconPath;
 
     private ArrayList<MemberModel> membersModelList;
     private ArrayList<String> iconsList;
@@ -177,6 +184,7 @@ public class BungieService extends IntentService {
                                 insertClanMember(membersModelList.get(i));
                             }
                             insertLoggedUser();
+                            getNewEvents(receiver);
                             receiver.send(STATUS_FINISHED, Bundle.EMPTY);
                         }
                     }
@@ -219,6 +227,32 @@ public class BungieService extends IntentService {
 
         this.stopSelf();
 
+    }
+
+    private int getDBTypesCount() {
+        Cursor cursor = null;
+        try{
+            cursor = getContentResolver().query(DataProvider.EVENT_TYPE_URI, EventTypeTable.ALL_COLUMNS,null,null,null);
+            if (cursor != null){
+                return cursor.getCount();
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+        return 999;
+    }
+
+    private int getDBEventsCount() {
+        Cursor cursor = null;
+        try{
+            cursor = getContentResolver().query(DataProvider.EVENT_URI,EventTable.ALL_COLUMNS,null,null,null);
+            if (cursor != null){
+                return cursor.getCount();
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+        return 999;
     }
 
     private int updateClan(ResultReceiver receiver) {
@@ -413,7 +447,6 @@ public class BungieService extends IntentService {
                 bundle.putInt("platform", platformId);
                 receiver.send(STATUS_DOCS, bundle);
 
-                String userIconPath;
                 try {
                     JSONObject jBungie = jResponse.getJSONObject("bungieNetUser");
                     userIconPath = jBungie.getString("profilePicturePath");
@@ -439,20 +472,6 @@ public class BungieService extends IntentService {
                     int err = checkInServer(receiver);
                     if (err != NO_ERROR) { return err; }
 
-                    MemberModel user = new MemberModel();
-                    user.setName(displayName);
-                    user.setMembershipId(membershipId);
-                    user.setClanId(clanId);
-                    user.setIconPath(userIconPath);
-                    user.setPlatformId(platformId);
-                    user.setLikes(userLikes);
-                    user.setDislikes(userDislikes);
-                    user.setGamesCreated(userCreated);
-                    user.setGamesPlayed(userPlayed);
-                    user.setFavoriteEvent(userFavoriteEvent);
-                    user.setInsert(true);
-
-                    membersModelList.add(user);
                     bundle.clear();
                     bundle.putString("clanId", clanId);
                     receiver.send(STATUS_FRIENDS, bundle);
@@ -498,8 +517,9 @@ public class BungieService extends IntentService {
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
-                urlConnection.setRequestProperty(ServerService.CLAN_TAG, clanId);
+                urlConnection.setRequestProperty(CLAN_EXTRA, clanId);
                 urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
+                urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
                 urlConnection.setRequestMethod(POST_METHOD);
 
                 int statusCode = urlConnection.getResponseCode();
@@ -510,19 +530,33 @@ public class BungieService extends IntentService {
 
                     if (response != null) {
                         JSONObject jObject = new JSONObject(response);
-                        //Log.w(TAG, "JSON uparsed do Server: " + response);
-                        userLikes = jObject.getInt("likes");
-                        userDislikes = jObject.getInt("dislikes");
-                        userCreated = jObject.getInt("gamesCreated");
-                        userPlayed = jObject.getInt("gamesPlayed");
-                        EventModel event = new EventModel();
-                        if (jObject.isNull("favoriteEvent")){
-                            event.setEventId(0);
+                        int userLikes = jObject.getInt("likes");
+                        int userDislikes = jObject.getInt("dislikes");
+                        int userCreated = jObject.getInt("gamesCreated");
+                        int userPlayed = jObject.getInt("gamesPlayed");
+                        String userTitle;
+                        if (jObject.isNull("memberTitle")){
+                            userTitle = getString(R.string.default_title);
                         } else {
-                            JSONObject jFavorite = jObject.getJSONObject("favoriteEvent");
-                            event.setEventId(jFavorite.getInt("id"));
+                            JSONObject jTitle = jObject.getJSONObject("memberTitle");
+                            userTitle = jTitle.getString(getLanguageString());
                         }
-                        userFavoriteEvent = event;
+
+                        MemberModel user = new MemberModel();
+                        user.setName(displayName);
+                        user.setMembershipId(membershipId);
+                        user.setClanId(clanId);
+                        user.setIconPath(userIconPath);
+                        user.setPlatformId(platformId);
+                        user.setLikes(userLikes);
+                        user.setDislikes(userDislikes);
+                        user.setGamesCreated(userCreated);
+                        user.setGamesPlayed(userPlayed);
+                        user.setTitle(userTitle);
+                        user.setInsert(true);
+
+                        Log.w(TAG, "User Title: " + user.getTitle());
+                        membersModelList.add(user);
                         receiver.send(STATUS_VERIFY, Bundle.EMPTY);
                         return NO_ERROR;
                     } else { return ERROR_RESPONSE_CODE; }
@@ -545,9 +579,7 @@ public class BungieService extends IntentService {
 
     private int getMembersOfClan(ResultReceiver receiver){
 
-        //String myURL = BASE_URL + GROUP_PREFIX + clanId + "/" + GET_MEMBERS_OF_CLAN + "?" + CURRENT_PAGE + String.valueOf(page) + "&" + MEMBER_TYPE + "-1&" + PLATFORM_TYPE + platformId + "&" + SORT + "0";
         String myURL = SERVER_BASE_URL + CLAN_ENDPOINT + "/" + clanId + "/" + MEMBERS_ENDPOINT;
-        //Log.w(TAG,myURL);
 
         try{
 
@@ -556,7 +588,6 @@ public class BungieService extends IntentService {
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                //urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
                 urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
                 urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
                 urlConnection.setRequestMethod(GET_METHOD);
@@ -610,6 +641,78 @@ public class BungieService extends IntentService {
         }
     }
 
+    private void getNewEvents(ResultReceiver receiver) {
+        SharedPreferences.Editor sharedEditor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+        sharedEditor.putInt(DrawerActivity.EVENT_PREF, getDBEventsCount());
+        sharedEditor.putInt(DrawerActivity.TYPE_PREF, getDBTypesCount());
+        sharedEditor.apply();
+
+        String myURL = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + getDBEventsCount();
+        Log.w(TAG, "New Events URL: " + myURL);
+        receiver.send(STATUS_EVENTS, Bundle.EMPTY);
+
+        try{
+            URL url = new URL(myURL);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+            urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
+            urlConnection.setRequestProperty(CLAN_EXTRA, clanId);
+            urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
+            urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
+            urlConnection.setRequestMethod(GET_METHOD);
+
+            int statusCode = urlConnection.getResponseCode();
+
+            if (statusCode == 200) {
+                InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                String response = convertInputStreamToString(inputStream);
+
+                if (response != null) {
+                    parseNewEvents(response);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private int parseNewEvents(String response) {
+        Log.w(TAG, "getNewEvents response: " + response);
+        int err = NO_ERROR;
+        try{
+            JSONArray jArray = new JSONArray(response);
+            if (jArray.length() != 0) {
+                Log.w(TAG, "New event found. Inserting...");
+                for (int i=0;i<jArray.length();i++){
+                    JSONObject jEvent = jArray.getJSONObject(i);
+                    EventModel e = new EventModel();
+                    EventTypeModel eT = new EventTypeModel();
+                    e.setEventId(jEvent.getInt("id"));
+                    e.setEventIcon(jEvent.getString("icon"));
+                    e.setMinLight(jEvent.getInt("minLight"));
+                    e.setMaxGuardians(jEvent.getInt("maxGuardians"));
+
+                    JSONObject jType = jEvent.getJSONObject("eventType");
+                    eT.setTypeId(jType.getInt("id"));
+                    eT.setTypeIcon(jType.getString("icon"));
+                    eT.setEnName(jType.getString("en"));
+                    eT.setPtName(jType.getString("pt"));
+                    eT.setEsName(jType.getString("es"));
+
+                    e.setEventType(eT);
+                    e.setEnName(jEvent.getString("en"));
+                    e.setPtName(jEvent.getString("pt"));
+                    e.setEsName(jEvent.getString("es"));
+                    err = insertEvent(e);
+                }
+                return err;
+            } else return NO_ERROR;
+        } catch (JSONException e){
+            e.printStackTrace();
+            return ERROR_RESPONSE_CODE;
+        }
+    }
+
     private int parseNewMembers(ArrayList<String> memberList) {
 
         int error = parseMembersOfClan(memberList);
@@ -618,12 +721,10 @@ public class BungieService extends IntentService {
         } else {
             for (int i=0;i<membersModelList.size();i++){
                 for (int x=0;x<actualMemberList.size();x++){
-                    Log.w(TAG, "Is " + membersModelList.get(i).getMembershipId() + " equal to " + actualMemberList.get(x) + " ?");
                     if (actualMemberList.get(x).equals(membersModelList.get(i).getMembershipId())){
                         membersModelList.get(i).setInsert(false);
-                        Log.w(TAG, "True");
                         break;
-                    } else Log.w(TAG, "False");
+                    }
                 }
                 insertClanMember(membersModelList.get(i));
             }
@@ -697,14 +798,13 @@ public class BungieService extends IntentService {
                             member.setDislikes(jMember.getInt("dislikes"));
                             member.setGamesCreated(jMember.getInt("gamesCreated"));
                             member.setGamesPlayed(jMember.getInt("gamesPlayed"));
-                            EventModel event = new EventModel();
-                            if (jMember.isNull("favoriteEvent")){
-                                event.setEventId(0);
+                            if (jMember.isNull("memberTitle")){
+                                member.setTitle(getString(R.string.default_title));
                             } else {
-                                JSONObject jFavorite = jMember.getJSONObject("favoriteEvent");
-                                event.setEventId(jFavorite.getInt("id"));
+                                JSONObject jTitle = jMember.getJSONObject("memberTitle");
+                                member.setTitle(jTitle.getString(getLanguageString()));
                             }
-                            member.setFavoriteEvent(event);
+                            //Log.w(TAG, "Member Title: " + member.getTitle());
                             member.setInsert(true);
                             membersModelList.add(member);
                         }
@@ -731,6 +831,18 @@ public class BungieService extends IntentService {
                     return ERROR_HTTP_REQUEST;
         }
 
+    }
+
+    private String getLanguageString() {
+        getResources();
+        String lang = Resources.getSystem().getConfiguration().locale.getLanguage();
+        switch (lang) {
+            case "pt":
+            case "es":
+                return lang;
+            default:
+                return "en";
+        }
     }
 
     private JSONArray createJSONMemberList(ArrayList<String> memberList) {
@@ -791,7 +903,7 @@ public class BungieService extends IntentService {
         String imageName = member.getIconPath().substring(member.getIconPath().lastIndexOf("/")+1, member.getIconPath().length());
         values.put(MemberTable.COLUMN_ICON, imageName);
         values.put(MemberTable.COLUMN_PLATFORM, member.getPlatformId());
-        values.put(MemberTable.COLUMN_TITLE, member.getFavoriteEvent().getEventId());
+        values.put(MemberTable.COLUMN_TITLE, member.getTitle());
         values.put(MemberTable.COLUMN_LIKES, member.getLikes());
         values.put(MemberTable.COLUMN_DISLIKES, member.getDislikes());
         values.put(MemberTable.COLUMN_CREATED, member.getGamesCreated());
@@ -804,7 +916,7 @@ public class BungieService extends IntentService {
             getContentResolver().update(DataProvider.MEMBER_URI, values,MemberTable.COLUMN_MEMBERSHIP + "=" + member.getMembershipId(),null);
         }
 
-}
+    }
 
     private void downloadImages(){
         ArrayList<String> notDownloaded = new ArrayList<>();
@@ -859,8 +971,64 @@ public class BungieService extends IntentService {
 
         getContentResolver().insert(DataProvider.LOGGED_USER_URI, values);
 
-        //Log.w(TAG, "Logged User criado com sucesso!");
+    }
 
+    private int insertEvent(EventModel e) {
+        try{
+            Log.w(TAG, "Inserting event (" + e.getEnName() + ")");
+            ArrayList<Integer> typeList = new ArrayList<>();
+            int maxType = getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).getInt(DrawerActivity.TYPE_PREF, 999);
+            ContentValues values = new ContentValues();
+            values.put(EventTable.COLUMN_ID,e.getEventId());
+            values.put(EventTable.COLUMN_EN, e.getEnName());
+            values.put(EventTable.COLUMN_PT, e.getPtName());
+            values.put(EventTable.COLUMN_ES, e.getEsName());
+            values.put(EventTable.COLUMN_ICON, e.getEventIcon());
+            if (e.getEventType().getTypeId() > maxType){
+                boolean insert = true;
+                for (int i=0;i<typeList.size();i++){
+                    if (typeList.get(i) == e.getEventType().getTypeId()){
+                        insert = false;
+                        break;
+                    }
+                }
+                if (insert){
+                    typeList.add(e.getEventType().getTypeId());
+                    insertType(e.getEventType());
+                }
+            }
+            values.put(EventTable.COLUMN_TYPE, e.getEventType().getTypeId());
+            values.put(EventTable.COLUMN_LIGHT, e.getMinLight());
+            values.put(EventTable.COLUMN_GUARDIANS, e.getMaxGuardians());
+            Uri uri = getContentResolver().insert(DataProvider.EVENT_URI,values);
+            if (uri != null){
+                SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                editor.putInt(DrawerActivity.EVENT_PREF,getDBEventsCount());
+                editor.apply();
+            }
+            values.clear();
+            return NO_ERROR;
+        }catch (Exception exc){
+            exc.printStackTrace();
+            return ERROR_RESPONSE_CODE;
+        }
+    }
+
+    private void insertType(EventTypeModel eventType) {
+        Log.w(TAG, "Inserting eventType (" + eventType.getEnName() + ")");
+        ContentValues values = new ContentValues();
+        values.put(EventTypeTable.COLUMN_ID, eventType.getTypeId());
+        values.put(EventTypeTable.COLUMN_EN, eventType.getEnName());
+        values.put(EventTypeTable.COLUMN_PT, eventType.getPtName());
+        values.put(EventTypeTable.COLUMN_ES, eventType.getEsName());
+        values.put(EventTypeTable.COLUMN_ICON, eventType.getTypeIcon());
+        Uri uri = getContentResolver().insert(DataProvider.EVENT_TYPE_URI, values);
+        if (uri != null){
+            SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+            editor.putInt(DrawerActivity.TYPE_PREF,getDBTypesCount());
+            editor.apply();
+        }
+        values.clear();
     }
 
 }

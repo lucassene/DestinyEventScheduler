@@ -114,10 +114,8 @@ public class LocalService extends IntentService {
                     Log.w(TAG, "Updating member " + memberList.get(i).getMembershipId());
                     updateMember(memberList.get(i));
                     isInsert = false;
-                    Log.w(TAG, memberList.get(i).getMembershipId() + " is equal to " + localIdList.get(x));
                     break;
                 } else {
-                    Log.w(TAG, memberList.get(i).getMembershipId() + " is different than " + localIdList.get(x));
                     isInsert = true;
                 }
             }
@@ -139,7 +137,7 @@ public class LocalService extends IntentService {
         memberValues.put(MemberTable.COLUMN_CREATED, memberModel.getGamesCreated());
         memberValues.put(MemberTable.COLUMN_PLAYED, memberModel.getGamesPlayed());
         memberValues.put(MemberTable.COLUMN_ICON, getIconName(memberModel.getIconPath()));
-        memberValues.put(MemberTable.COLUMN_TITLE, memberModel.getFavoriteEvent().getEventId());
+        memberValues.put(MemberTable.COLUMN_TITLE, memberModel.getTitle());
         getContentResolver().insert(DataProvider.MEMBER_URI, memberValues);
         memberValues.clear();
     }
@@ -151,7 +149,7 @@ public class LocalService extends IntentService {
         memberValues.put(MemberTable.COLUMN_CREATED, memberModel.getGamesCreated());
         memberValues.put(MemberTable.COLUMN_PLAYED, memberModel.getGamesPlayed());
         memberValues.put(MemberTable.COLUMN_ICON, getIconName(memberModel.getIconPath()));
-        memberValues.put(MemberTable.COLUMN_TITLE, memberModel.getFavoriteEvent().getEventId());
+        memberValues.put(MemberTable.COLUMN_TITLE, memberModel.getTitle());
         getContentResolver().update(DataProvider.MEMBER_URI, memberValues, MemberTable.COLUMN_MEMBERSHIP + "=" + memberModel.getMembershipId(), null);
         memberValues.clear();
     }

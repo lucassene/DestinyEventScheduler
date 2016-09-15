@@ -2,6 +2,7 @@ package com.destiny.event.scheduler.data;
 
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -65,7 +66,8 @@ public class EventTypeTable {
     }
 
     public static String getName(Context context, Cursor cursor){
-        switch (context.getResources().getSystem().getConfiguration().locale.getLanguage()){
+        context.getResources();
+        switch (Resources.getSystem().getConfiguration().locale.getLanguage()){
             case "pt":
                 return cursor.getString(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_PT));
             case "es":

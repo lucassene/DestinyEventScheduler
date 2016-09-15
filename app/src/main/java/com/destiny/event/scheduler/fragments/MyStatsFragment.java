@@ -188,9 +188,7 @@ public class MyStatsFragment extends Fragment{
             memberLevel.setText(StringUtils.parseString(MemberTable.getMemberLevel(xp)));
             progressBar.setMax(MemberTable.getExpNeeded(xp));
             progressBar.setProgress(xp);
-            if (member.getFavoriteEvent().getEventId() == 0){
-                titleText.setText(getString(R.string.default_title));
-            } else { titleText.setText(MemberTable.getMemberTitle(getActivity(), xp, member.getFavoriteEvent().getEventId())); }
+            titleText.setText(member.getTitle());
 
             int likes = member.getLikes();
             int dislikes = member.getDislikes();

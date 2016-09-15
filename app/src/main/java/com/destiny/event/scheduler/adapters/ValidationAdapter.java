@@ -78,8 +78,7 @@ public class ValidationAdapter extends BaseAdapter {
         MemberModel currentMember = getItem(position);
 
         vViewHolder.memberName.setText(currentMember.getName());
-        int xp = MemberTable.getMemberXP(currentMember.getLikes(), currentMember.getDislikes(), currentMember.getGamesPlayed(), currentMember.getGamesCreated());
-        vViewHolder.memberTitle.setText(MemberTable.getMemberTitle(context, xp, currentMember.getFavoriteEvent().getEventId()));
+        vViewHolder.memberTitle.setText(currentMember.getTitle());
         try {
             vViewHolder.memberIcon.setImageBitmap(ImageUtils.loadImage(context,ImageUtils.getIconName(currentMember.getIconPath())));
         } catch (IOException e) {

@@ -115,11 +115,10 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
 
         int xp = cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_EXP));
         int lvl = MemberTable.getMemberLevel(xp);
-        String memberTitle = MemberTable.getMemberTitle(context, xp, cursor.getInt(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
         points.setText(StringUtils.parseString(lvl));
 
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
-        title.setText(memberTitle);
+        title.setText(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_TITLE)));
 
     }
 

@@ -1,11 +1,8 @@
 package com.destiny.event.scheduler.data;
 
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-
-import com.destiny.event.scheduler.R;
 
 public class MemberTable {
 
@@ -22,7 +19,7 @@ public class MemberTable {
     public static final String COLUMN_DISLIKES = "dislikes";
     public static final String COLUMN_CREATED = "games_created";
     public static final String COLUMN_PLAYED = "games_played";
-    public static final String COLUMN_TITLE = "member_favoriteid";
+    public static final String COLUMN_TITLE = "member_title";
 
     public static final String LIKE_MODIFIER = "16";
     public static final String CREATOR_MODIFIER = "64";
@@ -33,8 +30,6 @@ public class MemberTable {
     public static final String COLUMN_EXP = "(" + COLUMN_LIKES + "*" + LIKE_MODIFIER + ") + (" + COLUMN_CREATED + "*" + CREATOR_MODIFIER + ") + (" + COLUMN_PLAYED + "*" + PLAYED_MODIFIER + ") - (" + COLUMN_DISLIKES + "*" + DISLIKE_MODIFIER + ")";
 
     public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_NAME, COLUMN_MEMBERSHIP, COLUMN_CLAN, COLUMN_ICON, COLUMN_PLATFORM, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED, COLUMN_EXP, COLUMN_TITLE};
-    public static final String[] VIEW_COLUMNS = {COLUMN_NAME, COLUMN_ICON, COLUMN_LIKES, COLUMN_DISLIKES, COLUMN_CREATED, COLUMN_PLAYED, COLUMN_TITLE};
-
     public static final String CREATE_TABLE = "CREATE TABLE "
             + TABLE_NAME
             + " ("
@@ -59,7 +54,7 @@ public class MemberTable {
             + COLUMN_PLAYED
             + " INTEGER, "
             + COLUMN_TITLE
-            + " INTEGER NOT NULL"
+            + " TEXT NOT NULL"
             + ");";
 
     public static void onCreate(SQLiteDatabase db){
@@ -105,49 +100,7 @@ public class MemberTable {
         int createdFator = ( gamesCreated * Integer.parseInt(CREATOR_MODIFIER));
         int playedFator = ( gamesPlayed * Integer.parseInt(PLAYED_MODIFIER));
         int dislikeFator = ( dislikes *  Integer.parseInt(DISLIKE_MODIFIER));
-        int result = (likesFator + createdFator + playedFator) - dislikeFator;
-        return result;
-    }
-
-    public static String getMemberTitle(Context context, int xp, int favoriteId){
-        String[] eventTitles = context.getResources().getStringArray(R.array.event_title);
-        if (favoriteId == 0){
-            return context.getString(R.string.default_title);
-        } else {
-            String title = eventTitles[favoriteId-1];
-            //Log.w(TAG, "FavId: " + favoriteId + " / Title: " + title);
-            String prefix = title.substring(0,title.indexOf(":"));
-            //Log.w(TAG, "Prefix: " + prefix);
-            if (prefix.equals("a")){
-                return getLevelTitle(context, xp) + " " + title.substring(title.indexOf(":")+1,title.length());
-            } else if (prefix.equals("b")){
-                return title.substring(title.indexOf(":")+1,title.length()) + " " + getLevelTitle(context, xp);
-            } else return "Error";
-        }
-    }
-
-    private static String getLevelTitle(Context context, int xp) {
-        String[] levelTitles = context.getResources().getStringArray(R.array.level_title);
-        int lvl = MemberTable.getMemberLevel(xp);
-        if (lvl<=10){
-            return levelTitles[0];
-        } else if (lvl<=20){
-            return levelTitles[1];
-        } else if (lvl<=30){
-            return levelTitles[2];
-        } else if (lvl<=40){
-            return levelTitles[3];
-        } else if (lvl<=50){
-            return levelTitles[4];
-        } else if (lvl<=60){
-            return levelTitles[5];
-        } else if (lvl<=70){
-            return levelTitles[6];
-        } else if (lvl<=80){
-            return levelTitles[7];
-        } else if (lvl<=90){
-            return levelTitles[8];
-        } else return levelTitles[9];
+        return (likesFator + createdFator + playedFator) - dislikeFator;
     }
 
 }
