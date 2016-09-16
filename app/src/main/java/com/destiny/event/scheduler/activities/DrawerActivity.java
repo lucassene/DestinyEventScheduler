@@ -190,8 +190,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         setContentView(R.layout.drawer_layout);
 
-        //Locale lang = Resources.getSystem().getConfiguration().locale;
-
         progress = (ProgressBar) findViewById(R.id.progress_bar);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

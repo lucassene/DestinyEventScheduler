@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -21,7 +22,6 @@ import android.util.Log;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.data.LoggedUserTable;
-import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.NetworkUtils;
@@ -255,12 +255,12 @@ public class NewGameNotificationService extends IntentService {
                 game.setCreatorName(jCreator.getString("name"));
                 JSONObject jEvent = jGame.getJSONObject("event");
                 game.setEventId(jEvent.getInt("id"));
-                game.setEventName(jEvent.getString("name"));
+                game.setEventName(jEvent.getString(getLanguageString()));
                 game.setEventIcon(jEvent.getString("icon"));
                 game.setMaxGuardians(jEvent.getInt("maxGuardians"));
                 JSONObject jType = jEvent.getJSONObject("eventType");
                 game.setTypeId(jType.getInt("id"));
-                game.setTypeName(jType.getString("name"));
+                game.setTypeName(jType.getString(getLanguageString()));
                 game.setTime(jGame.getString("time"));
                 game.setMinLight(jGame.getInt("light"));
                 game.setInscriptions(jGame.getInt("inscriptions"));
@@ -271,6 +271,19 @@ public class NewGameNotificationService extends IntentService {
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    private String getLanguageString() {
+        getResources();
+        String lang = Resources.getSystem().getConfiguration().locale.getLanguage();
+        switch (lang) {
+            case "pt":
+                return lang;
+            case "es":
+                return lang;
+            default:
+                return "en";
         }
     }
 

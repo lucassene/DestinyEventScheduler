@@ -63,7 +63,6 @@ public class NotificationService extends IntentService {
             if (cursor != null && cursor.moveToFirst()){
                 Log.w(TAG, "Notificação encontrada, abrindo...");
                 String title = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_EVENT));
-                title = getString(getResources().getIdentifier(title,"string",getPackageName()));
                 String iconId = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ICON));
                 String typeName = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TYPE));
                 Calendar gameTime = DateUtils.stringToDate(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME_TIME)));

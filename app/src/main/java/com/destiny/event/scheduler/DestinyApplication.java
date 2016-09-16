@@ -40,14 +40,30 @@ public class DestinyApplication extends Application {
     private String getErrorMessage(Throwable ex) {
         String error = ex.toString();
         String nextError;
-        for (int i=0;i<ex.getStackTrace().length;i++){
-            nextError = "\n at" + ex.getStackTrace()[i].toString();
-            if (error.length() + nextError.length() >= 1000){
-                break;
-            } else error = error + nextError;
+        String log = Log.getStackTraceString(ex);
+        boolean hasCaused = false;
+        if (log.contains("Caused by")){
+            int lenght = 990 - error.length();
+            String msg = mySubstring(log,"Caused by",lenght);
+            error = error + "\n" + msg;
+            hasCaused = true;
         }
+
+        if (!hasCaused){
+            for (int i=0;i<ex.getStackTrace().length;i++){
+                nextError = "\n at" + ex.getStackTrace()[i].toString();
+                if (error.length() + nextError.length() >= 1000){
+                    break;
+                } else error = error + nextError;
+            }
+        }
+        Log.w(TAG, "error: " + error);
         Log.w(TAG, "errorMessage lenght: " + error.length());
         return error;
+    }
+
+    String mySubstring(String myString, String start, int length) {
+        return myString.substring(myString.indexOf(start), Math.min(myString.indexOf(start) + length, myString.length()));
     }
 
     private void callServerService(String membership, int platformId, String clanId, String exceptionClass, String errorMessage) throws PackageManager.NameNotFoundException {

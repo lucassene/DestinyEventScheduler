@@ -995,7 +995,7 @@ public class ServerService extends IntentService {
         JSONObject json = new JSONObject();
         json.put("exception", bundle.getString(EXCEPTION_TAG));
         json.put("class", bundle.getString(CLASS_TAG));
-        json.put("androidVersion", bundle.getInt(ANDROID_TAG,0));
+        json.put("apiNumber", bundle.getInt(ANDROID_TAG,0));
         json.put("versionCode", bundle.getInt(APP_TAG, 0));
         json.put("deviceName", bundle.getString(DEVICE_TAG));
         Log.w(TAG, "ExceptionJSON: " + json.toString());

@@ -103,7 +103,7 @@ public class NewEventsListFragment extends ListFragment implements UserDataListe
                 gameAdapter.setGameList(gameList);
                 gameAdapter.notifyDataSetChanged();
                 if (gameAdapter.getCount() == 0){
-                    sectionTitle.setVisibility(View.GONE);
+                    if (sectionTitle != null) sectionTitle.setVisibility(View.GONE);
                 } else sectionTitle.setVisibility(View.VISIBLE);
             } else Log.w(TAG, "listView null");
         }

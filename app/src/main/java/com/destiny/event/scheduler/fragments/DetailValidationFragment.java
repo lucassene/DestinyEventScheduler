@@ -628,6 +628,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
             case ServerService.TYPE_DELETE_GAME:
                 validateButton.setText(R.string.deleting_msg_button);
                 validateButton.setEnabled(false);
+                break;
             default:
                 validateButton.setEnabled(true);
                 prepareViews();
