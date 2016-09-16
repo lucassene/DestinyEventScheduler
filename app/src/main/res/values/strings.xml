@@ -369,6 +369,13 @@
     <string name="update_later">UPDATE LATER</string>
     <string name="no_event_msg">Can\'t create this event. Please update this app.</string>
     <string name="version_code" translatable="false">1.03</string>
+    <string name="creating_button_msg">CREATING EVENT</string>
+    <string name="updating_database">Updating database</string>
+    <string name="joining_msg_button">JOINING</string>
+    <string name="deleting_msg_button">DELETING</string>
+    <string name="leaving_msg_button">LEAVING</string>
+    <string name="validating_msg_button">VALIDATING</string>
+    <string name="evaluating_msg_button">EVALUATING</string>
 
 
 </resources>

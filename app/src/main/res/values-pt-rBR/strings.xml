@@ -315,5 +315,12 @@
     <string name="update_later">ATUALIZAR DEPOIS</string>
     <string name="update_needed">AVISO</string>
     <string name="no_event_msg">Não foi possível criar esse evento. Por favor atualize este aplicativo.</string>
+    <string name="creating_button_msg">CRIANDO EVENTO</string>
+    <string name="updating_database">Atualizando banco de dados</string>
+    <string name="deleting_msg_button">EXCLUINDO</string>
+    <string name="evaluating_msg_button">AVALIANDO</string>
+    <string name="joining_msg_button">ENTRANDO</string>
+    <string name="leaving_msg_button">SAINDO</string>
+    <string name="validating_msg_button">VALIDANDO</string>
 
 </resources>

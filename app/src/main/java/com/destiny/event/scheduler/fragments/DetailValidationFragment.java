@@ -122,8 +122,6 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
 
         validateButton = (Button) footerView.findViewById(R.id.btn_join);
 
-        validateButton.setText(R.string.validate);
-
         Bundle bundle = getArguments();
         if (bundle != null){
             game = (GameModel) bundle.getSerializable("game");
@@ -164,6 +162,7 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
             case GameModel.STATUS_WAITING:
                 Log.w(TAG, "getBungieId: " + callback.getBungieId());
                 if (game.getCreatorId().equals(callback.getBungieId())){
+                    validateButton.setText(R.string.validate);
                     validateButton.setVisibility(View.VISIBLE);
                     checkLayout.setVisibility(View.VISIBLE);
                     validateButton.setEnabled(true);
@@ -614,6 +613,26 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
         bundle.putInt(ServerService.GAMEID_TAG, game.getGameId());
         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_DELETE_GAME);
         callback.runServerService(bundle);
+    }
+
+    public void onServerResponse(int type){
+        switch (type){
+            case ServerService.TYPE_VALIDATE_GAME:
+                validateButton.setText(R.string.validating_msg_button);
+                validateButton.setEnabled(false);
+                break;
+            case ServerService.TYPE_EVALUATE_GAME:
+                validateButton.setText(R.string.evaluating_msg_button);
+                validateButton.setEnabled(false);
+                break;
+            case ServerService.TYPE_DELETE_GAME:
+                validateButton.setText(R.string.deleting_msg_button);
+                validateButton.setEnabled(false);
+            default:
+                validateButton.setEnabled(true);
+                prepareViews();
+                break;
+        }
     }
 
     @Override

@@ -353,7 +353,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         super.onPrepareOptionsMenu(menu);
         menu.clear();
         callback.setToolbarTitle(getString(R.string.new_event_title));
-        getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
+        getActivity().getMenuInflater().inflate(R.menu.home_menu, menu);
     }
 
     @Override
@@ -580,4 +580,21 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         return year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00";
 
     }
+
+    public void onServerResponse(int type){
+        switch (type){
+            case ServerService.TYPE_CREATE_GAME:
+                createButton.setText(R.string.creating_button_msg);
+                createButton.setEnabled(false);
+                break;
+            case ServerService.TYPE_NEW_EVENTS:
+                createButton.setText(R.string.waiting_data);
+                createButton.setEnabled(false);
+                break;
+            default:
+                checkIfIsOk();
+                break;
+        }
+    }
+
 }

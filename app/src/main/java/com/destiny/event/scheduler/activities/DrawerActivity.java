@@ -296,6 +296,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         Bundle bundle = new Bundle();
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_HISTORY_GAMES);
                         runServerService(bundle);
+                    } else if (getOpenedFragment() instanceof NewEventFragment){
+                        Bundle bundle = new Bundle();
+                        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_EVENTS);
+                        runServerService(bundle);
                     } else refreshLists();
                 } else
                     Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
@@ -1352,6 +1356,35 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 break;
             case ServerService.STATUS_RUNNING:
                 onLoadingData();
+                int requestType = resultData.getInt(ServerService.REQUEST_TAG);
+                switch (requestType){
+                    case ServerService.TYPE_CREATE_GAME:
+                    case ServerService.TYPE_NEW_EVENTS:
+                        if (getOpenedFragment() instanceof NewEventFragment){
+                            NewEventFragment frag = (NewEventFragment) getOpenedFragment();
+                            frag.onServerResponse(requestType);
+                        }
+                        break;
+                    case ServerService.TYPE_DELETE_GAME:
+                    case ServerService.TYPE_JOIN_GAME:
+                    case ServerService.TYPE_LEAVE_GAME:
+                        if (getOpenedFragment() instanceof DetailEventFragment){
+                            DetailEventFragment frag = (DetailEventFragment) getOpenedFragment();
+                            frag.onServerResponse(requestType);
+                        }
+                        if (getOpenedFragment() instanceof DetailValidationFragment){
+                            DetailValidationFragment frag = (DetailValidationFragment) getOpenedFragment();
+                            frag.onServerResponse(requestType);
+                        }
+                        break;
+                    case ServerService.TYPE_VALIDATE_GAME:
+                    case ServerService.TYPE_EVALUATE_GAME:
+                        if (getOpenedFragment() instanceof DetailValidationFragment){
+                            DetailValidationFragment frag = (DetailValidationFragment) getOpenedFragment();
+                            frag.onServerResponse(requestType);
+                        }
+                        break;
+                }
                 break;
             case ServerService.STATUS_ERROR:
                 progress.setVisibility(View.GONE);
@@ -1535,6 +1568,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             if (userDataListener != null && getOpenedFragment() instanceof MyNewProfileFragment) {
                                userDataListener.onMemberLoaded(memberProfile, false);
                             }
+                        }
+                        break;
+                    case ServerService.TYPE_NEW_EVENTS:
+                        if (getOpenedFragment() instanceof NewEventFragment){
+                            NewEventFragment frag = (NewEventFragment) getOpenedFragment();
+                            frag.onServerResponse(0);
                         }
                         break;
                 }

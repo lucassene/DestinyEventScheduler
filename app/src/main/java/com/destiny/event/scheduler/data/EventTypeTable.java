@@ -16,7 +16,7 @@ public class EventTypeTable {
     public static final String COLUMN_ES = "es";
     public static final String COLUMN_ICON = "type_icon";
 
-    public static final String[] ALL_COLUMNS = {COLUMN_EN, COLUMN_PT, COLUMN_ICON, COLUMN_ID};
+    public static final String[] ALL_COLUMNS = {COLUMN_EN, COLUMN_PT, COLUMN_ES, COLUMN_ICON, COLUMN_ID};
 
     private static final String TABLE_CREATE = "CREATE TABLE "
             + TABLE_NAME

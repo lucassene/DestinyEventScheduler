@@ -1,6 +1,7 @@
 package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -128,24 +129,26 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
 
         switch (id){
             case 10:
-                projection = new String[] {EventTypeTable.COLUMN_ID, EventTypeTable.COLUMN_EN, EventTypeTable.COLUMN_PT, EventTypeTable.COLUMN_ES, EventTypeTable.COLUMN_ICON};
+                projection = EventTypeTable.ALL_COLUMNS;
+                getContext().getResources();
                 cursorLoader = new CursorLoader(
                         getActivity(),
                         DataProvider.EVENT_TYPE_URI,
                         projection,
                         null,
                         null,
-                        getContext().getResources().getSystem().getConfiguration().locale.getLanguage() + " ASC");
+                        Resources.getSystem().getConfiguration().locale.getLanguage() + " ASC");
                 break;
             case 20:
-                projection = new String[] {EventTable.COLUMN_ID, EventTable.COLUMN_EN, EventTable.COLUMN_PT, EventTable.COLUMN_ES, EventTable.COLUMN_ICON, EventTable.COLUMN_TYPE};
+                projection = EventTable.ALL_COLUMNS;
                 selectionArgs = new String[] {String.valueOf(gameType)};
+                getContext().getResources();
                 cursorLoader = new CursorLoader(getActivity(),
                         DataProvider.EVENT_URI,
                         projection,
                         EventTable.COLUMN_TYPE + "=?",
                         selectionArgs,
-                        getContext().getResources().getSystem().getConfiguration().locale.getLanguage() + " ASC");
+                        Resources.getSystem().getConfiguration().locale.getLanguage() + " ASC");
                 break;
             default:
                 cursorLoader = null;

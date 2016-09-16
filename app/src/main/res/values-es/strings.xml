@@ -353,6 +353,13 @@
         <item>Eventos de Asalto jugados</item>
         <item>Eventos de Incursión jugados</item>
     </string-array>
+    <string name="creating_button_msg">CREACIÓN DE EVENTO</string>
+    <string name="updating_database">Actualización de base de datos</string>
+    <string name="deleting_msg_button">EXCLUYENDO</string>
+    <string name="evaluating_msg_button">EVALUANDO</string>
+    <string name="joining_msg_button">ENTRANDO</string>
+    <string name="leaving_msg_button">DEJANDO</string>
+    <string name="validating_msg_button">VALIDANDO</string>
 
 
 </resources>

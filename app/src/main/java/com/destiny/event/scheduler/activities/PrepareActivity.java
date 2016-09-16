@@ -165,7 +165,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                 text.setText(msg);
                 break;
             case BungieService.STATUS_EVENTS:
-                msg = "Updating database";
+                msg = getString(R.string.updating_database);
                 text.setText(msg);
                 break;
             case BungieService.STATUS_FINISHED:

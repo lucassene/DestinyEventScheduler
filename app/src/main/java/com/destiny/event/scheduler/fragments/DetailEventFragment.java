@@ -116,35 +116,14 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
 
         Bundle bundle = getArguments();
         if (bundle != null){
-            //gameId = bundle.getString("gameId");
             origin = bundle.getString("origin");
-            //creator = bundle.getString("creator");
             game = (GameModel) bundle.getSerializable("game");
         }
 
         if (game != null){
             Calendar now = Calendar.getInstance();
             if (DateUtils.stringToDate(game.getTime()).getTimeInMillis() > now.getTimeInMillis()){
-                switch (game.getStatus()){
-                    case GameModel.STATUS_NEW:
-                        if (game.isJoined()){
-                            if (game.getCreatorId().equals(callback.getBungieId())){
-                                joinButton.setText(R.string.delete);
-                            } else joinButton.setText(R.string.leave);
-                        } else joinButton.setText(R.string.join);
-                        break;
-                    case GameModel.STATUS_WAITING:
-                        if (game.getCreatorId().equals(callback.getBungieId())){
-                            joinButton.setText(R.string.validate);
-                        } else {
-                            joinButton.setText(R.string.waiting_validation);
-                            joinButton.setEnabled(false);
-                        }
-                        break;
-                    case GameModel.STATUS_VALIDATED:
-                        joinButton.setText(R.string.evaluate);
-                        break;
-                }
+                prepareView();
             } else {
                 showAlertDialog(MyAlertDialog.ALERT_DIALOG);
             }
@@ -188,6 +167,29 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
         });
 
         return v;
+    }
+
+    private void prepareView() {
+        switch (game.getStatus()){
+            case GameModel.STATUS_NEW:
+                if (game.isJoined()){
+                    if (game.getCreatorId().equals(callback.getBungieId())){
+                        joinButton.setText(R.string.delete);
+                    } else joinButton.setText(R.string.leave);
+                } else joinButton.setText(R.string.join);
+                break;
+            case GameModel.STATUS_WAITING:
+                if (game.getCreatorId().equals(callback.getBungieId())){
+                    joinButton.setText(R.string.validate);
+                } else {
+                    joinButton.setText(R.string.waiting_validation);
+                    joinButton.setEnabled(false);
+                }
+                break;
+            case GameModel.STATUS_VALIDATED:
+                joinButton.setText(R.string.evaluate);
+                break;
+        }
     }
 
     @Override
@@ -550,6 +552,26 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
 
     }
 
+    public void onServerResponse(int type){
+        switch (type){
+            case ServerService.TYPE_JOIN_GAME:
+                joinButton.setText(R.string.joining_msg_button);
+                joinButton.setEnabled(false);
+                break;
+            case ServerService.TYPE_DELETE_GAME:
+                joinButton.setText(R.string.deleting_msg_button);
+                joinButton.setEnabled(false);
+                break;
+            case ServerService.TYPE_LEAVE_GAME:
+                joinButton.setText(R.string.leaving_msg_button);
+                joinButton.setEnabled(false);
+                break;
+            default:
+                joinButton.setEnabled(true);
+                prepareView();
+                break;
+        }
+    }
 
     @Override
     public void onDateSent(Calendar date) {

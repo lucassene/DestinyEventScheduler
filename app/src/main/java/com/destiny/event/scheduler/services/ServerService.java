@@ -334,15 +334,21 @@ public class ServerService extends IntentService {
                 } else sendNotice(receiver, notice);
                 break;
             case TYPE_NEW_EVENTS:
-                url = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + intent.getIntExtra(EVENT_LIST_TAG,999);
+                url = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + getDBEventsCount();
                 error = requestServer(receiver, type, url, null);
                 if (error != NO_ERROR){
                     sendError(receiver, error);
-                }
+                } else sendStatus(receiver, STATUS_FINISHED);
                 break;
         }
         this.stopSelf();
 
+    }
+
+    private void sendStatus(ResultReceiver receiver, int statusRunning) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(REQUEST_TAG, type);
+        receiver.send(statusRunning, bundle);
     }
 
     private void sendNotice(ResultReceiver receiver, NoticeModel notice) {
@@ -398,7 +404,7 @@ public class ServerService extends IntentService {
 
     private int requestServer(ResultReceiver receiver, int type, String url, Bundle bundle) {
         Log.w(TAG, "URL: " + url);
-        if (receiver != null) { receiver.send(STATUS_RUNNING, Bundle.EMPTY); }
+        if (receiver != null) { sendStatus(receiver, STATUS_RUNNING); }
         try {
             if (NetworkUtils.checkConnection(getApplicationContext())){
                 URL myURL = new URL(url);
@@ -573,7 +579,7 @@ public class ServerService extends IntentService {
         try{
             Log.w(TAG, "Inserting event (" + e.getEnName() + ")");
             ArrayList<Integer> typeList = new ArrayList<>();
-            int maxType = getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).getInt(DrawerActivity.TYPE_PREF, 999);
+            int maxType = getDBTypesCount();
             ContentValues values = new ContentValues();
             values.put(EventTable.COLUMN_ID,e.getEventId());
             values.put(EventTable.COLUMN_EN, e.getEnName());
@@ -725,7 +731,7 @@ public class ServerService extends IntentService {
                 JSONObject jType = jTypes.getJSONObject(i);
                 EventTypeModel type = new EventTypeModel();
                 type.setTypeId(jType.getInt("eventTypeId"));
-                type.setTypeName(jType.getString("eventTypeName"));
+                type.setTypeName(jType.getString(getLanguageString()));
                 type.setTimesPlayed(jType.getInt("timesPlayed"));
                 typeList.add(type);
             }
