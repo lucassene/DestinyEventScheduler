@@ -83,21 +83,6 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
 
     }
 
-    private void setViewIcon(ImageView view, int resId, String typeIcon){
-        if (resId != 0){
-            view.setImageResource(resId);
-        } else {
-            int typeRes = context.getResources().getIdentifier(typeIcon,"drawable",context.getPackageName());
-            if (typeRes != 0){
-                Log.w(TAG, "Event icon not found. Using Type icon instead");
-                view.setImageResource(typeRes);
-            } else{
-                Log.w(TAG, "Drawable resource not found.");
-                view.setImageResource(R.drawable.ic_missing);
-            }
-        }
-    }
-
     private void getMembers(View view, Context context, Cursor cursor) {
 
         TextView name = (TextView) view.findViewById(R.id.primary_text);
@@ -105,11 +90,11 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
         TextView title = (TextView) view.findViewById(R.id.secondary_text);
         TextView points = (TextView) view.findViewById(R.id.text_points);
 
-
         try {
             profile.setImageBitmap(ImageUtils.loadImage(context, cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_ICON))));
         } catch (IOException e) {
             Log.w(TAG, "Image Bitmap not Found");
+            profile.setImageResource(R.drawable.ic_missing);
             e.printStackTrace();
         }
 

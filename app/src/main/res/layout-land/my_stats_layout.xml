@@ -97,13 +97,13 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:orientation="horizontal">
 
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="3">
+                        android:layout_weight="3"
+                        android:layout_gravity="center_vertical">
 
                         <TextView
                             android:id="@+id/empty_eval_chart"
@@ -198,13 +198,13 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:orientation="horizontal">
 
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="3">
+                        android:layout_weight="3"
+                        android:layout_gravity="center_vertical">
 
                         <TextView
                             android:id="@+id/empty_events_chart"
@@ -301,13 +301,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:orientation="horizontal">
 
                 <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="3">
+                    android:layout_weight="3"
+                    android:layout_gravity="center_vertical">
 
                     <TextView
                         android:id="@+id/empty_game_chart"
@@ -323,7 +323,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:focusable="false"/>
-
 
                 </FrameLayout>
 

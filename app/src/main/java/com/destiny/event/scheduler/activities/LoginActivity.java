@@ -63,6 +63,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     RequestResultReceiver mReceiver;
 
     private int errorCode;
+    private boolean showButtons = false;
+    private boolean showProgressBar = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,21 +81,42 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
         getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
 
+        if (savedInstanceState != null){
+            showButtons = savedInstanceState.getBoolean("showButtons");
+            showProgressBar = savedInstanceState.getBoolean("showProgress");
+        }
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("showButtons", showButtons);
+        outState.putBoolean("showProgress", showProgressBar);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (buttonsLayout != null) {
-            buttonsLayout.setVisibility(View.GONE);
-        }
-
-        if (isBungieServiceRunning()){
+        if (getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getBoolean(PrepareActivity.PREPARE_PREF,false)){
             Intent intent = new Intent(this, PrepareActivity.class);
             startActivity(intent);
             finish();
         }
+
+        if (showButtons){
+            if (buttonsLayout != null) {
+                buttonsLayout.setVisibility(View.VISIBLE);
+            }
+        } else if (buttonsLayout != null){
+            buttonsLayout.setVisibility(View.GONE);
+        }
+
+        if (showProgressBar){
+            progressBar.setVisibility(View.VISIBLE);
+        } else progressBar.setVisibility(View.GONE);
+
     }
 
     public boolean isBungieServiceRunning() {
@@ -141,6 +164,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                     startActivity(intent);
                     finish();
                 } else {
+                    showProgressBar = false;
                     progressBar.setVisibility(View.GONE);
                     Intent intent = new Intent(this, DrawerActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -180,6 +204,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
             switch (loader.getId()) {
                 case URL_LOADER_USER:
                     if (data.getCount() > 0) {
+                        showButtons = false;
                         bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
                         userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
                         platformId = data.getInt(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
@@ -188,7 +213,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                     }
                     break;
             }
-        } else{
+        } else {
+            showButtons = true;
             buttonsLayout.setVisibility(View.VISIBLE);
         }
 
@@ -199,21 +225,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
             mReceiver = new RequestResultReceiver(new Handler());
             mReceiver.setReceiver(this);
         }
-            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ServerService.class);
-            intent.putExtra(ServerService.REQUEST_TAG, ServerService.TYPE_NOTICE);
-            intent.putExtra(ServerService.PLATFORM_TAG, platform);
-            intent.putExtra(ServerService.MEMBER_TAG, bungieId);
-            intent.putExtra(ServerService.RECEIVER_TAG, mReceiver);
-            intent.putExtra(ServerService.CLAN_TAG, clanId);
-            startService(intent);
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ServerService.class);
+        intent.putExtra(ServerService.REQUEST_TAG, ServerService.TYPE_NOTICE);
+        intent.putExtra(ServerService.PLATFORM_TAG, platform);
+        intent.putExtra(ServerService.MEMBER_TAG, bungieId);
+        intent.putExtra(ServerService.RECEIVER_TAG, mReceiver);
+        intent.putExtra(ServerService.CLAN_TAG, clanId);
+        startService(intent);
     }
 
     private void isClanMember(String bungieId, int platform) {
-
-        if (mReceiver == null) {
-            mReceiver = new RequestResultReceiver(new Handler());
-            mReceiver.setReceiver(this);
-        }
+        if (!isBungieServiceRunning()){
+            if (mReceiver == null) {
+                mReceiver = new RequestResultReceiver(new Handler());
+                mReceiver.setReceiver(this);
+            }
             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
             intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_VERIFY_MEMBER);
             intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
@@ -229,6 +255,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 intent.putExtra(BungieService.XCSRF_EXTRA, xcsrf);
                 startService(intent);
             } else Log.w(TAG, "Cookies or X-CSRF are null");
+        }
     }
 
     @Override
@@ -240,6 +267,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         switch (resultCode){
             case BungieService.STATUS_RUNNING:
             case ServerService.STATUS_RUNNING:
+                showProgressBar = true;
                 progressBar.setVisibility(View.VISIBLE);
                 break;
             case BungieService.STATUS_ERROR:
@@ -252,6 +280,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                         break;
                 }
                 Log.w(TAG, "Erro ao receber dados do getBungieAccount: " + resultData.getInt(BungieService.ERROR_TAG));
+                showProgressBar = false;
                 progressBar.setVisibility(View.GONE);
                 if (errorCode == BungieService.ERROR_NO_CLAN || errorCode == BungieService.ERROR_AUTH) {
                     showAlertDialog();
@@ -283,6 +312,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
     private void callUpdateActivity(NoticeModel notice) {
+        showProgressBar = false;
         progressBar.setVisibility(View.GONE);
         Intent intent = new Intent(this, NoticeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -294,6 +324,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
     private void callDrawerActivity(){
+        showProgressBar = false;
         progressBar.setVisibility(View.GONE);
         Intent intent = new Intent(this, DrawerActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -341,10 +372,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 DBHelper database = new DBHelper(getApplicationContext());
                 SQLiteDatabase db = database.getWritableDatabase();
                 database.onUpgrade(db, 0, 0);
+                showButtons = true;
                 buttonsLayout.setVisibility(View.VISIBLE);
                 break;
             case BungieService.ERROR_AUTH:
                 CookiesUtils.clearCookies();
+                showButtons = true;
                 buttonsLayout.setVisibility(View.VISIBLE);
                 break;
         }

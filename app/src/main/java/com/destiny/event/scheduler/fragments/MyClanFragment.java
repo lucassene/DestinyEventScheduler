@@ -40,7 +40,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     private static final int LOADER_CLAN = 40;
 
     private static final String NAME_ORDER_BY = MemberTable.COLUMN_NAME + " COLLATE NOCASE ASC";
-    private static final String POINTS_ORDER_BY = MemberTable.COLUMN_EXP + " DESC, " + NAME_ORDER_BY;
+    private static final String POINTS_ORDER_BY = MemberTable.COLUMN_EXP + " DESC, " + MemberTable.COLUMN_NAME + " COLLATE NOCASE ASC";
     private String orderBy;
 
     private static final String[] from = {MemberTable.COLUMN_NAME, MemberTable.COLUMN_ICON, MemberTable.COLUMN_EXP, MemberTable.COLUMN_TITLE};
@@ -189,18 +189,14 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        String[] projection;
-
         callback.onLoadingData();
 
         switch (id){
             case LOADER_MEMBERS:
-                projection = new String[]{MemberTable.COLUMN_ID, MemberTable.COLUMN_NAME, MemberTable.COLUMN_MEMBERSHIP, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_ICON, MemberTable.COLUMN_PLATFORM, MemberTable.COLUMN_EXP, MemberTable.COLUMN_TITLE, MemberTable.COLUMN_CLAN, MemberTable.COLUMN_PLATFORM};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.MEMBER_URI,
-                        projection,
+                        MemberTable.ALL_COLUMNS,
                         null,
                         null,
                         orderBy
@@ -249,11 +245,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        //adapter.swapCursor(null);
-        Log.w("MyClan Loader: ", "O Loader entrou no método onLoaderReset");
-
-    }
+    public void onLoaderReset(Loader<Cursor> loader) { }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -278,8 +270,6 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     }
 
     private void initMemberLoader(){
-        callback.onLoadingData();
-        Log.w(TAG, "Inicializing MemberLoader...");
         if (getLoaderManager().getLoader(LOADER_MEMBERS) != null){
             getLoaderManager().destroyLoader(LOADER_MEMBERS);
         }
@@ -287,8 +277,6 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     }
 
     private void initClanLoader(){
-        callback.onLoadingData();
-        Log.w(TAG, "Inicializing ClanLoader...");
         if (getLoaderManager().getLoader(LOADER_CLAN) != null){
             getLoaderManager().destroyLoader(LOADER_CLAN);
         }

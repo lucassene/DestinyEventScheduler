@@ -1,6 +1,7 @@
 package com.destiny.event.scheduler.services;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -15,6 +16,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
@@ -88,6 +90,7 @@ public class NewGameNotificationService extends IntentService {
                 memberId = cursor.getString(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
                 platformId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
                 requestServer();
+                registerNewGamesAlarm();
             }
         } finally {
             if (cursor != null) cursor.close();
@@ -284,6 +287,27 @@ public class NewGameNotificationService extends IntentService {
                 return lang;
             default:
                 return "en";
+        }
+    }
+
+    public void registerNewGamesAlarm() {
+        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        if (sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, false)) {
+            int interval = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, DrawerActivity.DEFAULT_INTERVAL);
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
+            intent.putExtra("memberId", memberId);
+            intent.putExtra("platformId", platformId);
+            PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                Intent nIntent = new Intent(this, DrawerActivity.class);
+                nIntent.putExtra("isFromNews", true);
+                PendingIntent npIntent = PendingIntent.getActivity(this, 0, nIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager.AlarmClockInfo aC = new AlarmManager.AlarmClockInfo(System.currentTimeMillis() + interval, npIntent);
+                alarm.setAlarmClock(aC, pIntent);
+            } else alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, pIntent);
+            Log.w(TAG, "New game alarm registered in an interval of " + interval + " millis");
         }
     }
 

@@ -25,6 +25,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
     private static final String TAG = "PrepareActivity";
 
     public static final String LEGEND_PREF = "prepareLegend";
+    public static final String PREPARE_PREF = "prepareRunning";
 
     ProgressBar progressBar;
     TextView text;
@@ -63,24 +64,11 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
             intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
             startService(intent);
         }
-
-        if (savedInstanceState != null){
-            //Log.w(TAG, "SavedInstance != null");
-            msg = savedInstanceState.getString("legend");
-            text.setText(msg);
-        } else {
-            //Log.w(TAG, "SavedInstance is empty!");
-            SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-            msg = sharedPrefs.getString(LEGEND_PREF, getString(R.string.vanguard_data));
-            text.setText(msg);
-        }
     }
 
     public boolean isBungieServiceRunning() {
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        boolean var = sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
-        //Log.w(TAG, "BungieService running? " +  var);
-        return var;
+        return sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
     }
 
     @Override
@@ -88,8 +76,11 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
         super.onResume();
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(PREPARE_PREF, true);
         editor.putBoolean(DrawerActivity.FOREGROUND_PREF, true);
         editor.apply();
+        msg = sharedPrefs.getString(LEGEND_PREF, getString(R.string.vanguard_data));
+        text.setText(msg);
     }
 
     @Override
@@ -98,21 +89,8 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(DrawerActivity.FOREGROUND_PREF, false);
-        editor.putString(LEGEND_PREF,msg);
+        editor.putString(LEGEND_PREF, msg);
         editor.apply();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("legend",msg);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        msg = savedInstanceState.getString("legend");
-        text.setText(msg);
     }
 
     @Override
@@ -243,7 +221,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
            Intent intent = new Intent(this, DrawerActivity.class);
            startActivity(intent);
            finish();
-       };
+       }
     }
 
     @Override

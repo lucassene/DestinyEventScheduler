@@ -30,6 +30,7 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
     private List<GameModel> gameList;
 
     TextView sectionTitle;
+    private boolean showTitle = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,9 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
         if (gameList != null){
             onGamesLoaded(gameList);
         }
+        if (showTitle){
+            sectionTitle.setVisibility(View.VISIBLE);
+        } else sectionTitle.setVisibility(View.GONE);
     }
 
     @Override
@@ -92,8 +96,12 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
                 this.gameList = gameList;
                 gameAdapter = new GameAdapter(getActivity(), gameList);
                 if (gameAdapter.getCount() == 0){
+                    showTitle = false;
                     if (sectionTitle != null) sectionTitle.setVisibility(View.GONE);
-                } else sectionTitle.setVisibility(View.VISIBLE);
+                } else {
+                    showTitle = true;
+                    if (sectionTitle != null) sectionTitle.setVisibility(View.VISIBLE);
+                }
                 setListAdapter(gameAdapter);
             } else Log.w(TAG, "listView null ou size 0");
         } else {
@@ -104,8 +112,12 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
                 gameAdapter.setGameList(gameList);
                 gameAdapter.notifyDataSetChanged();
                 if (gameAdapter.getCount() == 0){
+                    showTitle = false;
                     if (sectionTitle != null) sectionTitle.setVisibility(View.GONE);
-                } else sectionTitle.setVisibility(View.VISIBLE);
+                } else {
+                    showTitle = true;
+                    if (sectionTitle != null) sectionTitle.setVisibility(View.VISIBLE);
+                }
             } else Log.w(TAG, "listView null");
         }
     }

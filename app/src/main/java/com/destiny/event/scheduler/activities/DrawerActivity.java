@@ -240,6 +240,17 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             openedFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
             readyAllLists(savedInstanceState);
         }
+
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(PrepareActivity.PREPARE_PREF, false);
+        editor.apply();
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.containsKey("isFromNews") && bundle.getBoolean("isFromNews",false)){
+            openConfigFragment(null);
+        }
+
     }
 
     private void getLoggedUserData() {
@@ -430,7 +441,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @SuppressWarnings("unchecked")
     private void readyAllLists(Bundle savedInstanceState) {
         allGameList = new ArrayList<>();
-        allGameList.addAll((ArrayList<GameModel>) savedInstanceState.getSerializable("allGameList"));
+        if (savedInstanceState.getSerializable("allGameList") != null){
+            allGameList.addAll((ArrayList<GameModel>) savedInstanceState.getSerializable("allGameList"));
+        }
         if (allGameList != null) {
             newGameList = getGamesFromList(GameModel.STATUS_NEW);
             if (newEventsListener != null) newEventsListener.onGamesLoaded(newGameList);
@@ -453,10 +466,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     private void prepareFragmentHolder(Fragment fragment, View child, Bundle bundle, String tag) {
-        drawerLayout.closeDrawers();
-        tabLayout.setViewPager(null);
-        viewPager.setAdapter(null);
-        child.playSoundEffect(SoundEffectConstants.CLICK);
+        if (drawerLayout != null) drawerLayout.closeDrawers();
+        if (tabLayout != null) tabLayout.setViewPager(null);
+        if (viewPager != null) viewPager.setAdapter(null);
+        if (child != null) child.playSoundEffect(SoundEffectConstants.CLICK);
         loadNewFragment(fragment, bundle, tag);
     }
 
@@ -480,7 +493,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void loadNewFragment(Fragment fragment, Bundle bundle, String tag) {
 
         fragment.setArguments(bundle);
-        FragmentTransaction ft = fm.beginTransaction();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame, fragment, tag);
         ft.addToBackStack(null);
         ft.commit();
@@ -490,7 +503,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             memberProfile = null;
         }
         openedFragment = fragment;
-        rAdapter.notifyDataSetChanged();
+        if (rAdapter != null) rAdapter.notifyDataSetChanged();
         invalidateOptionsMenu();
     }
 
@@ -1651,7 +1664,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             intent.putExtra("platformId", platformId);
             PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, pIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                Intent nIntent = new Intent(this, DrawerActivity.class);
+                nIntent.putExtra("isFromNews", true);
+                PendingIntent npIntent = PendingIntent.getActivity(this, 0, nIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager.AlarmClockInfo aC = new AlarmManager.AlarmClockInfo(System.currentTimeMillis() + interval, npIntent);
+                alarm.setAlarmClock(aC, pIntent);
+            } else alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, pIntent);
             Log.w(TAG, "New game alarm registered in an interval of " + interval + " millis");
         }
     }
