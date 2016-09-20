@@ -5,34 +5,34 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.views.DestinyWebView;
 
-import java.util.Locale;
-
 public class WebActivity extends Activity implements DestinyWebView.DestinyListener {
 
     String url;
     DestinyWebView destinyWebView;
     TextView urlText;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.webview_layout);
-
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         Intent intent = getIntent();
         url = intent.getStringExtra("url");
 
         urlText = (TextView) findViewById(R.id.webview_text);
-
-        String locale = Locale.getDefault().getLanguage();
+        progressBar = (ProgressBar) findViewById(R.id.progress);
 
         destinyWebView = (DestinyWebView) findViewById(R.id.webview);
         destinyWebView.clearUserCookies();
@@ -40,6 +40,12 @@ public class WebActivity extends Activity implements DestinyWebView.DestinyListe
         destinyWebView.setHorizontalScrollBarEnabled(true);
         destinyWebView.setListener(this);
         destinyWebView.loadLoginUrl(url);
+
+        destinyWebView.setWebChromeClient(new WebChromeClient(){
+            public void onProgressChanged(WebView view, int progress){
+                progressBar.setProgress(progress);
+            }
+        });
 
         destinyWebView = new DestinyWebView(getApplicationContext());
 
