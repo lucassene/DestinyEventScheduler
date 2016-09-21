@@ -9,7 +9,9 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.destiny.event.scheduler.BuildConfig;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
@@ -20,6 +22,8 @@ public class AboutSettingsFragment extends Fragment {
 
     LinearLayout emailLayout;
     LinearLayout helpLayout;
+    LinearLayout patreonLayout;
+    TextView versionTxt;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,6 +36,9 @@ public class AboutSettingsFragment extends Fragment {
         View v = inflater.inflate(R.layout.about_settings_layout, container, false);
         emailLayout = (LinearLayout) v.findViewById(R.id.email_layout);
         helpLayout = (LinearLayout) v.findViewById(R.id.help_layout);
+        patreonLayout = (LinearLayout) v.findViewById(R.id.patreon_layout);
+        versionTxt = (TextView) v.findViewById(R.id.versionTxt);
+        versionTxt.setText(BuildConfig.VERSION_NAME);
 
         emailLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,6 +51,13 @@ public class AboutSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 callback.callAndroidIntent(DrawerActivity.TYPE_BROWSER_INTENT, getString(R.string.website));
+            }
+        });
+
+        patreonLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.callAndroidIntent(DrawerActivity.TYPE_BROWSER_INTENT, getString(R.string.patreon_website));
             }
         });
 

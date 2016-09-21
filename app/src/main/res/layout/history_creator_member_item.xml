@@ -48,13 +48,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
-                    android:textAppearance="?android:textAppearanceMedium" />
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
                 <TextView
                     android:id="@+id/secondary_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/secondaryTextSize"/>
+                    android:textSize="@dimen/secondaryTextSize"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
                 <TextView
                     android:id="@+id/txt_xp"

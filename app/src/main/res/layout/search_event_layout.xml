@@ -54,32 +54,43 @@
 
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/list_layout"
+        <com.destiny.event.scheduler.views.CustomSwipeLayout
+            android:id="@+id/swipe_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@id/header_layout">
 
-            <ListView
-                android:id="@+id/search_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:scrollbarStyle="outsideOverlay"
-                android:paddingRight="@dimen/global_padding"
-                android:footerDividersEnabled="false"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="8dp"/>
-
-            <TextView
-                android:id="@+id/empty_label"
+            <FrameLayout
+                android:id="@+id/list_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="@string/search_empty_list"
-                android:visibility="gone"/>
+                android:layout_below="@id/header_layout"
+                android:clickable="true">
 
-        </FrameLayout>
+                <ListView
+                    android:id="@+id/search_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:scrollbarStyle="outsideOverlay"
+                    android:paddingRight="@dimen/global_padding"
+                    android:footerDividersEnabled="false"
+                    android:divider="@android:color/transparent"
+                    android:dividerHeight="8dp"/>
+
+                <TextView
+                    android:id="@+id/empty_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/search_empty_list"
+                    android:visibility="gone"
+                    android:paddingRight="8dp"
+                    android:paddingEnd="8dp"/>
+
+            </FrameLayout>
+
+        </com.destiny.event.scheduler.views.CustomSwipeLayout>
 
     </RelativeLayout>
 

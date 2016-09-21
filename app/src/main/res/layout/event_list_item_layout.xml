@@ -28,6 +28,8 @@
             android:paddingLeft="@dimen/primaryTextLeftPadding"
             android:paddingStart="@dimen/primaryTextLeftPadding"
             android:textSize="18sp"
-            android:layout_marginLeft="8dp"/>
+            android:layout_marginLeft="8dp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
 
 </RelativeLayout>

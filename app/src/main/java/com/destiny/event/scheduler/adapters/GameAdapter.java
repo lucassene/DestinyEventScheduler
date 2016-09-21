@@ -37,8 +37,9 @@ public class GameAdapter extends BaseAdapter implements Filterable {
     }
 
     public void setGameList(List<GameModel> gameList){
+        this.gameList = gameList;
         this.filteredGameList = gameList;
-        //notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     @Override
@@ -111,7 +112,7 @@ public class GameAdapter extends BaseAdapter implements Filterable {
         TextView time;
         TextView date;
 
-        public GameViewHolder(View item){
+        GameViewHolder(View item){
             icon = (ImageView) item.findViewById(R.id.game_image);
             eventName = (TextView) item.findViewById(R.id.primary_text);
             typeName = (TextView) item.findViewById(R.id.type_text);
@@ -139,8 +140,9 @@ public class GameAdapter extends BaseAdapter implements Filterable {
             switch (prefix){
                 case "type":
                     if (!filter.equals("all")){
+                        int eventId = Integer.parseInt(filter);
                         for (int i=0;i<originalGameList.size();i++){
-                            if (originalGameList.get(i).getTypeName().equals(filter)){
+                            if (originalGameList.get(i).getTypeId() == eventId){
                                 newGameList.add(originalGameList.get(i));
                             }
                         }

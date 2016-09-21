@@ -53,32 +53,40 @@
 
             </LinearLayout>
 
-            <FrameLayout
-                android:id="@+id/list_layout"
+            <com.destiny.event.scheduler.views.CustomSwipeLayout
+                android:id="@+id/swipe_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/header_layout">
+                android:layout_height="wrap_content">
 
-                <ListView
-                    android:id="@+id/my_events_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:scrollbarStyle="outsideOverlay"
-                    android:paddingRight="@dimen/global_padding"
-                    android:footerDividersEnabled="false"
-                    android:divider="@android:color/transparent"
-                    android:dividerHeight="8dp"/>
-
-                <TextView
-                    android:id="@+id/empty_label"
+                <FrameLayout
+                    android:id="@+id/list_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="@string/no_games_status"
-                    android:visibility="gone"/>
+                    android:layout_below="@id/header_layout"
+                    android:clickable="true">
 
-            </FrameLayout>
+                    <ListView
+                        android:id="@+id/my_events_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:scrollbarStyle="outsideOverlay"
+                        android:paddingRight="@dimen/global_padding"
+                        android:footerDividersEnabled="false"
+                        android:divider="@android:color/transparent"
+                        android:dividerHeight="8dp"/>
+
+                    <TextView
+                        android:id="@+id/empty_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="@string/no_games_status"
+                        android:visibility="gone"/>
+
+                </FrameLayout>
+
+            </com.destiny.event.scheduler.views.CustomSwipeLayout>
 
         </RelativeLayout>
 

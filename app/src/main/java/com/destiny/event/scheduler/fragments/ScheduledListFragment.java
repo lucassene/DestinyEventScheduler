@@ -3,6 +3,7 @@ package com.destiny.event.scheduler.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,8 @@ import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
+import com.destiny.event.scheduler.services.ServerService;
+import com.destiny.event.scheduler.views.CustomSwipeLayout;
 
 import java.util.List;
 
@@ -23,10 +26,9 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
 
     public static final String TAG = "ScheduledListFragment";
 
-   GameAdapter gameAdapter;
-
+    GameAdapter gameAdapter;
+    CustomSwipeLayout swipeLayout;
     private ToActivityListener callback;
-
     private List<GameModel> gameList;
 
     TextView sectionTitle;
@@ -56,6 +58,7 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.scheduled_list_layout, container, false);
         sectionTitle = (TextView) v.findViewById(R.id.section_title);
+        swipeLayout = (CustomSwipeLayout) v.findViewById(R.id.swipe_layout);
         return v;
     }
 
@@ -63,6 +66,7 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getListView().setEmptyView(view.findViewById(android.R.id.empty));
         callback.onSelectedFragment(1);
         gameList = callback.getGameList(GameModel.STATUS_SCHEDULED);
         if (gameList != null){
@@ -71,6 +75,13 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
         if (showTitle){
             sectionTitle.setVisibility(View.VISIBLE);
         } else sectionTitle.setVisibility(View.GONE);
+        swipeLayout.setColorSchemeResources(R.color.colorAccent);
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshList();
+            }
+        });
     }
 
     @Override
@@ -120,6 +131,9 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
                 }
             } else Log.w(TAG, "listView null");
         }
+        if (swipeLayout != null){
+            swipeLayout.setRefreshing(false);
+        }
     }
 
     @Override
@@ -137,4 +151,11 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
 
     }
 
+    public void refreshList() {
+        Log.w(TAG, "Refreshing...");
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_ALL_GAMES);
+        callback.runServerService(bundle);
+        swipeLayout.setRefreshing(true);
+    }
 }

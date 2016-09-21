@@ -121,15 +121,15 @@
 
     <string-array name="type_ids">
         <item>type:all</item>
-        <item>type:court</item>
-        <item>type:crucible</item>
-        <item>type:patrol</item>
-        <item>type:prison</item>
-        <item>type:raid</item>
-        <item>type:story</item>
-        <item>type:strike</item>
-        <item>type:strike_list</item>
-        <item>type:srl</item>
+        <item>type:1</item>
+        <item>type:2</item>
+        <item>type:3</item>
+        <item>type:4</item>
+        <item>type:5</item>
+        <item>type:6</item>
+        <item>type:7</item>
+        <item>type:8</item>
+        <item>type:9</item>
     </string-array>
 
     <string-array name="game_status">
@@ -376,6 +376,10 @@
     <string name="leaving_msg_button">LEAVING</string>
     <string name="validating_msg_button">VALIDATING</string>
     <string name="evaluating_msg_button">EVALUATING</string>
+    <string name="patreon">Patreon</string>
+    <string name="support">Support Destiny Scheduler</string>
+    <string name="other">Other</string>
+    <string name="patreon_website" translatable="false">https://www.patreon.com/destinyscheduler</string>
 
 
 </resources>

@@ -26,9 +26,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_toRightOf="@id/game_image"
+        android:paddingRight="8dp"
         android:layout_centerVertical="true"
-        android:paddingRight="8dp">
+        android:layout_toRightOf="@+id/game_image"
+        android:layout_toEndOf="@+id/game_image">
 
         <LinearLayout
             android:id="@+id/top_layout"
@@ -42,7 +43,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
                 android:textSize="16sp"
-                android:textColor="@color/colorAccent" />
+                android:textColor="@color/colorAccent"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
             <TextView
                 android:id="@+id/game_max"
@@ -64,7 +67,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
-                android:textSize="@dimen/secondaryTextSize" />
+                android:textSize="@dimen/secondaryTextSize"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/game_time"
@@ -89,10 +94,8 @@
                 android:textSize="@dimen/secondaryTextSize"
                 android:layout_weight="4"
                 android:alpha="0.5"
-                android:lines="1"
-                android:inputType="text"
-                android:focusable="false"
-                android:clickable="false"/>
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
             <TextView
                 android:id="@+id/game_date"

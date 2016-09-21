@@ -36,7 +36,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:textAppearance="?android:textAppearanceMedium"/>
+            android:textAppearance="?android:textAppearanceMedium"
+            android:maxLines="1"
+            android:ellipsize="end"/>
 
         <TextView
             android:id="@+id/secondary_text"
@@ -44,7 +46,9 @@
             android:layout_height="wrap_content"
             android:text=""
             android:textSize="@dimen/secondaryTextSize"
-            android:alpha="0.75"/>
+            android:alpha="0.75"
+            android:maxLines="1"
+            android:ellipsize="end"/>
 
     </LinearLayout>
 

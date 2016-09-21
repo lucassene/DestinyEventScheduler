@@ -241,28 +241,28 @@
 
     <string-array name="spinner_types">
         <item>Todos</item>
+        <item>Asalto</item>
         <item>Corte de Oryx</item>
         <item>El Crisol</item>
-        <item>Patrulla</item>
         <item>El Presidio de los Ancianos</item>
-        <item>Incursión</item>
         <item>Historia</item>
-        <item>Asalto</item>
+        <item>Incursión</item>
         <item>Lista de Asalto</item>
+        <item>Patrulla</item>
         <item>SRL</item>
     </string-array>
 
     <string-array name="type_ids">
         <item>type:all</item>
-        <item>type:court</item>
-        <item>type:crucible</item>
-        <item>type:patrol</item>
-        <item>type:prison</item>
-        <item>type:raid</item>
-        <item>type:story</item>
-        <item>type:strike</item>
-        <item>type:strike_list</item>
-        <item>type:srl</item>
+        <item>type:7</item>
+        <item>type:1</item>
+        <item>type:2</item>
+        <item>type:4</item>
+        <item>type:6</item>
+        <item>type:5</item>
+        <item>type:8</item>
+        <item>type:3</item>
+        <item>type:9</item>
     </string-array>
 
     <string-array name="game_status">
@@ -360,6 +360,9 @@
     <string name="joining_msg_button">ENTRANDO</string>
     <string name="leaving_msg_button">DEJANDO</string>
     <string name="validating_msg_button">VALIDANDO</string>
+    <string name="other">Otro</string>
+    <string name="patreon">Patreon</string>
+    <string name="support">Apoye a Destiny Scheduler</string>
 
 
 </resources>

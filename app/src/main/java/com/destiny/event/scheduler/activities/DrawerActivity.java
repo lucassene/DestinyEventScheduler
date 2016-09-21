@@ -309,6 +309,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         Bundle bundle = new Bundle();
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_EVENTS);
                         runServerService(bundle);
+                    } else if (getOpenedFragment() instanceof SearchFragment){
+                        Bundle bundle = new Bundle();
+                        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_GAMES);
+                        runServerService(bundle);
                     } else refreshLists();
                 } else
                     Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
@@ -1446,7 +1450,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         searchGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
                         if (userDataListener != null && getOpenedFragment() instanceof SearchFragment) {
                             userDataListener.onGamesLoaded(searchGameList);
+                        } else if (getOpenedFragment() instanceof SearchFragment){
+                            userDataListener = (UserDataListener) getOpenedFragment();
+                            userDataListener.onGamesLoaded(searchGameList);
                         }
+                        addtoAllGameList(searchGameList);
                         break;
                     case ServerService.TYPE_JOINED_GAMES:
                         joinedGameList = new ArrayList<>();
@@ -1591,6 +1599,38 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 onDataLoaded();
                 break;
         }
+    }
+
+    private void addtoAllGameList(ArrayList<GameModel> gameList) {
+        boolean add = false;
+        int added = 0;
+        if (allGameList == null) allGameList = new ArrayList<>();
+        if (allGameList.size() == 0){
+            for (int i=0;i<gameList.size();i++){
+                added++;
+                allGameList.add(gameList.get(i));
+            }
+        } else {
+            for (int i=0;i<gameList.size();i++){
+                for (int x=0;x<allGameList.size();x++){
+                    if (allGameList.get(x).getGameId() == gameList.get(i).getGameId()){
+                        add = false;
+                        break;
+                    } else add = true;
+                }
+                if (add){
+                    added++;
+                    allGameList.add(gameList.get(i));
+                }
+            }
+        }
+        if (added >0){
+            Collections.sort(allGameList, new GameComparator());
+            newGameList = getGamesFromList(GameModel.STATUS_NEW);
+            if (newEventsListener != null) newEventsListener.onGamesLoaded(newGameList);
+            scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
+            if (scheduledEventsListener != null) scheduledEventsListener.onGamesLoaded(scheduledGameList);
+        } else Log.w(TAG, "No game added to any lists");
     }
 
     private void updateGameList(UserDataListener listener, ArrayList<GameModel> list) {
