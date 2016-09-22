@@ -56,7 +56,8 @@
             <com.destiny.event.scheduler.views.CustomSwipeLayout
                 android:id="@+id/swipe_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_below="@id/header_layout">
 
                 <FrameLayout
                     android:id="@+id/list_layout"

@@ -116,10 +116,10 @@ public class EventTable {
 
         //Version 1.04
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Inferno: Doubles', 'Inferno: Duplas', 'Infierno: Dobles', 'ic_inferno2', '2', '5', '2');");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Supremacy', 'Supremacia', 'Supremacía', 'ic_supremacia', '2', '5', '6');");
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Supremacy', 'Supremacia', 'Supremacía', 'ic_supremacy', '2', '5', '6');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Inferno: Supremacy', 'Inferno: Supremacia', 'Supremacía Infernal', 'ic_inferno_sup', '2', '5', '6');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Rumble Supremacy', 'Briga: Supremacia', 'Disputa: Supremacía', 'ic_rumble_sup', '2', '5', '6');");
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Mayhem: Supremacy', 'Caos: Supremacia', 'Caos: Supremacía', 'ic_supremacia', '2', '5', '6');");
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Mayhem: Supremacy', 'Caos: Supremacia', 'Caos: Supremacía', 'ic_supremacy', '2', '5', '6');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'The Abomination Heist', 'O Golpe à Abominação', 'El Rapto de la Abominación', 'ic_strike', '7', '5', '3');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Sepiks Perfected', 'Sepiks Aperfeiçoado', 'Sepiks Perfeccionado', 'ic_strike', '7', '5', '3');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'The Wretched Eye', 'O Olho Maldito', 'El Abominable Ojo', 'ic_strike', '7', '5', '3');");
@@ -129,22 +129,10 @@ public class EventTable {
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Combined Arms', 'Armas Combinadas', 'Armas Combinadas', 'ic_combined', '2', '5', '6');");
     }
 
-    public static void onUpdate(SQLiteDatabase db, int oldVersion, int newVersion){
+    static void onUpdate(SQLiteDatabase db, int oldVersion, int newVersion){
         Log.e(EventTable.class.getName(), "Upgrading database from version " + oldVersion + " to " + newVersion);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
-    }
-
-    public static String getQualifiedColumn(String column){
-        return TABLE_NAME + "." + column;
-    }
-
-    public static String getAliasColumn(String column){
-        return TABLE_NAME + "_" + column;
-    }
-
-    public static String getAliasExpression(String column){
-        return getQualifiedColumn(column) + " AS " + getAliasColumn(column);
     }
 
     public static String getName(Context context, Cursor cursor){

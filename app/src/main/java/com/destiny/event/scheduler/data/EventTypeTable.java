@@ -43,7 +43,7 @@ public class EventTypeTable {
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Raid', 'Incursão', 'Incursión', 'ic_raid');"); //5
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Story', 'História', 'Historia', 'ic_story');"); //6
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Strike', 'Assalto', 'Asalto', 'ic_strike');"); //7
-        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Strike List', 'Lista de Assaltos', 'Lista de Asaltos', 'ic_strike');"); //8
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'Strike List', 'Lista de Assaltos', 'Lista de Asaltos', 'ic_strike_list');"); //8
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ")" + " VALUES " + "(null, 'SRL', 'SRL', 'SRL', 'ic_srl');"); //9
     }
 

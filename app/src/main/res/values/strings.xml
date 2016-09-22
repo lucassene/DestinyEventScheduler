@@ -380,6 +380,7 @@
     <string name="support">Support Destiny Scheduler</string>
     <string name="other">Other</string>
     <string name="patreon_website" translatable="false">https://www.patreon.com/destinyscheduler</string>
+    <string name="all">All</string>
 
 
 </resources>

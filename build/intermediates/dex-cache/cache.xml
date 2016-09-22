@@ -61,7 +61,7 @@
         jumboMode="true"
         optimize="true"
         revision="23.0.3"
-        sha1="39061afa422035c2c855e3ce9c66b5745faa1fea">
+        sha1="ad6d1ca48d6b4c0315d468fcbfce85544fc1971a">
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_8f8e3140ffa0a537a42df9e9b51e1ba83edc6257\classes.dex" />
     </item>
     <item
@@ -106,7 +106,7 @@
         jumboMode="true"
         optimize="true"
         revision="23.0.3"
-        sha1="2d5d99c8eb350f89d26f8fc3c01f5069cb5bcc4d">
+        sha1="567536e2e13517399004db0828a6c715177e082a">
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_528c79f81cd48a8de8f9cfb90d233d6ed022fc30\classes.dex" />
     </item>
     <item

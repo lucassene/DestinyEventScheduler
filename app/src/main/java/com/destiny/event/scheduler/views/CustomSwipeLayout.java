@@ -1,21 +1,29 @@
 package com.destiny.event.scheduler.views;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.destiny.event.scheduler.R;
+
 public class CustomSwipeLayout extends SwipeRefreshLayout {
     private ViewGroup container;
 
-    public CustomSwipeLayout(Context context) {
+    public CustomSwipeLayout(Context context)
+    {
         super(context);
+        setProgressBackgroundColorSchemeColor(ContextCompat.getColor(getContext(),R.color.colorAccent));
+        setColorSchemeColors(ContextCompat.getColor(getContext(),R.color.colorWhite));
     }
 
     public CustomSwipeLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setProgressBackgroundColorSchemeColor(ContextCompat.getColor(getContext(),R.color.colorAccent));
+        setColorSchemeColors(ContextCompat.getColor(getContext(),R.color.colorWhite));
     }
 
     @Override

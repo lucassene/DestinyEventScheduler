@@ -110,10 +110,10 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
 
         switch (tableName){
             case EventTypeTable.TABLE_NAME:
-                callback.onEventTypeSelected(String.valueOf(id));
+                callback.onEventTypeSelected((int)id);
                 break;
             case EventTable.TABLE_NAME:
-                callback.onEventGameSelected(String.valueOf(id));
+                callback.onEventGameSelected((int)id);
                 break;
         }
     }

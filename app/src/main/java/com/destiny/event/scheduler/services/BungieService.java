@@ -42,9 +42,12 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
+
+import static com.destiny.event.scheduler.services.ServerService.ERROR_JSON;
 
 public class BungieService extends IntentService {
 
@@ -679,37 +682,45 @@ public class BungieService extends IntentService {
     private int parseNewEvents(String response) {
         Log.w(TAG, "getNewEvents response: " + response);
         int err = NO_ERROR;
+        int maxType = getDBTypesCount();
+        ArrayList<EventTypeModel> typeList = new ArrayList<>();
         try{
             JSONArray jArray = new JSONArray(response);
-            if (jArray.length() != 0) {
-                Log.w(TAG, "New event found. Inserting...");
-                for (int i=0;i<jArray.length();i++){
-                    JSONObject jEvent = jArray.getJSONObject(i);
-                    EventModel e = new EventModel();
-                    EventTypeModel eT = new EventTypeModel();
-                    e.setEventId(jEvent.getInt("id"));
-                    e.setEventIcon(jEvent.getString("icon"));
-                    e.setMinLight(jEvent.getInt("minLight"));
-                    e.setMaxGuardians(jEvent.getInt("maxGuardians"));
+            for (int i=0;i<jArray.length();i++){
+                JSONObject jEvent = jArray.getJSONObject(i);
+                EventModel e = new EventModel();
+                EventTypeModel eT = new EventTypeModel();
+                e.setEventId(jEvent.getInt("id"));
+                e.setEventIcon(jEvent.getString("icon"));
+                e.setMinLight(jEvent.getInt("minLight"));
+                e.setMaxGuardians(jEvent.getInt("maxGuardians"));
 
-                    JSONObject jType = jEvent.getJSONObject("eventType");
-                    eT.setTypeId(jType.getInt("id"));
-                    eT.setTypeIcon(jType.getString("icon"));
-                    eT.setEnName(jType.getString("en"));
-                    eT.setPtName(jType.getString("pt"));
-                    eT.setEsName(jType.getString("es"));
-
-                    e.setEventType(eT);
-                    e.setEnName(jEvent.getString("en"));
-                    e.setPtName(jEvent.getString("pt"));
-                    e.setEsName(jEvent.getString("es"));
-                    err = insertEvent(e);
+                JSONObject jType = jEvent.getJSONObject("eventType");
+                eT.setTypeId(jType.getInt("id"));
+                eT.setTypeIcon(jType.getString("icon"));
+                eT.setEnName(jType.getString("en"));
+                eT.setPtName(jType.getString("pt"));
+                eT.setEsName(jType.getString("es"));
+                if (eT.getTypeId() > maxType){
+                    typeList.add(eT);
                 }
-                return err;
-            } else return NO_ERROR;
+
+                e.setEventType(eT);
+                e.setEnName(jEvent.getString("en"));
+                e.setPtName(jEvent.getString("pt"));
+                e.setEsName(jEvent.getString("es"));
+                err = insertEvent(e);
+            }
+            if (typeList.size() >0){
+                Collections.sort(typeList, new TypeComparator());
+                for (int i=0;i<typeList.size();i++){
+                    insertType(typeList.get(i));
+                }
+            }
+            return err;
         } catch (JSONException e){
             e.printStackTrace();
-            return ERROR_RESPONSE_CODE;
+            return ERROR_JSON;
         }
     }
 
@@ -976,27 +987,12 @@ public class BungieService extends IntentService {
     private int insertEvent(EventModel e) {
         try{
             Log.w(TAG, "Inserting event (" + e.getEnName() + ")");
-            ArrayList<Integer> typeList = new ArrayList<>();
-            int maxType = getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).getInt(DrawerActivity.TYPE_PREF, 999);
             ContentValues values = new ContentValues();
             values.put(EventTable.COLUMN_ID,e.getEventId());
             values.put(EventTable.COLUMN_EN, e.getEnName());
             values.put(EventTable.COLUMN_PT, e.getPtName());
             values.put(EventTable.COLUMN_ES, e.getEsName());
             values.put(EventTable.COLUMN_ICON, e.getEventIcon());
-            if (e.getEventType().getTypeId() > maxType){
-                boolean insert = true;
-                for (int i=0;i<typeList.size();i++){
-                    if (typeList.get(i) == e.getEventType().getTypeId()){
-                        insert = false;
-                        break;
-                    }
-                }
-                if (insert){
-                    typeList.add(e.getEventType().getTypeId());
-                    insertType(e.getEventType());
-                }
-            }
             values.put(EventTable.COLUMN_TYPE, e.getEventType().getTypeId());
             values.put(EventTable.COLUMN_LIGHT, e.getMinLight());
             values.put(EventTable.COLUMN_GUARDIANS, e.getMaxGuardians());
@@ -1029,6 +1025,13 @@ public class BungieService extends IntentService {
             editor.apply();
         }
         values.clear();
+    }
+
+    private class TypeComparator implements java.util.Comparator<EventTypeModel> {
+        @Override
+        public int compare(EventTypeModel et1, EventTypeModel et2) {
+            return et2.getTypeId() - et1.getTypeId();
+        }
     }
 
 }

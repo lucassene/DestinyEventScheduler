@@ -66,7 +66,6 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
         if (gameList != null){
             onGamesLoaded(gameList);
         }
-        swipeLayout.setColorSchemeResources(R.color.colorAccent);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

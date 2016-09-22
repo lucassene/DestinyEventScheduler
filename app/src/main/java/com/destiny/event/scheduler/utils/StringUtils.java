@@ -1,5 +1,7 @@
 package com.destiny.event.scheduler.utils;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.text.TextUtils;
 
 public class StringUtils {
@@ -20,6 +22,19 @@ public class StringUtils {
         } else if (Math.round(number) < 10) {
             return "0" + String.valueOf(number);
         } else return String.valueOf(number);
+    }
+
+    public static String getLanguageString(Context context) {
+        context.getResources();
+        String lang = Resources.getSystem().getConfiguration().locale.getLanguage();
+        switch (lang) {
+            case "pt":
+                return lang;
+            case "es":
+                return lang;
+            default:
+                return "en";
+        }
     }
 
 

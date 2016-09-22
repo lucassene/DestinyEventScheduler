@@ -7,22 +7,38 @@
     android:orientation="vertical"
     android:scrollbarStyle="outsideOverlay">
 
-    <ListView
-        android:id="@id/android:list"
+    <com.destiny.event.scheduler.views.CustomSwipeLayout
+        android:id="@+id/swipe_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:scrollbarStyle="outsideOverlay"
-        android:paddingRight="@dimen/global_padding"
-        android:divider="@null"
-        android:dividerHeight="8dp"/>
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@android:id/empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/my_clan_empty"
-        android:layout_gravity="center"
-        android:gravity="center"/>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true">
+
+            <ListView
+                android:id="@id/android:list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingRight="@dimen/global_padding"
+                android:scrollbarStyle="outsideOverlay"
+                android:footerDividersEnabled="false"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="8dp" />
+
+            <TextView
+                android:id="@android:id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/my_clan_empty"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingRight="@dimen/global_padding"/>
+
+        </FrameLayout>
+
+    </com.destiny.event.scheduler.views.CustomSwipeLayout>
 
 </LinearLayout>

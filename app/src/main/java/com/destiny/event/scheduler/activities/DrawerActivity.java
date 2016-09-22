@@ -265,6 +265,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
@@ -275,49 +276,58 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         MyClanFragment frag = (MyClanFragment) openedFragment;
                         ArrayList<String> idList = frag.getBungieIdList();
                         if (idList != null) {
-                            if (mReceiver == null) {
-                                mReceiver = new RequestResultReceiver(new Handler());
-                                mReceiver.setReceiver(this);
-                            }
-                            if (!isBungieServiceRunning()) {
-                                mReceiver = new RequestResultReceiver(new Handler());
-                                mReceiver.setReceiver(this);
-                                Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
-                                intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_UPDATE_CLAN);
-                                intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
-                                intent.putExtra("memberList", idList);
-                                intent.putExtra("clanId", clanId);
-                                intent.putExtra("platformId", platformId);
-                                intent.putExtra("userMembership", bungieId);
-                                startService(intent);
-                            }
+                            updateClan(idList);
                         } else Log.w(TAG, "bungieIdList is empty!");
                     } else if (getOpenedFragment() instanceof MyNewProfileFragment) {
                         if (memberProfile != null) {
                             Log.w(TAG, "opened Fragment: " + getOpenedFragment().toString());
-                            Bundle bundle = new Bundle();
+                            bundle.clear();
                             bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_PROFILE);
                             bundle.putString(ServerService.PROFILE_TAG, memberProfile.getMembershipId());
                             runServerService(bundle);
                         }
                     } else if (getOpenedFragment() instanceof  HistoryListFragment){
                         Log.w(TAG, "opened Fragment: " + getOpenedFragment().toString());
-                        Bundle bundle = new Bundle();
+
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_HISTORY_GAMES);
                         runServerService(bundle);
                     } else if (getOpenedFragment() instanceof NewEventFragment){
-                        Bundle bundle = new Bundle();
+                        bundle.clear();
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_EVENTS);
                         runServerService(bundle);
                     } else if (getOpenedFragment() instanceof SearchFragment){
-                        Bundle bundle = new Bundle();
+                        bundle.clear();
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_GAMES);
+                        runServerService(bundle);
+                    } else if (getOpenedFragment() instanceof MyEventsFragment){
+                        bundle.clear();
+                        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_JOINED_GAMES);
                         runServerService(bundle);
                     } else refreshLists();
                 } else
                     Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void updateClan(ArrayList<String> idList){
+        if (mReceiver == null) {
+            mReceiver = new RequestResultReceiver(new Handler());
+            mReceiver.setReceiver(this);
+        }
+        if (!isBungieServiceRunning()) {
+            mReceiver = new RequestResultReceiver(new Handler());
+            mReceiver.setReceiver(this);
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
+            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_UPDATE_CLAN);
+            intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
+            intent.putExtra("memberList", idList);
+            intent.putExtra("clanId", clanId);
+            intent.putExtra("platformId", platformId);
+            intent.putExtra("userMembership", bungieId);
+            startService(intent);
+        }
     }
 
     private void refreshLists() {
@@ -512,14 +522,16 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void onEventTypeSelected(String id) {
+    public void onEventTypeSelected(int id) {
         fm.popBackStack();
+        openedFragment = fm.findFragmentByTag("new");
+        if (openedFragment != null) fragmentTag = openedFragment.getTag();
         newEventListener = (FromActivityListener) getSupportFragmentManager().findFragmentByTag("new");
         newEventListener.onEventTypeSent(id);
     }
 
     @Override
-    public void onEventGameSelected(String id) {
+    public void onEventGameSelected(int id) {
         fm.popBackStack();
         openedFragment = fm.findFragmentByTag("new");
         if (openedFragment != null) fragmentTag = openedFragment.getTag();
@@ -608,18 +620,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         viewPager.setAdapter(null);
         loadNewFragment(fragment, bundle, "game");
 
-    }
-
-    @Override
-    public void onScheduledGames(boolean status) {
-        onDataLoaded();
-        hasScheduledGames = status;
-    }
-
-    @Override
-    public void onValidateGames(boolean status) {
-        onDataLoaded();
-        hasValidatedGames = status;
     }
 
     @Override
@@ -1443,6 +1443,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         Collections.sort(validatedGameList, new HistoryComparator());
                         if (userDataListener != null && getOpenedFragment() instanceof HistoryListFragment) {
                             userDataListener.onGamesLoaded(validatedGameList);
+                        } else if (getOpenedFragment() instanceof HistoryListFragment){
+                            userDataListener = (UserDataListener) getOpenedFragment();
+                            userDataListener.onGamesLoaded(validatedGameList);
                         }
                         break;
                     case ServerService.TYPE_NEW_GAMES:
@@ -1461,7 +1464,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         joinedGameList = (ArrayList<GameModel>) resultData.getSerializable(ServerService.GAME_TAG);
                         if (userDataListener != null && getOpenedFragment() instanceof MyEventsFragment) {
                             userDataListener.onGamesLoaded(joinedGameList);
+                        } else if (getOpenedFragment() instanceof MyEventsFragment){
+                            userDataListener = (UserDataListener) getOpenedFragment();
+                            userDataListener.onGamesLoaded(joinedGameList);
                         }
+                        addtoAllGameList(joinedGameList);
                         break;
                     case ServerService.TYPE_JOIN_GAME:
                         for (int i = 0; i < allGameList.size(); i++) {

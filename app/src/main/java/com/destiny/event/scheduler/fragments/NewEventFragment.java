@@ -39,6 +39,7 @@ import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.utils.NetworkUtils;
+import com.destiny.event.scheduler.utils.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -49,6 +50,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     private static final int LOADER_TYPE = 10;
     private static final int LOADER_EVENT = 20;
+    private static final int LOADER_EVENT_WITH_TYPE = 99;
 
     private static final int MAX_LIGHT = 400;
 
@@ -85,31 +87,12 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-        selectedType = 2;
-        selectedEvent = 4;
+        game = new GameModel();
 
         if (savedInstanceState != null){
             selectedEvent = savedInstanceState.getInt("id");
             selectedType = savedInstanceState.getInt("Type");
         }
-
-        Bundle bundle = getArguments();
-        if (bundle != null){
-            switch (bundle.getString("Table")){
-                case EventTypeTable.TABLE_NAME:
-                    selectedType = bundle.getInt("id");
-                    callEventList();
-                    checkGame(selectedType);
-                    initLoader(LOADER_TYPE);
-                    break;
-                case EventTable.TABLE_NAME:
-                    selectedEvent = bundle.getInt("id");
-                    selectedType = bundle.getInt("Type");
-            }
-        }
-
-        game = new GameModel();
 
     }
 
@@ -130,38 +113,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         if (!timeText.getText().toString().equals("")){
             hasTime = true;
         }
-    }
-
-    private void checkGame(int selectedType) {
-        switch (selectedType){
-            case 1:
-                selectedEvent = 1;
-                break;
-            case 2:
-                selectedEvent = 4;
-                break;
-            case 3:
-                selectedEvent = 24;
-                break;
-            case 4:
-                selectedEvent = 29;
-                break;
-            case 5:
-                selectedEvent = 35;
-                break;
-            case 6:
-                selectedEvent = 41;
-                break;
-            case 7:
-                selectedEvent = 43;
-                break;
-            case 8:
-                selectedEvent = 57;
-                break;
-            case 9:
-                selectedEvent = 62;
-                break;
-        }
+        checkIfIsOk();
     }
 
     @Override
@@ -308,11 +260,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
 
-
-        initLoader(LOADER_EVENT);
+        if (selectedType == 0) selectedType = 2;
         initLoader(LOADER_TYPE);
-
-        checkIfIsOk();
 
         return v;
     }
@@ -338,13 +287,15 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().restartLoader(loaderType, null, this);
     }
 
-    private void checkIfIsOk(){
+    private boolean checkIfIsOk(){
         if (hasDate && hasTime && commentText.getText().length() < 60){
             createButton.setEnabled(true);
             createButton.setText(R.string.new_event_button);
+            return true;
         } else {
             createButton.setEnabled(false);
             createButton.setText(R.string.waiting_data);
+            return false;
         }
     }
 
@@ -363,34 +314,38 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        String[] projection;
         String[] selectionArgs;
-
         callback.onLoadingData();
-
         switch (id){
             case LOADER_TYPE:
-                projection = EventTypeTable.ALL_COLUMNS;
                 selectionArgs = new String[] {String.valueOf(selectedType)};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.EVENT_TYPE_URI,
-                        projection,
+                        EventTypeTable.ALL_COLUMNS,
                         EventTypeTable.COLUMN_ID + "=?",
                         selectionArgs,
                         null
                 );
             case LOADER_EVENT:
-                projection = EventTable.ALL_COLUMNS;
                 selectionArgs = new String[] {String.valueOf(selectedEvent)};
                 return new CursorLoader(
                         getContext(),
                         DataProvider.EVENT_URI,
-                        projection,
+                        EventTable.ALL_COLUMNS,
                         EventTable.COLUMN_ID + "=?",
                         selectionArgs,
                         null
+                );
+            case LOADER_EVENT_WITH_TYPE:
+                selectionArgs = new String[] {String.valueOf(selectedType)};
+                return new CursorLoader(
+                        getContext(),
+                        DataProvider.EVENT_URI,
+                        EventTable.ALL_COLUMNS,
+                        EventTable.COLUMN_TYPE + "=?",
+                        selectionArgs,
+                        StringUtils.getLanguageString(getContext())
                 );
             default:
                 return null;
@@ -399,28 +354,37 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        data.moveToFirst();
-        switch (loader.getId()){
-            case LOADER_TYPE:
-                setViewIcon(iconType,getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName()));
-                textType.setText(EventTypeTable.getName(getContext(), data));
-                game.setTypeName(textType.getText().toString());
-                break;
-            case LOADER_EVENT:
-                minLight = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT));
-                lightBar.setMax(MAX_LIGHT - minLight);
-                lightText.setText(String.valueOf(minLight));
-                String iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
-                setViewIcon(iconGame,getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
-                textGame.setText(EventTable.getName(getContext(),data));
-                game.setEventIcon(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)));
-                game.setEventName(textGame.getText().toString());
-                game.setMaxGuardians(data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS)));
-                break;
+        if (data != null && data.moveToFirst()){
+            switch (loader.getId()){
+                case LOADER_TYPE:
+                    setViewIcon(iconType,getContext().getResources().getIdentifier(data.getString(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ICON)),"drawable",getContext().getPackageName()));
+                    textType.setText(EventTypeTable.getName(getContext(), data));
+                    game.setTypeName(textType.getText().toString());
+                    selectedType = data.getInt(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ID));
+                    if (selectedEvent == 0){
+                        initLoader(LOADER_EVENT_WITH_TYPE);
+                    } else initLoader(LOADER_EVENT);
+                    break;
+                case LOADER_EVENT:
+                case LOADER_EVENT_WITH_TYPE:
+                    selectedEvent = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_ID));
+                    prepareEventViews(data);
+                    break;
+            }
         }
         callback.onDataLoaded();
+    }
 
+    private void prepareEventViews(Cursor data){
+        minLight = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT));
+        lightBar.setMax(MAX_LIGHT - minLight);
+        lightText.setText(String.valueOf(minLight));
+        String iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
+        setViewIcon(iconGame,getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
+        textGame.setText(EventTable.getName(getContext(),data));
+        game.setEventIcon(data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON)));
+        game.setEventName(textGame.getText().toString());
+        game.setMaxGuardians(data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS)));
     }
 
     private void setViewIcon(ImageView view, int resId){
@@ -434,7 +398,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //Log.w("NewEvent Loader: ", "O Loader entrou no método onLoaderReset");
+        Log.w("NewEvent Loader: ", "O Loader entrou no método onLoaderReset");
     }
 
     @Override
@@ -455,7 +419,13 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         String finalDate = sdf.format(date.getTime());
         dateText.setText(finalDate);
         hasDate = true;
-        checkIfIsOk();
+        if (!checkIfIsOk()){
+            DialogFragment timeDialog = new MyTimePickerDialog();
+            Bundle bundle = new Bundle();
+            bundle.putString("tag","new");
+            timeDialog.setArguments(bundle);
+            timeDialog.show(getFragmentManager(), "timePicker");
+        }
     }
 
     @Override
@@ -499,18 +469,24 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     public void onMultiItemSelected(boolean[] items) {}
 
     @Override
-    public void onEventTypeSent(String id) {
-        selectedType = Integer.parseInt(id);
-        checkGame(selectedType);
-        initLoader(LOADER_TYPE);
+    public void onEventTypeSent(int id) {
+        selectedType = id;
+        selectedEvent = 0;
+        getLoaderManager().destroyLoader(LOADER_EVENT);
+        getLoaderManager().destroyLoader(LOADER_EVENT_WITH_TYPE);
+        //initLoader(LOADER_TYPE);
+        //initLoader(LOADER_EVENT_WITH_TYPE);
         callEventList();
     }
 
     @Override
-    public void onEventGameSent(String id) {
-        selectedEvent = Integer.parseInt(id);
-        initLoader(LOADER_EVENT);
-        initLoader(LOADER_TYPE);
+    public void onEventGameSent(int id) {
+        Log.w(TAG, "onEventGameSent called");
+        selectedEvent = id;
+        getLoaderManager().destroyLoader(LOADER_EVENT);
+        getLoaderManager().destroyLoader(LOADER_EVENT_WITH_TYPE);
+        //initLoader(LOADER_EVENT);
+        //initLoader(LOADER_TYPE);
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +29,7 @@ import com.destiny.event.scheduler.data.MemberTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.ImageUtils;
+import com.destiny.event.scheduler.views.CustomSwipeLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,13 +54,10 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     TextView clanDesc;
     ImageView clanLogo;
     ImageView clanBanner;
-
+    CustomSwipeLayout swipeLayout;
     Spinner orderSpinner;
-
     View headerView;
-
     TextView totalMembers;
-
     CustomCursorAdapter adapter;
 
     private ToActivityListener callback;
@@ -74,13 +73,22 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         View v = inflater.inflate(R.layout.my_clan_layout, container, false);
 
         headerView = inflater.inflate(R.layout.my_clan_header_layout, null);
-
+        swipeLayout = (CustomSwipeLayout) v.findViewById(R.id.swipe_layout);
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshList();
+            }
+        });
         bungieIdList = new ArrayList<>();
-
         callback = (ToActivityListener) getActivity();
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
-
         return v;
+    }
+
+    private void refreshList() {
+        if (bungieIdList != null) callback.updateClan(bungieIdList);
+        swipeLayout.setRefreshing(true);
     }
 
     @Override
@@ -291,6 +299,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
     public void refreshData(){
         initClanLoader();
         adapter.notifyDataSetChanged();
+        swipeLayout.setRefreshing(false);
     }
 
 }

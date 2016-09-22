@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +23,7 @@ import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.models.NoticeModel;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.NetworkUtils;
+import com.destiny.event.scheduler.utils.StringUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,7 +92,6 @@ public class ServerService extends IntentService {
     public static final String ANDROID_TAG = "apiNumber";
     public static final String APP_TAG = "appVersion";
     public static final String NOTICE_TAG = "notice";
-    public static final String EVENT_LIST_TAG = "eventList";
 
     public static final int STATUS_RUNNING = 200;
     public static final int STATUS_FINISHED = 210;
@@ -544,6 +543,8 @@ public class ServerService extends IntentService {
     private int parseNewEvents(String response) {
         Log.w(TAG, "getNewEvents response: " + response);
         int err = NO_ERROR;
+        int maxType = getDBTypesCount();
+        ArrayList<EventTypeModel> typeList = new ArrayList<>();
         try{
             JSONArray jArray = new JSONArray(response);
             for (int i=0;i<jArray.length();i++){
@@ -561,12 +562,21 @@ public class ServerService extends IntentService {
                 eT.setEnName(jType.getString("en"));
                 eT.setPtName(jType.getString("pt"));
                 eT.setEsName(jType.getString("es"));
+                if (eT.getTypeId() > maxType){
+                    typeList.add(eT);
+                }
 
                 e.setEventType(eT);
                 e.setEnName(jEvent.getString("en"));
                 e.setPtName(jEvent.getString("pt"));
                 e.setEsName(jEvent.getString("es"));
                 err = insertEvent(e);
+            }
+            if (typeList.size() >0){
+                Collections.sort(typeList, new TypeComparator());
+                for (int i=0;i<typeList.size();i++){
+                    insertType(typeList.get(i));
+                }
             }
             return err;
         } catch (JSONException e){
@@ -578,34 +588,19 @@ public class ServerService extends IntentService {
     private int insertEvent(EventModel e) {
         try{
             Log.w(TAG, "Inserting event (" + e.getEnName() + ")");
-            ArrayList<Integer> typeList = new ArrayList<>();
-            int maxType = getDBTypesCount();
             ContentValues values = new ContentValues();
             values.put(EventTable.COLUMN_ID,e.getEventId());
             values.put(EventTable.COLUMN_EN, e.getEnName());
             values.put(EventTable.COLUMN_PT, e.getPtName());
             values.put(EventTable.COLUMN_ES, e.getEsName());
             values.put(EventTable.COLUMN_ICON, e.getEventIcon());
-            if (e.getEventType().getTypeId() > maxType){
-                boolean insert = true;
-                for (int i=0;i<typeList.size();i++){
-                    if (typeList.get(i) == e.getEventType().getTypeId()){
-                        insert = false;
-                        break;
-                    }
-                }
-                if (insert){
-                    typeList.add(e.getEventType().getTypeId());
-                    insertType(e.getEventType());
-                }
-            }
             values.put(EventTable.COLUMN_TYPE, e.getEventType().getTypeId());
             values.put(EventTable.COLUMN_LIGHT, e.getMinLight());
             values.put(EventTable.COLUMN_GUARDIANS, e.getMaxGuardians());
             Uri uri = getContentResolver().insert(DataProvider.EVENT_URI,values);
             if (uri != null){
                 SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                editor.putInt(DrawerActivity.EVENT_PREF,getDBEventsCount());
+                editor.putInt(DrawerActivity.EVENT_PREF, getDBEventsCount());
                 editor.apply();
             }
             values.clear();
@@ -696,7 +691,7 @@ public class ServerService extends IntentService {
                     member.setTitle(getString(R.string.default_title));
                 } else {
                     JSONObject jTitle = jMember.getJSONObject("memberTitle");
-                    member.setTitle(jTitle.getString(getLanguageString()));
+                    member.setTitle(jTitle.getString(StringUtils.getLanguageString(this)));
                 }
                 member.setInsert(true);
                 memberList.add(member);
@@ -731,7 +726,7 @@ public class ServerService extends IntentService {
                 JSONObject jType = jTypes.getJSONObject(i);
                 EventTypeModel type = new EventTypeModel();
                 type.setTypeId(jType.getInt("eventTypeId"));
-                type.setTypeName(jType.getString(getLanguageString()));
+                type.setTypeName(jType.getString(StringUtils.getLanguageString(this)));
                 type.setTimesPlayed(jType.getInt("timesPlayed"));
                 typeList.add(type);
             }
@@ -740,7 +735,7 @@ public class ServerService extends IntentService {
                 member.setTitle(getString(R.string.default_title));
             } else {
                 JSONObject jTitle = jMember.getJSONObject("memberTitle");
-                member.setTitle(jTitle.getString(getLanguageString()));
+                member.setTitle(jTitle.getString(StringUtils.getLanguageString(this)));
             }
 
             EventModel event = new EventModel();
@@ -752,11 +747,11 @@ public class ServerService extends IntentService {
                 event.setTimesPlayed(jFavorite.getInt("timesPlayed"));
                 JSONObject jEvent = jFavorite.getJSONObject("event");
                 event.setEventId(jEvent.getInt("id"));
-                event.setEventName(jEvent.getString(getLanguageString()));
+                event.setEventName(jEvent.getString(StringUtils.getLanguageString(this)));
                 event.setEventIcon(jEvent.getString("icon"));
                 JSONObject jFavType = jEvent.getJSONObject("eventType");
                 favType.setTypeId(jFavType.getInt("id"));
-                favType.setTypeName(jFavType.getString(getLanguageString()));
+                favType.setTypeName(jFavType.getString(StringUtils.getLanguageString(this)));
                 favType.setTypeIcon(jFavType.getString("icon"));
                 event.setEventType(favType);
             }
@@ -787,7 +782,7 @@ public class ServerService extends IntentService {
                     member.setTitle(getString(R.string.default_title));
                 } else {
                     JSONObject jTitle = jEntry.getJSONObject("memberTitle");
-                    member.setTitle(jTitle.getString(getLanguageString()));
+                    member.setTitle(jTitle.getString(StringUtils.getLanguageString(this)));
                 }
                 memberList.add(member);
             }
@@ -822,7 +817,7 @@ public class ServerService extends IntentService {
                     member.setTitle(getString(R.string.default_title));
                 } else {
                     JSONObject jTitle = jMember.getJSONObject("memberTitle");
-                    member.setTitle(jTitle.getString(getLanguageString()));
+                    member.setTitle(jTitle.getString(StringUtils.getLanguageString(this)));
                 }
                 memberList.add(member);
             }
@@ -837,8 +832,8 @@ public class ServerService extends IntentService {
         Log.w(TAG, "getGames response: " + response);
         JSONArray jResponse;
         gameList = new ArrayList<>();
-        ArrayList<Integer> eventIdList = new ArrayList<>();
-        int maxEvent = getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).getInt(DrawerActivity.EVENT_PREF, 999);
+        int maxEvent = getDBEventsCount();
+        boolean hasNewEvents = false;
         try {
             jResponse = new JSONArray(response);
             for (int i=0;i<jResponse.length();i++){
@@ -850,15 +845,13 @@ public class ServerService extends IntentService {
                 game.setCreatorName(jCreator.getString("name"));
                 JSONObject jEvent = jGame.getJSONObject("event");
                 game.setEventId(jEvent.getInt("id"));
-                if (game.getEventId() > maxEvent){
-                    eventIdList.add(game.getEventId());
-                }
-                game.setEventName(jEvent.getString(getLanguageString()));
+                if (game.getEventId() > maxEvent){hasNewEvents = true;}
+                game.setEventName(jEvent.getString(StringUtils.getLanguageString(this)));
                 game.setEventIcon(jEvent.getString("icon"));
                 game.setMaxGuardians(jEvent.getInt("maxGuardians"));
                 JSONObject jType = jEvent.getJSONObject("eventType");
                 game.setTypeId(jType.getInt("id"));
-                game.setTypeName(jType.getString(getLanguageString()));
+                game.setTypeName(jType.getString(StringUtils.getLanguageString(this)));
                 game.setTypeIcon(jType.getString("icon"));
                 game.setTime(jGame.getString("time"));
                 game.setMinLight(jGame.getInt("light"));
@@ -869,11 +862,9 @@ public class ServerService extends IntentService {
                 game.setEvaluated(getBoolean(jGame.getString("evaluated")));
                 gameList.add(game);
             }
-            Collections.sort(eventIdList, new EventComparator());
-            if (eventIdList.size()>0){
+            if (hasNewEvents){
                 Log.w(TAG, "New event found. Inserting...");
-                int id = eventIdList.get(0)-1;
-                String url = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + id;
+                String url = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + maxEvent;
                 requestServer(receiver, TYPE_NEW_EVENTS, url, null);
             }
         } catch (JSONException e) {
@@ -881,19 +872,6 @@ public class ServerService extends IntentService {
             return ERROR_JSON;
         }
         return NO_ERROR;
-    }
-
-    private String getLanguageString() {
-        getResources();
-        String lang = Resources.getSystem().getConfiguration().locale.getLanguage();
-        switch (lang) {
-            case "pt":
-                return lang;
-            case "es":
-                return lang;
-            default:
-                return "en";
-        }
     }
 
     private boolean getBoolean(String joined) {
@@ -1082,10 +1060,11 @@ public class ServerService extends IntentService {
         return result;
     }
 
-    private class EventComparator implements java.util.Comparator<Integer> {
+    private class TypeComparator implements java.util.Comparator<EventTypeModel> {
         @Override
-        public int compare(Integer i1, Integer i2) {
-            return i2 -i1;
+        public int compare(EventTypeModel et1, EventTypeModel et2) {
+            return et2.getTypeId() - et1.getTypeId();
         }
     }
+
 }

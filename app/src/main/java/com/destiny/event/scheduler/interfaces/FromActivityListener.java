@@ -2,8 +2,8 @@ package com.destiny.event.scheduler.interfaces;
 
 public interface FromActivityListener {
 
-    public void onEventTypeSent(String id);
-    public void onEventGameSent(String id);
+    public void onEventTypeSent(int id);
+    public void onEventGameSent(int id);
     public void onOrderBySet(String orderBy);
 
 }

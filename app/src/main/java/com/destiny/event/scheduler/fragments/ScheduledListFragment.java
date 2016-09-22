@@ -75,7 +75,6 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
         if (showTitle){
             sectionTitle.setVisibility(View.VISIBLE);
         } else sectionTitle.setVisibility(View.GONE);
-        swipeLayout.setColorSchemeResources(R.color.colorAccent);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

@@ -3,6 +3,7 @@ package com.destiny.event.scheduler.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,8 +24,8 @@ import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.services.ServerService;
+import com.destiny.event.scheduler.views.CustomSwipeLayout;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class MyEventsFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener {
@@ -34,11 +35,9 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
     Spinner filterSpinner;
     ListView listView;
     TextView emptyView;
-
+    CustomSwipeLayout swipeLayout;
     private ToActivityListener callback;
-
     private GameAdapter gameAdapter;
-
     private List<GameModel> gameList;
     private String statusId;
     private String[] statusList;
@@ -87,12 +86,16 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
         statusList = getContext().getResources().getStringArray(R.array.game_status_id);
 
+        swipeLayout = (CustomSwipeLayout) v.findViewById(R.id.swipe_layout);
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshList();
+            }
+        });
+
         gameList = callback.getGameList(GameModel.STATUS_JOINED);
-        if (savedInstanceState != null && savedInstanceState.containsKey("listView")){
-            gameList = (List<GameModel>) savedInstanceState.getSerializable("listView");
-            onGamesLoaded(gameList);
-            Log.w(TAG, "Game data already available");
-        } else if (gameList == null){
+        if (gameList == null){
             Log.w(TAG, "Getting game data...");
             getGamesData();
         } else {
@@ -107,6 +110,11 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         });
 
         return v;
+    }
+
+    private void refreshList() {
+        getGamesData();
+        swipeLayout.setRefreshing(true);
     }
 
     @Override
@@ -172,7 +180,6 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         if (gameAdapter == null) {
             Log.w(TAG, "adapter estava null");
             if (gameList != null){
-                listView.setAdapter(null);
                 this.gameList = gameList;
                 filterGameList(statusId);
                 gameAdapter = new GameAdapter(getActivity(), gameList);
@@ -180,13 +187,12 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
         } else {
             Log.w(TAG, "adapter já existia");
             if (gameList!=null){
-                listView.setAdapter(null);
                 this.gameList = gameList;
-                filterGameList(statusId);
                 gameAdapter.setGameList(gameList);
-                gameAdapter.notifyDataSetChanged();
+                filterGameList(statusId);
             } else Log.w(TAG, "listView null");
         }
+        if (swipeLayout != null) swipeLayout.setRefreshing(false);
     }
 
     @Override
@@ -202,12 +208,6 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onMembersUpdated() {
 
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("listView", (Serializable) gameList);
     }
 
 }

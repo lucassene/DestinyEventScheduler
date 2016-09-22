@@ -1,8 +1,13 @@
 package com.destiny.event.scheduler.fragments;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,18 +24,24 @@ import android.widget.TextView;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.GameAdapter;
+import com.destiny.event.scheduler.data.EventTypeTable;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
+import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.services.ServerService;
 import com.destiny.event.scheduler.views.CustomSwipeLayout;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener {
+public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String TAG = "SearchFragment";
+
+    private static final int LOADER_TYPE = 10;
 
     Spinner filterSpinner;
     ListView listView;
@@ -39,7 +50,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     GameAdapter gameAdapter;
     private ToActivityListener callback;
     private List<GameModel> gameList;
-    private String[] typeList;
+    private HashMap<String,String> typeList;
     private String eventType;
 
     @Override
@@ -71,6 +82,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         getActivity().getMenuInflater().inflate(R.menu.home_menu, menu);
     }
 
+
     @SuppressWarnings("unchecked")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -80,8 +92,6 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         listView = (ListView) v.findViewById(R.id.search_list);
         emptyView = (TextView) v.findViewById(R.id.empty_label);
 
-        typeList = getContext().getResources().getStringArray(R.array.type_ids);
-
         listView.setFooterDividersEnabled(false);
         listView.setEmptyView(emptyView);
 
@@ -89,7 +99,6 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         callback.setFragmentType(DrawerActivity.FRAGMENT_TYPE_WITHOUT_BACKSTACK);
 
         swipeLayout = (CustomSwipeLayout) v.findViewById(R.id.swipe_layout);
-        swipeLayout.setColorSchemeResources(R.color.colorAccent);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -114,6 +123,14 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         return v;
     }
 
+    private void initLoader(int loaderType){
+        callback.onLoadingData();
+        if (getLoaderManager().getLoader(loaderType) != null){
+            getLoaderManager().destroyLoader(loaderType);
+        }
+        getLoaderManager().restartLoader(loaderType, null, this);
+    }
+
     private void refreshList() {
         getGamesData();
         swipeLayout.setRefreshing(true);
@@ -121,10 +138,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getContext().getResources().getStringArray(R.array.spinner_types));
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        filterSpinner.setOnItemSelectedListener(this);
-        filterSpinner.setAdapter(spinnerAdapter);
+        initLoader(LOADER_TYPE);
     }
 
     private void getGamesData() {
@@ -144,17 +158,23 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
         super.onPause();
     }
 
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        callback.setSpinnerSelection(DrawerActivity.TAG_SEARCH_EVENTS, position);
-        eventType = typeList[position];
+        if (typeList != null){
+            eventType = typeList.get(parent.getItemAtPosition(position).toString());
+            callback.setSpinnerSelection(DrawerActivity.TAG_SEARCH_EVENTS, position);
+        } else {
+            int eventId = callback.getSpinnerSelection(DrawerActivity.TAG_SEARCH_EVENTS);
+            if (eventId == 0){
+                eventType = "type:all";
+            } else eventType = "type:" + eventId;
+        }
         filterGameList(eventType);
     }
 
     public void filterGameList(String filter){
         if (filter != null){
-            if (filter.isEmpty()) filter = typeList[0];
+            if (filter.isEmpty()) filter = "type:all";
             if (gameAdapter != null) {
                 gameAdapter.getFilter().filter(filter, new Filter.FilterListener() {
                     @Override
@@ -167,14 +187,10 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
+    public void onNothingSelected(AdapterView<?> parent) {}
 
     @Override
-    public void onUserDataLoaded() {
-
-    }
+    public void onUserDataLoaded() {}
 
     @Override
     public void onGamesLoaded(List<GameModel> gameList) {
@@ -190,26 +206,84 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
             Log.w(TAG, "adapter já existia");
             if (gameList != null){
                 this.gameList = gameList;
-                filterGameList(eventType);
                 gameAdapter.setGameList(gameList);
+                filterGameList(eventType);
             } else Log.w(TAG, "listView null");
         }
         if (swipeLayout != null) swipeLayout.setRefreshing(false);
     }
 
     @Override
-    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId) {
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId) {}
 
+    @Override
+    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {}
+
+    @Override
+    public void onMembersUpdated() {}
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        callback.onLoadingData();
+        switch (id){
+            case LOADER_TYPE:
+                return new CursorLoader(
+                        getContext(),
+                        DataProvider.EVENT_TYPE_URI,
+                        EventTypeTable.ALL_COLUMNS,
+                        null,
+                        null,
+                        getNameColumn() + " ASC"
+                );
+            default:
+                return null;
+        }
     }
 
     @Override
-    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        String nameColumn = getNameColumn();
+        if (data != null && data.moveToFirst()){
+            if (loader.getId() == LOADER_TYPE){
+                ArrayList<String> names = new ArrayList<>();
+                typeList = new HashMap<>();
+                typeList.put(getString(R.string.all),"type:all");
+                names.add(getString(R.string.all));
+                for (int i=0;i<data.getCount();i++){
+                    String name = data.getString(data.getColumnIndexOrThrow(nameColumn));
+                    String type = "type:" + data.getInt(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ID));
+                    names.add(name);
+                    typeList.put(name, type);
+                    data.moveToNext();
+                }
+                setSpinnerAdapter(names);
+            }
+        }
+        callback.onDataLoaded();
+    }
 
+    private void setSpinnerAdapter(ArrayList<String> nameList){
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, nameList);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        filterSpinner.setOnItemSelectedListener(this);
+        filterSpinner.setAdapter(spinnerAdapter);
+        filterSpinner.setSelection(callback.getSpinnerSelection(DrawerActivity.TAG_SEARCH_EVENTS));
+    }
+
+    private String getNameColumn() {
+        String lang = Resources.getSystem().getConfiguration().locale.getLanguage();
+        switch (lang) {
+            case "pt":
+                return EventTypeTable.COLUMN_PT;
+            case "es":
+                return EventTypeTable.COLUMN_ES;
+            default:
+                return EventTypeTable.COLUMN_EN;
+        }
     }
 
     @Override
-    public void onMembersUpdated() {
+    public void onLoaderReset(Loader<Cursor> loader) {
 
     }
-
 }
