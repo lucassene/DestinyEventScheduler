@@ -46,7 +46,7 @@ public class ServerService extends IntentService {
 
     private static final String TAG = "ServerService";
 
-    private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/";
+    private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/api/";
     private static final String GAME_ENDPOINT = "game";
     private static final String ENTRIES_ENDPOINT = "/entries";
     private static final String JOIN_ENDPOINT = "/join";
@@ -60,6 +60,7 @@ public class ServerService extends IntentService {
     private static final String MEMBERLIST_ENDPOINT = "member/list";
     private static final String NOTICE_ENDPOINT = "notice";
     private static final String EVENTS_ENDPOINT = "events";
+    private static final String LOGIN_URL = "https://destiny-event-scheduler.herokuapp.com/login";
 
     private static final String STATUS_PARAM = "status=";
     private static final String JOINED_PARAM = "joined=";
@@ -69,6 +70,7 @@ public class ServerService extends IntentService {
     private static final String PLATFORM_HEADER = "platform";
     private static final String CLAN_HEADER = "clanId";
     private static final String TIMEZONE_HEADER = "zoneid";
+    private static final String AUTH_HEADER = "Authorization";
 
     private static final String GET_METHOD = "GET";
     private static final String POST_METHOD = "POST";
@@ -92,6 +94,8 @@ public class ServerService extends IntentService {
     public static final String ANDROID_TAG = "apiNumber";
     public static final String APP_TAG = "appVersion";
     public static final String NOTICE_TAG = "notice";
+    public static final String URL_TAG = "firstUrl";
+    public static final String BUNDLE_TAG = "firstBundle";
 
     public static final int STATUS_RUNNING = 200;
     public static final int STATUS_FINISHED = 210;
@@ -114,6 +118,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_CLAN_MEMBERS = 15;
     public static final int TYPE_NOTICE = 16;
     public static final int TYPE_NEW_EVENTS = 17;
+    public static final int TYPE_LOGIN = 18;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -406,9 +411,11 @@ public class ServerService extends IntentService {
         if (receiver != null) { sendStatus(receiver, STATUS_RUNNING); }
         try {
             if (NetworkUtils.checkConnection(getApplicationContext())){
-                URL myURL = new URL(url);
+                URL myURL;
+                if (type == TYPE_LOGIN) {
+                    myURL = new URL(LOGIN_URL);
+                } else myURL = new URL(url);
                 HttpURLConnection urlConnection = (HttpURLConnection) myURL.openConnection();
-
                 switch (type){
                     case TYPE_CREATE_GAME:
                         urlConnection = createGameRequest(urlConnection, bundle);
@@ -446,6 +453,9 @@ public class ServerService extends IntentService {
                         break;
                     case TYPE_NOTICE:
                         urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
+                        break;
+                    case TYPE_LOGIN:
+                        urlConnection = getLoginHeaders(urlConnection);
                         break;
                 }
 
@@ -510,6 +520,14 @@ public class ServerService extends IntentService {
                                 case TYPE_NEW_EVENTS:
                                     error = parseNewEvents(response);
                                     return error;
+                                case TYPE_LOGIN:
+                                    String authKey = urlConnection.getHeaderField(AUTH_HEADER);
+                                    Log.w(TAG, "authKey: " + authKey);
+                                    SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                                    editor.putString(DrawerActivity.KEY_PREF, authKey);
+                                    editor.apply();
+                                    error = requestServer(receiver, bundle.getInt(REQUEST_TAG),bundle.getString(URL_TAG),bundle.getBundle(BUNDLE_TAG));
+                                    return error;
                                 default:
                                     return NO_ERROR;
                             }
@@ -522,9 +540,21 @@ public class ServerService extends IntentService {
                         return ERROR_NULL_RESPONSE;
                     }
                 } else {
-                    if (statusCode == 500 && type == TYPE_CREATE_GAME){
-                        Log.w(TAG, "Responde code equals 500.");
-                        return ERROR_NO_EVENT;
+                    if (statusCode == 500 || statusCode == 403){
+                        String s = convertInputStreamToString(urlConnection.getErrorStream());
+                        Log.w(TAG, "error: " + s);
+                        switch (type){
+                            case TYPE_CREATE_GAME:
+                                return ERROR_NO_EVENT;
+                            default:
+                                Log.w(TAG, "authKey expired or null. Acquiring a new one...");
+                                Bundle loginBundle = new Bundle();
+                                loginBundle.putInt(REQUEST_TAG, type);
+                                loginBundle.putString(URL_TAG, url);
+                                loginBundle.putBundle(BUNDLE_TAG, bundle);
+                                requestServer(receiver, TYPE_LOGIN, LOGIN_URL, loginBundle);
+                                break;
+                        }
                     }
                     Log.w(TAG, "Response code different than 200");
                     return ERROR_RESPONSE_CODE;
@@ -960,11 +990,33 @@ public class ServerService extends IntentService {
         return urlConnection;
     }
 
+    private HttpURLConnection getLoginHeaders(HttpURLConnection urlConnection) throws IOException, JSONException {
+        urlConnection.setRequestProperty(MEMBER_HEADER, memberId);
+        urlConnection.setRequestProperty(PLATFORM_HEADER, String.valueOf(platformId));
+        urlConnection.setRequestProperty(CLAN_HEADER, String.valueOf(clanId));
+        urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
+        urlConnection.setRequestMethod(POST_METHOD);
+        urlConnection.setDoOutput(true);
+        urlConnection.setRequestProperty("Content-Type", "application/json");
+        urlConnection.setRequestProperty("Accept", "application/json");
+
+        JSONObject jLogin = createLoginJSON();
+        if (jLogin != null){
+            OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+            writer.write(jLogin.toString());
+            writer.flush();
+        } else return null;
+
+        return urlConnection;
+    }
+
     private HttpURLConnection getDefaultHeaders(HttpURLConnection urlConnection, String postMethod) throws ProtocolException {
         urlConnection.setRequestProperty(MEMBER_HEADER, memberId);
         urlConnection.setRequestProperty(PLATFORM_HEADER, String.valueOf(platformId));
         urlConnection.setRequestProperty(CLAN_HEADER, String.valueOf(clanId));
         urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
+        String authKey = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getString(DrawerActivity.KEY_PREF,"");
+        urlConnection.setRequestProperty(AUTH_HEADER, authKey);
         urlConnection.setRequestMethod(postMethod);
         return urlConnection;
     }
@@ -1033,6 +1085,12 @@ public class ServerService extends IntentService {
         return json;
     }
 
+    private JSONObject createLoginJSON() throws JSONException {
+        JSONObject jLogin = new JSONObject();
+        jLogin.put("username", memberId);
+        jLogin.put("password", "password");
+        return jLogin;
+    }
 
     private JSONArray createEvaluationJSON(Bundle bundle) throws JSONException {
         JSONArray json = new JSONArray();

@@ -114,6 +114,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String CLAN_PREF = "clanId";
     public static final String EVENT_PREF = "eventMax";
     public static final String TYPE_PREF = "typeMax";
+    public static final String KEY_PREF = "authKey";
     public static final int DEFAULT_INTERVAL = 3600000;
 
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;

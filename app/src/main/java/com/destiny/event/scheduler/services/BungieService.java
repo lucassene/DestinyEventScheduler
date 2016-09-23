@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,6 +56,7 @@ public class BungieService extends IntentService {
     private static final String BASE_IMAGE_URL = "http://www.bungie.net";
 
     private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/";
+    private static final String API_SERVER_ENDPOINT = "api/";
     private static final String LOGIN_ENDPOINT = "login";
     private static final String CLAN_ENDPOINT = "clan";
     private static final String MEMBERS_ENDPOINT = "members";
@@ -64,6 +66,7 @@ public class BungieService extends IntentService {
 
     private static final String SERVER_MEMBER_HEADER = "membership";
     private static final String SERVER_PLATFORM_HEADER = "platform";
+    private static final String AUTH_HEADER = "Authorization";
 
     private static final String USER_PREFIX = "User/";
     private static final String GROUP_PREFIX = "Group/";
@@ -508,9 +511,44 @@ public class BungieService extends IntentService {
 
     }
 
+    private HttpURLConnection createLoginRequest(HttpURLConnection urlConnection) throws IOException, JSONException {
+        urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
+        urlConnection.setDoOutput(true);
+        urlConnection.setRequestProperty("Content-Type", "application/json");
+        urlConnection.setRequestProperty("Accept", "application/json");
+
+        JSONObject jLogin = createLoginJSON();
+        if (jLogin != null){
+            OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+            writer.write(jLogin.toString());
+            writer.flush();
+        } else return null;
+
+        return urlConnection;
+    }
+
+    private JSONObject createLoginJSON() throws JSONException {
+        JSONObject jLogin = new JSONObject();
+        jLogin.put("username", membershipId);
+        jLogin.put("password", "password");
+        return jLogin;
+    }
+
+    private HttpURLConnection getDefaultHeaders(HttpURLConnection urlConnection, String method) throws ProtocolException {
+        urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
+        urlConnection.setRequestProperty(CLAN_EXTRA, clanId);
+        urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
+        urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
+        String authKey = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getString(DrawerActivity.KEY_PREF,"");
+        urlConnection.setRequestProperty(AUTH_HEADER, authKey);
+        urlConnection.setRequestMethod(method);
+        return urlConnection;
+    }
+
     private int checkInServer(ResultReceiver receiver) {
         String myURL = SERVER_BASE_URL + LOGIN_ENDPOINT;
         receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+        Log.w(TAG, "Login initiaded. Getting authorization...");
 
         try {
 
@@ -518,17 +556,23 @@ public class BungieService extends IntentService {
 
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
-                urlConnection.setRequestProperty(CLAN_EXTRA, clanId);
-                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
-                urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
-                urlConnection.setRequestMethod(POST_METHOD);
-
-                int statusCode = urlConnection.getResponseCode();
+                urlConnection = createLoginRequest(urlConnection);
+                int statusCode;
+                if (urlConnection != null){
+                    statusCode = urlConnection.getResponseCode();
+                } else return ERROR_JSON;
 
                 if (statusCode == 200) {
-                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                    String authKey = urlConnection.getHeaderField("Authorization");
+                    Log.w(TAG, "authKey: " + authKey);
+
+                    SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                    editor.putString(DrawerActivity.KEY_PREF, authKey);
+                    editor.apply();
+
+                    receiver.send(STATUS_VERIFY, Bundle.EMPTY);
+
+                    /*InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     String response = convertInputStreamToString(inputStream);
 
                     if (response != null) {
@@ -562,17 +606,16 @@ public class BungieService extends IntentService {
                         membersModelList.add(user);
                         receiver.send(STATUS_VERIFY, Bundle.EMPTY);
                         return NO_ERROR;
-                    } else { return ERROR_RESPONSE_CODE; }
+                    } else { return ERROR_RESPONSE_CODE; }*/
+                    return NO_ERROR;
                 } else {
                     Log.w(TAG, "Response Code do JSON diferente de 200 (Server Login)");
                     return ERROR_RESPONSE_CODE;
                 }
-
             } else {
                 Log.w(TAG, "Sem conexão com a internet");
                 return ERROR_NO_CONNECTION;
             }
-
         } catch (Exception e) {
             Log.w(TAG, "Problema no HTTP Request (getCurrentBungieAccount)");
             e.printStackTrace();
@@ -582,7 +625,7 @@ public class BungieService extends IntentService {
 
     private int getMembersOfClan(ResultReceiver receiver){
 
-        String myURL = SERVER_BASE_URL + CLAN_ENDPOINT + "/" + clanId + "/" + MEMBERS_ENDPOINT;
+        String myURL = SERVER_BASE_URL + API_SERVER_ENDPOINT + CLAN_ENDPOINT + "/" + clanId + "/" + MEMBERS_ENDPOINT;
 
         try{
 
@@ -590,11 +633,7 @@ public class BungieService extends IntentService {
 
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
-                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
-                urlConnection.setRequestMethod(GET_METHOD);
-
+                urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
                 int statusCode = urlConnection.getResponseCode();
 
                 if (statusCode == 200){
@@ -605,6 +644,7 @@ public class BungieService extends IntentService {
                     if (response != null){
                         ArrayList<String> memberList = new ArrayList<>();
                         JSONArray jArray = new JSONArray(response);
+                        memberList.add(membershipId);
                         for (int i=0;i<jArray.length();i++){
                             memberList.add(jArray.getString(i));
                             //Log.w(TAG, "added member: " + jArray.getString(i));
@@ -613,8 +653,8 @@ public class BungieService extends IntentService {
                         if (actualMemberList != null){
                             memberList.add(membershipId);
                             //Log.w(TAG, "added member: " + membershipId);
-                            error = parseNewMembers(memberList);
-                        } else error = parseMembersOfClan(memberList);
+                            error = parseNewMembers(receiver, memberList);
+                        } else error = parseMembersOfClan(receiver, memberList);
                         if (error == NO_ERROR){
                             receiver.send(STATUS_PARTY, Bundle.EMPTY);
                             return NO_ERROR;
@@ -625,6 +665,13 @@ public class BungieService extends IntentService {
                         return ERROR_RESPONSE_CODE;
                     }
                 } else {
+                    Log.w(TAG, "responseCode different than 200");
+                    if (statusCode == 500 || statusCode == 403){
+                        int err = checkInServer(receiver);
+                        if (err != NO_ERROR) getMembersOfClan(receiver);
+                    }
+                    String s = convertInputStreamToString(urlConnection.getErrorStream());
+                    Log.w(TAG, "error getGroup: \n" + s);
                     Log.w(TAG, "Response Code do JSON diferente de 200 (...clan/" + clanId + "/members)");
                     error = ERROR_RESPONSE_CODE;
                     return ERROR_RESPONSE_CODE;
@@ -650,19 +697,14 @@ public class BungieService extends IntentService {
         sharedEditor.putInt(DrawerActivity.TYPE_PREF, getDBTypesCount());
         sharedEditor.apply();
 
-        String myURL = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + getDBEventsCount();
+        String myURL = SERVER_BASE_URL + API_SERVER_ENDPOINT + EVENTS_ENDPOINT + INITIAL_PARAM + getDBEventsCount();
         Log.w(TAG, "New Events URL: " + myURL);
         receiver.send(STATUS_EVENTS, Bundle.EMPTY);
 
         try{
             URL url = new URL(myURL);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-            urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
-            urlConnection.setRequestProperty(CLAN_EXTRA, clanId);
-            urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
-            urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
-            urlConnection.setRequestMethod(GET_METHOD);
+            urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
 
             int statusCode = urlConnection.getResponseCode();
 
@@ -672,6 +714,11 @@ public class BungieService extends IntentService {
 
                 if (response != null) {
                     parseNewEvents(response);
+                }
+            } else {
+                if (statusCode == 500 || statusCode == 403){
+                    int err = checkInServer(receiver);
+                    if (err != NO_ERROR) getNewEvents(receiver);
                 }
             }
         } catch (Exception e){
@@ -724,9 +771,9 @@ public class BungieService extends IntentService {
         }
     }
 
-    private int parseNewMembers(ArrayList<String> memberList) {
+    private int parseNewMembers(ResultReceiver receiver, ArrayList<String> memberList) {
 
-        int error = parseMembersOfClan(memberList);
+        int error = parseMembersOfClan(receiver, memberList);
         if (error != NO_ERROR){
             return error;
         } else {
@@ -764,22 +811,18 @@ public class BungieService extends IntentService {
 
     }
 
-    private int parseMembersOfClan(ArrayList<String> memberList) {
+    private int parseMembersOfClan(ResultReceiver receiver, ArrayList<String> memberList) {
 
-        String myURL = SERVER_BASE_URL + MEMBERLIST_ENDPOINT;
+        String myURL = SERVER_BASE_URL + API_SERVER_ENDPOINT + MEMBERLIST_ENDPOINT;
 
         try {
             if (NetworkUtils.checkConnection(getApplicationContext())){
 
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
-                urlConnection.setRequestProperty(ServerService.CLAN_TAG, clanId);
-                urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
+                urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
                 urlConnection.setDoOutput(true);
                 JSONArray jsonList = createJSONMemberList(memberList);
-                urlConnection.setRequestMethod(POST_METHOD);
                 urlConnection.setRequestProperty("Accept-Charset", "ISO-8859-1");
                 urlConnection.setRequestProperty("Accept-Language", "ISO-8859-1");
                 urlConnection.setRequestProperty("Content-Type", "application/json;charset=ISO-8859-1");
@@ -826,6 +869,10 @@ public class BungieService extends IntentService {
                         return ERROR_RESPONSE_CODE;
                     }
                 } else {
+                    if (statusCode == 500 || statusCode == 403){
+                        int err = checkInServer(receiver);
+                        if (err != NO_ERROR) parseMembersOfClan(receiver, memberList);
+                    }
                     Log.w(TAG, "Response Code do JSON diferente de 200 (Server MemberList)");
                     error = ERROR_RESPONSE_CODE;
                     return ERROR_RESPONSE_CODE;
