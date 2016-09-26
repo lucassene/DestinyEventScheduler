@@ -26,6 +26,7 @@ import com.destiny.event.scheduler.models.EventModel;
 import com.destiny.event.scheduler.models.EventTypeModel;
 import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.utils.CipherUtils;
 import com.destiny.event.scheduler.utils.ImageUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 
@@ -530,6 +531,14 @@ public class BungieService extends IntentService {
     private JSONObject createLoginJSON() throws JSONException {
         JSONObject jLogin = new JSONObject();
         jLogin.put("username", membershipId);
+        CipherUtils cUtils = new CipherUtils();
+        try{
+            String pass = cUtils.encrypt(membershipId);
+            Log.w(TAG, "password: " + pass);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
         jLogin.put("password", "password");
         return jLogin;
     }
@@ -669,9 +678,8 @@ public class BungieService extends IntentService {
                     if (statusCode == 500 || statusCode == 403){
                         int err = checkInServer(receiver);
                         if (err != NO_ERROR) getMembersOfClan(receiver);
+                        return err;
                     }
-                    String s = convertInputStreamToString(urlConnection.getErrorStream());
-                    Log.w(TAG, "error getGroup: \n" + s);
                     Log.w(TAG, "Response Code do JSON diferente de 200 (...clan/" + clanId + "/members)");
                     error = ERROR_RESPONSE_CODE;
                     return ERROR_RESPONSE_CODE;

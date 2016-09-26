@@ -12,6 +12,7 @@ import android.widget.ListView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.DoneGamesAdapter;
+import com.destiny.event.scheduler.interfaces.SwipeListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -21,7 +22,7 @@ import com.destiny.event.scheduler.views.CustomSwipeLayout;
 
 import java.util.List;
 
-public class ValidateListFragment extends ListFragment implements UserDataListener{
+public class ValidateListFragment extends ListFragment implements UserDataListener, SwipeListener{
 
     public static final String TAG = "ValidateListFragment";
 
@@ -148,4 +149,8 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
 
     }
 
+    @Override
+    public void toggleSwipeProgress(boolean b) {
+        if (swipeLayout != null) swipeLayout.setRefreshing(b);
+    }
 }

@@ -26,6 +26,7 @@ import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.CustomCursorAdapter;
 import com.destiny.event.scheduler.data.ClanTable;
 import com.destiny.event.scheduler.data.MemberTable;
+import com.destiny.event.scheduler.interfaces.SwipeListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.provider.DataProvider;
 import com.destiny.event.scheduler.utils.ImageUtils;
@@ -34,7 +35,7 @@ import com.destiny.event.scheduler.views.CustomSwipeLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MyClanFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemSelectedListener {
+public class MyClanFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemSelectedListener, SwipeListener {
 
     private static final String TAG = "MyClanFragment";
 
@@ -302,4 +303,8 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         swipeLayout.setRefreshing(false);
     }
 
+    @Override
+    public void toggleSwipeProgress(boolean b) {
+        swipeLayout.setRefreshing(b);
+    }
 }

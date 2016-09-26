@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.GameAdapter;
+import com.destiny.event.scheduler.interfaces.SwipeListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -28,7 +29,7 @@ import com.destiny.event.scheduler.views.CustomSwipeLayout;
 
 import java.util.List;
 
-public class MyEventsFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener {
+public class MyEventsFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener, SwipeListener {
 
     public static final String TAG = "MyEventsFragment";
 
@@ -210,4 +211,8 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
 
     }
 
+    @Override
+    public void toggleSwipeProgress(boolean b) {
+        swipeLayout.setRefreshing(b);
+    }
 }

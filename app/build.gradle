@@ -9,7 +9,7 @@ android {
         minSdkVersion 11
         targetSdkVersion 23
         versionCode 1
-        versionName "1.04"
+        versionName "1.05"
     }
     buildTypes {
         release {
@@ -20,6 +20,7 @@ android {
 
     buildTypes.each {
         it.buildConfigField 'String', 'API_KEY', API_KEY
+        it.buildConfigField 'String', 'ENCRYPT_KEY', ENCRYPT_KEY
     }
 }
 

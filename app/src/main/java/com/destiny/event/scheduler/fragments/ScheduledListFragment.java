@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.adapters.GameAdapter;
+import com.destiny.event.scheduler.interfaces.SwipeListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -22,7 +23,7 @@ import com.destiny.event.scheduler.views.CustomSwipeLayout;
 
 import java.util.List;
 
-public class ScheduledListFragment extends ListFragment implements UserDataListener{
+public class ScheduledListFragment extends ListFragment implements UserDataListener, SwipeListener{
 
     public static final String TAG = "ScheduledListFragment";
 
@@ -156,5 +157,10 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_ALL_GAMES);
         callback.runServerService(bundle);
         swipeLayout.setRefreshing(true);
+    }
+
+    @Override
+    public void toggleSwipeProgress(boolean b) {
+        if (swipeLayout != null) swipeLayout.setRefreshing(b);
     }
 }

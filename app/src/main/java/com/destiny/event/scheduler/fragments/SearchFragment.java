@@ -25,6 +25,7 @@ import com.destiny.event.scheduler.R;
 import com.destiny.event.scheduler.activities.DrawerActivity;
 import com.destiny.event.scheduler.adapters.GameAdapter;
 import com.destiny.event.scheduler.data.EventTypeTable;
+import com.destiny.event.scheduler.interfaces.SwipeListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener, UserDataListener, LoaderManager.LoaderCallbacks<Cursor>, SwipeListener {
 
     public static final String TAG = "SearchFragment";
 
@@ -285,5 +286,10 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void toggleSwipeProgress(boolean b) {
+        swipeLayout.setRefreshing(b);
     }
 }

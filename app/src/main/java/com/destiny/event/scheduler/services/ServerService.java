@@ -22,6 +22,7 @@ import com.destiny.event.scheduler.models.GameModel;
 import com.destiny.event.scheduler.models.MemberModel;
 import com.destiny.event.scheduler.models.NoticeModel;
 import com.destiny.event.scheduler.provider.DataProvider;
+import com.destiny.event.scheduler.utils.CipherUtils;
 import com.destiny.event.scheduler.utils.NetworkUtils;
 import com.destiny.event.scheduler.utils.StringUtils;
 
@@ -1088,6 +1089,14 @@ public class ServerService extends IntentService {
     private JSONObject createLoginJSON() throws JSONException {
         JSONObject jLogin = new JSONObject();
         jLogin.put("username", memberId);
+        CipherUtils cUtils = new CipherUtils();
+        try{
+            String pass = cUtils.encrypt(memberId);
+            Log.w(TAG, "password: " + pass);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
         jLogin.put("password", "password");
         return jLogin;
     }

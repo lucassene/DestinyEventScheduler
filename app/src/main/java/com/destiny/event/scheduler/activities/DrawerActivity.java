@@ -65,6 +65,7 @@ import com.destiny.event.scheduler.fragments.ValidateListFragment;
 import com.destiny.event.scheduler.interfaces.FromActivityListener;
 import com.destiny.event.scheduler.interfaces.FromDialogListener;
 import com.destiny.event.scheduler.interfaces.OnEventCreatedListener;
+import com.destiny.event.scheduler.interfaces.SwipeListener;
 import com.destiny.event.scheduler.interfaces.ToActivityListener;
 import com.destiny.event.scheduler.interfaces.UserDataListener;
 import com.destiny.event.scheduler.models.GameModel;
@@ -154,8 +155,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private String clanOrderBy;
 
     private int isNewScheduledOrValidated = GameModel.STATUS_NEW;
-    private boolean hasScheduledGames = true;
-    private boolean hasValidatedGames = true;
+    private boolean hasScheduledGames = false;
+    private boolean hasValidatedGames = false;
 
     ViewPager viewPager;
     ViewPagerAdapter viewPagerAdapter;
@@ -1359,6 +1360,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 bundle.putString("msg", getString(R.string.unable_update_clan));
                 bundle.putString("posButton", getString(R.string.got_it));
                 showAlertDialog(bundle);
+                hideSwipeProgress(false);
                 onDataLoaded();
                 break;
             case LocalService.STATUS_FINISHED:
@@ -1430,6 +1432,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         showAlertDialog(dialogBundle);
                         break;
                 }
+                hideSwipeProgress(false);
                 onDataLoaded();
                 break;
             case ServerService.STATUS_FINISHED:
@@ -1571,6 +1574,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             scheduledGameList = getGamesFromList(GameModel.STATUS_SCHEDULED);
                             if (scheduledGameList != null && scheduledEventsListener != null) {
                                 scheduledEventsListener.onGamesLoaded(scheduledGameList);
+                                hasScheduledGames = scheduledGameList.size() > 0;
                                 if (!isNotifyServiceRunning())
                                     updateNotifications(scheduledGameList);
                             } else Log.w(TAG, "scheduledGameList is null");
@@ -1578,6 +1582,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             doneGameList = getGamesFromList(GameModel.STATUS_DONE);
                             if (doneGameList != null && doneEventsListener != null) {
                                 doneEventsListener.onGamesLoaded(doneGameList);
+                                hasValidatedGames = doneGameList.size() > 0;
                             } else Log.w(TAG, "doneGameList is null");
 
                             searchGameList = getGamesFromList(GameModel.STATUS_NEW);
@@ -1606,6 +1611,22 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 }
                 onDataLoaded();
                 break;
+        }
+    }
+
+    private void hideSwipeProgress(boolean b) {
+        Fragment frag = getOpenedFragment();
+        SwipeListener sFrag;
+        if (frag == null){
+            for (int i=0;i<viewPagerAdapter.getCount();i++){
+                if (viewPagerAdapter.getItem(i) != null){
+                    sFrag = (SwipeListener) viewPagerAdapter.getItem(i);
+                    sFrag.toggleSwipeProgress(b);
+                }
+            }
+        } else if (frag instanceof SwipeListener){
+            sFrag = (SwipeListener) frag;
+            sFrag.toggleSwipeProgress(b);
         }
     }
 
