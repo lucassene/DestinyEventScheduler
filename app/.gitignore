@@ -7,6 +7,8 @@ out/
 .gradle/
 build/
 gradle.properties
+../keystore.properties
+app-release.apk
 
 # Local configuration file (sdk path, etc)
 local.properties

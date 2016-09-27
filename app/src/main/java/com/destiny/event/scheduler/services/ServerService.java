@@ -37,7 +37,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -523,9 +522,10 @@ public class ServerService extends IntentService {
                                     return error;
                                 case TYPE_LOGIN:
                                     String authKey = urlConnection.getHeaderField(AUTH_HEADER);
-                                    Log.w(TAG, "authKey: " + authKey);
+                                    //Log.w(TAG, "authKey: " + authKey);
+                                    CipherUtils cipher = new CipherUtils();
                                     SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                                    editor.putString(DrawerActivity.KEY_PREF, authKey);
+                                    editor.putString(DrawerActivity.KEY_PREF, cipher.encrypt(authKey));
                                     editor.apply();
                                     error = requestServer(receiver, bundle.getInt(REQUEST_TAG),bundle.getString(URL_TAG),bundle.getBundle(BUNDLE_TAG));
                                     return error;
@@ -910,7 +910,7 @@ public class ServerService extends IntentService {
     }
 
     @SuppressWarnings("unchecked")
-    private HttpURLConnection createMemberListRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
+    private HttpURLConnection createMemberListRequest(HttpURLConnection urlConnection, Bundle bundle) throws Exception {
         urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -931,7 +931,7 @@ public class ServerService extends IntentService {
         return urlConnection;
     }
 
-    private HttpURLConnection createExceptionRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
+    private HttpURLConnection createExceptionRequest(HttpURLConnection urlConnection, Bundle bundle) throws Exception {
         urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -945,7 +945,7 @@ public class ServerService extends IntentService {
         return urlConnection;
     }
 
-    private HttpURLConnection createGameRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
+    private HttpURLConnection createGameRequest(HttpURLConnection urlConnection, Bundle bundle) throws Exception {
         urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -959,7 +959,7 @@ public class ServerService extends IntentService {
         return urlConnection;
     }
 
-    private HttpURLConnection createValidateRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
+    private HttpURLConnection createValidateRequest(HttpURLConnection urlConnection, Bundle bundle) throws Exception {
         urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -975,7 +975,7 @@ public class ServerService extends IntentService {
         return urlConnection;
     }
 
-    private HttpURLConnection createEvaluationRequest(HttpURLConnection urlConnection, Bundle bundle) throws IOException, JSONException {
+    private HttpURLConnection createEvaluationRequest(HttpURLConnection urlConnection, Bundle bundle) throws Exception {
         urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -1011,13 +1011,16 @@ public class ServerService extends IntentService {
         return urlConnection;
     }
 
-    private HttpURLConnection getDefaultHeaders(HttpURLConnection urlConnection, String postMethod) throws ProtocolException {
+    private HttpURLConnection getDefaultHeaders(HttpURLConnection urlConnection, String postMethod) throws Exception {
         urlConnection.setRequestProperty(MEMBER_HEADER, memberId);
         urlConnection.setRequestProperty(PLATFORM_HEADER, String.valueOf(platformId));
         urlConnection.setRequestProperty(CLAN_HEADER, String.valueOf(clanId));
         urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
         String authKey = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getString(DrawerActivity.KEY_PREF,"");
-        urlConnection.setRequestProperty(AUTH_HEADER, authKey);
+        if (!authKey.isEmpty()){
+            CipherUtils cipher = new CipherUtils();
+            urlConnection.setRequestProperty(AUTH_HEADER, cipher.decrypt(authKey));
+        } else urlConnection.setRequestProperty(AUTH_HEADER, authKey);
         urlConnection.setRequestMethod(postMethod);
         return urlConnection;
     }
@@ -1089,15 +1092,16 @@ public class ServerService extends IntentService {
     private JSONObject createLoginJSON() throws JSONException {
         JSONObject jLogin = new JSONObject();
         jLogin.put("username", memberId);
+        String pass;
         CipherUtils cUtils = new CipherUtils();
         try{
-            String pass = cUtils.encrypt(memberId);
+            pass = cUtils.encrypt(memberId);
             Log.w(TAG, "password: " + pass);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        jLogin.put("password", "password");
+        jLogin.put("password", pass);
         return jLogin;
     }
 

@@ -41,7 +41,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -512,7 +511,7 @@ public class BungieService extends IntentService {
 
     }
 
-    private HttpURLConnection createLoginRequest(HttpURLConnection urlConnection) throws IOException, JSONException {
+    private HttpURLConnection createLoginRequest(HttpURLConnection urlConnection) throws Exception {
         urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
         urlConnection.setDoOutput(true);
         urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -531,25 +530,29 @@ public class BungieService extends IntentService {
     private JSONObject createLoginJSON() throws JSONException {
         JSONObject jLogin = new JSONObject();
         jLogin.put("username", membershipId);
+        String pass;
         CipherUtils cUtils = new CipherUtils();
         try{
-            String pass = cUtils.encrypt(membershipId);
+            pass = cUtils.encrypt(membershipId);
             Log.w(TAG, "password: " + pass);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        jLogin.put("password", "password");
+        jLogin.put("password", pass);
         return jLogin;
     }
 
-    private HttpURLConnection getDefaultHeaders(HttpURLConnection urlConnection, String method) throws ProtocolException {
+    private HttpURLConnection getDefaultHeaders(HttpURLConnection urlConnection, String method) throws Exception {
         urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
         urlConnection.setRequestProperty(CLAN_EXTRA, clanId);
         urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
         urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
         String authKey = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getString(DrawerActivity.KEY_PREF,"");
-        urlConnection.setRequestProperty(AUTH_HEADER, authKey);
+        if (!authKey.isEmpty()){
+            CipherUtils cipher = new CipherUtils();
+            urlConnection.setRequestProperty(AUTH_HEADER, cipher.decrypt(authKey));
+        } else urlConnection.setRequestProperty(AUTH_HEADER, authKey);
         urlConnection.setRequestMethod(method);
         return urlConnection;
     }
@@ -573,49 +576,13 @@ public class BungieService extends IntentService {
 
                 if (statusCode == 200) {
                     String authKey = urlConnection.getHeaderField("Authorization");
-                    Log.w(TAG, "authKey: " + authKey);
-
+                    //Log.w(TAG, "authKey: " + authKey);
+                    CipherUtils cipher = new CipherUtils();
                     SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                    editor.putString(DrawerActivity.KEY_PREF, authKey);
+                    editor.putString(DrawerActivity.KEY_PREF, cipher.encrypt(authKey));
                     editor.apply();
 
                     receiver.send(STATUS_VERIFY, Bundle.EMPTY);
-
-                    /*InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-                    String response = convertInputStreamToString(inputStream);
-
-                    if (response != null) {
-                        JSONObject jObject = new JSONObject(response);
-                        int userLikes = jObject.getInt("likes");
-                        int userDislikes = jObject.getInt("dislikes");
-                        int userCreated = jObject.getInt("gamesCreated");
-                        int userPlayed = jObject.getInt("gamesPlayed");
-                        String userTitle;
-                        if (jObject.isNull("memberTitle")){
-                            userTitle = getString(R.string.default_title);
-                        } else {
-                            JSONObject jTitle = jObject.getJSONObject("memberTitle");
-                            userTitle = jTitle.getString(getLanguageString());
-                        }
-
-                        MemberModel user = new MemberModel();
-                        user.setName(displayName);
-                        user.setMembershipId(membershipId);
-                        user.setClanId(clanId);
-                        user.setIconPath(userIconPath);
-                        user.setPlatformId(platformId);
-                        user.setLikes(userLikes);
-                        user.setDislikes(userDislikes);
-                        user.setGamesCreated(userCreated);
-                        user.setGamesPlayed(userPlayed);
-                        user.setTitle(userTitle);
-                        user.setInsert(true);
-
-                        Log.w(TAG, "User Title: " + user.getTitle());
-                        membersModelList.add(user);
-                        receiver.send(STATUS_VERIFY, Bundle.EMPTY);
-                        return NO_ERROR;
-                    } else { return ERROR_RESPONSE_CODE; }*/
                     return NO_ERROR;
                 } else {
                     Log.w(TAG, "Response Code do JSON diferente de 200 (Server Login)");

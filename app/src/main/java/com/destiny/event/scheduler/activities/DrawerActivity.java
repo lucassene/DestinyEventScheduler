@@ -136,6 +136,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private UserDataListener scheduledEventsListener;
     private UserDataListener doneEventsListener;
     private UserDataListener userDataListener;
+    private SwipeListener newSwipeListener;
+    private SwipeListener scheduledSwipeListener;
+    private SwipeListener doneSwipeListener;
 
     private FragmentManager fm;
     private Fragment openedFragment;
@@ -677,10 +680,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void registerUserDataListener(Fragment fragment) {
         if (fragment instanceof NewEventsListFragment) {
             newEventsListener = (UserDataListener) fragment;
+            newSwipeListener = (SwipeListener) fragment;
         } else if (fragment instanceof ScheduledListFragment) {
             scheduledEventsListener = (UserDataListener) fragment;
+            scheduledSwipeListener = (SwipeListener) fragment;
         } else if (fragment instanceof ValidateListFragment) {
             doneEventsListener = (UserDataListener) fragment;
+            doneSwipeListener = (SwipeListener) fragment;
         } else {
             userDataListener = (UserDataListener) fragment;
         }
@@ -690,10 +696,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public void deleteUserDataListener(Fragment fragment) {
         if (fragment instanceof NewEventsListFragment) {
             newEventsListener = null;
+            newSwipeListener = null;
         } else if (fragment instanceof ScheduledListFragment) {
             scheduledEventsListener = null;
+            scheduledSwipeListener = null;
         } else if (fragment instanceof ValidateListFragment) {
             doneEventsListener = null;
+            doneSwipeListener = null;
         } else {
             userDataListener = null;
         }
@@ -1321,6 +1330,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString(PrepareActivity.LEGEND_PREF, getString(R.string.vanguard_data));
+        editor.putString(KEY_PREF, "null");
         editor.apply();
 
         Intent intent = new Intent(this, LoginActivity.class);
@@ -1618,12 +1628,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Fragment frag = getOpenedFragment();
         SwipeListener sFrag;
         if (frag == null){
-            for (int i=0;i<viewPagerAdapter.getCount();i++){
-                if (viewPagerAdapter.getItem(i) != null){
-                    sFrag = (SwipeListener) viewPagerAdapter.getItem(i);
-                    sFrag.toggleSwipeProgress(b);
-                }
-            }
+            Log.w(TAG, "getOpenedFragment returned null");
+            if (newSwipeListener != null) newSwipeListener.toggleSwipeProgress(b);
+            if (scheduledSwipeListener != null) scheduledSwipeListener.toggleSwipeProgress(b);
+            if (doneSwipeListener != null) doneSwipeListener.toggleSwipeProgress(b);
         } else if (frag instanceof SwipeListener){
             sFrag = (SwipeListener) frag;
             sFrag.toggleSwipeProgress(b);
