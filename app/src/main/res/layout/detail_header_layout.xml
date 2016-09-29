@@ -25,7 +25,6 @@
             android:id="@+id/comment_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="O comentário do evento vai aqui."
             android:paddingBottom="@dimen/paddingBottomLabelText" />
 
     </LinearLayout>
@@ -37,15 +36,13 @@
         android:gravity="center_vertical"
         android:textSize="@dimen/secondaryTextSize"
         android:text="@string/date_time_section"
-        android:layout_below="@id/header"
         android:textColor="@color/psnColor"/>
 
     <LinearLayout
         android:id="@+id/linear_date"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/section_date">
+        android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="0dp"
@@ -60,7 +57,6 @@
             android:layout_weight="2"
             android:gravity="end"
             android:layout_height="wrap_content"
-            android:text="24/03/2016"
             android:textSize="@dimen/secondaryTextSize"/>
 
     </LinearLayout>
@@ -69,8 +65,7 @@
         android:id="@+id/linear_time"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/linear_date">
+        android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="0dp"
@@ -85,7 +80,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="end"
-            android:text="11:38"
             android:textSize="@dimen/secondaryTextSize"/>
 
     </LinearLayout>
@@ -98,7 +92,6 @@
         android:gravity="center_vertical"
         android:textSize="@dimen/secondaryTextSize"
         android:text="@string/specs"
-        android:layout_below="@id/linear_time"
         android:textColor="@color/psnColor"
         android:layout_marginTop="8dp"/>
 
@@ -106,8 +99,7 @@
         android:id="@+id/linear_light"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/section_specs">
+        android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="0dp"
@@ -122,7 +114,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
-            android:text="240"
             android:textSize="@dimen/secondaryTextSize"/>
 
     </LinearLayout>
@@ -131,8 +122,7 @@
         android:id="@+id/linear_guardians"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/linear_light">
+        android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="0dp"
@@ -147,7 +137,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
-            android:text="3 of 6"
             android:textSize="@dimen/secondaryTextSize"/>
 
     </LinearLayout>
@@ -160,7 +149,6 @@
         android:gravity="center_vertical"
         android:textSize="@dimen/secondaryTextSize"
         android:text="@string/guardians"
-        android:layout_below="@id/linear_guardians"
         android:textColor="@color/psnColor"
         android:layout_marginTop="8dp"/>
 

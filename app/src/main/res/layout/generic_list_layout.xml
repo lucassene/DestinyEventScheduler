@@ -18,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingRight="@dimen/global_padding"
+        android:paddingEnd="@dimen/global_padding"
         android:divider="@android:color/transparent"
         android:dividerHeight="8dp"
         android:scrollbarStyle="outsideOverlay"/>

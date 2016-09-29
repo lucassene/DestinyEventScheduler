@@ -53,13 +53,13 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"/>
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/members"/>
 
             <TextView
                 android:id="@+id/total_members"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="99"
                 android:layout_toLeftOf="@id/members_icon"
                 android:layout_toStartOf="@id/members_icon"
                 android:layout_centerVertical="true"/>

@@ -18,7 +18,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_centerVertical="true"
-            android:padding="8dp"/>
+            android:padding="8dp"
+            android:contentDescription="@string/event_icon"/>
 
         <TextView
             android:id="@+id/primary_text"
@@ -29,6 +30,7 @@
             android:paddingStart="@dimen/primaryTextLeftPadding"
             android:textSize="18sp"
             android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:maxLines="1"
             android:ellipsize="end"/>
 

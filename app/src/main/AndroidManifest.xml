@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.destiny.event.scheduler">
+    package="com.app.the.bunker">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -13,87 +13,86 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/DestinyApp"
-        android:name=".DestinyApplication">
+        android:name="com.app.the.bunker.DestinyApplication">
         <activity
-            android:name="com.destiny.event.scheduler.activities.LoginActivity">
+            android:name="com.app.the.bunker.activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.destiny.event.scheduler.activities.WebActivity"
+            android:name="com.app.the.bunker.activities.WebActivity"
             android:noHistory="true"
             android:theme="@android:style/Theme.Holo.Dialog.NoActionBar" />
-        <activity android:name=".activities.NoticeActivity"
+        <activity android:name="com.app.the.bunker.activities.NoticeActivity"
             android:noHistory="true"/>
         <activity
-            android:name="com.destiny.event.scheduler.activities.DrawerActivity"
+            android:name="com.app.the.bunker.activities.DrawerActivity"
             android:launchMode="singleTop">
         </activity>
         <activity
-            android:name="com.destiny.event.scheduler.activities.PrepareActivity"
+            android:name="com.app.the.bunker.activities.PrepareActivity"
             android:noHistory="true">
         </activity>
         
         <provider
-            android:authorities="com.destiny.event.scheduler.provider"
-            android:name=".provider.DataProvider"
+            android:authorities="com.app.the.bunker.provider"
+            android:name="com.app.the.bunker.provider.DataProvider"
             android:exported="false">
         </provider>
 
-        <service android:name=".services.BungieService"
+        <service android:name="com.app.the.bunker.services.BungieService"
             android:exported="false">
         </service>
 
-        <service android:name=".services.ServerService"
+        <service android:name="com.app.the.bunker.services.ServerService"
             android:exported="false">
         </service>
         
-        <service android:name=".services.NotificationService"
+        <service android:name="com.app.the.bunker.services.NotificationService"
             android:enabled="true">
         </service>
 
-        <service android:name=".services.AlarmService"
+        <service android:name="com.app.the.bunker.services.AlarmService"
             android:exported="false"
             android:enabled="true">
         </service>
 
-        <service android:name=".services.UpdateNotificationsService"
+        <service android:name="com.app.the.bunker.services.UpdateNotificationsService"
             android:exported="false"
             android:enabled="true">
         </service>
         
-        <receiver android:name=".services.AlarmReceiver">
+        <receiver android:name="com.app.the.bunker.services.AlarmReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
 
         </receiver>
 
-        <receiver android:name=".services.NetworkReceiver">
+        <receiver android:name="com.app.the.bunker.services.NetworkReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
 
-        <service android:name="com.destiny.event.scheduler.services.DownloadService"
+        <service android:name="com.app.the.bunker.services.DownloadService"
             android:exported="false"
             android:enabled="true">
         </service>
 
-        <service android:name=".services.LocalService"
+        <service android:name="com.app.the.bunker.services.LocalService"
             android:exported="false"
             android:enabled="true">
         </service>
 
-        <service android:name=".services.CreateNotificationService"
+        <service android:name="com.app.the.bunker.services.CreateNotificationService"
             android:exported="false"
             android:enabled="true">
         </service>
 
-        <service android:name=".services.NewGameNotificationService"
+        <service android:name="com.app.the.bunker.services.NewGameNotificationService"
             android:exported="false"
             android:enabled="true">
         </service>

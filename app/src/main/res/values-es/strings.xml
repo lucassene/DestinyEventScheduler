@@ -31,7 +31,7 @@
     <string name="deleting_match_dialog_msg"> Este evento ya no estará disponible para cualquier persona después de esto.</string>
     <string name="developers">Desarrolladores</string>
     <string name="dislikes">No me gusta</string>
-    <string name="empty_new_events"> There is no new events to play right now.  No hay nuevos eventos para jugar en este momento.</string>
+    <string name="empty_new_events">No hay nuevos eventos para jugar en este momento.</string>
     <string name="empty_scheduled_list">Usted no tiene ningún evento programado.</string>
     <string name="empty_validate_event">Usted no tiene ningún evento para evaluar o validar.</string>
     <string name="enter_value"> Por favor, introduzca el valor deseado:</string>
@@ -58,7 +58,7 @@
     <string name="guardians">Guardianes</string>
     <string name="help"><![CDATA[Ayuda & Más]]></string>
     <string name="history">HISTORIA</string>
-    <string name="home_title">Principal</string>
+    <string name="home_title">PRINCIPAL</string>
     <string name="hour">" hora"</string>
     <string name="hours">" horas"</string>
     <string name="interval">Interval de verificación</string>
@@ -66,20 +66,20 @@
     <string name="join_dialog_msg">Usted será añadido a este evento.</string>
     <string name="join_dialog_title">Unirse, sí?</string>
     <string name="join_full_dialog_msg">Este evento está ya lleno, que se añadirá a la lista de espera.</string>
-    <string name="just_warning">Sólo un aviso ...</string>
+    <string name="just_warning">Sólo un aviso …</string>
     <string name="leave">Salir</string>
     <string name="leave_dialog_msg">Usted ya no participará en este evento después de esto.</string>
     <string name="leave_game_title">Dejar este evento?</string>
     <string name="leaving">¿Te vas guardián?</string>
     <string name="likes">Gusto</string>
-    <string name="match_begin">Su partido comenzará ...</string>
+    <string name="match_begin">Su partido comenzará …</string>
     <string name="match_must_created">El evento debe ser creado con al menos</string>
     <string name="matches">Eventos</string>
     <string name="matches_played">Eventos jugados</string>
     <string name="members">Miembros</string>
     <string name="menu_new_event">Nuevo evento</string>
-    <string name="min_light">Mínimo de luz</string>
-    <string name="min_light_label">Mínimo de luz</string>
+    <string name="min_light">Luz recomendada</string>
+    <string name="min_light_label">Luz recomendada</string>
     <string name="minute">" minuto"</string>
     <string name="minutes">" minutos"</string>
     <string name="minutes_advance">minutos de antelación</string>
@@ -132,7 +132,7 @@
     <string name="save">Salvar</string>
     <string name="scheduled_games">Eventos programados</string>
     <string name="scheduled_notify_text">Notifica eventos que se unió</string>
-    <string name="search_empty_list">Parece que nadie quiere jugar a este tipo de juego ...</string>
+    <string name="search_empty_list">Parece que nadie quiere jugar a este tipo de juego …</string>
     <string name="search_title">BÚSQUEDA</string>
     <string name="server_error_msg">Error de conexión con el servidor. Por favor, inténtelo de nuevo más tarde.</string>
     <string name="server_side">Servidor</string>
@@ -145,7 +145,7 @@
     <string name="tx_login">Bienvenido Guardián! ¿Cuál es el código secreto?</string>
     <string name="type">Tipo</string>
     <string name="unable_update_clan">No se puede actualizar los datos del clan ahora. Por favor, inténtelo de nuevo más tarde.</string>
-    <string name="uncheck_match_not_happened">Desmarque si este evento no ocurrió</string>
+    <string name="uncheck_match_not_happened">Deseleccionar si este evento no ocurrió</string>
     <string name="unknown">Desconocido</string>
     <string name="update">ACTUALIZAR AHORA</string>
     <string name="update_later">ACTUALIZAR DESPUÉS</string>
@@ -163,7 +163,7 @@
     <string name="waiting_data">EN ESPERA DE DATOS</string>
     <string name="waiting_validation">En espera de la validación</string>
     <string name="when_play">¿Cuándo quieres jugar?</string>
-    <string name="will_begin_soon">" comenzará pronto ..."</string>
+    <string name="will_begin_soon">" comenzará pronto …"</string>
     <string name="xp">EXP</string>
     <string name="your_match_of">"Su partido de "</string>
     <string name="no_event_msg">No se pudo crear este evento. Por favor, actualice esta aplicación.</string>
@@ -362,8 +362,24 @@
     <string name="validating_msg_button">VALIDANDO</string>
     <string name="other">Otro</string>
     <string name="patreon">Patreon</string>
-    <string name="support">Apoye a Destiny Scheduler</string>
+    <string name="support">Apoye a El Bunker</string>
     <string name="all">Todos</string>
+    <string name="back">Regreso</string>
+    <string name="clan_banner">Bandera del clan</string>
+    <string name="clan_logo">Logotipo del clan</string>
+    <string name="column_color">Columna Color</string>
+    <string name="event_icon">Icono de evento</string>
+    <string name="five_stars">Cinco estrellas</string>
+    <string name="four_stars">Cuatro estrellas</string>
+    <string name="medal_icon">Icono de la medalla</string>
+    <string name="member_avatar">Avatar de miembro</string>
+    <string name="one_star">Una estrella</string>
+    <string name="rate">Evaluación</string>
+    <string name="three_stars">Tres estrellas</string>
+    <string name="two_stars">Dos estrellas</string>
+    <string name="type_icon">Icono de tipo</string>
+    <string name="app_name">El Bunker</string>
+    <string name="app_logo">El Bunker logotipo</string>
 
 
 </resources>

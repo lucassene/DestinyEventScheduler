@@ -159,7 +159,7 @@
 
     <string name="refresh_lists">Atualizar listas</string>
     <string name="game_type_label">Tipo de jogo</string>
-    <string name="min_light_label">Luz mínima</string>
+    <string name="min_light_label">Luz recomendada</string>
     <string name="new_event_button">CRIAR EVENTO</string>
     <string name="new_event_title">CRIAR EVENTO</string>
     <string name="validate_event_title">VALIDAÇÃO</string>
@@ -169,7 +169,7 @@
     <string name="date_time_section">Dia e horário</string>
     <string name="guardians">Guardiões</string>
     <string name="join">Participar</string>
-    <string name="min_light">Luz mínima</string>
+    <string name="min_light">Luz recomendada</string>
     <string name="participants_guardians">Guardiões inscritos</string>
     <string name="specs">Especificações</string>
     <string name="time">Horário</string>
@@ -199,7 +199,7 @@
     <string name="nevermind">Cancelar</string>
     <string name="event_details">DETALHES</string>
     <string name="of">de</string>
-    <string name="search_empty_list">Parece que ninguém quer jogar esse tipo de jogo...</string>
+    <string name="search_empty_list">Parece que ninguém quer jogar esse tipo de jogo…</string>
     <string name="delete">Excluir</string>
     <string name="evaluate">Avaliar</string>
     <string name="validate">Validar</string>
@@ -215,7 +215,7 @@
     <string name="leave_game_title">Deixar evento?</string>
     <string name="join_full_dialog_msg">Esse evento já está cheio, você será adicionado à lista de espera;</string>
     <string name="game_label">Jogo</string>
-    <string name="will_begin_soon">" vai começar em breve..."</string>
+    <string name="will_begin_soon">" vai começar em breve…"</string>
     <string name="your_match_of">"Sua partida de "</string>
     <string name="matches">Eventos</string>
     <string name="confirm_match">Confirmar evento</string>
@@ -258,7 +258,7 @@
     <string name="bungie_net_error_msg">Resposta incorreta de bungie.net. Por favor, tente novamente mais tarde.</string>
     <string name="error">Erro</string>
     <string name="got_it">Entendi</string>
-    <string name="just_warning">Só um aviso ...</string>
+    <string name="just_warning">Só um aviso …</string>
     <string name="no_connection_msg">Nenhuma conexão encontrada. Por favor conecte-se à internet ou tente novamente mais tarde.</string>
     <string name="no_icon_msg">Por motivo de segurança, alguns guardiões optam por não mostrar seus rosto. Para esses, usaremos uma foto padrão, ok?</string>
     <string name="problem_bungie_net">Problema ao conectar com Bungie.net</string>
@@ -279,7 +279,7 @@
     <string name="no_clan_title">Você saiu do clã?</string>
     <string name="no_clan_login_msg">Por favor verifique se você ainda está no clã através do site da bungie.net.</string>
     <string name="event_begin_in">"Seu evento irá começar em "</string>
-    <string name="match_begin">O evento irá começar...</string>
+    <string name="match_begin">O evento irá começar…</string>
     <string name="minutes">" minutos"</string>
     <string name="check_connection">Por favor cheque sua conexao com a internet.</string>
     <string name="history">HISTÓRICO</string>
@@ -324,7 +324,23 @@
     <string name="validating_msg_button">VALIDANDO</string>
     <string name="other">Outros</string>
     <string name="patreon">Patreon</string>
-    <string name="support">Apoie o Destiny Scheduler</string>
+    <string name="support">Apoie O Bunker</string>
     <string name="all">Todos</string>
+    <string name="back">Voltar</string>
+    <string name="clan_logo">Logo do clã</string>
+    <string name="clan_banner">Bandeira do clã</string>
+    <string name="column_color">Coluna Cor</string>
+    <string name="event_icon">Ícone do evento</string>
+    <string name="five_stars">Cinco estrelas</string>
+    <string name="four_stars">Quatro estrelas</string>
+    <string name="medal_icon">Ícone da medalha</string>
+    <string name="member_avatar">Avatar do membro</string>
+    <string name="one_star">Uma estrela</string>
+    <string name="rate">Avaliação</string>
+    <string name="three_stars">Três estrelas</string>
+    <string name="two_stars">Duas estrelas</string>
+    <string name="type_icon">Ícone do tipo</string>
+    <string name="app_name">O Bunker</string>
+    <string name="app_logo">O Bunker logo</string>
 
 </resources>

@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/drawer_layout"
-    android:elevation="7dp"
     android:background="@drawable/app_bg">
 
     <LinearLayout
@@ -20,18 +19,18 @@
             android:layout_height="wrap_content"
             android:id="@+id/content_frame"
             android:paddingBottom="@dimen/global_padding"
-            android:paddingLeft="@dimen/global_padding">
+            android:paddingLeft="@dimen/global_padding"
+            android:paddingStart="@dimen/global_padding">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <com.destiny.event.scheduler.views.SlidingTabLayout
+                <com.app.the.bunker.views.SlidingTabLayout
                     android:id="@+id/sliding_tab"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="2dp" />
+                    android:layout_height="wrap_content" />
 
                 <android.support.v4.view.ViewPager
                     android:id="@+id/content_view"
@@ -43,9 +42,10 @@
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
+                android:layout_gravity="bottom|end"
                 android:layout_marginBottom="5dp"
-                android:layout_marginRight="16dp">
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp">
 
                 <ProgressBar
                     android:id="@+id/progress_bar"

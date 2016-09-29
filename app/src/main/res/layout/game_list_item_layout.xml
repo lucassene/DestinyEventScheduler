@@ -20,13 +20,17 @@
         android:layout_gravity="center_vertical"
         android:layout_centerVertical="true"
         android:layout_marginRight="8dp"
-        android:layout_marginLeft="8dp" />
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/event_icon"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingRight="8dp"
+        android:paddingEnd="8dp"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/game_image"
         android:layout_toEndOf="@+id/game_image">

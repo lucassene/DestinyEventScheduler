@@ -17,7 +17,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:padding="8dp" />
+            android:padding="8dp"
+            android:contentDescription="@string/medal_icon"/>
 
         <LinearLayout
             android:id="@+id/names_layout"
@@ -25,6 +26,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_toRightOf="@id/medal_img"
+            android:layout_toEndOf="@id/medal_img"
             android:layout_centerVertical="true">
 
             <LinearLayout
@@ -40,8 +42,10 @@
                     android:textSize="16sp"
                     android:layout_gravity="center_vertical"
                     android:lines="1"
-                    android:inputType="text"
-                    android:paddingRight="4dp"/>
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:paddingRight="4dp"
+                    android:paddingEnd="4dp"/>
 
                 <LinearLayout
                     android:id="@+id/stars_layout"
@@ -50,42 +54,48 @@
                     android:layout_weight="3"
                     android:orientation="horizontal"
                     android:paddingRight="8dp"
-                    android:gravity="right">
+                    android:paddingEnd="8dp"
+                    android:gravity="end">
 
                     <ImageView
                         android:id="@+id/star5"
                         android:layout_width="21dp"
                         android:layout_height="21dp"
                         android:src="@drawable/ic_star"
-                        android:alpha="0.1"/>
+                        android:alpha="0.1"
+                        android:contentDescription="@string/one_star"/>
 
                     <ImageView
                         android:id="@+id/star4"
                         android:layout_width="21dp"
                         android:layout_height="21dp"
                         android:src="@drawable/ic_star"
-                        android:alpha="0.1"/>
+                        android:alpha="0.1"
+                        android:contentDescription="@string/two_stars"/>
 
                     <ImageView
                         android:id="@+id/star3"
                         android:layout_width="21dp"
                         android:layout_height="21dp"
                         android:src="@drawable/ic_star"
-                        android:alpha="0.1"/>
+                        android:alpha="0.1"
+                        android:contentDescription="@string/three_stars"/>
 
                     <ImageView
                         android:id="@+id/star2"
                         android:layout_width="21dp"
                         android:layout_height="21dp"
                         android:src="@drawable/ic_star"
-                        android:alpha="0.1"/>
+                        android:alpha="0.1"
+                        android:contentDescription="@string/four_stars"/>
 
                     <ImageView
                         android:id="@+id/star1"
                         android:layout_width="21dp"
                         android:layout_height="21dp"
                         android:src="@drawable/ic_star"
-                        android:alpha="0.1"/>
+                        android:alpha="0.1"
+                        android:contentDescription="@string/five_stars"/>
 
                 </LinearLayout>
 
@@ -104,18 +114,22 @@
                     android:alpha="0.6"
                     android:textSize="14sp"
                     android:lines="1"
-                    android:inputType="text"
-                    android:paddingRight="4dp" />
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:paddingRight="4dp"
+                    android:paddingEnd="4dp"/>
 
                 <TextView
                     android:id="@+id/terciary_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="right"
+                    android:gravity="end"
                     android:paddingRight="8dp"
+                    android:paddingEnd="8dp"
                     android:lines="1"
-                    android:inputType="text"/>
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
             </LinearLayout>
 

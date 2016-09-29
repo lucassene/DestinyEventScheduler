@@ -15,7 +15,8 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingRight="@dimen/global_padding">
+                android:paddingRight="@dimen/global_padding"
+                android:paddingEnd="@dimen/global_padding">
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -53,7 +54,7 @@
 
             </LinearLayout>
 
-            <com.destiny.event.scheduler.views.CustomSwipeLayout
+            <com.app.the.bunker.views.CustomSwipeLayout
                 android:id="@+id/swipe_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,6 +74,7 @@
                         android:layout_gravity="center_horizontal"
                         android:scrollbarStyle="outsideOverlay"
                         android:paddingRight="@dimen/global_padding"
+                        android:paddingEnd="@dimen/global_padding"
                         android:footerDividersEnabled="false"
                         android:divider="@android:color/transparent"
                         android:dividerHeight="8dp"/>
@@ -87,7 +89,7 @@
 
                 </FrameLayout>
 
-            </com.destiny.event.scheduler.views.CustomSwipeLayout>
+            </com.app.the.bunker.views.CustomSwipeLayout>
 
         </RelativeLayout>
 

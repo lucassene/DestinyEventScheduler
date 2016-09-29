@@ -34,8 +34,10 @@
             android:scaleType="fitStart"
             android:layout_margin="6.5dp"
             android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:layout_gravity="center_vertical"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/member_avatar"/>
 
         <LinearLayout
             android:id="@+id/text_layout"
@@ -43,7 +45,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/profile_pic"
+            android:layout_toEndOf="@id/profile_pic"
             android:paddingLeft="5dp"
+            android:paddingStart="5dp"
             android:layout_centerVertical="true">
 
             <TextView
@@ -66,10 +70,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:orientation="vertical"
             android:paddingRight="8dp"
+            android:paddingEnd="8dp"
             android:layout_centerVertical="true">
-
 
             <TextView
                 android:id="@+id/text_points"

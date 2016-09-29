@@ -1,4 +1,4 @@
-package com.destiny.event.scheduler;
+package com.app.the.bunker;
 
 import org.junit.Test;
 

@@ -2,7 +2,7 @@
 <resources>
     <string name="psn" translatable="false">PSN</string>
     <string name="live" translatable="false">LIVE</string>
-    <string name="app_name" translatable="false">Destiny Scheduler</string>
+    <string name="app_name" >The Bunker</string>
     <string name="default_url" translatable="false">https://www.bungie.net</string>
     <string name="default_img_desc">Icon</string>
     <string name="open_menu">Open menu</string>
@@ -57,7 +57,7 @@
     <string name="refresh_lists">Refresh lists</string>
     <string name="game_type_label">Game type</string>
     <string name="game_label">Game</string>
-    <string name="min_light_label">Min light</string>
+    <string name="min_light_label">Recommended light</string>
     <string name="new_event_button">CREATE EVENT</string>
     <string name="validate_event_title">VALIDATION</string>
     <string name="search_title">SEARCH</string>
@@ -65,7 +65,7 @@
     <string name="date">Date</string>
     <string name="time">Time</string>
     <string name="specs">Specs</string>
-    <string name="min_light">Min light</string>
+    <string name="min_light">Recommended light</string>
     <string name="guardians">Guardians</string>
     <string name="join">Join</string>
     <string name="participants_guardians">Enrolled guardians</string>
@@ -243,7 +243,7 @@
     <string name="nevermind">Cancel</string>
     <string name="event_details">DETAILS</string>
     <string name="of">of</string>
-    <string name="search_empty_list">Looks like no one wants to play this kind of game...</string>
+    <string name="search_empty_list">Looks like no one wants to play this kind of game…</string>
     <string name="delete">Delete</string>
     <string name="validate">Validate</string>
     <string name="waiting_validation">Waiting for validation</string>
@@ -260,7 +260,7 @@
     <string name="join_full_dialog_msg">This event is already full, you will be added to the waiting list. </string>
     <string name="wait_list">Wait list</string>
     <string name="your_match_of">"Your match of "</string>
-    <string name="will_begin_soon">" will begin soon..."</string>
+    <string name="will_begin_soon">" will begin soon…"</string>
     <string name="matches">Events</string>
     <string name="confirm_match">Confirm event</string>
     <string name="uncheck_match_not_happened">Uncheck if this event did not happen</string>
@@ -275,7 +275,7 @@
     <string name="at">" at "</string>
     <string name="evaluate_match">Evaluate event</string>
     <string name="matches_played">Events played</string>
-    <string name="email" translatable="false">lsgrandchamp@gmail.com</string>
+    <string name="email" translatable="false">thebunker.contact@gmail.com</string>
     <string name="contact">Contact</string>
     <string name="version">Version</string>
     <string name="about">ABOUT</string>
@@ -301,7 +301,7 @@
     <string name="played">Played</string>
     <string name="value">Value</string>
     <string name="problem_bungie_net">Problem connecting to Bungie.net</string>
-    <string name="just_warning">Just a warning ...</string>
+    <string name="just_warning">Just a warning …</string>
     <string name="no_icon_msg">For security reasons, some guardians choose not to show their face. For these, we will use a default photo, okay?</string>
     <string name="got_it">Got it</string>
     <string name="error">Error</string>
@@ -328,7 +328,7 @@
     <string name="confirm_evaluation">Confirm evaluation?</string>
     <string name="no_clan_title">Have you left the clan?</string>
     <string name="no_clan_login_msg">Please make sure you are still in the clan through bungie.net website.</string>
-    <string name="match_begin">Your match will begin...</string>
+    <string name="match_begin">Your match will begin…</string>
     <string name="event_begin_in">"Your event will begin in "</string>
     <string name="minutes">" minutes"</string>
     <string name="check_connection">Please check your internet connection.</string>
@@ -361,7 +361,7 @@
     <string name="for_evaluation">For evaluate</string>
     <string name="help"><![CDATA[Help & More]]></string>
     <string name="visit_website">Visit our website to know more</string>
-    <string name="website" translatable="false">http://destinyscheduler.wordpress.com/</string>
+    <string name="website" translatable="false">http://thebunkerapp.wordpress.com/</string>
     <string name="unknown">Unknown</string>
     <string name="close_app">CLOSE APP</string>
     <string name="update">UPDATE NOW</string>
@@ -377,10 +377,27 @@
     <string name="validating_msg_button">VALIDATING</string>
     <string name="evaluating_msg_button">EVALUATING</string>
     <string name="patreon">Patreon</string>
-    <string name="support">Support Destiny Scheduler</string>
+    <string name="support">Support The Bunker</string>
     <string name="other">Other</string>
-    <string name="patreon_website" translatable="false">https://www.patreon.com/destinyscheduler</string>
+    <string name="patreon_website" translatable="false">https://www.patreon.com/thebunker</string>
     <string name="all">All</string>
+    <string name="member_avatar">Member avatar</string>
+    <string name="clan_banner">Clan banner</string>
+    <string name="back">Back</string>
+    <string name="app_logo">The Bunker logo</string>
+    <string name="event_icon">Event icon</string>
+    <string name="medal_icon">Medal icon</string>
+    <string name="column_color">Column Color</string>
+    <string name="percent" translatable="false">%</string>
+    <string name="clan_logo">Clan logo</string>
+    <string name="rate">Rate</string>
+    <string name="type_icon">Type icon</string>
+    <string name="chart_count" translatable="false">60</string>
+    <string name="one_star">One star</string>
+    <string name="two_stars">Two stars</string>
+    <string name="three_stars">Three stars</string>
+    <string name="four_stars">Four stars</string>
+    <string name="five_stars">Five stars</string>
 
 
 </resources>

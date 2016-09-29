@@ -26,13 +26,15 @@
             android:scaleType="fitStart"
             android:layout_margin="6dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/member_avatar"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="center_vertical">
+            android:layout_gravity="center_vertical"
+            android:baselineAligned="false">
 
             <LinearLayout
                 android:id="@+id/text_layout"
@@ -93,7 +95,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_like"
-                        android:tint="@color/lineColor" />
+                        android:tint="@color/lineColor"
+                        android:contentDescription="@string/likes"/>
 
                 </LinearLayout>
 
@@ -114,7 +117,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_dislike"
-                        android:alpha="0.75"/>
+                        android:alpha="0.75"
+                        android:contentDescription="@string/dislikes"/>
 
                 </LinearLayout>
 

@@ -6,6 +6,7 @@
     android:id="@+id/new_event_fragment"
     android:scrollbarStyle="outsideOverlay"
     android:paddingRight="@dimen/global_padding"
+    android:paddingEnd="@dimen/global_padding"
     android:paddingTop="@dimen/global_padding">
 
     <LinearLayout
@@ -56,7 +57,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_centerVertical="true"/>
+                        android:layout_centerVertical="true"
+                        android:contentDescription="@string/type_icon"/>
 
                     <TextView
                         android:id="@+id/type_text"
@@ -100,14 +102,16 @@
                     android:focusable="true"
                     android:clickable="true"
                     android:background="?android:attr/selectableItemBackground"
-                    android:paddingLeft="8dp">
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp">
 
                     <ImageView
                         android:id="@+id/game_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_centerVertical="true"/>
+                        android:layout_centerVertical="true"
+                        android:contentDescription="@string/event_icon"/>
 
                     <TextView
                         android:id="@+id/game_text"
@@ -137,7 +141,8 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/listItemHeight">
+            android:layout_height="@dimen/listItemHeight"
+            android:baselineAligned="false">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
@@ -214,7 +219,6 @@
                     android:layout_width="0dp"
                     android:layout_height="@dimen/listItemHeight"
                     android:layout_weight="1"
-                    android:text="200"
                     android:alpha="0.60"
                     android:gravity="center"
                     android:id="@+id/light_min_text"
@@ -245,14 +249,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:maxLength="70"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                android:inputType="text"
+                android:hint="@string/comment"/>
 
             <TextView
                 android:id="@+id/char_count"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="60"
+                android:text="@string/chart_count"
                 android:alpha="0.60"
                 android:gravity="center"/>
 

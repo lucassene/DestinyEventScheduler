@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:scrollbarStyle="outsideOverlay">
 
-    <com.destiny.event.scheduler.views.CustomSwipeLayout
+    <com.app.the.bunker.views.CustomSwipeLayout
         android:id="@+id/swipe_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -23,6 +23,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:paddingRight="@dimen/global_padding"
+                android:paddingEnd="@dimen/global_padding"
                 android:scrollbarStyle="outsideOverlay"
                 android:footerDividersEnabled="false"
                 android:divider="@android:color/transparent"
@@ -35,10 +36,11 @@
                 android:text="@string/my_clan_empty"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:paddingRight="@dimen/global_padding"/>
+                android:paddingRight="@dimen/global_padding"
+                android:paddingEnd="@dimen/global_padding"/>
 
         </FrameLayout>
 
-    </com.destiny.event.scheduler.views.CustomSwipeLayout>
+    </com.app.the.bunker.views.CustomSwipeLayout>
 
 </LinearLayout>

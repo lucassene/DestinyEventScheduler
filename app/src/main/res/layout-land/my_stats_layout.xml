@@ -23,7 +23,9 @@
                 android:layout_width="59dp"
                 android:layout_height="match_parent"
                 android:scaleType="fitStart"
-                android:layout_marginLeft="5dp" />
+                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
+                android:contentDescription="@string/member_avatar"/>
 
             <ProgressBar
                 android:id="@+id/progress_bar"
@@ -32,7 +34,8 @@
                 android:indeterminate="false"
                 style="@android:style/Widget.Holo.ProgressBar.Horizontal"
                 android:layout_alignParentBottom="true"
-                android:layout_alignLeft="@id/profile_pic"/>
+                android:layout_alignLeft="@id/profile_pic"
+                android:layout_alignStart="@id/profile_pic"/>
 
             <LinearLayout
                 android:id="@+id/profile_text"
@@ -40,8 +43,10 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_toRightOf="@id/profile_pic"
+                android:layout_toEndOf="@id/profile_pic"
                 android:layout_alignTop="@id/profile_pic"
-                android:paddingLeft="8dp">
+                android:paddingLeft="8dp"
+                android:paddingStart="8dp">
 
                 <TextView
                     android:id="@+id/primary_text"
@@ -62,6 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_alignTop="@id/profile_pic"
                 android:textSize="46sp"
                 android:textColor="@android:color/white"
@@ -97,7 +103,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
 
                     <FrameLayout
                         android:layout_width="0dp"
@@ -155,7 +162,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="%"
+                                android:text="@string/percent"
                                 android:gravity="center_horizontal"/>
 
                         </LinearLayout>
@@ -198,7 +205,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
 
                     <FrameLayout
                         android:layout_width="0dp"
@@ -256,7 +264,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="%"
+                                android:text="@string/percent"
                                 android:gravity="center_horizontal"/>
 
                         </LinearLayout>
@@ -273,14 +281,6 @@
                     </LinearLayout>
 
                 </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
 
             </LinearLayout>
 
@@ -301,7 +301,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:baselineAligned="false">
 
                 <FrameLayout
                     android:layout_width="0dp"
@@ -359,7 +360,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="%"
+                            android:text="@string/percent"
                             android:gravity="center_horizontal"/>
 
                     </LinearLayout>
@@ -418,7 +419,8 @@
                     android:scaleType="fitStart"
                     android:gravity="center"
                     android:layout_centerVertical="true"
-                    android:layout_margin="6dp"/>
+                    android:layout_margin="6dp"
+                    android:contentDescription="@string/event_icon"/>
 
                 <LinearLayout
                     android:id="@+id/fav_text_layout"
@@ -426,7 +428,9 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
                     android:layout_toRightOf="@id/game_icon"
+                    android:layout_toEndOf="@id/game_icon"
                     android:layout_alignTop="@id/game_icon">
 
                     <TextView
@@ -448,6 +452,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:layout_alignBottom="@id/fav_text_layout">
 
                     <TextView
