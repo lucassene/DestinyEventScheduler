@@ -148,6 +148,7 @@ public class BungieService extends IntentService {
 
     public BungieService() {
         super(BungieService.class.getName());
+        setIntentRedelivery(true);
     }
 
     @Override
@@ -230,9 +231,7 @@ public class BungieService extends IntentService {
                 error = ERROR_INCORRECT_REQUEST;
                 sendError(receiver);
         }
-
         this.stopSelf();
-
     }
 
     private int getDBTypesCount() {
@@ -368,7 +367,7 @@ public class BungieService extends IntentService {
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(RUNNING_SERVICE, true);
         editor.apply();
-        Log.w(TAG, "Service running!");
+        Log.w(TAG, "BungieService running!");
     }
 
     @Override
@@ -378,7 +377,7 @@ public class BungieService extends IntentService {
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(RUNNING_SERVICE, false);
         editor.apply();
-        Log.w(TAG, "Service destroyed!");
+        Log.w(TAG, "BungieService destroyed!");
     }
 
     private void sendError(ResultReceiver receiver) {
@@ -1047,6 +1046,7 @@ public class BungieService extends IntentService {
         if (uri != null){
             SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
             editor.putInt(DrawerActivity.TYPE_PREF,getDBTypesCount());
+            editor.putBoolean(String.valueOf(eventType.getTypeId()),true);
             editor.apply();
         }
         values.clear();

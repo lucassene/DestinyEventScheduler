@@ -90,12 +90,12 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
         TextView title = (TextView) view.findViewById(R.id.secondary_text);
         TextView points = (TextView) view.findViewById(R.id.text_points);
 
+        profile.setContentDescription(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
         try {
             profile.setImageBitmap(ImageUtils.loadImage(context, cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_ICON))));
-            profile.setContentDescription(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
         } catch (IOException e) {
             Log.w(TAG, "Image Bitmap not Found");
-            profile.setImageResource(R.drawable.ic_missing);
+            profile.setImageResource(R.drawable.ic_default_avatar);
             e.printStackTrace();
         }
 

@@ -20,6 +20,7 @@ import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.the.bunker.R;
 import com.app.the.bunker.activities.DrawerActivity;
@@ -32,6 +33,7 @@ import com.app.the.bunker.models.GameModel;
 import com.app.the.bunker.models.MemberModel;
 import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.services.ServerService;
+import com.app.the.bunker.utils.NetworkUtils;
 import com.app.the.bunker.views.CustomSwipeLayout;
 
 import java.util.ArrayList;
@@ -133,8 +135,13 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     }
 
     private void refreshList() {
-        getGamesData();
-        swipeLayout.setRefreshing(true);
+        if (NetworkUtils.checkConnection(getContext())){
+            getGamesData();
+            swipeLayout.setRefreshing(true);
+        } else {
+            swipeLayout.setRefreshing(false);
+            Toast.makeText(getContext(), R.string.check_connection, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

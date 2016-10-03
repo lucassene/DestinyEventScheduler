@@ -11,6 +11,8 @@ import android.util.Log;
 import com.app.the.bunker.R;
 import com.app.the.bunker.interfaces.FromDialogListener;
 
+import java.util.ArrayList;
+
 public class MultiChoiceDialog extends DialogFragment implements DialogInterface.OnMultiChoiceClickListener {
 
     private static final String TAG = "MultiChoiceDialog";
@@ -18,7 +20,9 @@ public class MultiChoiceDialog extends DialogFragment implements DialogInterface
     private FromDialogListener listener;
 
     private boolean[] checkedItems;
+    private String[] itemNames;
 
+    @SuppressWarnings("unchecked")
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -27,17 +31,19 @@ public class MultiChoiceDialog extends DialogFragment implements DialogInterface
 
         Bundle bundle = getArguments();
 
-        checkedItems = new boolean[] {false, false, false, false, false, false, false, false};
+        checkedItems = new boolean[] {false, false, false, false, false, false, false, false, false};
 
         if (bundle != null){
             title = bundle.getString("title");
-            checkedItems = bundle.getBooleanArray("selectedItems");
+            ArrayList<Boolean> list = (ArrayList<Boolean>) bundle.getSerializable("selectedItems");
+            itemNames = bundle.getStringArray("itemsNames");
+            convertList(list);
             listener = (FromDialogListener) getFragmentManager().findFragmentByTag(bundle.getString("fragTag"));
         }
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(), R.style.DestinyApp_AlertDialog)
                 .setTitle(title)
-                .setMultiChoiceItems(R.array.event_types, checkedItems, this)
+                .setMultiChoiceItems(itemNames, checkedItems, this)
                 .setNegativeButton(getResources().getString(R.string.nevermind), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -55,6 +61,14 @@ public class MultiChoiceDialog extends DialogFragment implements DialogInterface
                 });
 
         return dialog.create();
+    }
+
+    private void convertList(ArrayList<Boolean> list) {
+        checkedItems= new boolean[list.size()];
+        int index = 0;
+        for (Boolean ob : list){
+            checkedItems[index++] = ob;
+        }
     }
 
     @Override

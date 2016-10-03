@@ -7,12 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.Build;
 import android.util.Log;
 
 import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.data.LoggedUserTable;
 import com.app.the.bunker.data.NotificationTable;
 import com.app.the.bunker.provider.DataProvider;
+import com.app.the.bunker.utils.DateUtils;
+
+import java.util.Calendar;
 
 public class AlarmService extends IntentService {
 
@@ -52,26 +56,37 @@ public class AlarmService extends IntentService {
 
     private void registerNewGamesAlarm(String memberId, int platformId) {
         SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int interval = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, DrawerActivity.DEFAULT_INTERVAL);
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
-        intent.putExtra("memberId",memberId);
-        intent.putExtra("platformId",platformId);
-        PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(), interval, pIntent);
-        Log.w(TAG, "New game alarm registered after boot.");
-
+        if (sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, false)) {
+            int interval = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, DrawerActivity.DEFAULT_INTERVAL);
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
+            intent.putExtra("memberId", memberId);
+            intent.putExtra("platformId", platformId);
+            PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                Intent nIntent = new Intent(this, DrawerActivity.class);
+                nIntent.putExtra("isFromNews", true);
+                PendingIntent npIntent = PendingIntent.getActivity(this, 0, nIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager.AlarmClockInfo aC = new AlarmManager.AlarmClockInfo(System.currentTimeMillis() + interval, npIntent);
+                alarm.setAlarmClock(aC, pIntent);
+            } else alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, pIntent);
+            Log.w(TAG, "New game alarm registered in an interval of " + interval + " millis");
+        }
     }
 
     private void registerAlarm(Integer notifyId, String notifyTime) {
-        long time = Long.parseLong(notifyTime);
+        Calendar time = DateUtils.stringToDate(notifyTime);
         Intent intent = new Intent(this, AlarmReceiver.class);
         intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
         intent.putExtra(AlarmReceiver.NOTIFY_ID, notifyId);
         PendingIntent pIntent = PendingIntent.getBroadcast(this, notifyId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarm.set(AlarmManager.RTC_WAKEUP, time, pIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), pIntent);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            alarm.setExact(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), pIntent);
+        } else alarm.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), pIntent);
         Log.w(TAG, "Alarm Register after boot. Notification ID: " + notifyId);
     }
 }

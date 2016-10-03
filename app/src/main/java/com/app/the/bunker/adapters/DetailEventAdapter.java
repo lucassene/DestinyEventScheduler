@@ -97,12 +97,12 @@ public class DetailEventAdapter extends BaseAdapter {
         }
 
         MemberModel currentMember = getItem(position);
+        viewHolder.iconPath.setContentDescription(currentMember.getName());
         try {
             viewHolder.iconPath.setImageBitmap(ImageUtils.loadImage(context,ImageUtils.getIconName(currentMember.getIconPath())));
-            viewHolder.iconPath.setContentDescription(currentMember.getName());
         } catch (IOException e) {
             e.printStackTrace();
-            viewHolder.iconPath.setImageResource(R.drawable.ic_missing);
+            viewHolder.iconPath.setImageResource(R.drawable.ic_default_avatar);
         }
         viewHolder.memberName.setText(currentMember.getName());
         viewHolder.memberTitle.setText(currentMember.getTitle());

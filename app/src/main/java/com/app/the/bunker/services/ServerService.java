@@ -61,7 +61,7 @@ public class ServerService extends IntentService {
     private static final String MEMBERLIST_ENDPOINT = "member/list";
     private static final String NOTICE_ENDPOINT = "notice";
     private static final String EVENTS_ENDPOINT = "events";
-    private static final String LOGIN_URL = "https://destiny-event-scheduler.herokuapp.com/login";
+    private static final String LOGIN_URL = "https://destiny-scheduler.herokuapp.com/login";
 
     private static final String STATUS_PARAM = "status=";
     private static final String JOINED_PARAM = "joined=";
@@ -517,8 +517,10 @@ public class ServerService extends IntentService {
                                     error = parseMembers(response);
                                     return error;
                                 case TYPE_NOTICE:
-                                    error = parseNotice(response);
-                                    return error;
+                                    if (!StringUtils.isEmptyOrWhiteSpaces(response)){
+                                        error = parseNotice(response);
+                                        return error;
+                                    } else return NO_ERROR;
                                 case TYPE_NEW_EVENTS:
                                     error = parseNewEvents(response);
                                     return error;
@@ -543,11 +545,11 @@ public class ServerService extends IntentService {
                         return ERROR_NULL_RESPONSE;
                     }
                 } else {
+                    String s = convertInputStreamToString(urlConnection.getErrorStream());
+                    Log.w(TAG, "error: " + s);
                     if (statusCode == 500 || statusCode == 403){
                         if (hasTriedOnce) return ERROR_RESPONSE_CODE;
                         hasTriedOnce = true;
-                        String s = convertInputStreamToString(urlConnection.getErrorStream());
-                        Log.w(TAG, "error: " + s);
                         switch (type){
                             case TYPE_CREATE_GAME:
                                 return ERROR_NO_EVENT;

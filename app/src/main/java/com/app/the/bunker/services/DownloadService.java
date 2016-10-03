@@ -30,6 +30,7 @@ public class DownloadService extends IntentService {
 
         SharedPreferences prefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> set = prefs.getStringSet(DrawerActivity.DOWNLOAD_PREF, null);
+        String icon;
         if (set != null){
             ArrayList<String> downloadList = new ArrayList<>(set);
             ContentValues values = new ContentValues();
@@ -37,12 +38,14 @@ public class DownloadService extends IntentService {
                 int error = ImageUtils.downloadImage(getApplicationContext(),downloadList.get(i));
                 if (error == ImageUtils.NO_ERROR){
                     //Log.w(TAG, "Image " + downloadList.get(i) + " downloaded successfully");
-                    String icon = downloadList.get(i).substring(downloadList.get(i).lastIndexOf("/")+1, downloadList.get(i).length());
+                    icon = downloadList.get(i).substring(downloadList.get(i).lastIndexOf("/")+1, downloadList.get(i).length());
                     values.put(SavedImagesTable.COLUMN_PATH, icon);
                     getContentResolver().insert(DataProvider.SAVED_IMAGES_URI, values);
                     downloadList.remove(i);
                     i--;
-                } else Log.w(TAG, "Error (" + error + ") when trying to download " + downloadList.get(i));
+                } else {
+                    Log.w(TAG, "Error (" + error + ") when trying to download " + downloadList.get(i));
+                }
                 values.clear();
             }
             SharedPreferences.Editor editor = prefs.edit();

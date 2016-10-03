@@ -3,8 +3,12 @@ package com.app.the.bunker.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,19 +24,22 @@ import android.widget.Toast;
 
 import com.app.the.bunker.R;
 import com.app.the.bunker.activities.DrawerActivity;
+import com.app.the.bunker.data.EventTypeTable;
 import com.app.the.bunker.dialogs.MultiChoiceDialog;
 import com.app.the.bunker.dialogs.SingleChoiceDialog;
 import com.app.the.bunker.interfaces.FromDialogListener;
 import com.app.the.bunker.interfaces.ToActivityListener;
+import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.services.UpdateNotificationsService;
+import com.app.the.bunker.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
-public class MainSettingsFragment extends Fragment implements FromDialogListener {
+public class MainSettingsFragment extends Fragment implements FromDialogListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = "MainSettingsFragment";
-
+    private static final int LOADER_TYPE = 10;
     private static final int DIVISOR = 60000;
 
     private SwitchCompat scheduledSwitch;
@@ -53,7 +60,10 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     private SharedPreferences sharedPrefs;
 
-    private boolean[] checkedItems;
+    private ArrayList<Boolean> checkedItems;
+
+    private ArrayList<String> typeNameList;
+    private ArrayList<Integer> typeIdList;
 
     private int switchType;
 
@@ -147,13 +157,14 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putString("title",getResources().getString(R.string.game_type_label));
-                bundle.putBooleanArray("selectedItems",checkedItems);
-                bundle.putString("fragTag",getTag());
+                bundle.putString("title", getResources().getString(R.string.game_type_label));
+                bundle.putSerializable("selectedItems", checkedItems);
+                bundle.putStringArray("itemsNames", getNameArray());
+                bundle.putString("fragTag", getTag());
 
                 MultiChoiceDialog dialog = new MultiChoiceDialog();
                 dialog.setArguments(bundle);
-                dialog.show(getFragmentManager(),"multiChoiceDialog");
+                dialog.show(getFragmentManager(), "multiChoiceDialog");
             }
         });
 
@@ -168,8 +179,6 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
         checkChanged = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
         previousCheck = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
-        setCheckedItems();
-        updateViews();
 
         return v;
     }
@@ -232,28 +241,13 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     }
 
     private void setCheckedItems() {
-        checkedItems = new boolean[] {false, false, false, false, false, false, false, false, false};
-        HashMap<Integer, Boolean> map = new HashMap<>();
-        int[] ids = getResources().getIntArray(R.array.event_type_ids);
-        for (int id : ids) {
-            map.put(id, sharedPrefs.getBoolean(String.valueOf(id), false));
+        checkedItems = new ArrayList<>();
+        Log.w(TAG, "typeIds: " + typeIdList.toString());
+        Log.w(TAG, "typeNames: " + typeNameList.toString());
+        for (int i=0;i<typeIdList.size();i++){
+            checkedItems.add(sharedPrefs.getBoolean(String.valueOf(typeIdList.get(i)), false));
         }
-        Log.w(TAG, map.toString());
-        for (int i=0;i<map.size();i++){
-            checkedItems[i] = map.get(ids[i]);
-        }
-        if (!hasSomeTrue(checkedItems)){
-            checkedItems = new boolean[] {true, true, true, true, true, true, true, true, true};
-        }
-    }
-
-    private boolean hasSomeTrue(boolean[] items){
-        for (boolean item : items) {
-            if (item) {
-                return true;
-            }
-        }
-        return false;
+        Log.w(TAG, "checkedItems: " + checkedItems.toString());
     }
 
     private int getSelectedTime() {
@@ -313,7 +307,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         soundCheckBox.setChecked(sharedPrefs.getBoolean(DrawerActivity.SOUND_PREF, true));
 
         newSwitch.setChecked(sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, true));
-        updateListText(checkedItems);
+        updateListText();
     }
 
     private void changeCheckText(CheckBox checkBox, TextView textView) {
@@ -372,6 +366,8 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             newTimeLayout.setClickable(true);
             newTimeLayout.setFocusable(true);
             changeSoundStatus();
+            editor.apply();
+            callback.registerNewGamesAlarm();
         } else {
             if (!scheduledSwitch.isChecked()){
                 switchType = 0;
@@ -388,8 +384,9 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             newTimeLayout.setClickable(false);
             newTimeLayout.setFocusable(false);
             changeSoundStatus();
+            editor.apply();
+            callback.deleteNewGamesAlarm();
         }
-        editor.apply();
     }
 
     private void changeSoundStatus(){
@@ -417,6 +414,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getLoaderManager().initLoader(LOADER_TYPE, null, this);
     }
 
     @Override
@@ -494,29 +492,27 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     @Override
     public void onMultiItemSelected(boolean[] items) {
-        updateListText(items);
         saveCheckedItems(items);
+        updateListText();
     }
 
     private void saveCheckedItems(boolean[] items) {
-        String[] events = getResources().getStringArray(R.array.event_types);
-        int[] ids = getResources().getIntArray(R.array.event_type_ids);
         SharedPreferences.Editor editor = getContext().getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).edit();
         for (int i=0;i<items.length;i++){
-            editor.putBoolean(String.valueOf(ids[i]),items[i]);
-            Log.w(TAG, events[i] + " marcado como " + items[i]);
+            editor.putBoolean(String.valueOf(typeIdList.get(i)),items[i]);
+            checkedItems.set(i, items[i]);
+            Log.w(TAG, typeNameList.get(i) + " marcado como " + items[i]);
         }
         editor.apply();
     }
 
-    private void updateListText(boolean[] items){
-        String[] eventList = getResources().getStringArray(R.array.event_types);
+    private void updateListText(){
         int count = 0;
         String selectedEvent = "";
-        for (int i = 0; i < items.length; i++) {
-            if (items[i]) {
+        for (int i = 0; i < typeIdList.size(); i++) {
+            if (checkedItems.get(i)) {
                 count++;
-                selectedEvent = eventList[i];
+                selectedEvent = typeNameList.get(i);
             }
         }
         String text;
@@ -531,4 +527,41 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(
+                getContext(),
+                DataProvider.EVENT_TYPE_URI,
+                EventTypeTable.ALL_COLUMNS,
+                null,
+                null,
+                StringUtils.getLanguageString(getContext()) + " ASC"
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null && data.moveToFirst()){
+            typeIdList = new ArrayList<>();
+            typeNameList = new ArrayList<>();
+            for (int i=0;i<data.getCount();i++){
+                typeIdList.add(data.getInt(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ID)));
+                typeNameList.add(data.getString(data.getColumnIndexOrThrow(StringUtils.getLanguageString(getContext()))));
+                data.moveToNext();
+            }
+            setCheckedItems();
+            updateViews();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    public String[] getNameArray() {
+        String[] nameList = new String[typeNameList.size()];
+        nameList = typeNameList.toArray(nameList);
+        return nameList;
+    }
 }

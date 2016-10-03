@@ -8,7 +8,6 @@ import android.util.Log;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,9 +93,6 @@ public class ImageUtils {
             File f = new File(path, imageName);
             fis = new FileInputStream(f);
             image = BitmapFactory.decodeStream(fis);
-        } catch (FileNotFoundException e){
-            Log.w(TAG, "Image not found");
-            e.printStackTrace();
         } finally {
             try{
                 if (fis != null) fis.close();

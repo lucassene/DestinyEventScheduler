@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.app.the.bunker.R;
 import com.app.the.bunker.adapters.DoneGamesAdapter;
@@ -18,6 +19,7 @@ import com.app.the.bunker.interfaces.UserDataListener;
 import com.app.the.bunker.models.GameModel;
 import com.app.the.bunker.models.MemberModel;
 import com.app.the.bunker.services.ServerService;
+import com.app.the.bunker.utils.NetworkUtils;
 import com.app.the.bunker.views.CustomSwipeLayout;
 
 import java.util.List;
@@ -76,11 +78,16 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
     }
 
     private void refreshList() {
-        Log.w(TAG, "Refreshing...");
-        Bundle bundle = new Bundle();
-        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_ALL_GAMES);
-        callback.runServerService(bundle);
-        swipeLayout.setRefreshing(true);
+        if (NetworkUtils.checkConnection(getContext())){
+            Log.w(TAG, "Refreshing...");
+            Bundle bundle = new Bundle();
+            bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_ALL_GAMES);
+            callback.runServerService(bundle);
+            swipeLayout.setRefreshing(true);
+        } else{
+            swipeLayout.setRefreshing(false);
+            Toast.makeText(getContext(), R.string.check_connection, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

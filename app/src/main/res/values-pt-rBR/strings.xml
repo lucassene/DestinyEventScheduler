@@ -45,30 +45,6 @@
         <item>Nível</item>
     </string-array>
 
-    <string-array name="event_types">
-        <item>Assalto</item>
-        <item>Corte de Oryx</item>
-        <item>Crisol</item>
-        <item>História</item>
-        <item>Incursão</item>
-        <item>Lista de Assaltos</item>
-        <item>Patrulha</item>
-        <item>Prisão do Anciões</item>
-        <item>SRL</item>
-    </string-array>
-
-    <integer-array name="event_type_ids">
-        <item>7</item>
-        <item>1</item>
-        <item>2</item>
-        <item>6</item>
-        <item>5</item>
-        <item>8</item>
-        <item>3</item>
-        <item>4</item>
-        <item>9</item>
-    </integer-array>
-
     <string-array name="spinner_types">
         <item>Todos</item>
         <item>Assalto</item>

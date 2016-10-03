@@ -23,9 +23,11 @@ import android.util.Log;
 
 import com.app.the.bunker.R;
 import com.app.the.bunker.activities.DrawerActivity;
+import com.app.the.bunker.data.EventTypeTable;
 import com.app.the.bunker.data.LoggedUserTable;
 import com.app.the.bunker.models.GameModel;
 import com.app.the.bunker.provider.DataProvider;
+import com.app.the.bunker.utils.CipherUtils;
 import com.app.the.bunker.utils.NetworkUtils;
 
 import org.json.JSONArray;
@@ -46,17 +48,22 @@ public class NewGameNotificationService extends IntentService {
 
     private static final String TAG = "NewGameNotifyService";
 
-    private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/";
-    private static final String GAME_ENDPOINT = "game";
+    private static final String SERVER_BASE_URL = "https://destiny-scheduler.herokuapp.com/";
+    private static final String GAME_ENDPOINT = "api/game";
+    private static final String LOGIN_ENDPOINT = "login";
     private static final String STATUS_PARAM = "?status=0";
     private static final String JOINED_PARAM = "&joined=false";
     private static final String MEMBER_HEADER = "membership";
+    private static final String CLAN_HEADER = "clanId";
     private static final String PLATFORM_HEADER = "platform";
     private static final String TIMEZONE_HEADER = "zoneid";
+    private static final String AUTH_HEADER = "Authorization";
     private static final String GET_METHOD = "GET";
 
     private String memberId;
     private int platformId;
+    private int clanId;
+    private boolean hasTriedOnce = false;
 
     public NewGameNotificationService() {
         super(NewGameNotificationService.class.getName());
@@ -74,29 +81,60 @@ public class NewGameNotificationService extends IntentService {
         sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         selectedIds = new ArrayList<>();
 
-        int typeIds[] = getResources().getIntArray(R.array.event_type_ids);
-        for (int typeId : typeIds) {
-            boolean b = sharedPrefs.getBoolean(String.valueOf(typeId), false);
-            if (b) { selectedIds.add(typeId); }
-        }
-        Log.w(TAG, "selectedIds size: " + selectedIds.size());
-
-        previousGames = getPreviousGamesList(sharedPrefs.getString(DrawerActivity.NEW_GAMES_PREF,""));
-
-        Cursor cursor = null;
-        try{
-            cursor = getContentResolver().query(DataProvider.LOGGED_USER_URI, LoggedUserTable.ALL_COLUMNS, null, null, null);
-            if (cursor != null && cursor.moveToFirst()){
-                memberId = cursor.getString(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
-                platformId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
-                requestServer();
-                registerNewGamesAlarm();
+        int typeIds[] = getIdArray();
+        if (typeIds != null) {
+            for (int typeId : typeIds) {
+                boolean b = sharedPrefs.getBoolean(String.valueOf(typeId), false);
+                if (b) {
+                    selectedIds.add(typeId);
+                }
             }
+            Log.w(TAG, "selectedIds size: " + selectedIds.size());
+
+            previousGames = getPreviousGamesList(sharedPrefs.getString(DrawerActivity.NEW_GAMES_PREF, ""));
+
+            Cursor cursor = null;
+            try {
+                cursor = getContentResolver().query(DataProvider.LOGGED_USER_URI, LoggedUserTable.ALL_COLUMNS, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    memberId = cursor.getString(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
+                    platformId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
+                    clanId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_CLAN));
+                    String url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + JOINED_PARAM;
+                    requestServer(ServerService.TYPE_NEW_GAMES, url);
+                    registerNewGamesAlarm();
+                }
+            } finally {
+                if (cursor != null) cursor.close();
+                stopSelf();
+            }
+        }
+    }
+
+    private int[] getIdArray() {
+        Cursor cursor = null;
+        ArrayList<Integer> list = new ArrayList<>();
+        try{
+            cursor = getContentResolver().query(DataProvider.EVENT_TYPE_URI, EventTypeTable.ALL_COLUMNS,null,null,null);
+            if (cursor != null && cursor.moveToFirst()){
+                for (int i=0;i<cursor.getCount();i++){
+                    list.add(cursor.getInt(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_ID)));
+                    cursor.moveToNext();
+                }
+            }
+            return convertList(list);
         } finally {
             if (cursor != null) cursor.close();
-            Log.w(TAG, "cursor is null.");
-            stopSelf();
         }
+    }
+
+    private int[] convertList(ArrayList<Integer> list) {
+        int[] items = new int[list.size()];
+        int index = 0;
+        for (Integer ob : list){
+            items[index++] = ob;
+        }
+        return items;
     }
 
     @Override
@@ -111,30 +149,60 @@ public class NewGameNotificationService extends IntentService {
         Log.w(TAG, "NewGameNotificationService destroyed");
     }
 
-    private void requestServer() {
-        String url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + JOINED_PARAM;
-
+    private void requestServer(int type, String url) {
         try{
             if (NetworkUtils.checkConnection(this)){
                 URL myURL = new URL(url);
                 HttpURLConnection urlConnection = (HttpURLConnection) myURL.openConnection();
                 urlConnection.setRequestProperty(MEMBER_HEADER, memberId);
                 urlConnection.setRequestProperty(PLATFORM_HEADER, String.valueOf(platformId));
+                urlConnection.setRequestProperty(CLAN_HEADER, String.valueOf(clanId));
                 urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
+                String authKey = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getString(DrawerActivity.KEY_PREF,"");
+                try{
+                    if (!authKey.isEmpty()){
+                        CipherUtils cipher = new CipherUtils();
+                        urlConnection.setRequestProperty(AUTH_HEADER, cipher.decrypt(authKey));
+                    } else urlConnection.setRequestProperty(AUTH_HEADER, authKey);
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
                 urlConnection.setRequestMethod(GET_METHOD);
-
-                if (urlConnection.getResponseCode() == 200){
-                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-                    String response = convertInputStreamToString(inputStream);
-                    parseGames(response);
-                    boolean hasSelectedGames = checkifHasSelectedGames();
-                    if (hasSelectedGames) {
-                        Log.w(TAG, "New games found. Making notification.");
-                        makeNotification();
-                    } else {
-                        Log.w(TAG, "No new games found.");
+                int statusCode = urlConnection.getResponseCode();
+                if (statusCode == 200){
+                    switch (type){
+                        case ServerService.TYPE_NEW_GAMES:
+                            InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                            String response = convertInputStreamToString(inputStream);
+                            parseGames(response);
+                            boolean hasSelectedGames = checkifHasSelectedGames();
+                            if (hasSelectedGames) {
+                                Log.w(TAG, "New games found. Making notification.");
+                                makeNotification();
+                            } else {
+                                Log.w(TAG, "No new games found.");
+                            }
+                            break;
+                        case ServerService.TYPE_LOGIN:
+                            authKey = urlConnection.getHeaderField(AUTH_HEADER);
+                            CipherUtils cipher = new CipherUtils();
+                            SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                            editor.putString(DrawerActivity.KEY_PREF, cipher.encrypt(authKey));
+                            editor.apply();
+                            String nUrl = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + JOINED_PARAM;
+                            requestServer(ServerService.TYPE_NEW_GAMES, nUrl);
+                            break;
                     }
-                } else { Log.w(TAG, "Status code different than 200."); }
+                } else {
+                    Log.w(TAG, "Status code different than 200.");
+                    if (statusCode == 500 || statusCode == 403){
+                        if (!hasTriedOnce){
+                            String lUrl = SERVER_BASE_URL + LOGIN_ENDPOINT;
+                            requestServer(ServerService.TYPE_LOGIN, lUrl);
+                            hasTriedOnce = true;
+                        }
+                    }
+                }
 
             } else { Log.w(TAG, "No internet connection."); }
         } catch (Exception e){
@@ -194,7 +262,6 @@ public class NewGameNotificationService extends IntentService {
 
     private ArrayList<String> getPreviousGamesList(String string) {
         Log.w(TAG, "previousGames string: " + string);
-        if (string.equals(",42")) string = "";
         ArrayList<String> list = new ArrayList<>();
         if (!string.equals("")){
             while (string.length()>0){
@@ -213,6 +280,7 @@ public class NewGameNotificationService extends IntentService {
         String gameIds = "";
         int numberOfGames = 0;
         ArrayList<String> idList = new ArrayList<>();
+        Log.w(TAG, "gameList size: " + gameList.size());
         for (int i=0;i<gameList.size();i++){
             for (int x=0;x<selectedIds.size();x++){
                 Log.w(TAG, "Comparing game.typeId: " + gameList.get(i).getTypeId() + " with selectedTypeId: " + selectedIds.get(x));

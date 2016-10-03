@@ -99,7 +99,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     protected void onResume() {
         super.onResume();
 
-        if (getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getBoolean(PrepareActivity.PREPARE_PREF,false)){
+        if (getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getBoolean(PrepareActivity.PREPARE_PREF,false) || isBungieServiceRunning()){
             Intent intent = new Intent(this, PrepareActivity.class);
             startActivity(intent);
             finish();

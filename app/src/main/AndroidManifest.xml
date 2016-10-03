@@ -64,17 +64,13 @@
             android:enabled="true">
         </service>
         
-        <receiver android:name="com.app.the.bunker.services.AlarmReceiver">
+        <receiver android:name="com.app.the.bunker.services.AlarmBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
-
         </receiver>
 
-        <receiver android:name="com.app.the.bunker.services.NetworkReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-            </intent-filter>
+        <receiver android:name=".services.AlarmReceiver">
         </receiver>
 
         <service android:name="com.app.the.bunker.services.DownloadService"

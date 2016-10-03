@@ -246,16 +246,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             readyAllLists(savedInstanceState);
         }
 
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean(PrepareActivity.PREPARE_PREF, false);
-        editor.apply();
-
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null && bundle.containsKey("isFromNews") && bundle.getBoolean("isFromNews",false)){
-            openConfigFragment(null);
-        }
-
     }
 
     private void getLoggedUserData() {
@@ -754,6 +744,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         allGameList.add(game);
         if (scheduledGameList == null) scheduledGameList = new ArrayList<>();
         scheduledGameList.add(game);
+        Collections.sort(scheduledGameList, new GameComparator());
         if (scheduledEventsListener != null) {
             scheduledEventsListener.onGamesLoaded(scheduledGameList);
         }
@@ -1374,7 +1365,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 bundle.putString("msg", getString(R.string.unable_update_clan));
                 bundle.putString("posButton", getString(R.string.got_it));
                 showAlertDialog(bundle);
-                hideSwipeProgress(false);
+                toggleSwipeProgress(false);
                 onDataLoaded();
                 break;
             case LocalService.STATUS_FINISHED:
@@ -1446,7 +1437,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         showAlertDialog(dialogBundle);
                         break;
                 }
-                hideSwipeProgress(false);
+                toggleSwipeProgress(false);
                 onDataLoaded();
                 break;
             case ServerService.STATUS_FINISHED:
@@ -1581,7 +1572,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         if (allGameList != null) {
                             newGameList = getGamesFromList(GameModel.STATUS_NEW);
                             if (newGameList != null && newEventsListener != null) {
-                                updateNewGamesListPref();
                                 newEventsListener.onGamesLoaded(newGameList);
                             } else Log.w(TAG, "newGameList is null");
 
@@ -1602,6 +1592,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             searchGameList = getGamesFromList(GameModel.STATUS_NEW);
                             joinedGameList = getGamesFromList(GameModel.STATUS_JOINED);
                         }
+                        toggleSwipeProgress(false);
                         break;
                     case ServerService.TYPE_PROFILE:
                         MemberModel member = (MemberModel) resultData.getSerializable(ServerService.PROFILE_TAG);
@@ -1628,7 +1619,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
     }
 
-    private void hideSwipeProgress(boolean b) {
+    private void toggleSwipeProgress(boolean b) {
         Fragment frag = getOpenedFragment();
         SwipeListener sFrag;
         if (frag == null){
@@ -1676,41 +1667,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private void updateGameList(UserDataListener listener, ArrayList<GameModel> list) {
         if (listener != null) listener.onGamesLoaded(list);
-    }
-
-    private void updateNewGamesListPref() {
-
-        ArrayList<Integer> selectedIds = new ArrayList<>();
-        SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        String gameIds = "";
-        ArrayList<GameModel> gameList = getGamesFromList(GameModel.STATUS_NEW);
-
-        if (gameList != null && gameList.size() > 0) {
-            int typeIds[] = getResources().getIntArray(R.array.event_type_ids);
-            for (int typeId : typeIds) {
-                boolean b = sharedPrefs.getBoolean(String.valueOf(typeId), false);
-                if (b) {
-                    selectedIds.add(typeId);
-                }
-            }
-
-            for (int i = 0; i < gameList.size(); i++) {
-                for (int x = 0; x < selectedIds.size(); x++) {
-                    Log.w(TAG, "Comparing game.typeId: " + gameList.get(i).getTypeId() + " with selectedTypeId: " + selectedIds.get(x));
-                    if (gameList.get(i).getTypeId() == selectedIds.get(x)) {
-                        gameIds = gameIds + String.valueOf(gameList.get(i).getGameId()) + ",";
-                    }
-                }
-            }
-
-            if (!gameIds.equals("")) {
-                Log.w(TAG, "Saving string: " + gameIds);
-                SharedPreferences.Editor editor = sharedPrefs.edit();
-                editor.putString(DrawerActivity.NEW_GAMES_PREF, gameIds);
-                editor.apply();
-            }
-        }
-
     }
 
     private void updateNotifications(ArrayList<GameModel> scheduledGameList) {
@@ -1794,11 +1750,16 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             switch (type) {
                 case GameModel.STATUS_NEW:
                 case GameModel.STATUS_AVAILABLE:
+                    String idList = "";
                     for (int i = 0; i < allGameList.size(); i++) {
                         if (allGameList.get(i).getStatus() == GameModel.STATUS_NEW && !allGameList.get(i).isJoined()) {
+                            idList = idList + allGameList.get(i).getGameId() + ",";
                             result.add(allGameList.get(i));
                         }
                     }
+                    SharedPreferences.Editor editor = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                    editor.putString(NEW_GAMES_PREF, idList);
+                    editor.apply();
                     Collections.sort(result, new GameComparator());
                     return result;
                 case GameModel.STATUS_SCHEDULED:

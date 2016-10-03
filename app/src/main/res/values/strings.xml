@@ -82,30 +82,6 @@
     <string name="order_by">Order by</string>
     <string name="my_profile">PROFILE</string>
 
-    <string-array name="event_types">
-        <item>Court of Oryx</item>
-        <item>Crucible</item>
-        <item>Patrol</item>
-        <item>Prison of Elders</item>
-        <item>Raid</item>
-        <item>Story</item>
-        <item>Strike</item>
-        <item>Strike List</item>
-        <item>SRL</item>
-    </string-array>
-
-    <integer-array name="event_type_ids">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-    </integer-array>
-
     <string-array name="spinner_types">
         <item>All</item>
         <item>Court of Oryx</item>

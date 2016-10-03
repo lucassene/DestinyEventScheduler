@@ -85,7 +85,7 @@ public class CreateNotificationService extends IntentService {
     private void createNotifications(List<GameModel> gameList, List<Integer> notifyList, List<Integer> nIdList) {
         boolean insert = false;
         if (notifyList.size()>0){
-            Log.w(TAG, "notifyList size > 0 (" + notifyList.size() + ")");
+            //Log.w(TAG, "notifyList size > 0 (" + notifyList.size() + ")");
             for (int i=0;i<gameList.size();i++){
                 for (int x=0;x<notifyList.size();x++){
                     if (gameList.get(i).getGameId() == notifyList.get(x)){
@@ -119,7 +119,7 @@ public class CreateNotificationService extends IntentService {
                 }
             }
         } else {
-            Log.w(TAG, "notifyList size < 0");
+            //Log.w(TAG, "notifyList size < 0");
             if (gameList.size()>0){
                 for (int i=0;i<gameList.size();i++){
                     insertNotifications(gameList.get(i));

@@ -15,6 +15,7 @@ import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.the.bunker.R;
 import com.app.the.bunker.activities.DrawerActivity;
@@ -25,6 +26,7 @@ import com.app.the.bunker.interfaces.UserDataListener;
 import com.app.the.bunker.models.GameModel;
 import com.app.the.bunker.models.MemberModel;
 import com.app.the.bunker.services.ServerService;
+import com.app.the.bunker.utils.NetworkUtils;
 import com.app.the.bunker.views.CustomSwipeLayout;
 
 import java.util.List;
@@ -114,8 +116,13 @@ public class MyEventsFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     private void refreshList() {
-        getGamesData();
-        swipeLayout.setRefreshing(true);
+        if (NetworkUtils.checkConnection(getContext())){
+            getGamesData();
+            swipeLayout.setRefreshing(true);
+        } else {
+            swipeLayout.setRefreshing(false);
+            Toast.makeText(getContext(), R.string.check_connection, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
