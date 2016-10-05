@@ -356,6 +356,12 @@
     <string name="type_icon">Icono de tipo</string>
     <string name="app_name">El Bunker</string>
     <string name="app_logo">El Bunker logotipo</string>
+    <string name="first_msg">Si usted es el primero de su clan para venir en El Bunker, se puede sentir solo. Invite a sus colegas para utilizar El Bunker también.</string>
+    <string name="all_items_selected">Todos los tipos seleccionados</string>
+    <string name="share_with">Compartir con:</string>
+    <string name="share_msg">\nHey, echar un vistazo! Con esta aplicación podemos programar partidos de Destiny con nuestro clan.\n</string>
+    <string name="not_now">Ahora no</string>
+    <string name="invite">Invitar</string>
 
 
 </resources>

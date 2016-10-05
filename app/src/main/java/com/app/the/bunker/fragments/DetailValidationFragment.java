@@ -28,6 +28,7 @@ import com.app.the.bunker.interfaces.UserDataListener;
 import com.app.the.bunker.models.EvaluationModel;
 import com.app.the.bunker.models.GameModel;
 import com.app.the.bunker.models.MemberModel;
+import com.app.the.bunker.models.MultiChoiceItemModel;
 import com.app.the.bunker.services.ServerService;
 import com.app.the.bunker.utils.DateUtils;
 import com.app.the.bunker.utils.NetworkUtils;
@@ -658,6 +659,11 @@ public class DetailValidationFragment extends ListFragment implements FromDialog
 
     @Override
     public void onMultiItemSelected(boolean[] items) {
+
+    }
+
+    @Override
+    public void onListChecked(List<MultiChoiceItemModel> list) {
 
     }
 }

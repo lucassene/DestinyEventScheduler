@@ -27,6 +27,7 @@ import com.app.the.bunker.data.DBHelper;
 import com.app.the.bunker.data.LoggedUserTable;
 import com.app.the.bunker.dialogs.MyAlertDialog;
 import com.app.the.bunker.interfaces.FromDialogListener;
+import com.app.the.bunker.models.MultiChoiceItemModel;
 import com.app.the.bunker.models.NoticeModel;
 import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.services.BungieService;
@@ -36,6 +37,7 @@ import com.app.the.bunker.utils.CookiesUtils;
 import com.app.the.bunker.utils.NetworkUtils;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, RequestResultReceiver.Receiver, FromDialogListener {
 
@@ -414,6 +416,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     public void onMultiItemSelected(boolean[] items) {
+
+    }
+
+    @Override
+    public void onListChecked(List<MultiChoiceItemModel> list) {
 
     }
 

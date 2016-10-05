@@ -25,6 +25,8 @@ public class MyAlertDialog extends DialogFragment {
     public static final int JOIN_DIALOG = 12;
     public static final int ALERT_DIALOG = 13;
     public static final int CONFIRM_DIALOG = 14;
+    public static final int SHARE_DIALOG = 15;
+    public static final int NOT_SHARE_DIALOG = 16;
 
     private FromDialogListener listener;
     private FromDialogListener fragmentListener;
@@ -60,6 +62,12 @@ public class MyAlertDialog extends DialogFragment {
                     negButton = getResources().getString(R.string.cancel);
                     break;
                 case ALERT_DIALOG:
+                    title = (bundle.getString("title"));
+                    message = (bundle.getString("msg"));
+                    posButton = bundle.getString("posButton");
+                    negButton = bundle.getString("negButton");
+                    break;
+                case SHARE_DIALOG:
                     title = (bundle.getString("title"));
                     message = (bundle.getString("msg"));
                     posButton = bundle.getString("posButton");
@@ -111,6 +119,9 @@ public class MyAlertDialog extends DialogFragment {
                             case CONFIRM_DIALOG:
                                 fragmentListener.onPositiveClick(null, dialogType);
                                 break;
+                            case SHARE_DIALOG:
+                                listener.onPositiveClick(null, dialogType);
+                                break;
                         }
                         dialog.dismiss();
                     }
@@ -136,6 +147,9 @@ public class MyAlertDialog extends DialogFragment {
                 if (fragment instanceof DetailEventFragment){
                     fragmentListener.onPositiveClick(null, dialogType);
                 } else listener.onPositiveClick(null, dialogType);
+                break;
+            case SHARE_DIALOG:
+                listener.onPositiveClick(null, NOT_SHARE_DIALOG);
                 break;
         }
         super.onDismiss(dialog);

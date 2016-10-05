@@ -36,6 +36,7 @@ import com.app.the.bunker.interfaces.FromActivityListener;
 import com.app.the.bunker.interfaces.FromDialogListener;
 import com.app.the.bunker.interfaces.ToActivityListener;
 import com.app.the.bunker.models.GameModel;
+import com.app.the.bunker.models.MultiChoiceItemModel;
 import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.services.ServerService;
 import com.app.the.bunker.utils.NetworkUtils;
@@ -43,6 +44,7 @@ import com.app.the.bunker.utils.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 public class NewEventFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, FromDialogListener, FromActivityListener {
 
@@ -467,6 +469,11 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onMultiItemSelected(boolean[] items) {}
+
+    @Override
+    public void onListChecked(List<MultiChoiceItemModel> list) {
+
+    }
 
     @Override
     public void onEventTypeSent(int id) {

@@ -70,6 +70,7 @@ import com.app.the.bunker.interfaces.ToActivityListener;
 import com.app.the.bunker.interfaces.UserDataListener;
 import com.app.the.bunker.models.GameModel;
 import com.app.the.bunker.models.MemberModel;
+import com.app.the.bunker.models.MultiChoiceItemModel;
 import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.services.AlarmReceiver;
 import com.app.the.bunker.services.BungieService;
@@ -194,7 +195,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.drawer_layout);
-
         progress = (ProgressBar) findViewById(R.id.progress_bar);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -246,6 +246,29 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             readyAllLists(savedInstanceState);
         }
 
+        Bundle bundle = getIntent().getExtras();
+        if (bundle.containsKey("share")){
+            boolean b = bundle.getBoolean("share");
+            if (b){
+                callShareIntent();
+            }
+        }
+
+        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor sharedEditor = sharedPrefs.edit();
+        sharedEditor.putBoolean(PrepareActivity.MSG_SHOWED_PREF, false);
+        sharedEditor.apply();
+
+    }
+
+    private void callShareIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT,getString(R.string.app_name));
+        String msg = getString(R.string.share_msg);
+        msg = msg + getString(R.string.google_play_link);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, msg);
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_with)));
     }
 
     private void getLoggedUserData() {
@@ -267,13 +290,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 return true;
             case R.id.menu_refresh:
                 if (NetworkUtils.checkConnection(this)) {
-                    if (openedFragment instanceof MyClanFragment) {
-                        MyClanFragment frag = (MyClanFragment) openedFragment;
-                        ArrayList<String> idList = frag.getBungieIdList();
-                        if (idList != null) {
-                            updateClan(idList);
-                        } else Log.w(TAG, "bungieIdList is empty!");
-                    } else if (getOpenedFragment() instanceof MyNewProfileFragment) {
+                    if (getOpenedFragment() instanceof MyNewProfileFragment) {
                         if (memberProfile != null) {
                             Log.w(TAG, "opened Fragment: " + getOpenedFragment().toString());
                             bundle.clear();
@@ -301,6 +318,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     } else refreshLists();
                 } else
                     Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.menu_share:
+                callShareIntent();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -1339,6 +1360,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void onMultiItemSelected(boolean[] items) {
+    }
+
+    @Override
+    public void onListChecked(List<MultiChoiceItemModel> list) {
+
     }
 
     @SuppressWarnings("unchecked")

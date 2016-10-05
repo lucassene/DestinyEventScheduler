@@ -318,5 +318,11 @@
     <string name="type_icon">Ícone do tipo</string>
     <string name="app_name">O Bunker</string>
     <string name="app_logo">O Bunker logo</string>
+    <string name="first_msg">Se você é o primeiro de seu clã a entrar em O Bunker, você pode se sentir sozinho. Convide seus companheiros à usar O Bunker também.</string>
+    <string name="all_items_selected">Todos os tipos selecionados</string>
+    <string name="share_with">Compartilhar com:</string>
+    <string name="share_msg">\nEi, dê uma olhada! Com esse aplicativo nós podemos agendar partidas de Destiny com o nosso clã.\n</string>
+    <string name="not_now">Agora não</string>
+    <string name="invite">Convidar</string>
 
 </resources>

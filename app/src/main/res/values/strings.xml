@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <integer name="versionCode">3</integer>
     <string name="psn" translatable="false">PSN</string>
     <string name="live" translatable="false">LIVE</string>
     <string name="app_name" >The Bunker</string>
@@ -374,6 +375,13 @@
     <string name="three_stars">Three stars</string>
     <string name="four_stars">Four stars</string>
     <string name="five_stars">Five stars</string>
+    <string name="first_msg">If you are the first one in your clan to enter The Bunker, you may feel alone. Invite your clanmates to use The Bunker too.</string>
+    <string name="all_items_selected">All items selected</string>
+    <string name="share_with">Share with:</string>
+    <string name="google_play_link" translatable="false">https://play.google.com/store/apps/details?id=com.app.the.bunker</string>
+    <string name="share_msg">\nHey, check it out! With this app we can schedule matches in Destiny with our clan.\n</string>
+    <string name="not_now">Not now</string>
+    <string name="invite">Invite</string>
 
 
 </resources>

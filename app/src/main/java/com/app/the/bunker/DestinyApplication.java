@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.services.ServerService;
-import com.github.mikephil.charting.BuildConfig;
 
 public class DestinyApplication extends Application {
 
@@ -58,7 +57,7 @@ public class DestinyApplication extends Application {
             }
         }
         //Log.w(TAG, "error: " + error);
-        //Log.w(TAG, "errorMessage lenght: " + error.length());
+        Log.w(TAG, "errorMessage lenght: " + error.length());
         return error;
     }
 
@@ -77,7 +76,7 @@ public class DestinyApplication extends Application {
         //Log.w(TAG, "Device name: " + getDeviceName());
         intent.putExtra(ServerService.ANDROID_TAG, Build.VERSION.SDK_INT);
         //Log.w(TAG, "API number: " + Build.VERSION.SDK_INT);
-        intent.putExtra(ServerService.APP_TAG, BuildConfig.VERSION_CODE);
+        intent.putExtra(ServerService.APP_TAG, getResources().getInteger(R.integer.versionCode));
         //Log.w(TAG, "App version: " + BuildConfig.VERSION_CODE);
         intent.putExtra(ServerService.EXCEPTION_TAG, errorMessage);
         startService(intent);

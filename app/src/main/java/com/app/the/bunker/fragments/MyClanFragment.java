@@ -173,7 +173,7 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         super.onPrepareOptionsMenu(menu);
         menu.clear();
         callback.setToolbarTitle(getString(R.string.my_clan));
-        getActivity().getMenuInflater().inflate(R.menu.home_menu, menu);
+        getActivity().getMenuInflater().inflate(R.menu.share_menu, menu);
     }
 
     @Override

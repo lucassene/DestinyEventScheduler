@@ -1006,6 +1006,12 @@ public class BungieService extends IntentService {
 
         getContentResolver().insert(DataProvider.LOGGED_USER_URI, values);
 
+        SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+        for (int i=1;i<=getDBTypesCount();i++){
+            editor.putBoolean(String.valueOf(i),true);
+        }
+        editor.apply();
+
     }
 
     private int insertEvent(EventModel e) {
@@ -1035,7 +1041,7 @@ public class BungieService extends IntentService {
     }
 
     private void insertType(EventTypeModel eventType) {
-        Log.w(TAG, "Inserting eventType (" + eventType.getEnName() + ")");
+        Log.w(TAG, "Inserting eventType ("+ eventType.getTypeId() + " - " + eventType.getEnName() + ")");
         ContentValues values = new ContentValues();
         values.put(EventTypeTable.COLUMN_ID, eventType.getTypeId());
         values.put(EventTypeTable.COLUMN_EN, eventType.getEnName());

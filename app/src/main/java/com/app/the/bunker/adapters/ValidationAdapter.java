@@ -126,7 +126,7 @@ public class ValidationAdapter extends BaseAdapter {
         ImageView memberRating;
         TextView memberTitle;
 
-        public ValidateViewHolder(View item){
+        ValidateViewHolder(View item){
             memberTitle = (TextView) item.findViewById(R.id.secondary_text);
             memberName = (TextView) item.findViewById(R.id.primary_text);
             memberIcon = (ImageView) item.findViewById(R.id.profile_pic);

@@ -18,11 +18,13 @@ import android.widget.TextView;
 import com.app.the.bunker.R;
 import com.app.the.bunker.dialogs.MyAlertDialog;
 import com.app.the.bunker.interfaces.FromDialogListener;
+import com.app.the.bunker.models.MultiChoiceItemModel;
 import com.app.the.bunker.services.AlarmReceiver;
 import com.app.the.bunker.services.BungieService;
 import com.app.the.bunker.services.RequestResultReceiver;
 
 import java.util.Calendar;
+import java.util.List;
 
 import static com.app.the.bunker.activities.DrawerActivity.DEFAULT_INTERVAL;
 import static com.app.the.bunker.activities.DrawerActivity.NEW_NOTIFY_PREF;
@@ -35,6 +37,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
 
     public static final String LEGEND_PREF = "prepareLegend";
     public static final String PREPARE_PREF = "prepareRunning";
+    public static final String MSG_SHOWED_PREF = "msgShowed";
 
     ProgressBar progressBar;
     TextView text;
@@ -167,9 +170,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                 text.setText(msg);
                 break;
             case BungieService.STATUS_FINISHED:
-                if (errorCode != BungieService.NO_ERROR){
-                    showAlertDialog();
-                } else openDrawerActivity();
+                showAlertDialog();
                 progressBar.setVisibility(View.GONE);
                 text.setVisibility(View.GONE);
                 break;
@@ -179,7 +180,7 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
     private void showAlertDialog() {
         DialogFragment dialog = new MyAlertDialog();
         Bundle bundle = new Bundle();
-        bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
+        bundle.putInt("type",MyAlertDialog.SHARE_DIALOG);
 
         switch (errorCode){
             case BungieService.ERROR_NO_ICON:
@@ -211,6 +212,21 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                 bundle.putString("msg",getString(R.string.error_bungie_auth));
                 bundle.putString("posButton",getString(R.string.got_it));
                 break;
+            case BungieService.NO_ERROR:
+                SharedPreferences prefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+                boolean showed = prefs.getBoolean(MSG_SHOWED_PREF, false);
+                if (!showed){
+                    Log.w(TAG, "Dialog not showed before");
+                    bundle.putString("title", getString(R.string.just_warning));
+                    bundle.putString("msg", getString(R.string.first_msg));
+                    bundle.putString("posButton", getString(R.string.invite));
+                    bundle.putString("negButton", getString(R.string.not_now));
+                } else {
+                    Log.w(TAG, "Dialog showed is true");
+                    bundle.clear();
+                    openDrawerActivity(false);
+                }
+                break;
             default:
                 bundle.putString("title",getString(R.string.error));
                 bundle.putString("msg", getString(R.string.some_problem_msg));
@@ -222,27 +238,30 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
         dialog.show(getSupportFragmentManager(),"alert");
     }
 
-    public void openDrawerActivity(){
+    public void openDrawerActivity(boolean share){
 
-        SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
 
         SharedPreferences.Editor sharedEditor = sharedPrefs.edit();
+        sharedEditor.putBoolean(MSG_SHOWED_PREF, true);
         sharedEditor.putBoolean(DrawerActivity.SOUND_PREF, true);
         sharedEditor.putBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, true);
-        sharedEditor.putBoolean(NEW_NOTIFY_PREF, true);
+        sharedEditor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, true);
         sharedEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, 0);
-        sharedEditor.putInt(NEW_NOTIFY_TIME_PREF, DEFAULT_INTERVAL);
+        sharedEditor.putInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, DEFAULT_INTERVAL);
         sharedEditor.putString(DrawerActivity.MEMBER_PREF, membershipId);
         sharedEditor.putInt(DrawerActivity.PLATFORM_PREF, platformId);
         sharedEditor.putString(DrawerActivity.CLAN_PREF, clanId);
         sharedEditor.apply();
 
         registerNewGamesAlarm();
-       if (sharedPrefs.getBoolean(DrawerActivity.FOREGROUND_PREF, false)){
-           Intent intent = new Intent(this, DrawerActivity.class);
-           startActivity(intent);
-           finish();
-       }
+        if (sharedPrefs.getBoolean(DrawerActivity.FOREGROUND_PREF, false)){
+            Intent intent = new Intent(this, DrawerActivity.class);
+            Log.w(TAG, "share? " + share);
+            intent.putExtra("share", share);
+            startActivity(intent);
+            finish();
+        }
     }
 
     public void registerNewGamesAlarm() {
@@ -268,7 +287,17 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
 
     @Override
     public void onPositiveClick(String input, int type) {
-        backToLoginActivity();
+        if (errorCode == BungieService.NO_ERROR){
+            switch (type){
+                case MyAlertDialog.SHARE_DIALOG:
+                    openDrawerActivity(true);
+                    break;
+                case MyAlertDialog.NOT_SHARE_DIALOG:
+                default:
+                    openDrawerActivity(false);
+                    break;
+            }
+        } else backToLoginActivity();
     }
 
     private void backToLoginActivity() {
@@ -299,6 +328,11 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
 
     @Override
     public void onMultiItemSelected(boolean[] items) {
+
+    }
+
+    @Override
+    public void onListChecked(List<MultiChoiceItemModel> list) {
 
     }
 }

@@ -29,12 +29,15 @@ import com.app.the.bunker.dialogs.MultiChoiceDialog;
 import com.app.the.bunker.dialogs.SingleChoiceDialog;
 import com.app.the.bunker.interfaces.FromDialogListener;
 import com.app.the.bunker.interfaces.ToActivityListener;
+import com.app.the.bunker.models.MultiChoiceItemModel;
 import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.services.UpdateNotificationsService;
 import com.app.the.bunker.utils.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainSettingsFragment extends Fragment implements FromDialogListener, LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -60,11 +63,6 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     private SharedPreferences sharedPrefs;
 
-    private ArrayList<Boolean> checkedItems;
-
-    private ArrayList<String> typeNameList;
-    private ArrayList<Integer> typeIdList;
-
     private int switchType;
 
     private int previousScheduleTime;
@@ -76,6 +74,8 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     private boolean checkChanged;
     private boolean previousCheck;
+
+    private List<MultiChoiceItemModel> typeList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -156,15 +156,16 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         newListLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString("title", getResources().getString(R.string.game_type_label));
-                bundle.putSerializable("selectedItems", checkedItems);
-                bundle.putStringArray("itemsNames", getNameArray());
-                bundle.putString("fragTag", getTag());
+                if (typeList != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title", getResources().getString(R.string.game_type_label));
+                    bundle.putSerializable("itemList", (Serializable) typeList);
+                    bundle.putString("fragTag", getTag());
 
-                MultiChoiceDialog dialog = new MultiChoiceDialog();
-                dialog.setArguments(bundle);
-                dialog.show(getFragmentManager(), "multiChoiceDialog");
+                    MultiChoiceDialog dialog = new MultiChoiceDialog();
+                    dialog.setArguments(bundle);
+                    dialog.show(getFragmentManager(), "multiChoiceDialog");
+                }
             }
         });
 
@@ -238,16 +239,6 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     public void onPause() {
         super.onPause();
         //Log.w(TAG, "MainSettings paused");
-    }
-
-    private void setCheckedItems() {
-        checkedItems = new ArrayList<>();
-        Log.w(TAG, "typeIds: " + typeIdList.toString());
-        Log.w(TAG, "typeNames: " + typeNameList.toString());
-        for (int i=0;i<typeIdList.size();i++){
-            checkedItems.add(sharedPrefs.getBoolean(String.valueOf(typeIdList.get(i)), false));
-        }
-        Log.w(TAG, "checkedItems: " + checkedItems.toString());
     }
 
     private int getSelectedTime() {
@@ -492,16 +483,22 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     @Override
     public void onMultiItemSelected(boolean[] items) {
-        saveCheckedItems(items);
-        updateListText();
     }
 
-    private void saveCheckedItems(boolean[] items) {
+    @Override
+    public void onListChecked(List<MultiChoiceItemModel> list) {
+        if (list != null){
+            typeList = list;
+            saveCheckedItems();
+            updateListText();
+        }
+    }
+
+    private void saveCheckedItems() {
         SharedPreferences.Editor editor = getContext().getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).edit();
-        for (int i=0;i<items.length;i++){
-            editor.putBoolean(String.valueOf(typeIdList.get(i)),items[i]);
-            checkedItems.set(i, items[i]);
-            Log.w(TAG, typeNameList.get(i) + " marcado como " + items[i]);
+        for (int i=0;i<typeList.size();i++){
+            editor.putBoolean(String.valueOf(typeList.get(i).getId()),typeList.get(i).isChecked());
+            Log.w(TAG, typeList.get(i).getText() + " marcado como " + typeList.get(i).isChecked());
         }
         editor.apply();
     }
@@ -509,10 +506,10 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     private void updateListText(){
         int count = 0;
         String selectedEvent = "";
-        for (int i = 0; i < typeIdList.size(); i++) {
-            if (checkedItems.get(i)) {
+        for (int i = 0; i < typeList.size(); i++) {
+            if (typeList.get(i).isChecked()) {
                 count++;
-                selectedEvent = typeNameList.get(i);
+                selectedEvent = typeList.get(i).getText();
             }
         }
         String text;
@@ -520,6 +517,8 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             text = getResources().getString(R.string.no_game_selected);
         } else if (count == 1){
             text = selectedEvent;
+        } else if (count == typeList.size()){
+            text = getString(R.string.all_items_selected);
         } else {
             text = String.valueOf(count) + " " + getResources().getString(R.string.games_selected);
         }
@@ -542,14 +541,17 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()){
-            typeIdList = new ArrayList<>();
-            typeNameList = new ArrayList<>();
+            typeList = new ArrayList<>();
+            SharedPreferences prefs = getContext().getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE);
             for (int i=0;i<data.getCount();i++){
-                typeIdList.add(data.getInt(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ID)));
-                typeNameList.add(data.getString(data.getColumnIndexOrThrow(StringUtils.getLanguageString(getContext()))));
+                MultiChoiceItemModel item = new MultiChoiceItemModel();
+                int id = data.getInt(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ID));
+                item.setId(id);
+                item.setText(data.getString(data.getColumnIndexOrThrow(StringUtils.getLanguageString(getContext()))));
+                item.setChecked(prefs.getBoolean(String.valueOf(id),false));
+                typeList.add(item);
                 data.moveToNext();
             }
-            setCheckedItems();
             updateViews();
         }
     }
@@ -559,9 +561,4 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     }
 
-    public String[] getNameArray() {
-        String[] nameList = new String[typeNameList.size()];
-        nameList = typeNameList.toArray(nameList);
-        return nameList;
-    }
 }

@@ -449,6 +449,7 @@ public class ServerService extends IntentService {
                         break;
                     case TYPE_EXCEPTION:
                         urlConnection = createExceptionRequest(urlConnection, bundle);
+                        //return ERROR_HTTP_REQUEST;
                         break;
                     case TYPE_CLAN_MEMBERS:
                         urlConnection = createMemberListRequest(urlConnection, bundle);

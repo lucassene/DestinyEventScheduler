@@ -1,7 +1,10 @@
 package com.app.the.bunker.interfaces;
 
 
+import com.app.the.bunker.models.MultiChoiceItemModel;
+
 import java.util.Calendar;
+import java.util.List;
 
 public interface FromDialogListener {
 
@@ -14,4 +17,5 @@ public interface FromDialogListener {
     void onLogoff();
     void onItemSelected(String type, String entry, int value);
     void onMultiItemSelected(boolean[] items);
+    void onListChecked(List<MultiChoiceItemModel> list);
 }
