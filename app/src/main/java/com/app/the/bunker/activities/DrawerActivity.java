@@ -1,11 +1,15 @@
 package com.app.the.bunker.activities;
 
+import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
@@ -13,6 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -247,9 +252,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
 
         Bundle bundle = getIntent().getExtras();
-        if (bundle.containsKey("share")){
+        if (bundle.containsKey("share")) {
             boolean b = bundle.getBoolean("share");
-            if (b){
+            if (b) {
                 callShareIntent();
             }
         }
@@ -264,7 +269,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private void callShareIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT,getString(R.string.app_name));
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
         String msg = getString(R.string.share_msg);
         msg = msg + getString(R.string.google_play_link);
         shareIntent.putExtra(Intent.EXTRA_TEXT, msg);
@@ -298,20 +303,20 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             bundle.putString(ServerService.PROFILE_TAG, memberProfile.getMembershipId());
                             runServerService(bundle);
                         }
-                    } else if (getOpenedFragment() instanceof  HistoryListFragment){
+                    } else if (getOpenedFragment() instanceof HistoryListFragment) {
                         Log.w(TAG, "opened Fragment: " + getOpenedFragment().toString());
 
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_HISTORY_GAMES);
                         runServerService(bundle);
-                    } else if (getOpenedFragment() instanceof NewEventFragment){
+                    } else if (getOpenedFragment() instanceof NewEventFragment) {
                         bundle.clear();
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_EVENTS);
                         runServerService(bundle);
-                    } else if (getOpenedFragment() instanceof SearchFragment){
+                    } else if (getOpenedFragment() instanceof SearchFragment) {
                         bundle.clear();
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_GAMES);
                         runServerService(bundle);
-                    } else if (getOpenedFragment() instanceof MyEventsFragment){
+                    } else if (getOpenedFragment() instanceof MyEventsFragment) {
                         bundle.clear();
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_JOINED_GAMES);
                         runServerService(bundle);
@@ -327,7 +332,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public void updateClan(ArrayList<String> idList){
+    public void updateClan(ArrayList<String> idList) {
         if (mReceiver == null) {
             mReceiver = new RequestResultReceiver(new Handler());
             mReceiver.setReceiver(this);
@@ -392,7 +397,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         openMainActivity(null);
-        if (intent.hasExtra("notification")){
+        if (intent.hasExtra("notification")) {
             refreshLists();
         }
     }
@@ -402,35 +407,35 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else if (fragmentTag == null) {
-                finish();
-            } else if (openedFragmentType == FRAGMENT_TYPE_WITHOUT_BACKSTACK) {
-                openMainActivity(null);
-                switch (isNewScheduledOrValidated) {
-                    case GameModel.STATUS_NEW:
-                        viewPager.setCurrentItem(0);
-                        break;
-                    case GameModel.STATUS_SCHEDULED:
-                        if (hasScheduledGames) {
-                            viewPager.setCurrentItem(1);
-                        } else viewPager.setCurrentItem(0);
-                        break;
-                    case GameModel.STATUS_VALIDATED:
-                    case GameModel.STATUS_DONE:
-                        Log.w(TAG, "hasValidatedGames: " + hasValidatedGames);
-                        if (hasValidatedGames) {
-                            Log.w(TAG, "viewPager count: " + viewPager.getChildCount());
-                            viewPager.setCurrentItem(2);
-                        } else viewPager.setCurrentItem(0);
-                        break;
-                    default:
-                        viewPager.setCurrentItem(0);
-                        break;
-                }
-            } else {
-                super.onBackPressed();
-                openedFragment = fm.findFragmentById(R.id.content_frame);
-                if (openedFragment != null) fragmentTag = openedFragment.getTag();
+            finish();
+        } else if (openedFragmentType == FRAGMENT_TYPE_WITHOUT_BACKSTACK) {
+            openMainActivity(null);
+            switch (isNewScheduledOrValidated) {
+                case GameModel.STATUS_NEW:
+                    viewPager.setCurrentItem(0);
+                    break;
+                case GameModel.STATUS_SCHEDULED:
+                    if (hasScheduledGames) {
+                        viewPager.setCurrentItem(1);
+                    } else viewPager.setCurrentItem(0);
+                    break;
+                case GameModel.STATUS_VALIDATED:
+                case GameModel.STATUS_DONE:
+                    Log.w(TAG, "hasValidatedGames: " + hasValidatedGames);
+                    if (hasValidatedGames) {
+                        Log.w(TAG, "viewPager count: " + viewPager.getChildCount());
+                        viewPager.setCurrentItem(2);
+                    } else viewPager.setCurrentItem(0);
+                    break;
+                default:
+                    viewPager.setCurrentItem(0);
+                    break;
             }
+        } else {
+            super.onBackPressed();
+            openedFragment = fm.findFragmentById(R.id.content_frame);
+            if (openedFragment != null) fragmentTag = openedFragment.getTag();
+        }
     }
 
     private Fragment getOpenedFragment() {
@@ -474,7 +479,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @SuppressWarnings("unchecked")
     private void readyAllLists(Bundle savedInstanceState) {
         allGameList = new ArrayList<>();
-        if (savedInstanceState.getSerializable("allGameList") != null){
+        if (savedInstanceState.getSerializable("allGameList") != null) {
             allGameList.addAll((ArrayList<GameModel>) savedInstanceState.getSerializable("allGameList"));
         }
         if (allGameList != null) {
@@ -657,9 +662,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
             intent.putExtra(AlarmReceiver.NOTIFY_ID, firstId);
             PendingIntent pIntent = PendingIntent.getBroadcast(this, firstId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 Log.w(TAG, "Code M: " + Build.VERSION_CODES.M);
-                alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,firstNotification.getTimeInMillis(),pIntent);
+                alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 alarm.setExact(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
             } else alarm.set(AlarmManager.RTC_WAKEUP, firstNotification.getTimeInMillis(), pIntent);
@@ -671,12 +676,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             sIntent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
             sIntent.putExtra(AlarmReceiver.NOTIFY_ID, secondId);
             PendingIntent psIntent = PendingIntent.getBroadcast(this, secondId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 Log.w(TAG, "Code M: " + Build.VERSION_CODES.M);
-                alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,secondNotification.getTimeInMillis(),psIntent);
+                alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 alarm.setExact(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
-            } else alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
+            } else
+                alarm.set(AlarmManager.RTC_WAKEUP, secondNotification.getTimeInMillis(), psIntent);
             Log.w(TAG, "requestId: " + secondId + " registered!");
         }
 
@@ -849,7 +855,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             intent.putExtra(ServerService.PLATFORM_TAG, platformId);
             intent.putExtra(ServerService.CLAN_TAG, clanId);
 
-            if (bundle.containsKey(ServerService.GAME_TAG)) intent.putExtra(ServerService.GAME_TAG, bundle.getSerializable(ServerService.GAME_TAG));
+            if (bundle.containsKey(ServerService.GAME_TAG))
+                intent.putExtra(ServerService.GAME_TAG, bundle.getSerializable(ServerService.GAME_TAG));
             if (bundle.containsKey(ServerService.GAMEID_TAG))
                 intent.putExtra(ServerService.GAMEID_TAG, bundle.getInt(ServerService.GAMEID_TAG));
             if (bundle.containsKey(ServerService.ENTRY_TAG))
@@ -1031,7 +1038,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     public boolean openMyProfileFragment(View child) {
-        if (memberProfile != null){
+        if (memberProfile != null) {
             if (openedFragment instanceof MyNewProfileFragment && memberProfile.getMembershipId().equals(bungieId)) {
                 drawerLayout.closeDrawers();
                 return false;
@@ -1292,7 +1299,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     private boolean showLogOffDialog(View child) {
-        if (!hasOpenedDialogs()){
+        if (!hasOpenedDialogs()) {
             DialogFragment logOffDialog = new MyAlertDialog();
             Bundle bundle = new Bundle();
             bundle.putInt("type", MyAlertDialog.LOGOFF_DIALOG);
@@ -1348,6 +1355,18 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         editor.putString(PrepareActivity.LEGEND_PREF, getString(R.string.vanguard_data));
         editor.putString(KEY_PREF, "");
         editor.apply();
+
+        AccountManager manager = AccountManager.get(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {}
+
+        Account[] accs = manager.getAccounts();
+        for (Account acc : accs) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                manager.removeAccount(acc, null, null, null);
+            } else {
+                manager.removeAccount(acc, null, null);
+            }
+        }
 
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);

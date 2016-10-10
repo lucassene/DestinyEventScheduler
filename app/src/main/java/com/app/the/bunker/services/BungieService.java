@@ -90,6 +90,7 @@ public class BungieService extends IntentService {
     public static final int STATUS_FRIENDS = 14;
     public static final int STATUS_PARTY = 15;
     public static final int STATUS_EVENTS = 16;
+    public static final int STATUS_LOGIN = 17;
 
     public static final String COOKIE_EXTRA = "cookies";
     public static final String REQUEST_EXTRA = "request";
@@ -573,11 +574,16 @@ public class BungieService extends IntentService {
                     String authKey = urlConnection.getHeaderField("Authorization");
                     //Log.w(TAG, "authKey: " + authKey);
                     CipherUtils cipher = new CipherUtils();
+                    String encryptedKey = cipher.encrypt(authKey);
                     SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                    editor.putString(DrawerActivity.KEY_PREF, cipher.encrypt(authKey));
+                    editor.putString(DrawerActivity.KEY_PREF, encryptedKey);
                     editor.apply();
 
-                    receiver.send(STATUS_VERIFY, Bundle.EMPTY);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("displayName", displayName);
+                    bundle.putString("authKey", encryptedKey);
+
+                    receiver.send(STATUS_LOGIN, bundle);
                     return NO_ERROR;
                 } else {
                     Log.w(TAG, "Response Code do JSON diferente de 200 (" + statusCode + " - Server Login)");
@@ -597,6 +603,7 @@ public class BungieService extends IntentService {
     private int getMembersOfClan(ResultReceiver receiver){
 
         String myURL = SERVER_BASE_URL + API_SERVER_ENDPOINT + CLAN_ENDPOINT + "/" + clanId + "/" + MEMBERS_ENDPOINT;
+        receiver.send(STATUS_VERIFY, Bundle.EMPTY);
 
         try{
 

@@ -382,6 +382,7 @@
     <string name="share_msg">\nHey, check it out! With this app we can schedule matches in Destiny with our clan.\n</string>
     <string name="not_now">Not now</string>
     <string name="invite">Invite</string>
+    <string name="total_access">Total access to the application.</string>
 
 
 </resources>

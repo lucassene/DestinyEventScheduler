@@ -532,6 +532,7 @@ public class ServerService extends IntentService {
                                     SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
                                     editor.putString(DrawerActivity.KEY_PREF, cipher.encrypt(authKey));
                                     editor.apply();
+                                    //TODO salvar o userName nas prefs tbm e alterar o token para o novo
                                     error = requestServer(receiver, bundle.getInt(REQUEST_TAG),bundle.getString(URL_TAG),bundle.getBundle(BUNDLE_TAG));
                                     return error;
                                 default:

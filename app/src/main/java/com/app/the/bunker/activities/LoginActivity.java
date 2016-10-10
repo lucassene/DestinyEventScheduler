@@ -103,6 +103,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
         if (getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getBoolean(PrepareActivity.PREPARE_PREF,false) || isBungieServiceRunning()){
             Intent intent = new Intent(this, PrepareActivity.class);
+            intent.putExtra(PrepareActivity.TYPE, PrepareActivity.TYPE_LOGIN);
             startActivity(intent);
             finish();
         }
@@ -159,6 +160,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
                 if (errorCode != BungieService.ERROR_AUTH){
                     Intent intent = new Intent(this, PrepareActivity.class);
+                    intent.putExtra(PrepareActivity.TYPE, PrepareActivity.TYPE_LOGIN);
                     //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.putExtra("cookies",cookies);
                     intent.putExtra("x-csrf",xcsrf);

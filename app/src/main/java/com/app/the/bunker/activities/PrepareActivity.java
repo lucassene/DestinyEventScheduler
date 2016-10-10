@@ -1,5 +1,7 @@
 package com.app.the.bunker.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -9,12 +11,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
 import com.app.the.bunker.dialogs.MyAlertDialog;
 import com.app.the.bunker.interfaces.FromDialogListener;
@@ -31,13 +33,17 @@ import static com.app.the.bunker.activities.DrawerActivity.NEW_NOTIFY_PREF;
 import static com.app.the.bunker.activities.DrawerActivity.NEW_NOTIFY_TIME_PREF;
 import static com.app.the.bunker.activities.DrawerActivity.SHARED_PREFS;
 
-public class PrepareActivity extends AppCompatActivity implements RequestResultReceiver.Receiver, FromDialogListener {
+public class PrepareActivity extends AccountAuthenticatorActivity implements RequestResultReceiver.Receiver, FromDialogListener {
 
     private static final String TAG = "PrepareActivity";
 
     public static final String LEGEND_PREF = "prepareLegend";
     public static final String PREPARE_PREF = "prepareRunning";
     public static final String MSG_SHOWED_PREF = "msgShowed";
+
+    public static final String TYPE = "type";
+    public static final int TYPE_LOGIN = 1;
+    public static final int TYPE_RENEW_TOKEN = 2;
 
     ProgressBar progressBar;
     TextView text;
@@ -61,21 +67,32 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
         progressBar = (ProgressBar) findViewById(R.id.progress);
         text = (TextView) findViewById(R.id.msg_text);
 
-        String cookies = getIntent().getStringExtra("cookies");
-        String xcsrf = getIntent().getStringExtra("x-csrf");
-        int platform = getIntent().getIntExtra("platform",0);
+        switch (getIntent().getIntExtra(TYPE,1)){
+            case TYPE_LOGIN:
+                String cookies = getIntent().getStringExtra("cookies");
+                String xcsrf = getIntent().getStringExtra("x-csrf");
+                int platform = getIntent().getIntExtra("platform",0);
 
-        if (mReceiver == null && !isBungieServiceRunning()){
-            mReceiver = new RequestResultReceiver(new Handler());
-            mReceiver.setReceiver(this);
-            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
-            intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_LOGIN);
-            intent.putExtra(BungieService.COOKIE_EXTRA, cookies);
-            intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
-            intent.putExtra(BungieService.XCSRF_EXTRA, xcsrf);
-            intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
-            startService(intent);
-        } else Log.w(TAG, "Receiver is null or BungieService is running.");
+                if (mReceiver == null && !isBungieServiceRunning()){
+                    mReceiver = new RequestResultReceiver(new Handler());
+                    mReceiver.setReceiver(this);
+                    Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
+                    intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_LOGIN);
+                    intent.putExtra(BungieService.COOKIE_EXTRA, cookies);
+                    intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
+                    intent.putExtra(BungieService.XCSRF_EXTRA, xcsrf);
+                    intent.putExtra(BungieService.PLATFORM_EXTRA, platform);
+                    startService(intent);
+                } else Log.w(TAG, "Receiver is null or BungieService is running.");
+                break;
+            case TYPE_RENEW_TOKEN:
+                //Esconder todo o layout, deixando apenas o logo do app
+                //Exibir dialog informando que só é possível ter uma conta e dando opção para logoff
+                break;
+            default:
+                finish();
+                break;
+        }
     }
 
     public boolean isBungieServiceRunning() {
@@ -156,6 +173,14 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                 msg = getString(R.string.prior_entries);
                 text.setText(msg);
                 break;
+            case BungieService.STATUS_LOGIN:
+                Log.w(TAG, "Creating " + userName + " account...");
+                Intent intent = new Intent();
+                intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACC_TYPE);
+                intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, userName);
+                intent.putExtra(AccountManager.KEY_AUTHTOKEN, resultData.getString("authKey"));
+                authorize(intent);
+                break;
             case BungieService.STATUS_VERIFY:
                 msg = getString(R.string.allies);
                 text.setText(msg);
@@ -174,6 +199,21 @@ public class PrepareActivity extends AppCompatActivity implements RequestResultR
                 progressBar.setVisibility(View.GONE);
                 text.setVisibility(View.GONE);
                 break;
+        }
+    }
+
+    private void authorize(Intent intent) {
+        AccountManager mAccManager = AccountManager.get(this);
+        String accType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
+        String accName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+        String accToken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
+        Account mAcc = new Account(accName, accType);
+
+        if (!accToken.equalsIgnoreCase("null")){
+            mAccManager.addAccountExplicitly(mAcc, null, null);
+            mAccManager.setAuthToken(mAcc, accType, accToken);
+            setAccountAuthenticatorResult(intent.getExtras());
+            Log.w(TAG, "Account created!");
         }
     }
 
