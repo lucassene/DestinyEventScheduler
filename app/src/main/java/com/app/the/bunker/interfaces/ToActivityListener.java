@@ -18,7 +18,6 @@ public interface ToActivityListener {
     String getBungieId();
     String getUserName();
     int getPlatform();
-    String getClanName();
     String getOrderBy();
     void closeFragment();
     void onLoadingData();
@@ -28,7 +27,6 @@ public interface ToActivityListener {
     void registerAlarmTask(Calendar firstNotification, int firstId, Calendar secondNotification, int secondId);
     void registerUserDataListener(Fragment fragment);
     void deleteUserDataListener(Fragment fragment);
-    void cancelAlarmTask(int requestId);
     void setSpinnerSelection(String tag, int position);
     int getSpinnerSelection(String tag);
     void onSelectedFragment(int id);
@@ -44,8 +42,6 @@ public interface ToActivityListener {
     void updateGameStatus(GameModel game, int status);
     void updateGameEntries(int status, int gameId, int entries);
     void updateMembers(List<MemberModel> list);
-    void registerNewGamesAlarm();
-    void deleteNewGamesAlarm();
     MemberModel getMemberProfile();
     void callAndroidIntent(int type, String text);
     void updateClan(ArrayList<String> idList);

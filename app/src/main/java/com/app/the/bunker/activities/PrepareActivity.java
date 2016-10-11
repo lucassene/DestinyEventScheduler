@@ -2,12 +2,9 @@ package com.app.the.bunker.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
@@ -21,16 +18,13 @@ import com.app.the.bunker.R;
 import com.app.the.bunker.dialogs.MyAlertDialog;
 import com.app.the.bunker.interfaces.FromDialogListener;
 import com.app.the.bunker.models.MultiChoiceItemModel;
-import com.app.the.bunker.services.AlarmReceiver;
 import com.app.the.bunker.services.BungieService;
 import com.app.the.bunker.services.RequestResultReceiver;
+import com.app.the.bunker.utils.SyncUtils;
 
 import java.util.Calendar;
 import java.util.List;
 
-import static com.app.the.bunker.activities.DrawerActivity.DEFAULT_INTERVAL;
-import static com.app.the.bunker.activities.DrawerActivity.NEW_NOTIFY_PREF;
-import static com.app.the.bunker.activities.DrawerActivity.NEW_NOTIFY_TIME_PREF;
 import static com.app.the.bunker.activities.DrawerActivity.SHARED_PREFS;
 
 public class PrepareActivity extends AccountAuthenticatorActivity implements RequestResultReceiver.Receiver, FromDialogListener {
@@ -175,10 +169,18 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
                 break;
             case BungieService.STATUS_LOGIN:
                 Log.w(TAG, "Creating " + userName + " account...");
+                msg = getString(R.string.credentials);
+                text.setText(msg);
                 Intent intent = new Intent();
+                clanId = resultData.getString("clanId");
                 intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACC_TYPE);
                 intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, userName);
                 intent.putExtra(AccountManager.KEY_AUTHTOKEN, resultData.getString("authKey"));
+                Bundle bundle = new Bundle();
+                bundle.putString(Constants.ACC_MEMEBRSHIP, membershipId);
+                bundle.putString(Constants.ACC_PLATFORM, String.valueOf(platformId));
+                bundle.putString(Constants.ACC_CLAN, String.valueOf(clanId));
+                intent.putExtra(AccountManager.KEY_USERDATA, bundle);
                 authorize(intent);
                 break;
             case BungieService.STATUS_VERIFY:
@@ -186,7 +188,6 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
                 text.setText(msg);
                 break;
             case BungieService.STATUS_FRIENDS:
-                clanId = resultData.getString("clanId");
                 msg = getString(R.string.network);
                 text.setText(msg);
                 break;
@@ -207,10 +208,11 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
         String accType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
         String accName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         String accToken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
+        Bundle userData = intent.getBundleExtra(AccountManager.KEY_USERDATA);
         Account mAcc = new Account(accName, accType);
 
         if (!accToken.equalsIgnoreCase("null")){
-            mAccManager.addAccountExplicitly(mAcc, null, null);
+            mAccManager.addAccountExplicitly(mAcc, null, userData);
             mAccManager.setAuthToken(mAcc, accType, accToken);
             setAccountAuthenticatorResult(intent.getExtras());
             Log.w(TAG, "Account created!");
@@ -286,42 +288,22 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
         sharedEditor.putBoolean(MSG_SHOWED_PREF, true);
         sharedEditor.putBoolean(DrawerActivity.SOUND_PREF, true);
         sharedEditor.putBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, true);
-        sharedEditor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, true);
         sharedEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, 0);
-        sharedEditor.putInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, DEFAULT_INTERVAL);
+        sharedEditor.putLong(DrawerActivity.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
         sharedEditor.putString(DrawerActivity.MEMBER_PREF, membershipId);
         sharedEditor.putInt(DrawerActivity.PLATFORM_PREF, platformId);
         sharedEditor.putString(DrawerActivity.CLAN_PREF, clanId);
+        sharedEditor.putString(DrawerActivity.USERNAME_PREF, userName);
         sharedEditor.apply();
 
-        registerNewGamesAlarm();
+        SyncUtils.toogleSync(this, true, SyncUtils.DEFAULT_INTERVAL);
+
         if (sharedPrefs.getBoolean(DrawerActivity.FOREGROUND_PREF, false)){
             Intent intent = new Intent(this, DrawerActivity.class);
             Log.w(TAG, "share? " + share);
             intent.putExtra("share", share);
             startActivity(intent);
             finish();
-        }
-    }
-
-    public void registerNewGamesAlarm() {
-        SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        if (sharedPrefs.getBoolean(NEW_NOTIFY_PREF, false)) {
-            int interval = sharedPrefs.getInt(NEW_NOTIFY_TIME_PREF, DEFAULT_INTERVAL);
-            Intent intent = new Intent(this, AlarmReceiver.class);
-            intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
-            intent.putExtra("memberId", membershipId);
-            intent.putExtra("platformId", platformId);
-            PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                Intent nIntent = new Intent(this, DrawerActivity.class);
-                nIntent.putExtra("isFromNews", true);
-                PendingIntent npIntent = PendingIntent.getActivity(this, 0, nIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager.AlarmClockInfo aC = new AlarmManager.AlarmClockInfo(System.currentTimeMillis() + interval, npIntent);
-                alarm.setAlarmClock(aC, pIntent);
-            } else alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, pIntent);
-            Log.w(TAG, "New game alarm registered in an interval of " + interval + " millis");
         }
     }
 

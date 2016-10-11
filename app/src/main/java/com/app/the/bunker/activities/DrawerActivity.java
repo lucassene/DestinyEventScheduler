@@ -109,7 +109,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String SCHEDULED_NOTIFY_PREF = "allowScheduledNotify";
     public static final String SCHEDULED_TIME_PREF = "notificationTime";
     public static final String SOUND_PREF = "scheduledNotifySound";
-    public static final String NEW_NOTIFY_PREF = "allowNewNotify";
     public static final String NEW_NOTIFY_TIME_PREF = "newNotificationTime";
     public static final String FOREGROUND_PREF = "isForeground";
     public static final String DOWNLOAD_PREF = "downloadList";
@@ -122,7 +121,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String EVENT_PREF = "eventMax";
     public static final String TYPE_PREF = "typeMax";
     public static final String KEY_PREF = "authKey";
-    public static final int DEFAULT_INTERVAL = 3600000;
+    public static final String USERNAME_PREF = "userName";
 
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
     public static final int FRAGMENT_TYPE_WITH_BACKSTACK = 1;
@@ -579,11 +578,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
-    public String getClanName() {
-        return clanName;
-    }
-
-    @Override
     public String getOrderBy() {
         return clanOrderBy;
     }
@@ -686,15 +680,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             Log.w(TAG, "requestId: " + secondId + " registered!");
         }
 
-    }
-
-    @Override
-    public void cancelAlarmTask(int requestId) {
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pIntent = PendingIntent.getBroadcast(this, requestId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarm.cancel(pIntent);
-        Log.w(TAG, "requestId canceled: " + requestId);
     }
 
     @Override
@@ -1733,41 +1718,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         intent.putExtra(LocalService.MEMBERS_HEADER, (Serializable) list);
         intent.putExtra(LocalService.CLAN_HEADER, clanId);
         startService(intent);
-    }
-
-    @Override
-    public void registerNewGamesAlarm() {
-        SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        if (sharedPrefs.getBoolean(NEW_NOTIFY_PREF, false)) {
-            int interval = sharedPrefs.getInt(NEW_NOTIFY_TIME_PREF, DEFAULT_INTERVAL);
-            Intent intent = new Intent(this, AlarmReceiver.class);
-            intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
-            intent.putExtra("memberId", bungieId);
-            intent.putExtra("platformId", platformId);
-            PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                Intent nIntent = new Intent(this, DrawerActivity.class);
-                nIntent.putExtra("isFromNews", true);
-                PendingIntent npIntent = PendingIntent.getActivity(this, 0, nIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager.AlarmClockInfo aC = new AlarmManager.AlarmClockInfo(System.currentTimeMillis() + interval, npIntent);
-                alarm.setAlarmClock(aC, pIntent);
-            } else alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, pIntent);
-            Log.w(TAG, "New game alarm registered in an interval of " + interval + " millis");
-        }
-    }
-
-    @Override
-    public void deleteNewGamesAlarm() {
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        intent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_NEW_NOTIFICATIONS);
-        intent.putExtra("memberId", bungieId);
-        intent.putExtra("platformId", platformId);
-        PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarm.cancel(pIntent);
-        Log.w(TAG, "New game alarm deleted.");
-
     }
 
     @Override

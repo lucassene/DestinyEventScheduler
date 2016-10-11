@@ -94,6 +94,14 @@
         <item>10 minutos</item>
     </string-array>
 
+    <integer-array name="pref_new_time_list_values">
+        <item>21600</item>
+        <item>7200</item>
+        <item>3600</item>
+        <item>1800</item>
+        <item>600</item>
+    </integer-array>
+
     <string-array name="medal_names">
         <item>Criador</item>
         <item>Jogador</item>

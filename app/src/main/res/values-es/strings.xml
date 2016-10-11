@@ -290,11 +290,11 @@
     </string-array>
 
     <integer-array name="pref_new_time_list_values">
-        <item>21600000</item>
-        <item>7200000</item>
-        <item>3600000</item>
-        <item>1800000</item>
-        <item>600000</item>
+        <item>21600</item>
+        <item>7200</item>
+        <item>3600</item>
+        <item>1800</item>
+        <item>600</item>
     </integer-array>
 
     <array name="medals_icons">

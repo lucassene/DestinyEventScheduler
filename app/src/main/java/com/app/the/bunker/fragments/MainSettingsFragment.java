@@ -33,6 +33,7 @@ import com.app.the.bunker.models.MultiChoiceItemModel;
 import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.services.UpdateNotificationsService;
 import com.app.the.bunker.utils.StringUtils;
+import com.app.the.bunker.utils.SyncUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -67,10 +68,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     private int previousScheduleTime;
     private int newScheduleTime;
-    private boolean previousNewPrefs;
-    private boolean newNewPrefs;
-    private int previousNewTime;
-    private int newNewTime;
+    private long newNotificationInterval;
 
     private boolean checkChanged;
     private boolean previousCheck;
@@ -173,10 +171,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         previousScheduleTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
         newScheduleTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
 
-        previousNewPrefs = sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
-        previousNewTime = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF,DrawerActivity.DEFAULT_INTERVAL);
-        newNewTime = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF,DrawerActivity.DEFAULT_INTERVAL);
-        newNewPrefs = sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
+        newNotificationInterval = sharedPrefs.getLong(DrawerActivity.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
 
         checkChanged = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
         previousCheck = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
@@ -200,7 +195,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     private void updateNotifications() {
         //Log.w(TAG, "checkChanged: " + checkChanged);
-        //Log.w(TAG, "previousTime: " + previousScheduleTime + " / newTime: " + newScheduleTime);
+        //Log.w(TAG, "previousTime: " + previousScheduleTime + " / newNotificationInterval: " + newScheduleTime);
         if (newScheduleTime != previousScheduleTime || checkChanged != scheduledSwitch.isChecked()){
             SharedPreferences.Editor editor = getContext().getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).edit();
             editor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, newScheduleTime);
@@ -217,22 +212,6 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
                 Toast.makeText(getContext(), "Atualizando notificações ainda, por favor aguarde!", Toast.LENGTH_SHORT).show();
             }
         } else Log.w(TAG, "New notifyTime equals to previsous notifyTime. No need to change");
-        if (previousNewPrefs != newNewPrefs){
-            Log.w(TAG, "previousNew: " + previousNewPrefs + " / newNew: " + newNewPrefs);
-            Log.w(TAG, "Updating new prefs");
-            if (newNewPrefs){
-                Log.w(TAG, "Creating New games notify alarm.");
-                callback.registerNewGamesAlarm();
-            } else {
-                Log.w(TAG, "Deleting new games notify alarm.");
-                callback.deleteNewGamesAlarm();
-            }
-        }
-        if (previousNewTime != newNewTime){
-            Log.w(TAG, "Change in newTime. Updating alarm.");
-            callback.deleteNewGamesAlarm();
-            callback.registerNewGamesAlarm();
-        }
     }
 
     @Override
@@ -259,19 +238,19 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     }
 
     private int getNewSelectedTime(){
-        switch (newNewTime){
-            case 600000:
+        switch ((int)newNotificationInterval){
+            case 600:
                 return 4;
-            case 1800000:
+            case 1800:
                 return 3;
-            case 3600000:
+            case 3600:
                 return 2;
-            case 7200000:
+            case 7200:
                 return 1;
-            case 21600000:
+            case 21600:
                 return 0;
             default:
-                return 2;
+                return 4;
         }
     }
 
@@ -292,12 +271,12 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             text = time + " " + getResources().getString(R.string.minutes_before);
         }
         timeText.setText(text);
-        int newTime = sharedPrefs.getInt(DrawerActivity.NEW_NOTIFY_TIME_PREF,DrawerActivity.DEFAULT_INTERVAL);
-        newTimeText.setText(getNewTimeText(newTime));
+        long newTime = sharedPrefs.getLong(DrawerActivity.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
+        newTimeText.setText(getNewTimeText((int)newTime));
 
         soundCheckBox.setChecked(sharedPrefs.getBoolean(DrawerActivity.SOUND_PREF, true));
 
-        newSwitch.setChecked(sharedPrefs.getBoolean(DrawerActivity.NEW_NOTIFY_PREF, true));
+        newSwitch.setChecked(SyncUtils.isSyncEnabled(getContext()));
         updateListText();
     }
 
@@ -340,13 +319,10 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     }
 
     private void changeNewStatus() {
-        SharedPreferences.Editor editor = getContext().getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).edit();
         if (newSwitch.isChecked()){
             if (scheduledSwitch.isChecked()){
                 switchType = 2;
             } else switchType = 1;
-            editor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, true);
-            newNewPrefs = true;
             AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
             anim.setDuration(250);
             anim.setFillAfter(true);
@@ -357,14 +333,12 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             newTimeLayout.setClickable(true);
             newTimeLayout.setFocusable(true);
             changeSoundStatus();
-            editor.apply();
-            callback.registerNewGamesAlarm();
+            SyncUtils.toogleSync(getContext(), newSwitch.isChecked(), newNotificationInterval);
+            //callback.registerNewGamesAlarm();
         } else {
             if (!scheduledSwitch.isChecked()){
                 switchType = 0;
             } else switchType = 1;
-            editor.putBoolean(DrawerActivity.NEW_NOTIFY_PREF, false);
-            newNewPrefs = false;
             AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
             anim.setDuration(250);
             anim.setFillAfter(true);
@@ -375,8 +349,8 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             newTimeLayout.setClickable(false);
             newTimeLayout.setFocusable(false);
             changeSoundStatus();
-            editor.apply();
-            callback.deleteNewGamesAlarm();
+            SyncUtils.toogleSync(getContext(), newSwitch.isChecked(), newNotificationInterval);
+            //callback.deleteNewGamesAlarm();
         }
     }
 
@@ -460,24 +434,24 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
                 break;
             case "new":
                 SharedPreferences.Editor editor = sharedPrefs.edit();
-                editor.putInt(DrawerActivity.NEW_NOTIFY_TIME_PREF, value);
+                editor.putLong(DrawerActivity.NEW_NOTIFY_TIME_PREF, value);
                 editor.apply();
-                newNewTime = value;
+                newNotificationInterval = value;
+                SyncUtils.toogleSync(getContext(), newSwitch.isChecked(), value);
                 newTimeText.setText(getNewTimeText(value));
                 break;
         }
     }
 
     public String getNewTimeText(int value){
-        String text;
-        if (value <= 1800000){
-            text = String.valueOf(value/DIVISOR) + getString(R.string.minutes);
-        } else if (value == 3600000){
-            text = String.valueOf((value/DIVISOR)/60) + getString(R.string.hour);
-        } else {
-            text = String.valueOf((value/DIVISOR)/60) + getString(R.string.hours);
+        String[] names = getContext().getResources().getStringArray(R.array.pref_new_time_list_entries);
+        int[] values = getContext().getResources().getIntArray(R.array.pref_new_time_list_values);
+        for (int i=1; i<values.length;i++){
+            if (values[i] == value){
+                return names[i];
+            }
         }
-        return text;
+        return names[2];
     }
 
 

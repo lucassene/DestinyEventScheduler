@@ -469,9 +469,7 @@ public class BungieService extends IntentService {
                     int err = checkInServer(receiver);
                     if (err != NO_ERROR) { return err; }
 
-                    bundle.clear();
-                    bundle.putString("clanId", clanId);
-                    receiver.send(STATUS_FRIENDS, bundle);
+                    receiver.send(STATUS_VERIFY, Bundle.EMPTY);
                     return NO_ERROR;
                 } catch (JSONException e){
                     Log.w(TAG, "Erro no JSON do getGroup");
@@ -555,7 +553,6 @@ public class BungieService extends IntentService {
 
     private int checkInServer(ResultReceiver receiver) {
         String myURL = SERVER_BASE_URL + LOGIN_ENDPOINT;
-        receiver.send(STATUS_RUNNING, Bundle.EMPTY);
         Log.w(TAG, "Login initiaded. Getting authorization...");
 
         try {
@@ -580,7 +577,7 @@ public class BungieService extends IntentService {
                     editor.apply();
 
                     Bundle bundle = new Bundle();
-                    bundle.putString("displayName", displayName);
+                    bundle.putString("clanId", clanId);
                     bundle.putString("authKey", encryptedKey);
 
                     receiver.send(STATUS_LOGIN, bundle);
@@ -603,7 +600,7 @@ public class BungieService extends IntentService {
     private int getMembersOfClan(ResultReceiver receiver){
 
         String myURL = SERVER_BASE_URL + API_SERVER_ENDPOINT + CLAN_ENDPOINT + "/" + clanId + "/" + MEMBERS_ENDPOINT;
-        receiver.send(STATUS_VERIFY, Bundle.EMPTY);
+        receiver.send(STATUS_FRIENDS, Bundle.EMPTY);
 
         try{
 

@@ -1,5 +1,7 @@
 package com.app.the.bunker.services;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
 import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.data.EventTable;
@@ -529,10 +532,15 @@ public class ServerService extends IntentService {
                                     String authKey = urlConnection.getHeaderField(AUTH_HEADER);
                                     //Log.w(TAG, "authKey: " + authKey);
                                     CipherUtils cipher = new CipherUtils();
-                                    SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                                    editor.putString(DrawerActivity.KEY_PREF, cipher.encrypt(authKey));
+                                    SharedPreferences prefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = prefs.edit();
+                                    String encrypted = cipher.encrypt(authKey);
+                                    editor.putString(DrawerActivity.KEY_PREF, encrypted);
                                     editor.apply();
-                                    //TODO salvar o userName nas prefs tbm e alterar o token para o novo
+                                    String userName = prefs.getString(DrawerActivity.USERNAME_PREF, "");
+                                    AccountManager manager = AccountManager.get(this);
+                                    Account acc = new Account(userName, Constants.ACC_TYPE);
+                                    manager.setAuthToken(acc, Constants.ACC_TYPE, encrypted);
                                     error = requestServer(receiver, bundle.getInt(REQUEST_TAG),bundle.getString(URL_TAG),bundle.getBundle(BUNDLE_TAG));
                                     return error;
                                 default:
