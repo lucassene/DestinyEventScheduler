@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
-import com.app.the.bunker.activities.DrawerActivity;
 
 public class SyncUtils {
 
@@ -18,8 +17,8 @@ public class SyncUtils {
 
     public static void toogleSync(Context context, boolean b, long interval){
         Log.w(TAG, "Changing syncAutomatically to " + b + " in intervals of " + interval + " secs.");
-        SharedPreferences prefs = context.getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        String userName = prefs.getString(DrawerActivity.USERNAME_PREF, "");
+        SharedPreferences prefs = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        String userName = prefs.getString(Constants.USERNAME_PREF, "");
         Account acc = new Account(userName, Constants.ACC_TYPE);
         ContentResolver.setSyncAutomatically(acc, context.getString(R.string.AUTHORITY), b);
         if (b){
@@ -28,8 +27,8 @@ public class SyncUtils {
     }
 
     public static boolean isSyncEnabled(Context context){
-        SharedPreferences prefs = context.getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        String userName = prefs.getString(DrawerActivity.USERNAME_PREF, "");
+        SharedPreferences prefs = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        String userName = prefs.getString(Constants.USERNAME_PREF, "");
         Account acc = new Account(userName, Constants.ACC_TYPE);
         return ContentResolver.getSyncAutomatically(acc, context.getString(R.string.AUTHORITY));
     }

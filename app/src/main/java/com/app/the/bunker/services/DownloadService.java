@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.app.the.bunker.activities.DrawerActivity;
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.data.SavedImagesTable;
 import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.utils.ImageUtils;
@@ -28,8 +28,8 @@ public class DownloadService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        SharedPreferences prefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> set = prefs.getStringSet(DrawerActivity.DOWNLOAD_PREF, null);
+        SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        Set<String> set = prefs.getStringSet(Constants.DOWNLOAD_PREF, null);
         String icon;
         if (set != null){
             ArrayList<String> downloadList = new ArrayList<>(set);
@@ -50,12 +50,12 @@ public class DownloadService extends IntentService {
             }
             SharedPreferences.Editor editor = prefs.edit();
             if (downloadList.size()==0){
-                editor.remove(DrawerActivity.DOWNLOAD_PREF);
+                editor.remove(Constants.DOWNLOAD_PREF);
                 editor.apply();
             } else {
                 Set<String> newSet = new HashSet<>();
                 newSet.addAll(downloadList);
-                editor.putStringSet(DrawerActivity.DOWNLOAD_PREF,newSet);
+                editor.putStringSet(Constants.DOWNLOAD_PREF,newSet);
                 editor.apply();
             }
         }

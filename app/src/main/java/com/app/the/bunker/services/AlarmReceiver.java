@@ -27,7 +27,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 context.startService(service);
                 break;
             case TYPE_NEW_NOTIFICATIONS:
-                service = new Intent(context, NewGameNotificationService.class);
+                service = new Intent(context, ServerSyncService.class);
                 service.putExtra("memberId", intent.getStringExtra("memberId"));
                 service.putExtra("platformId", intent.getIntExtra("platformId",0));
                 context.startService(service);

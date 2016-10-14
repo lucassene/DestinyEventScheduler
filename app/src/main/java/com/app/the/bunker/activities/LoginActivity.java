@@ -1,17 +1,18 @@
 package com.app.the.bunker.activities;
 
+import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -22,14 +23,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app.the.bunker.BuildConfig;
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
 import com.app.the.bunker.data.DBHelper;
-import com.app.the.bunker.data.LoggedUserTable;
 import com.app.the.bunker.dialogs.MyAlertDialog;
 import com.app.the.bunker.interfaces.FromDialogListener;
 import com.app.the.bunker.models.MultiChoiceItemModel;
 import com.app.the.bunker.models.NoticeModel;
-import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.services.BungieService;
 import com.app.the.bunker.services.RequestResultReceiver;
 import com.app.the.bunker.services.ServerService;
@@ -39,10 +39,9 @@ import com.app.the.bunker.utils.NetworkUtils;
 import java.util.Calendar;
 import java.util.List;
 
-public class LoginActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, RequestResultReceiver.Receiver, FromDialogListener {
+public class LoginActivity extends AppCompatActivity implements RequestResultReceiver.Receiver, FromDialogListener {
 
     private static final String TAG = "LoginActivity";
-    private static final int URL_LOADER_USER = 30;
 
     private static final String PSN_URL = "http://www.bungie.net/en/User/SignIn/Psnid";
     private static final String LIVE_URL = "http://www.bungie.net/en/User/SignIn/Xuid";
@@ -81,13 +80,52 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         buttonsLayout = (LinearLayout) findViewById(R.id.buttons_layout);
 
-        getSupportLoaderManager().initLoader(URL_LOADER_USER, null, this);
+        checkAccount();
 
         if (savedInstanceState != null){
             showButtons = savedInstanceState.getBoolean("showButtons");
             showProgressBar = savedInstanceState.getBoolean("showProgress");
         }
 
+    }
+
+    private void prepareDatabase(){
+        CookiesUtils.clearCookies();
+        DBHelper database = new DBHelper(getApplicationContext());
+        SQLiteDatabase db = database.getWritableDatabase();
+        database.onUpgrade(db, 0, 0);
+        db.close();
+        database.close();
+    }
+
+    private void checkAccount(){
+        AccountManager manager = AccountManager.get(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {}
+        Account[] accs = manager.getAccountsByType(Constants.ACC_TYPE);
+        Log.w(TAG, "Number of accounts found: " + accs.length);
+        SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        userName = prefs.getString(Constants.USERNAME_PREF, "");
+        String clanId = prefs.getString(Constants.CLAN_PREF, "");
+        boolean accFound = false;
+        for (Account acc : accs) {
+            if (acc.name.equals(userName)) {
+                Log.w(TAG, "user " + acc.name + " found.");
+                bungieId = manager.getUserData(acc,Constants.ACC_MEMEBRSHIP);
+                platformId = Integer.parseInt(manager.getUserData(acc, Constants.ACC_PLATFORM));
+                if (!isServerServiceRunning()) {
+                    getNotice(bungieId, platformId, clanId);
+                } else {
+                    isClanMember(bungieId, platformId);
+                }
+                accFound = true;
+                break;
+            }
+        }
+        if (!accFound){
+            prepareDatabase();
+            showButtons = true;
+            buttonsLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -101,7 +139,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     protected void onResume() {
         super.onResume();
 
-        if (getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getBoolean(PrepareActivity.PREPARE_PREF,false) || isBungieServiceRunning()){
+        if (getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).getBoolean(PrepareActivity.PREPARE_PREF,false) || isBungieServiceRunning()){
             Intent intent = new Intent(this, PrepareActivity.class);
             intent.putExtra(PrepareActivity.TYPE, PrepareActivity.TYPE_LOGIN);
             startActivity(intent);
@@ -123,7 +161,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
     public boolean isBungieServiceRunning() {
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         return sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
     }
 
@@ -152,10 +190,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 String cookies = data.getStringExtra("cookies");
                 String xcsrf = data.getStringExtra("x-csrf");
 
-                SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+                SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPrefs.edit();
-                editor.putString(DrawerActivity.COOKIES_PREF, cookies);
-                editor.putString(DrawerActivity.XCSRF_PREF, xcsrf);
+                editor.putString(Constants.COOKIES_PREF, cookies);
+                editor.putString(Constants.XCSRF_PREF, xcsrf);
                 editor.apply();
 
                 if (errorCode != BungieService.ERROR_AUTH){
@@ -182,54 +220,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection;
-
-        switch (id) {
-            case URL_LOADER_USER:
-                projection = LoggedUserTable.ALL_COLUMNS;
-                return new CursorLoader(
-                        this,
-                        DataProvider.LOGGED_USER_URI,
-                        projection,
-                        null,
-                        null,
-                        null);
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        if (data != null && data.moveToFirst()){
-            switch (loader.getId()) {
-                case URL_LOADER_USER:
-                    if (data.getCount() > 0) {
-                        showButtons = false;
-                        bungieId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
-                        userName = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_NAME));
-                        platformId = data.getInt(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
-                        String clanId = data.getString(data.getColumnIndexOrThrow(LoggedUserTable.COLUMN_CLAN));
-                        if (!isServerServiceRunning()) {
-                            getNotice(bungieId, platformId, clanId);
-                        } else {
-                            isClanMember(bungieId, platformId);
-                        }
-                    }
-                    break;
-            }
-        } else {
-            showButtons = true;
-            buttonsLayout.setVisibility(View.VISIBLE);
-        }
-
-    }
 
     public boolean isServerServiceRunning() {
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         return sharedPrefs.getBoolean(ServerService.RUNNING_SERVICE, false);
     }
 
@@ -259,9 +252,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
             intent.putExtra(BungieService.MEMBERSHIP_EXTRA, bungieId);
             intent.putExtra(BungieService.RECEIVER_EXTRA, mReceiver);
 
-            SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-            String cookies = sharedPrefs.getString(DrawerActivity.COOKIES_PREF, null);
-            String xcsrf = sharedPrefs.getString(DrawerActivity.XCSRF_PREF, null);
+            SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+            String cookies = sharedPrefs.getString(Constants.COOKIES_PREF, null);
+            String xcsrf = sharedPrefs.getString(Constants.XCSRF_PREF, null);
 
             if (cookies != null && xcsrf != null){
                 intent.putExtra(BungieService.COOKIE_EXTRA, cookies);
@@ -269,10 +262,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 startService(intent);
             } else Log.w(TAG, "Cookies or X-CSRF are null");
         }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
     }
 
     @Override
@@ -341,8 +330,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         progressBar.setVisibility(View.GONE);
         Intent intent = new Intent(this, DrawerActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra("bungieId",bungieId);
-        intent.putExtra("userName",userName);
         startActivity(intent);
         finish();
     }
@@ -389,7 +376,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 buttonsLayout.setVisibility(View.VISIBLE);
                 break;
             case BungieService.ERROR_AUTH:
-                CookiesUtils.clearCookies();
+                prepareDatabase();
                 showButtons = true;
                 buttonsLayout.setVisibility(View.VISIBLE);
                 break;

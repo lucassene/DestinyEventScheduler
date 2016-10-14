@@ -20,15 +20,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
 import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.data.EventTable;
 import com.app.the.bunker.data.EventTypeTable;
+import com.app.the.bunker.data.MemberTable;
 import com.app.the.bunker.dialogs.MyDatePickerDialog;
 import com.app.the.bunker.dialogs.MyTimePickerDialog;
 import com.app.the.bunker.dialogs.SimpleInputDialog;
@@ -75,7 +78,13 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private Button createButton;
     private EditText commentText;
     private TextView chartCount;
+    private LinearLayout reservedLayout;
+    private TextView reservedText;
+    private SeekBar spaceBar;
+    private TextView spaceText;
     private int chars = 60;
+    private int maxGuardians = 6;
+    private int reservedSpaces = 1;
 
     private SimpleInputDialog dialog;
 
@@ -149,6 +158,37 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
         dateText = (EditText) v.findViewById(R.id.date_text);
         timeText = (EditText) v.findViewById(R.id.time_text);
+
+        reservedLayout = (LinearLayout) v.findViewById(R.id.reserved_layout);
+        reservedText = (TextView) v.findViewById(R.id.space_text);
+        spaceBar = (SeekBar) v.findViewById(R.id.space_bar);
+        spaceText = (TextView) v.findViewById(R.id.space_btn_text);
+
+        reservedLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new GenericListFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("title", "Select members");
+                bundle.putInt("selected", selectedType);
+                bundle.putString("table", MemberTable.TABLE_NAME);
+                bundle.putString("tag", getTag());
+                callback.loadNewFragment(fragment, bundle, "member");
+            }
+        });
+
+        spaceBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                spaceText.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
 
         commentText = (EditText) v.findViewById(R.id.comment_text);
         commentText.addTextChangedListener(new TextWatcher() {
@@ -233,6 +273,26 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 bundle.putInt("min", minLight);
                 bundle.putInt("type", FromDialogListener.LIGHT_TYPE);
                 String hint = getResources().getString(R.string.value_between2) + minLight + getResources().getString(R.string.and320);
+                bundle.putString("hint", hint);
+                dialog = new SimpleInputDialog();
+                dialog.setArguments(bundle);
+                dialog.show(getFragmentManager(), "dialog");
+            }
+        });
+
+        spaceText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putString("tag","new");
+                bundle.putString("title", getResources().getString(R.string.spaces_available));
+                bundle.putString("yes", getResources().getString(R.string.save));
+                bundle.putString("no", getResources().getString(R.string.cancel));
+                int n = maxGuardians - reservedSpaces;
+                bundle.putInt("max", n);
+                bundle.putInt("min", 0);
+                bundle.putInt("type", FromDialogListener.GUARDIAN_TYPE);
+                String hint = getResources().getString(R.string.value_between2) + 0 + getString(R.string.and) + n;
                 bundle.putString("hint", hint);
                 dialog = new SimpleInputDialog();
                 dialog.setArguments(bundle);
@@ -370,6 +430,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 case LOADER_EVENT:
                 case LOADER_EVENT_WITH_TYPE:
                     selectedEvent = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_ID));
+                    maxGuardians = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_GUARDIANS));
                     prepareEventViews(data);
                     break;
             }
@@ -381,6 +442,10 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         minLight = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT));
         lightBar.setMax(MAX_LIGHT - minLight);
         lightText.setText(String.valueOf(minLight));
+        int n = maxGuardians - reservedSpaces;
+        spaceBar.setMax(n);
+        spaceBar.setProgress(spaceBar.getMax());
+        spaceText.setText(String.valueOf(n));
         String iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
         setViewIcon(iconGame,getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
         textGame.setText(EventTable.getName(getContext(),data));
@@ -410,6 +475,10 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 lightText.setText(input);
                 int min = Integer.parseInt(input) - minLight;
                 lightBar.setProgress(min);
+                break;
+            case FromDialogListener.GUARDIAN_TYPE:
+                spaceText.setText(input);
+                spaceBar.setProgress(Integer.parseInt(input));
                 break;
         }
     }
@@ -544,8 +613,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         Calendar notifyTime = Calendar.getInstance();
         notifyTime.setTime(insertedDate.getTime());
 
-        SharedPreferences sharedPrefs = getActivity().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0)*-1;
+        SharedPreferences sharedPrefs = getActivity().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        int alarmTime = sharedPrefs.getInt(Constants.SCHEDULED_TIME_PREF, 0)*-1;
         notifyTime.add(Calendar.MINUTE,alarmTime);
         minimumIntTime = (alarmTime*-1) + 10;
 

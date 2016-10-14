@@ -22,6 +22,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
 import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.data.NotificationTable;
@@ -76,9 +77,9 @@ public class NotificationService extends IntentService {
 
     private void makeNotification(String title, String iconId, String typeName, Calendar gameTime, String notifyTime, int notificationId) {
 
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
 
-        if (sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false)){
+        if (sharedPrefs.getBoolean(Constants.SCHEDULED_NOTIFY_PREF, false)){
 
             Intent nIntent = new Intent(getApplicationContext(), DrawerActivity.class);
             nIntent.putExtra("notification",notificationId);
@@ -111,7 +112,7 @@ public class NotificationService extends IntentService {
             setPriority(nBuilder);
             nBuilder.setContentIntent(pIntent);
 
-            boolean sound = sharedPrefs.getBoolean(DrawerActivity.SOUND_PREF,false);
+            boolean sound = sharedPrefs.getBoolean(Constants.SOUND_PREF,false);
 
             if (sound){
                 nBuilder.setDefaults(Notification.DEFAULT_ALL);

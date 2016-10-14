@@ -44,6 +44,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
 import com.app.the.bunker.adapters.DrawerAdapter;
 import com.app.the.bunker.adapters.ViewPagerAdapter;
@@ -105,29 +106,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public static final String TAG_MY_EVENTS = "myEvents";
     public static final String TAG_SEARCH_EVENTS = "searchEvents";
 
-    public static final String SHARED_PREFS = "myDestinyPrefs";
-    public static final String SCHEDULED_NOTIFY_PREF = "allowScheduledNotify";
-    public static final String SCHEDULED_TIME_PREF = "notificationTime";
-    public static final String SOUND_PREF = "scheduledNotifySound";
-    public static final String NEW_NOTIFY_TIME_PREF = "newNotificationTime";
-    public static final String FOREGROUND_PREF = "isForeground";
-    public static final String DOWNLOAD_PREF = "downloadList";
-    public static final String COOKIES_PREF = "cookies";
-    public static final String XCSRF_PREF = "xcsrf";
-    public static final String NEW_GAMES_PREF = "newGames";
-    public static final String MEMBER_PREF = "membership";
-    public static final String PLATFORM_PREF = "platform";
-    public static final String CLAN_PREF = "clanId";
-    public static final String EVENT_PREF = "eventMax";
-    public static final String TYPE_PREF = "typeMax";
-    public static final String KEY_PREF = "authKey";
-    public static final String USERNAME_PREF = "userName";
-
     public static final int FRAGMENT_TYPE_WITHOUT_BACKSTACK = 0;
     public static final int FRAGMENT_TYPE_WITH_BACKSTACK = 1;
 
     public static final int TYPE_EMAIL_INTENT = 1;
     public static final int TYPE_BROWSER_INTENT = 2;
+    public static final int TYPE_SHARE_INTENT = 3;
 
     RecyclerView rView;
     RecyclerView.Adapter rAdapter;
@@ -171,6 +155,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     SlidingTabLayout tabLayout;
     private int selectedTabFragment;
 
+    Toolbar toolbar;
     TextView toolbarTitle;
 
     private Bundle spinnerSelections = new Bundle();
@@ -201,7 +186,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         setContentView(R.layout.drawer_layout);
         progress = (ProgressBar) findViewById(R.id.progress_bar);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("");
@@ -251,28 +236,38 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         }
 
         Bundle bundle = getIntent().getExtras();
-        if (bundle.containsKey("share")) {
+        if (bundle != null && bundle.containsKey("share")) {
             boolean b = bundle.getBoolean("share");
-            if (b) {
-                callShareIntent();
-            }
+            if (b) { callAndroidIntent(TYPE_SHARE_INTENT, null);}
         }
 
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor sharedEditor = sharedPrefs.edit();
-        sharedEditor.putBoolean(PrepareActivity.MSG_SHOWED_PREF, false);
+        sharedEditor.putBoolean(PrepareActivity.MSG_SHOWED_PREF, true);
         sharedEditor.apply();
 
-    }
+        String[] members = {
+                "4611686018449763730",
+                "4611686018450253378",
+                "4611686018442220415",
+                "4611686018432074920",
+                "4611686018433014309",
+                "4611686018432713903",
+                "4611686018439224227",
+                "4611686018456783207",
+                "4611686018428867206"
+        };
 
-    private void callShareIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
-        String msg = getString(R.string.share_msg);
-        msg = msg + getString(R.string.google_play_link);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, msg);
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_with)));
+/*        for (String member : members) {
+            CipherUtils utils = new CipherUtils();
+            try {
+                String key = utils.encrypt(member);
+                Log.w(TAG, "membership: " + member + " , key: " + key);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }*/
+
     }
 
     private void getLoggedUserData() {
@@ -324,7 +319,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                     Toast.makeText(this, R.string.check_connection, Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.menu_share:
-                callShareIntent();
+                callAndroidIntent(TYPE_SHARE_INTENT, null);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -373,9 +368,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     protected void onPause() {
         super.onPause();
         //Log.w(TAG, "Application Paused!");
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean(DrawerActivity.FOREGROUND_PREF, false);
+        editor.putBoolean(Constants.FOREGROUND_PREF, false);
         editor.apply();
     }
 
@@ -383,9 +378,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     protected void onResume() {
         super.onResume();
         //Log.w(TAG, "Application Resumed!");
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean(DrawerActivity.FOREGROUND_PREF, true);
+        editor.putBoolean(Constants.FOREGROUND_PREF, true);
         editor.apply();
 
         getClanData();
@@ -821,8 +816,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     private Calendar getNotifyTime(Calendar gameTime) {
         Calendar notifyTime = Calendar.getInstance();
         notifyTime.setTime(gameTime.getTime());
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0) * -1;
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        int alarmTime = sharedPrefs.getInt(Constants.SCHEDULED_TIME_PREF, 0) * -1;
         notifyTime.add(Calendar.MINUTE, alarmTime);
         return notifyTime;
     }
@@ -1335,10 +1330,10 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
         CookiesUtils.clearCookies();
 
-        SharedPreferences sharedPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString(PrepareActivity.LEGEND_PREF, getString(R.string.vanguard_data));
-        editor.putString(KEY_PREF, "");
+        editor.putString(Constants.KEY_PREF, "");
         editor.apply();
 
         AccountManager manager = AccountManager.get(this);
@@ -1700,8 +1695,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     private void updateNotifications(ArrayList<GameModel> scheduledGameList) {
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        if (sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false)) {
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        if (sharedPrefs.getBoolean(Constants.SCHEDULED_NOTIFY_PREF, false)) {
             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, CreateNotificationService.class);
             intent.putExtra(CreateNotificationService.GAME_HEADER, scheduledGameList);
             startService(intent);
@@ -1736,6 +1731,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 Intent eIntent = new Intent(Intent.ACTION_SENDTO,Uri.parse("mailto:" + text));
                 startActivity(eIntent);
                 break;
+            case TYPE_SHARE_INTENT:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
+                String msg = getString(R.string.share_msg);
+                msg = msg + getString(R.string.google_play_link);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, msg);
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_with)));
+                break;
         }
     }
 
@@ -1752,8 +1756,8 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             result.add(allGameList.get(i));
                         }
                     }
-                    SharedPreferences.Editor editor = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                    editor.putString(NEW_GAMES_PREF, idList);
+                    SharedPreferences.Editor editor = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                    editor.putString(Constants.NEW_GAMES_PREF, idList);
                     editor.apply();
                     Collections.sort(result, new GameComparator());
                     return result;
@@ -1811,22 +1815,22 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     private boolean isBungieServiceRunning() {
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         return sharedPrefs.getBoolean(BungieService.RUNNING_SERVICE, false);
     }
 
     public boolean isServerServiceRunning() {
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         return sharedPrefs.getBoolean(ServerService.RUNNING_SERVICE, false);
     }
 
     public boolean isLocalServiceRunning() {
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         return sharedPrefs.getBoolean(LocalService.RUNNING_SERVICE, false);
     }
 
     public boolean isNotifyServiceRunning() {
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         return sharedPrefs.getBoolean(CreateNotificationService.RUNNING_SERVICE, false);
     }
 

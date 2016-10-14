@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
-import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.services.ServerService;
 
 public class DestinyApplication extends Application {
@@ -21,10 +20,10 @@ public class DestinyApplication extends Application {
         @Override
         public void uncaughtException(Thread thread, Throwable ex) {
             String exceptionClass = ex.getStackTrace()[0].toString().substring(ex.getStackTrace()[0].toString().indexOf("(")+1,ex.getStackTrace()[0].toString().lastIndexOf("."));
-            SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-            String membership = sharedPrefs.getString(DrawerActivity.MEMBER_PREF,"");
-            int platform = sharedPrefs.getInt(DrawerActivity.PLATFORM_PREF, 0);
-            String clanId = sharedPrefs.getString(DrawerActivity.CLAN_PREF, "");
+            SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+            String membership = sharedPrefs.getString(Constants.MEMBER_PREF,"");
+            int platform = sharedPrefs.getInt(Constants.PLATFORM_PREF, 0);
+            String clanId = sharedPrefs.getString(Constants.CLAN_PREF, "");
             String errorMessage = getErrorMessage(ex);
             try {
                 callServerService(membership, platform, clanId, exceptionClass, errorMessage);

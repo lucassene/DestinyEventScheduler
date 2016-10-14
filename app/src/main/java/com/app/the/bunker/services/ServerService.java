@@ -15,7 +15,6 @@ import android.util.Log;
 
 import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
-import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.data.EventTable;
 import com.app.the.bunker.data.EventTypeTable;
 import com.app.the.bunker.models.EvaluationModel;
@@ -49,8 +48,8 @@ public class ServerService extends IntentService {
 
     private static final String TAG = "ServerService";
 
-    private static final String SERVER_BASE_URL = "https://destiny-scheduler.herokuapp.com/api/";
-    //private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/api/";
+    //private static final String SERVER_BASE_URL = "https://destiny-scheduler.herokuapp.com/api/";
+    private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/api/";
     private static final String GAME_ENDPOINT = "game";
     private static final String ENTRIES_ENDPOINT = "/entries";
     private static final String JOIN_ENDPOINT = "/join";
@@ -123,6 +122,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_NOTICE = 16;
     public static final int TYPE_NEW_EVENTS = 17;
     public static final int TYPE_LOGIN = 18;
+    public static final int TYPE_DONE = 19;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -156,7 +156,7 @@ public class ServerService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(RUNNING_SERVICE, true);
         editor.apply();
@@ -166,7 +166,7 @@ public class ServerService extends IntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(RUNNING_SERVICE, false);
         editor.apply();
@@ -532,12 +532,12 @@ public class ServerService extends IntentService {
                                     String authKey = urlConnection.getHeaderField(AUTH_HEADER);
                                     //Log.w(TAG, "authKey: " + authKey);
                                     CipherUtils cipher = new CipherUtils();
-                                    SharedPreferences prefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+                                    SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
                                     SharedPreferences.Editor editor = prefs.edit();
                                     String encrypted = cipher.encrypt(authKey);
-                                    editor.putString(DrawerActivity.KEY_PREF, encrypted);
+                                    editor.putString(Constants.KEY_PREF, encrypted);
                                     editor.apply();
-                                    String userName = prefs.getString(DrawerActivity.USERNAME_PREF, "");
+                                    String userName = prefs.getString(Constants.USERNAME_PREF, "");
                                     AccountManager manager = AccountManager.get(this);
                                     Account acc = new Account(userName, Constants.ACC_TYPE);
                                     manager.setAuthToken(acc, Constants.ACC_TYPE, encrypted);
@@ -646,8 +646,8 @@ public class ServerService extends IntentService {
             values.put(EventTable.COLUMN_GUARDIANS, e.getMaxGuardians());
             Uri uri = getContentResolver().insert(DataProvider.EVENT_URI,values);
             if (uri != null){
-                SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                editor.putInt(DrawerActivity.EVENT_PREF, getDBEventsCount());
+                SharedPreferences.Editor editor = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                editor.putInt(Constants.EVENT_PREF, getDBEventsCount());
                 editor.apply();
             }
             values.clear();
@@ -668,8 +668,8 @@ public class ServerService extends IntentService {
         values.put(EventTypeTable.COLUMN_ICON, eventType.getTypeIcon());
         Uri uri = getContentResolver().insert(DataProvider.EVENT_TYPE_URI, values);
         if (uri != null){
-            SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-            editor.putInt(DrawerActivity.TYPE_PREF,getDBTypesCount());
+            SharedPreferences.Editor editor = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+            editor.putInt(Constants.TYPE_PREF,getDBTypesCount());
             editor.apply();
         }
         values.clear();
@@ -1037,7 +1037,7 @@ public class ServerService extends IntentService {
         urlConnection.setRequestProperty(PLATFORM_HEADER, String.valueOf(platformId));
         urlConnection.setRequestProperty(CLAN_HEADER, String.valueOf(clanId));
         urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
-        String authKey = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getString(DrawerActivity.KEY_PREF,"");
+        String authKey = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).getString(Constants.KEY_PREF,"");
         try{
             if (!authKey.isEmpty()){
                 CipherUtils cipher = new CipherUtils();

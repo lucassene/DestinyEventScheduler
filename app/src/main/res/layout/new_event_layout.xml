@@ -154,7 +154,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="date"
-                    android:singleLine="true"
+                    android:maxLines="1"
                     android:focusable="false"
                     android:clickable="true"
                     android:hint="@string/date" />
@@ -170,7 +170,7 @@
                     android:id="@+id/time_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
+                    android:maxLines="1"
                     android:focusable="false"
                     android:clickable="true"
                     android:hint="@string/time"
@@ -235,6 +235,79 @@
             android:layout_height="@dimen/subheaderHeight"
             android:textColor="@color/psnColor"
             android:textSize="@dimen/secondaryTextSize"
+            android:text="@string/spaces"
+            android:gravity="center_vertical"/>
+
+        <LinearLayout
+            android:id="@+id/reserved_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reserved"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/space_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_spaces_reserved"
+                android:textSize="13sp"
+                android:alpha="0.75"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/global_padding">
+
+            <TextView
+                android:id="@+id/space_header_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/spaces_available"
+                android:layout_marginTop="@dimen/paddingTopLabelText"
+                android:layout_marginBottom="@dimen/paddingBottomLabelText"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@id/space_header_text">
+
+                <SeekBar
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:id="@+id/space_bar"
+                    android:layout_gravity="center_vertical"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/listItemHeight"
+                    android:layout_weight="1"
+                    android:alpha="0.60"
+                    android:gravity="center"
+                    android:id="@+id/space_btn_text"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="?android:attr/selectableItemBackground"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheaderHeight"
+            android:textColor="@color/psnColor"
+            android:textSize="@dimen/secondaryTextSize"
             android:text="@string/optional_comment"
             android:gravity="center_vertical"/>
 
@@ -249,7 +322,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:maxLength="70"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:inputType="text"
                 android:hint="@string/comment"/>
 

@@ -12,7 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
-import com.app.the.bunker.activities.DrawerActivity;
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.data.NotificationTable;
 import com.app.the.bunker.models.GameModel;
 import com.app.the.bunker.provider.DataProvider;
@@ -37,7 +37,7 @@ public class CreateNotificationService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(RUNNING_SERVICE, true);
         editor.apply();
@@ -47,7 +47,7 @@ public class CreateNotificationService extends IntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(RUNNING_SERVICE, false);
         editor.apply();
@@ -129,8 +129,8 @@ public class CreateNotificationService extends IntentService {
     }
 
     private void insertNotifications(GameModel gameModel) {
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int diff = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF,0);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        int diff = sharedPrefs.getInt(Constants.SCHEDULED_TIME_PREF,0);
         int times = 1;
         if (diff != 0){
             Calendar now = Calendar.getInstance();
@@ -184,8 +184,8 @@ public class CreateNotificationService extends IntentService {
 
     private String getNotificationTime(String time) {
         Calendar gameTime = DateUtils.stringToDate(time);
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int notify = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF,0);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        int notify = sharedPrefs.getInt(Constants.SCHEDULED_TIME_PREF,0);
         gameTime.add(Calendar.MINUTE,-notify);
         return DateUtils.calendarToString(gameTime);
     }

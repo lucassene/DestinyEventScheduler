@@ -6,6 +6,10 @@
         <item name="android:alertDialogTheme">@style/DestinyApp.AlertDialog</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
     <style name="DestinyApp.AlertDialog" parent="Theme.AppCompat.Dialog.Alert">

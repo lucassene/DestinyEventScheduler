@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
-import com.app.the.bunker.activities.DrawerActivity;
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.data.MemberTable;
 import com.app.the.bunker.models.MemberModel;
 import com.app.the.bunker.provider.DataProvider;
@@ -43,7 +43,7 @@ public class LocalService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(RUNNING_SERVICE, true);
         editor.apply();
@@ -53,7 +53,7 @@ public class LocalService extends IntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(RUNNING_SERVICE, false);
         editor.apply();

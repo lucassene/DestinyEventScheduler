@@ -14,8 +14,8 @@ import android.text.Html;
 import android.util.Log;
 
 import com.app.the.bunker.BuildConfig;
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
-import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.data.ClanTable;
 import com.app.the.bunker.data.EventTable;
 import com.app.the.bunker.data.EventTypeTable;
@@ -55,8 +55,8 @@ public class BungieService extends IntentService {
     private static final String BASE_URL = "https://www.bungie.net/Platform/";
     private static final String BASE_IMAGE_URL = "http://www.bungie.net";
 
-    private static final String SERVER_BASE_URL = "https://destiny-scheduler.herokuapp.com/";
-    //private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/";
+    //private static final String SERVER_BASE_URL = "https://destiny-scheduler.herokuapp.com/";
+    private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/";
     private static final String API_SERVER_ENDPOINT = "api/";
     private static final String LOGIN_ENDPOINT = "login";
     private static final String CLAN_ENDPOINT = "clan";
@@ -364,7 +364,7 @@ public class BungieService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(RUNNING_SERVICE, true);
         editor.apply();
@@ -374,7 +374,7 @@ public class BungieService extends IntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(RUNNING_SERVICE, false);
         editor.apply();
@@ -537,7 +537,7 @@ public class BungieService extends IntentService {
         urlConnection.setRequestProperty(CLAN_EXTRA, clanId);
         urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
         urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
-        String authKey = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).getString(DrawerActivity.KEY_PREF,"");
+        String authKey = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).getString(Constants.KEY_PREF,"");
         try{
             if (!authKey.isEmpty()){
                 CipherUtils cipher = new CipherUtils();
@@ -572,8 +572,8 @@ public class BungieService extends IntentService {
                     //Log.w(TAG, "authKey: " + authKey);
                     CipherUtils cipher = new CipherUtils();
                     String encryptedKey = cipher.encrypt(authKey);
-                    SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                    editor.putString(DrawerActivity.KEY_PREF, encryptedKey);
+                    SharedPreferences.Editor editor = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                    editor.putString(Constants.KEY_PREF, encryptedKey);
                     editor.apply();
 
                     Bundle bundle = new Bundle();
@@ -669,9 +669,9 @@ public class BungieService extends IntentService {
     }
 
     private void getNewEvents(ResultReceiver receiver) {
-        SharedPreferences.Editor sharedEditor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-        sharedEditor.putInt(DrawerActivity.EVENT_PREF, getDBEventsCount());
-        sharedEditor.putInt(DrawerActivity.TYPE_PREF, getDBTypesCount());
+        SharedPreferences.Editor sharedEditor = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+        sharedEditor.putInt(Constants.EVENT_PREF, getDBEventsCount());
+        sharedEditor.putInt(Constants.TYPE_PREF, getDBTypesCount());
         sharedEditor.apply();
 
         String myURL = SERVER_BASE_URL + API_SERVER_ENDPOINT + EVENTS_ENDPOINT + INITIAL_PARAM + getDBEventsCount();
@@ -972,11 +972,11 @@ public class BungieService extends IntentService {
             values.clear();
         }
         if (notDownloaded.size() > 0){
-            SharedPreferences prefs = getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE);
+            SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS,Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
             Set<String> set = new HashSet<>();
             set.addAll(notDownloaded);
-            editor.putStringSet(DrawerActivity.DOWNLOAD_PREF, set);
+            editor.putStringSet(Constants.DOWNLOAD_PREF, set);
             editor.apply();
         }
     }
@@ -1010,7 +1010,7 @@ public class BungieService extends IntentService {
 
         getContentResolver().insert(DataProvider.LOGGED_USER_URI, values);
 
-        SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
         for (int i=1;i<=getDBTypesCount();i++){
             editor.putBoolean(String.valueOf(i),true);
         }
@@ -1032,8 +1032,8 @@ public class BungieService extends IntentService {
             values.put(EventTable.COLUMN_GUARDIANS, e.getMaxGuardians());
             Uri uri = getContentResolver().insert(DataProvider.EVENT_URI,values);
             if (uri != null){
-                SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                editor.putInt(DrawerActivity.EVENT_PREF,getDBEventsCount());
+                SharedPreferences.Editor editor = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                editor.putInt(Constants.EVENT_PREF,getDBEventsCount());
                 editor.apply();
             }
             values.clear();
@@ -1054,8 +1054,8 @@ public class BungieService extends IntentService {
         values.put(EventTypeTable.COLUMN_ICON, eventType.getTypeIcon());
         Uri uri = getContentResolver().insert(DataProvider.EVENT_TYPE_URI, values);
         if (uri != null){
-            SharedPreferences.Editor editor = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-            editor.putInt(DrawerActivity.TYPE_PREF,getDBTypesCount());
+            SharedPreferences.Editor editor = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+            editor.putInt(Constants.TYPE_PREF,getDBTypesCount());
             editor.putBoolean(String.valueOf(eventType.getTypeId()),true);
             editor.apply();
         }

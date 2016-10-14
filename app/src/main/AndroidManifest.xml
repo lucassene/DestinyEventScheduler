@@ -93,7 +93,7 @@
             android:enabled="true">
         </service>
 
-        <service android:name="com.app.the.bunker.services.NewGameNotificationService"
+        <service android:name="com.app.the.bunker.services.ServerSyncService"
             android:exported="false"
             android:enabled="true">
         </service>

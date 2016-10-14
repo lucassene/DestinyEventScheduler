@@ -13,7 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
-import com.app.the.bunker.activities.DrawerActivity;
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.data.NotificationTable;
 import com.app.the.bunker.models.NotificationModel;
 import com.app.the.bunker.provider.DataProvider;
@@ -82,10 +82,10 @@ public class UpdateNotificationsService extends IntentService {
 
     private void updateNotifications() {
 
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int sharedTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF,0);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        int sharedTime = sharedPrefs.getInt(Constants.SCHEDULED_TIME_PREF,0);
         Log.w(TAG, "actualSharedTime: " + sharedTime + " previousSharedTime: " + previousTime);
-        boolean isAllowed = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
+        boolean isAllowed = sharedPrefs.getBoolean(Constants.SCHEDULED_NOTIFY_PREF, false);
 
         if (!isAllowed){
             for (int i=0;i<notificationList.size();i++){
@@ -155,7 +155,7 @@ public class UpdateNotificationsService extends IntentService {
     public void onCreate() {
         super.onCreate();
         Log.w(TAG, "Service running");
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(NOTIFY_RUNNING, true);
         editor.apply();
@@ -165,7 +165,7 @@ public class UpdateNotificationsService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         Log.w(TAG, "Service destroyed");
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(NOTIFY_RUNNING, false);
         editor.apply();

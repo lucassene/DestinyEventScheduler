@@ -25,7 +25,7 @@ import com.app.the.bunker.utils.SyncUtils;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.app.the.bunker.activities.DrawerActivity.SHARED_PREFS;
+import static com.app.the.bunker.Constants.SHARED_PREFS;
 
 public class PrepareActivity extends AccountAuthenticatorActivity implements RequestResultReceiver.Receiver, FromDialogListener {
 
@@ -100,7 +100,7 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(PREPARE_PREF, true);
-        editor.putBoolean(DrawerActivity.FOREGROUND_PREF, true);
+        editor.putBoolean(Constants.FOREGROUND_PREF, true);
         editor.apply();
         msg = sharedPrefs.getString(LEGEND_PREF, getString(R.string.vanguard_data));
         text.setText(msg);
@@ -111,7 +111,7 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
         super.onPause();
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean(DrawerActivity.FOREGROUND_PREF, false);
+        editor.putBoolean(Constants.FOREGROUND_PREF, false);
         editor.putString(LEGEND_PREF, msg);
         editor.apply();
     }
@@ -120,7 +120,7 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
     protected void onDestroy() {
         super.onDestroy();
         Log.w(TAG, "PrepareActivity destroyed!");
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putBoolean(PrepareActivity.PREPARE_PREF, false);
         editor.putString(LEGEND_PREF, getString(R.string.vanguard_data));
@@ -222,47 +222,64 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
     private void showAlertDialog() {
         DialogFragment dialog = new MyAlertDialog();
         Bundle bundle = new Bundle();
-        bundle.putInt("type",MyAlertDialog.SHARE_DIALOG);
 
         switch (errorCode){
             case BungieService.ERROR_NO_ICON:
+                bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
                 bundle.putString("title",getString(R.string.just_warning));
                 bundle.putString("msg",getString(R.string.no_icon_msg));
                 bundle.putString("posButton",getString(R.string.got_it));
+                dialog.setArguments(bundle);
+                dialog.show(getSupportFragmentManager(),"alert");
                 break;
             case BungieService.ERROR_NO_CONNECTION:
+                bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
                 bundle.putString("title",getString(R.string.error));
                 bundle.putString("msg",getString(R.string.no_connection_msg));
                 bundle.putString("posButton",getString(R.string.got_it));
+                dialog.setArguments(bundle);
+                dialog.show(getSupportFragmentManager(),"alert");
                 break;
             case BungieService.ERROR_HTTP_REQUEST:
             case BungieService.ERROR_RESPONSE_CODE:
             case BungieService.ERROR_CLAN_MEMBER:
             case BungieService.ERROR_MEMBERS_OF_CLAN:
+                bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
                 bundle.putString("title",getString(R.string.error));
                 bundle.putString("msg",getString(R.string.bungie_net_error_msg));
                 bundle.putString("posButton",getString(R.string.got_it));
+                dialog.setArguments(bundle);
+                dialog.show(getSupportFragmentManager(),"alert");
                 break;
             case BungieService.ERROR_NO_CLAN:
+                bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
                 bundle.putString("title",getString(R.string.error));
                 bundle.putString("msg",getString(R.string.no_clan_msg));
                 bundle.putString("posButton", getString(R.string.got_it));
+                dialog.setArguments(bundle);
+                dialog.show(getSupportFragmentManager(),"alert");
                 break;
             case BungieService.ERROR_CURRENT_USER:
             case BungieService.ERROR_AUTH:
+                bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
                 bundle.putString("title",getString(R.string.error));
                 bundle.putString("msg",getString(R.string.error_bungie_auth));
                 bundle.putString("posButton",getString(R.string.got_it));
+                dialog.setArguments(bundle);
+                dialog.show(getSupportFragmentManager(),"alert");
                 break;
             case BungieService.NO_ERROR:
-                SharedPreferences prefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+                SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
                 boolean showed = prefs.getBoolean(MSG_SHOWED_PREF, false);
                 if (!showed){
                     Log.w(TAG, "Dialog not showed before");
                     bundle.putString("title", getString(R.string.just_warning));
+                    bundle.putInt("type", MyAlertDialog.SHARE_DIALOG);
                     bundle.putString("msg", getString(R.string.first_msg));
                     bundle.putString("posButton", getString(R.string.invite));
                     bundle.putString("negButton", getString(R.string.not_now));
+                    dialog.setArguments(bundle);
+                    dialog.show(getSupportFragmentManager(),"alert");
                 } else {
                     Log.w(TAG, "Dialog showed is true");
                     bundle.clear();
@@ -270,35 +287,35 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
                 }
                 break;
             default:
+                bundle.putInt("type",MyAlertDialog.ALERT_DIALOG);
                 bundle.putString("title",getString(R.string.error));
                 bundle.putString("msg", getString(R.string.some_problem_msg));
                 bundle.putString("posButton", getString(R.string.got_it));
+                dialog.setArguments(bundle);
+                dialog.show(getSupportFragmentManager(),"alert");
                 break;
         }
-
-        dialog.setArguments(bundle);
-        dialog.show(getSupportFragmentManager(),"alert");
     }
 
     public void openDrawerActivity(boolean share){
 
-        SharedPreferences sharedPrefs = getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
 
         SharedPreferences.Editor sharedEditor = sharedPrefs.edit();
         sharedEditor.putBoolean(MSG_SHOWED_PREF, true);
-        sharedEditor.putBoolean(DrawerActivity.SOUND_PREF, true);
-        sharedEditor.putBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, true);
-        sharedEditor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, 0);
-        sharedEditor.putLong(DrawerActivity.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
-        sharedEditor.putString(DrawerActivity.MEMBER_PREF, membershipId);
-        sharedEditor.putInt(DrawerActivity.PLATFORM_PREF, platformId);
-        sharedEditor.putString(DrawerActivity.CLAN_PREF, clanId);
-        sharedEditor.putString(DrawerActivity.USERNAME_PREF, userName);
+        sharedEditor.putBoolean(Constants.SOUND_PREF, true);
+        sharedEditor.putBoolean(Constants.SCHEDULED_NOTIFY_PREF, true);
+        sharedEditor.putInt(Constants.SCHEDULED_TIME_PREF, 0);
+        sharedEditor.putLong(Constants.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
+        sharedEditor.putString(Constants.MEMBER_PREF, membershipId);
+        sharedEditor.putInt(Constants.PLATFORM_PREF, platformId);
+        sharedEditor.putString(Constants.CLAN_PREF, clanId);
+        sharedEditor.putString(Constants.USERNAME_PREF, userName);
         sharedEditor.apply();
 
         SyncUtils.toogleSync(this, true, SyncUtils.DEFAULT_INTERVAL);
 
-        if (sharedPrefs.getBoolean(DrawerActivity.FOREGROUND_PREF, false)){
+        if (sharedPrefs.getBoolean(Constants.FOREGROUND_PREF, false)){
             Intent intent = new Intent(this, DrawerActivity.class);
             Log.w(TAG, "share? " + share);
             intent.putExtra("share", share);

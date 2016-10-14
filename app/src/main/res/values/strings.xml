@@ -263,7 +263,7 @@
     <string name="new_notify_text">Notifies new events created</string>
     <string name="off">Off</string>
     <string name="minutes_before">minutes before</string>
-    <string name="scheduled_notify_text">Notifies events you joined</string>
+    <string name="scheduled_notify_text">Notifies scheduled events</string>
     <string name="new_matches">New events</string>
     <string name="settings">SETTINGS</string>
     <string name="on_time">On time</string>
@@ -385,6 +385,15 @@
     <string name="invite">Invite</string>
     <string name="total_access">Total access to the application.</string>
     <string name="credentials">Registering credentials</string>
+    <string name="invite_your_friends">Invite</string>
+    <string name="invite_msg">Help us and invite your friends to The Bunker</string>
+    <string name="finished_events">Finished events</string>
+    <string name="finished_events_text">Notifies events to validate or evaluate</string>
+    <string name="spaces">Spaces</string>
+    <string name="reserved">Reserved</string>
+    <string name="no_spaces_reserved">No spaces reserved</string>
+    <string name="spaces_available">Spaces available</string>
+    <string name="and">" and "</string>
 
 
 </resources>

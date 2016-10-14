@@ -9,7 +9,7 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.app.the.bunker.services.NewGameNotificationService;
+import com.app.the.bunker.services.ServerSyncService;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -24,7 +24,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.w(TAG, "Performing sync...");
-        Intent intent = new Intent(mContext, NewGameNotificationService.class);
+        Intent intent = new Intent(mContext, ServerSyncService.class);
         mContext.startService(intent);
     }
 }

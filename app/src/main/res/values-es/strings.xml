@@ -362,6 +362,10 @@
     <string name="share_msg">\nHey, echar un vistazo! Con esta aplicación podemos programar partidos de Destiny con nuestro clan.\n</string>
     <string name="not_now">Ahora no</string>
     <string name="invite">Invitar</string>
+    <string name="credentials">Registro de credenciales</string>
+    <string name="invite_msg">Ayúdanos y invitar a sus amigos a El Bunker</string>
+    <string name="invite_your_friends">Convite</string>
+    <string name="total_access">Acceso total a la aplicación.</string>
 
 
 </resources>

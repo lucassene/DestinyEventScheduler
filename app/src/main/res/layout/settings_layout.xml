@@ -45,7 +45,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/scheduled_notify_text"
                     android:textSize="13sp"
-                    android:alpha="0.75"/>
+                    android:alpha="0.75"
+                    android:id="@+id/textView" />
 
             </LinearLayout>
 
@@ -196,6 +197,44 @@
                 android:text="@string/games_selected"
                 android:textSize="13sp"
                 android:alpha="0.75"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/done_switch_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/finished_events"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/finished_events_text"
+                    android:textSize="13sp"
+                    android:alpha="0.75"/>
+
+            </LinearLayout>
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/done_switch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true" />
 
         </LinearLayout>
 

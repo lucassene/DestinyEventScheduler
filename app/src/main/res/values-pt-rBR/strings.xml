@@ -332,5 +332,9 @@
     <string name="share_msg">\nEi, dê uma olhada! Com esse aplicativo nós podemos agendar partidas de Destiny com o nosso clã.\n</string>
     <string name="not_now">Agora não</string>
     <string name="invite">Convidar</string>
+    <string name="credentials">Registrando credenciais</string>
+    <string name="invite_msg">Ajude-nos e convide seus amigos para O Bunker</string>
+    <string name="invite_your_friends">Convite</string>
+    <string name="total_access">Acesso total ao aplicativo.</string>
 
 </resources>

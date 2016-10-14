@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
 import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.adapters.DetailEventAdapter;
@@ -455,8 +456,8 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
         Calendar notifyTime = Calendar.getInstance();
         notifyTime.setTime(eventCalendar.getTime());
 
-        SharedPreferences sharedPrefs = getActivity().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        int alarmTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 0)*-1;
+        SharedPreferences sharedPrefs = getActivity().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        int alarmTime = sharedPrefs.getInt(Constants.SCHEDULED_TIME_PREF, 0)*-1;
         notifyTime.add(Calendar.MINUTE,alarmTime);
 
         return notifyTime;

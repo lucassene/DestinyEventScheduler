@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.the.bunker.Constants;
 import com.app.the.bunker.R;
 import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.data.EventTypeTable;
@@ -59,6 +60,9 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     private TextView newTimeText;
     private LinearLayout newTimeLayout;
+
+    private LinearLayout doneLayout;
+    private SwitchCompat doneSwitch;
 
     private ToActivityListener callback;
 
@@ -98,6 +102,9 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
         newTimeText = (TextView) v.findViewById(R.id.new_list_time_text);
         newTimeLayout = (LinearLayout) v.findViewById(R.id.new_time_list_layout);
+
+        doneLayout = (LinearLayout) v.findViewById(R.id.done_switch_layout);
+        doneSwitch = (SwitchCompat) v.findViewById(R.id.done_switch);
 
         scheduledSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -140,7 +147,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 changeCheckText(soundCheckBox, soundText);
-                saveSoundPref(DrawerActivity.SOUND_PREF, soundCheckBox.isChecked());
+                saveSoundPref(Constants.SOUND_PREF, soundCheckBox.isChecked());
             }
         });
 
@@ -167,14 +174,21 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             }
         });
 
-        sharedPrefs = getActivity().getSharedPreferences(DrawerActivity.SHARED_PREFS, Context.MODE_PRIVATE);
-        previousScheduleTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
-        newScheduleTime = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 15);
+        doneSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                changeDoneStatus();
+            }
+        });
 
-        newNotificationInterval = sharedPrefs.getLong(DrawerActivity.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
+        sharedPrefs = getActivity().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        previousScheduleTime = sharedPrefs.getInt(Constants.SCHEDULED_TIME_PREF, 15);
+        newScheduleTime = sharedPrefs.getInt(Constants.SCHEDULED_TIME_PREF, 15);
 
-        checkChanged = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
-        previousCheck = sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
+        newNotificationInterval = sharedPrefs.getLong(Constants.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
+
+        checkChanged = sharedPrefs.getBoolean(Constants.SCHEDULED_NOTIFY_PREF, false);
+        previousCheck = sharedPrefs.getBoolean(Constants.SCHEDULED_NOTIFY_PREF, false);
 
         return v;
     }
@@ -197,8 +211,8 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         //Log.w(TAG, "checkChanged: " + checkChanged);
         //Log.w(TAG, "previousTime: " + previousScheduleTime + " / newNotificationInterval: " + newScheduleTime);
         if (newScheduleTime != previousScheduleTime || checkChanged != scheduledSwitch.isChecked()){
-            SharedPreferences.Editor editor = getContext().getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).edit();
-            editor.putInt(DrawerActivity.SCHEDULED_TIME_PREF, newScheduleTime);
+            SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SHARED_PREFS,Context.MODE_PRIVATE).edit();
+            editor.putInt(Constants.SCHEDULED_TIME_PREF, newScheduleTime);
             editor.apply();
 
             if (!sharedPrefs.getBoolean(UpdateNotificationsService.NOTIFY_RUNNING,false)){
@@ -255,15 +269,15 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     }
 
     private void saveSoundPref(String scheduledSoundPref, boolean checked) {
-        SharedPreferences.Editor editor = getContext().getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SHARED_PREFS,Context.MODE_PRIVATE).edit();
         editor.putBoolean(scheduledSoundPref, checked);
         editor.apply();
     }
 
     private void updateViews() {
-        scheduledSwitch.setChecked(sharedPrefs.getBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, true));
+        scheduledSwitch.setChecked(sharedPrefs.getBoolean(Constants.SCHEDULED_NOTIFY_PREF, true));
 
-        int time = sharedPrefs.getInt(DrawerActivity.SCHEDULED_TIME_PREF, 10);
+        int time = sharedPrefs.getInt(Constants.SCHEDULED_TIME_PREF, 10);
         String text;
         if (time == 0){
             text = getResources().getString(R.string.on_time);
@@ -271,10 +285,10 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             text = time + " " + getResources().getString(R.string.minutes_before);
         }
         timeText.setText(text);
-        long newTime = sharedPrefs.getLong(DrawerActivity.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
+        long newTime = sharedPrefs.getLong(Constants.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
         newTimeText.setText(getNewTimeText((int)newTime));
 
-        soundCheckBox.setChecked(sharedPrefs.getBoolean(DrawerActivity.SOUND_PREF, true));
+        soundCheckBox.setChecked(sharedPrefs.getBoolean(Constants.SOUND_PREF, true));
 
         newSwitch.setChecked(SyncUtils.isSyncEnabled(getContext()));
         updateListText();
@@ -289,12 +303,12 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     }
 
     private void changeScheduledStatus() {
-        SharedPreferences.Editor editor = getContext().getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SHARED_PREFS,Context.MODE_PRIVATE).edit();
         if (scheduledSwitch.isChecked()){
             if (newSwitch.isChecked()){
                 switchType = 2;
             } else switchType = 1;
-            editor.putBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, true);
+            editor.putBoolean(Constants.SCHEDULED_NOTIFY_PREF, true);
             AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
             anim.setDuration(250);
             anim.setFillAfter(true);
@@ -306,7 +320,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             if (!newSwitch.isChecked()){
                 switchType = 0;
             } else switchType = 1;
-            editor.putBoolean(DrawerActivity.SCHEDULED_NOTIFY_PREF, false);
+            editor.putBoolean(Constants.SCHEDULED_NOTIFY_PREF, false);
             AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
             anim.setDuration(250);
             anim.setFillAfter(true);
@@ -314,6 +328,16 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             scheduledListLayout.setClickable(false);
             scheduledListLayout.setFocusable(false);
             changeSoundStatus();
+        }
+        editor.apply();
+    }
+
+    private void changeDoneStatus() {
+        SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+        if (doneSwitch.isChecked()){
+            editor.putBoolean(Constants.DONE_NOTIFY_PREF, true);
+        } else{
+            editor.putBoolean(Constants.DONE_NOTIFY_PREF, false);
         }
         editor.apply();
     }
@@ -434,7 +458,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
                 break;
             case "new":
                 SharedPreferences.Editor editor = sharedPrefs.edit();
-                editor.putLong(DrawerActivity.NEW_NOTIFY_TIME_PREF, value);
+                editor.putLong(Constants.NEW_NOTIFY_TIME_PREF, value);
                 editor.apply();
                 newNotificationInterval = value;
                 SyncUtils.toogleSync(getContext(), newSwitch.isChecked(), value);
@@ -469,7 +493,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     }
 
     private void saveCheckedItems() {
-        SharedPreferences.Editor editor = getContext().getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SHARED_PREFS,Context.MODE_PRIVATE).edit();
         for (int i=0;i<typeList.size();i++){
             editor.putBoolean(String.valueOf(typeList.get(i).getId()),typeList.get(i).isChecked());
             Log.w(TAG, typeList.get(i).getText() + " marcado como " + typeList.get(i).isChecked());
@@ -516,7 +540,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()){
             typeList = new ArrayList<>();
-            SharedPreferences prefs = getContext().getSharedPreferences(DrawerActivity.SHARED_PREFS,Context.MODE_PRIVATE);
+            SharedPreferences prefs = getContext().getSharedPreferences(Constants.SHARED_PREFS,Context.MODE_PRIVATE);
             for (int i=0;i<data.getCount();i++){
                 MultiChoiceItemModel item = new MultiChoiceItemModel();
                 int id = data.getInt(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ID));

@@ -152,6 +152,33 @@
             android:paddingLeft="8dp"/>
 
         <LinearLayout
+            android:id="@+id/share_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="8dp"
+            android:paddingLeft="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/invite_your_friends"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/invite_msg"
+                android:textSize="13sp"
+                android:alpha="0.75"/>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/patreon_layout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/listItemHeight"
