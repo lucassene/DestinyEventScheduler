@@ -256,7 +256,7 @@
                 android:id="@+id/space_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/no_spaces_reserved"
+                android:text="@string/no_members_selected"
                 android:textSize="13sp"
                 android:alpha="0.75"/>
 

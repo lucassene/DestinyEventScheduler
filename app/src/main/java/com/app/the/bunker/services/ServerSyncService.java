@@ -55,7 +55,7 @@ public class ServerSyncService extends IntentService {
     private static final String DONE_ENDPOINT = "/done";
     private static final String LOGIN_ENDPOINT = "login";
     private static final String STATUS_PARAM = "?status=0";
-    private static final String JOINED_PARAM = "&joined=false";
+    private static final String JOINED_PARAM = "&joined=";
     private static final String MEMBER_HEADER = "membership";
     private static final String CLAN_HEADER = "clanId";
     private static final String PLATFORM_HEADER = "platform";
@@ -69,6 +69,7 @@ public class ServerSyncService extends IntentService {
     private boolean hasTriedOnce = false;
     private boolean hasNewGames = false;
     private boolean hasDoneGames = false;
+    private String priorUrl;
 
     public ServerSyncService() {
         super(ServerSyncService.class.getName());
@@ -94,7 +95,6 @@ public class ServerSyncService extends IntentService {
                     selectedIds.add(typeId);
                 }
             }
-            //Log.w(TAG, "selectedIds size: " + selectedIds.size());
 
             previousGames = getPreviousGamesList(sharedPrefs.getString(Constants.NEW_GAMES_PREF, ""));
 
@@ -105,7 +105,7 @@ public class ServerSyncService extends IntentService {
                     memberId = cursor.getString(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
                     platformId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
                     clanId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_CLAN));
-                    String url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + JOINED_PARAM;
+                    String url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + JOINED_PARAM + "false";
                     requestServer(ServerService.TYPE_NEW_GAMES, url);
 
                     SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
@@ -123,9 +123,15 @@ public class ServerSyncService extends IntentService {
                 }
             } finally {
                 if (cursor != null) cursor.close();
-                stopSelf();
             }
         }
+
+        sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        if (sharedPrefs.getBoolean(Constants.SCHEDULED_NOTIFY_PREF, false)) {
+            String url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + JOINED_PARAM + "true";
+            requestServer(ServerService.TYPE_SYNC_SCHEDULED, url);
+        }
+
     }
 
     private int[] getIdArray() {
@@ -200,8 +206,7 @@ public class ServerSyncService extends IntentService {
                             SharedPreferences.Editor editor = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
                             editor.putString(Constants.KEY_PREF, cipher.encrypt(authKey));
                             editor.apply();
-                            String nUrl = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + JOINED_PARAM;
-                            requestServer(ServerService.TYPE_NEW_GAMES, nUrl);
+                            requestServer(ServerService.TYPE_NEW_GAMES, priorUrl);
                             break;
                         case ServerService.TYPE_DONE:
                             InputStream iStream = new BufferedInputStream(urlConnection.getInputStream());
@@ -220,11 +225,23 @@ public class ServerSyncService extends IntentService {
                                 hasDoneGames = false;
                             }
                             break;
+                        case ServerService.TYPE_SYNC_SCHEDULED:
+                            InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
+                            String r = convertInputStreamToString(stream);
+                            parseGames(r);
+                            if (gameList.size()>0){
+                                Log.w(TAG, "calling CreateNotificationService...");
+                                Intent intent = new Intent(Intent.ACTION_SYNC, null, this, CreateNotificationService.class);
+                                intent.putExtra(CreateNotificationService.GAME_HEADER, gameList);
+                                startService(intent);
+                            } else Log.w(TAG, "No schedule events found.");
+                            break;
                     }
                 } else {
                     Log.w(TAG, "Status code different than 200.");
                     if (statusCode == 500 || statusCode == 403){
                         if (!hasTriedOnce){
+                            priorUrl = url;
                             String lUrl = SERVER_BASE_URL + LOGIN_ENDPOINT;
                             requestServer(ServerService.TYPE_LOGIN, lUrl);
                             hasTriedOnce = true;

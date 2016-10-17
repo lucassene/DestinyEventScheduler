@@ -75,7 +75,7 @@ public class GameAdapter extends BaseAdapter implements Filterable {
         viewHolder.typeName.setText(currentGame.getTypeName());
         String creatorName = context.getString(R.string.created_by) + " " + currentGame.getCreatorName();
         viewHolder.creatorName.setText(creatorName);
-        String insc = currentGame.getInscriptions() + "/" + currentGame.getMaxGuardians();
+        String insc = currentGame.getInscriptions() + "/" + (currentGame.getMaxGuardians() - currentGame.getReserved());
         viewHolder.inscriptions.setText(insc);
         viewHolder.time.setText(DateUtils.getTime(currentGame.getTime()));
         viewHolder.date.setText(DateUtils.onBungieDate(currentGame.getTime()));

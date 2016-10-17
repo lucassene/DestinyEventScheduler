@@ -15,9 +15,9 @@ public interface ToActivityListener {
     void loadNewFragment(Fragment fragment, Bundle bundle, String tag);
     void onEventTypeSelected(int id);
     void onEventGameSelected(int id);
+    void onEntriesSelected(List<String> list);
     String getBungieId();
     String getUserName();
-    int getPlatform();
     String getOrderBy();
     void closeFragment();
     void onLoadingData();

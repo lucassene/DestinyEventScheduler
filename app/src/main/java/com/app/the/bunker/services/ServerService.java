@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.text.Html;
 import android.util.Log;
 
 import com.app.the.bunker.Constants;
@@ -123,6 +124,7 @@ public class ServerService extends IntentService {
     public static final int TYPE_NEW_EVENTS = 17;
     public static final int TYPE_LOGIN = 18;
     public static final int TYPE_DONE = 19;
+    public static final int TYPE_SYNC_SCHEDULED = 20;
 
     public static final int NO_ERROR = 0;
     public static final int ERROR_INCORRECT_REQUEST = 10;
@@ -905,6 +907,7 @@ public class ServerService extends IntentService {
                 game.setInscriptions(jGame.getInt("inscriptions"));
                 game.setStatus(jGame.getInt("status"));
                 if (!jGame.isNull("comment")) { game.setComment(jGame.getString("comment")); }
+                if (!jGame.isNull("reserved")) { game.setReserved(jGame.getInt("reserved")); }
                 game.setJoined(getBoolean(jGame.getString("joined")));
                 game.setEvaluated(getBoolean(jGame.getString("evaluated")));
                 gameList.add(game);
@@ -1082,6 +1085,20 @@ public class ServerService extends IntentService {
             json.put("light", game.getMinLight());
             json.put("status",0);
             json.put("comment", game.getComment());
+            json.put("reserved", game.getReserved());
+
+            JSONArray jArray = new JSONArray();
+            if (game.getEntryList().size()>0){
+                for (int i=0;i<game.getEntryList().size();i++){
+                    JSONObject jEntry = new JSONObject();
+                    JSONObject jMember = new JSONObject();
+                    jMember.put("membership", game.getEntryList().get(i).getMembershipId());
+                    jEntry.put("member", jMember);
+                    jArray.put(jEntry);
+                }
+                json.put("entries", jArray);
+            }
+
             Log.w(TAG, "GameJSON: " + json.toString());
         }
         return json;
@@ -1154,6 +1171,7 @@ public class ServerService extends IntentService {
             result += line;
         }
         inputStream.close();
+        result = Html.fromHtml(result).toString();
         return result;
     }
 

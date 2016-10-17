@@ -58,6 +58,7 @@ import com.app.the.bunker.fragments.DBViewerFragment;
 import com.app.the.bunker.fragments.DetailEventFragment;
 import com.app.the.bunker.fragments.DetailHistoryFragment;
 import com.app.the.bunker.fragments.DetailValidationFragment;
+import com.app.the.bunker.fragments.GenericListFragment;
 import com.app.the.bunker.fragments.HistoryListFragment;
 import com.app.the.bunker.fragments.MainSettingsFragment;
 import com.app.the.bunker.fragments.MyClanFragment;
@@ -321,6 +322,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             case R.id.menu_share:
                 callAndroidIntent(TYPE_SHARE_INTENT, null);
                 return true;
+            case R.id.menu_done:
+                if (getOpenedFragment() instanceof GenericListFragment){
+                    GenericListFragment frag = (GenericListFragment) getOpenedFragment();
+                    onEntriesSelected(frag.getCheckedMembershipList());
+                }
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -558,6 +565,15 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     }
 
     @Override
+    public void onEntriesSelected(List<String> list) {
+        fm.popBackStack();
+        openedFragment = fm.findFragmentByTag("new");
+        if (openedFragment != null) fragmentTag = openedFragment.getTag();
+        newEventListener = (FromActivityListener) getSupportFragmentManager().findFragmentByTag("new");
+        newEventListener.onEntriesSent(list);
+    }
+
+    @Override
     public String getBungieId() {
         return bungieId;
     }
@@ -565,11 +581,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     @Override
     public String getUserName() {
         return userName;
-    }
-
-    @Override
-    public int getPlatform() {
-        return platformId;
     }
 
     @Override
@@ -1200,6 +1211,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                             break;
                         case 11:
                             openAboutFragment(child);
+                            //openDBViewerFragment(child);
                             break;
                         case 12:
                             showLogOffDialog(child);

@@ -366,6 +366,20 @@
     <string name="invite_msg">Ayúdanos y invitar a sus amigos a El Bunker</string>
     <string name="invite_your_friends">Convite</string>
     <string name="total_access">Acceso total a la aplicación.</string>
+    <string name="and">" y "</string>
+    <string name="finished_events">Eventos completados</string>
+    <string name="finished_events_text">Notifica eventos para validar o evaluar</string>
+    <string name="member">" MIEMBRO"</string>
+    <string name="members_">" MIEMBROS"</string>
+    <string name="members_selected">" miembros seleccionados"</string>
+    <string name="no_member">NINGÚN MIEMBRO</string>
+    <string name="no_members_selected">Ningún miembro seleccionado</string>
+    <string name="one_member_selected">Un miembro seleccionado</string>
+    <string name="reserved">Reservados</string>
+    <string name="select_members">Seleccionar a los miembros</string>
+    <string name="spaces">Espacios</string>
+    <string name="spaces_available">Disponibles</string>
+    <string name="event_full">EVENTO LLENO</string>
 
 
 </resources>

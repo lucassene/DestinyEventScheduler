@@ -14,6 +14,7 @@ import com.app.the.bunker.models.MemberModel;
 import com.app.the.bunker.utils.ImageUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MemberAdapter extends BaseAdapter {
@@ -43,6 +44,16 @@ public class MemberAdapter extends BaseAdapter {
             if (memberList.get(i).isChecked()) count++;
         }
         return count;
+    }
+
+    public List<String> getCheckedMembershipList(){
+        List<String> list = new ArrayList<>();
+        for (int i=0;i<memberList.size();i++){
+            if (memberList.get(i).isChecked()){
+                list.add(memberList.get(i).getMembershipId());
+            }
+        }
+        return list;
     }
 
     @Override
@@ -83,7 +94,7 @@ public class MemberAdapter extends BaseAdapter {
             e.printStackTrace();
         }
         if (currentMember.isChecked()){
-            mHolder.layout.setAlpha(0.50f);
+            mHolder.layout.setAlpha(0.35f);
         } else mHolder.layout.setAlpha(0.05f);
         return convertView;
     }

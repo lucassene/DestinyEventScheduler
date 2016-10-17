@@ -391,9 +391,16 @@
     <string name="finished_events_text">Notifies events to validate or evaluate</string>
     <string name="spaces">Spaces</string>
     <string name="reserved">Reserved</string>
-    <string name="no_spaces_reserved">No spaces reserved</string>
-    <string name="spaces_available">Spaces available</string>
+    <string name="no_members_selected">No member selected</string>
+    <string name="spaces_available">Available</string>
     <string name="and">" and "</string>
+    <string name="one_member_selected">One member selected</string>
+    <string name="members_selected">\" members selected\"</string>
+    <string name="select_members">Select members</string>
+    <string name="no_member">NO MEMBER</string>
+    <string name="member">" MEMBER"</string>
+    <string name="members_">" MEMBERS"</string>
+    <string name="event_full">EVENT FULL</string>
 
 
 </resources>

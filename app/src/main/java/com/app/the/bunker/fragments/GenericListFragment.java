@@ -40,14 +40,14 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
 
     private String title;
     private String tableName;
-    private ListView listView;
     private int gameType;
-    private int count;
+    private int maxGuardians;
 
     private ToActivityListener callback;
     private TextView titleView;
     private CustomCursorAdapter adapter;
     private MemberAdapter memberAdapter;
+    private ArrayList<String> entryList;
 
     @Override
     public void onAttach(Context context) {
@@ -65,12 +65,12 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View v = inflater.inflate(R.layout.generic_list_layout, container, false);
         titleView = (TextView) v.findViewById(R.id.title);
         return v;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -79,12 +79,13 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
         if (bundle != null) {
             title = bundle.getString("title");
             tableName = bundle.getString("table");
+            maxGuardians = bundle.getInt("max");
+            entryList = (ArrayList<String>) bundle.getSerializable("list");
             if (bundle.containsKey("type") && bundle.getInt("type") != 0) {
                 gameType = bundle.getInt("type");
             }
         }
         fillData(title, tableName);
-        listView = getListView();
     }
 
     @Override
@@ -115,7 +116,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
                 setListAdapter(adapter);
                 break;
             case MemberTable.TABLE_NAME:
-                callback.setToolbarTitle("NO MEMBER");
+                callback.setToolbarTitle(getString(R.string.no_member));
                 getLoaderManager().initLoader(LOADER_MEMBERS, null, this);
                 break;
         }
@@ -132,7 +133,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
         super.onPrepareOptionsMenu(menu);
         menu.clear();
         if (tableName.equals(MemberTable.TABLE_NAME)){
-            getActivity().getMenuInflater().inflate(R.menu.add_menu, menu);
+            getActivity().getMenuInflater().inflate(R.menu.done_menu, menu);
         } else getActivity().getMenuInflater().inflate(R.menu.empty_menu, menu);
     }
 
@@ -148,17 +149,33 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
                 break;
             case MemberTable.TABLE_NAME:
                 if(memberAdapter != null){
-                    memberAdapter.toggleMemberCheck(position);
-                    memberAdapter.notifyDataSetChanged();
-                    int count = memberAdapter.getCheckedMemberCount();
-                    if (count == 0){
-                        callback.setToolbarTitle("NO MEMBER");
-                    } else if (count == 1){
-                        callback.setToolbarTitle(count + " MEMBER");
-                    } else callback.setToolbarTitle(count + " MEMBERS");
+                    if (maxGuardians > memberAdapter.getCheckedMemberCount()){
+                        memberAdapter.toggleMemberCheck(position);
+                        memberAdapter.notifyDataSetChanged();
+                    } else if (memberAdapter.getItem(position).isChecked()){
+                        memberAdapter.toggleMemberCheck(position);
+                        memberAdapter.notifyDataSetChanged();
+                    }
+                    updateTitle();
                 }
                 break;
         }
+    }
+
+    private void updateTitle(){
+        int count = memberAdapter.getCheckedMemberCount();
+        if (count == 0){
+            callback.setToolbarTitle(getString(R.string.no_member));
+        } else if (count == 1){
+            callback.setToolbarTitle(count + getString(R.string.member));
+        } else callback.setToolbarTitle(count + getString(R.string.members_));
+    }
+
+    public List<String> getCheckedMembershipList(){
+        if (memberAdapter != null){
+            return memberAdapter.getCheckedMembershipList();
+        }
+        return null;
     }
 
     @Override
@@ -232,6 +249,12 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
                             currentMember.setGamesPlayed(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_PLAYED)));
                             currentMember.setGamesCreated(data.getInt(data.getColumnIndexOrThrow(MemberTable.COLUMN_CREATED)));
                             currentMember.setChecked(false);
+                            for (int x=0;x<entryList.size();x++){
+                                if (currentMember.getMembershipId().equals(entryList.get(x))){
+                                    currentMember.setChecked(true);
+                                    break;
+                                }
+                            }
                             memberList.add(currentMember);
                         }
                         data.moveToNext();
@@ -240,6 +263,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
                         memberAdapter = new MemberAdapter(getActivity(), memberList);
                         setListAdapter(memberAdapter);
                     } else memberAdapter.setMemberList(memberList);
+                    updateTitle();
                     break;
             }
         }

@@ -1,6 +1,7 @@
 package com.app.the.bunker.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class GameModel implements Serializable {
 
@@ -30,6 +31,8 @@ public class GameModel implements Serializable {
     private String comment;
     private boolean joined;
     private boolean evaluated;
+    private int reserved;
+    private ArrayList<MemberModel> entryList;
 
     public String getCreatorId() {
         return creatorId;
@@ -165,5 +168,21 @@ public class GameModel implements Serializable {
 
     public void setTypeIcon(String typeIcon) {
         this.typeIcon = typeIcon;
+    }
+
+    public ArrayList<MemberModel> getEntryList() {
+        return entryList;
+    }
+
+    public void setEntryList(ArrayList<MemberModel> entryList) {
+        this.entryList = entryList;
+    }
+
+    public int getReserved() {
+        return reserved;
+    }
+
+    public void setReserved(int reserved) {
+        this.reserved = reserved;
     }
 }

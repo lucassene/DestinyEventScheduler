@@ -47,6 +47,8 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
 
     public static final String TAG = "DetailEventFragment";
 
+    private static final int MAX_GUARDIANS = 12;
+
     private String origin;
     private int inscriptions;
     private int maxGuardians;
@@ -324,7 +326,7 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
         time.setText(DateUtils.getTime(gameTime));
         light.setText(String.valueOf(game.getMinLight()));
 
-        maxGuardians = game.getMaxGuardians();
+        maxGuardians = game.getMaxGuardians() - game.getReserved();
         inscriptions = game.getInscriptions();
         String sg = inscriptions + " " + getContext().getResources().getString(R.string.of) + " " + maxGuardians;
         guardians.setText(sg);
@@ -342,7 +344,7 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
                 onEntriesLoaded(entryList, false, game.getGameId());
             }
         }
-
+        checkIfEventIsFull();
     }
 
     private void setViewIcon(ImageView view, int resId, String typeIcon){
@@ -388,6 +390,17 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
             }
         } else {
             callback.getGameEntries(game.getGameId());
+        }
+        checkIfEventIsFull();
+    }
+
+    private void checkIfEventIsFull(){
+        if (entryList.size() >= 12 && !game.isJoined()){
+            joinButton.setEnabled(false);
+            joinButton.setText(R.string.event_full);
+        } else{
+            joinButton.setEnabled(true);
+            prepareView();
         }
     }
 

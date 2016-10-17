@@ -39,6 +39,7 @@ import com.app.the.bunker.interfaces.FromActivityListener;
 import com.app.the.bunker.interfaces.FromDialogListener;
 import com.app.the.bunker.interfaces.ToActivityListener;
 import com.app.the.bunker.models.GameModel;
+import com.app.the.bunker.models.MemberModel;
 import com.app.the.bunker.models.MultiChoiceItemModel;
 import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.services.ServerService;
@@ -46,6 +47,7 @@ import com.app.the.bunker.utils.NetworkUtils;
 import com.app.the.bunker.utils.StringUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -84,7 +86,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     private TextView spaceText;
     private int chars = 60;
     private int maxGuardians = 6;
-    private int reservedSpaces = 1;
+    private int reservedSpaces = 0;
+    private ArrayList<String> entriesList;
 
     private SimpleInputDialog dialog;
 
@@ -169,10 +172,13 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             public void onClick(View v) {
                 Fragment fragment = new GenericListFragment();
                 Bundle bundle = new Bundle();
-                bundle.putString("title", "Select members");
+                bundle.putString("title", getString(R.string.select_members));
                 bundle.putInt("selected", selectedType);
                 bundle.putString("table", MemberTable.TABLE_NAME);
                 bundle.putString("tag", getTag());
+                bundle.putInt("max", maxGuardians-1);
+                if (entriesList == null) entriesList = new ArrayList<>();
+                bundle.putSerializable("list", entriesList);
                 callback.loadNewFragment(fragment, bundle, "member");
             }
         });
@@ -342,7 +348,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void initLoader(int loaderType){
         callback.onLoadingData();
-        Log.w(TAG, "Inicializing Loader " + loaderType);
+        //Log.w(TAG, "Initializing Loader " + loaderType);
         if (getLoaderManager().getLoader(loaderType) != null){
             getLoaderManager().destroyLoader(loaderType);
         }
@@ -442,10 +448,8 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         minLight = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_LIGHT));
         lightBar.setMax(MAX_LIGHT - minLight);
         lightText.setText(String.valueOf(minLight));
-        int n = maxGuardians - reservedSpaces;
-        spaceBar.setMax(n);
-        spaceBar.setProgress(spaceBar.getMax());
-        spaceText.setText(String.valueOf(n));
+        updateReservedText();
+        updateAvailableSpaces();
         String iconId = data.getString(data.getColumnIndexOrThrow(EventTable.COLUMN_ICON));
         setViewIcon(iconGame,getContext().getResources().getIdentifier(iconId,"drawable",getContext().getPackageName()));
         textGame.setText(EventTable.getName(getContext(),data));
@@ -550,8 +554,10 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         selectedEvent = 0;
         getLoaderManager().destroyLoader(LOADER_EVENT);
         getLoaderManager().destroyLoader(LOADER_EVENT_WITH_TYPE);
-        //initLoader(LOADER_TYPE);
-        //initLoader(LOADER_EVENT_WITH_TYPE);
+        reservedSpaces = 0;
+        updateAvailableSpaces();
+        updateReservedText();
+        entriesList = new ArrayList<>();
         callEventList();
     }
 
@@ -561,12 +567,38 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
         selectedEvent = id;
         getLoaderManager().destroyLoader(LOADER_EVENT);
         getLoaderManager().destroyLoader(LOADER_EVENT_WITH_TYPE);
-        //initLoader(LOADER_EVENT);
-        //initLoader(LOADER_TYPE);
+        reservedSpaces = 0;
+        updateAvailableSpaces();
+        updateReservedText();
+        entriesList = new ArrayList<>();
     }
 
     @Override
-    public void onOrderBySet(String orderBy) { }
+    public void onEntriesSent(List<String> list) {
+        entriesList = new ArrayList<>();
+        entriesList = (ArrayList<String>) list;
+        updateReservedText();
+        updateAvailableSpaces();
+    }
+
+    private void updateReservedText() {
+        if (entriesList != null){
+            reservedSpaces = entriesList.size();
+        } else reservedSpaces = 0;
+        Log.w(TAG, "reservedSpaces: " + reservedSpaces);
+        if (reservedSpaces == 0){
+            reservedText.setText(getString(R.string.no_members_selected));
+        } else if (reservedSpaces == 1){
+            reservedText.setText(R.string.one_member_selected);
+        } else reservedText.setText(reservedSpaces + getString(R.string.members_selected));
+    }
+
+    private void updateAvailableSpaces(){
+        int n = maxGuardians - (reservedSpaces+1);
+        spaceBar.setMax(n);
+        spaceBar.setProgress(spaceBar.getMax());
+        spaceText.setText(String.valueOf(n));
+    }
 
     private void createNewEvent() {
 
@@ -590,9 +622,20 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
             game.setEventId(selectedEvent);
             game.setTypeId(selectedType);
             game.setTime(gameTime);
-            game.setInscriptions(1);
+            game.setInscriptions(reservedSpaces + 1);
             game.setMinLight(lightBar.getProgress() + minLight);
             game.setStatus(GameModel.STATUS_NEW);
+            int r = spaceBar.getMax() - spaceBar.getProgress();
+            game.setReserved(r);
+            ArrayList<MemberModel> memberList = new ArrayList<>();
+            if (entriesList != null){
+                for (int i=0;i<entriesList.size();i++){
+                    MemberModel member = new MemberModel();
+                    member.setMembershipId(entriesList.get(i));
+                    memberList.add(member);
+                }
+            }
+            game.setEntryList(memberList);
             if (commentText.getText().length() != 0){
                 game.setComment(commentText.getText().toString());
             } else game.setComment("");

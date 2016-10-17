@@ -167,7 +167,10 @@ public class CreateNotificationService extends IntentService {
             sIntent.putExtra(AlarmReceiver.TYPE_HEADER, AlarmReceiver.TYPE_SCHEDULED_NOTIFICATIONS);
             sIntent.putExtra(AlarmReceiver.NOTIFY_ID, requestId);
             PendingIntent psIntent = PendingIntent.getBroadcast(this, requestId, sIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Log.w(TAG, "Code M: " + Build.VERSION_CODES.M);
+                alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, notifyTime.getTimeInMillis(), psIntent);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 alarm.setExact(AlarmManager.RTC_WAKEUP, notifyTime.getTimeInMillis(), psIntent);
             } else alarm.set(AlarmManager.RTC_WAKEUP, notifyTime.getTimeInMillis(), psIntent);
         }
