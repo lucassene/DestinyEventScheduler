@@ -299,11 +299,6 @@ public class MyClanFragment extends ListFragment implements LoaderManager.Loader
         getLoaderManager().restartLoader(LOADER_CLAN, null, this);
     }
 
-
-    public ArrayList<String> getBungieIdList(){
-        return bungieIdList;
-    }
-
     public void refreshData(){
         initClanLoader();
         adapter.notifyDataSetChanged();

@@ -133,6 +133,10 @@ public class EventTable {
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Fused Offering', 'Oferenda Fundida', 'Ofrenda Imbuida', 'ic_patrol', '10', '320', '3');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Enhanced Offering', 'Oferenda Otimizada', 'Ofrenda Alterada', 'ic_patrol', '10', '340', '3');");
         db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Perfected Offering', 'Oferenda Aperfeiçoada', 'Ofrenda Perfeccionada', 'ic_patrol', '10', '360', '3');");
+
+        //Version 1.1.0
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Wrath of the Machine: Heroic', 'A Ira da Máquina: Heroico', 'La Fúria de las Máquinas: Heroico', 'ic_raid', '5', '390', '6');");
+        db.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMN_ID + ", " + COLUMN_EN + ", " + COLUMN_PT + ", " + COLUMN_ES + ", " + COLUMN_ICON + ", " + COLUMN_TYPE + ", " + COLUMN_LIGHT + ", " + COLUMN_GUARDIANS  + ")" + " VALUES " + "(null, 'Inferno: Elimination', 'Inferno: Eliminação', 'Infierno: Eliminación', 'ic_inferno_elim', '2', '5', '3');");
     }
 
     static void onUpdate(SQLiteDatabase db, int oldVersion, int newVersion){

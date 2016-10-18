@@ -401,6 +401,7 @@
     <string name="member">" MEMBER"</string>
     <string name="members_">" MEMBERS"</string>
     <string name="event_full">EVENT FULL</string>
+    <string name="nothing_to_show">Nothing to show</string>
 
 
 </resources>

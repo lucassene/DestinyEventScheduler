@@ -6,13 +6,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
 import com.app.the.bunker.R;
 import com.app.the.bunker.interfaces.FromDialogListener;
+import com.app.the.bunker.utils.StringUtils;
 
 public class SimpleInputDialog extends DialogFragment {
 
@@ -90,8 +90,8 @@ public class SimpleInputDialog extends DialogFragment {
     }
 
     public void sendResult(int type){
-        if (TextUtils.isEmpty(input.getText().toString())){
-            listener.onPositiveClick(String.valueOf(min),type);
+        if (StringUtils.isEmptyOrWhiteSpaces(input.getText().toString())){
+            listener.onPositiveClick("",type);
         } else {
             int text = Integer.parseInt(input.getText().toString());
             if (text < min) {

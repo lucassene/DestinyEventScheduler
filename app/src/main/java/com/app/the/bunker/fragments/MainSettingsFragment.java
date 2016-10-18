@@ -45,7 +45,6 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
 
     private static final String TAG = "MainSettingsFragment";
     private static final int LOADER_TYPE = 10;
-    private static final int DIVISOR = 60000;
 
     private SwitchCompat scheduledSwitch;
     private LinearLayout scheduledListLayout;
@@ -61,14 +60,11 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     private TextView newTimeText;
     private LinearLayout newTimeLayout;
 
-    private LinearLayout doneLayout;
     private SwitchCompat doneSwitch;
 
     private ToActivityListener callback;
 
     private SharedPreferences sharedPrefs;
-
-    private int switchType;
 
     private int previousScheduleTime;
     private int newScheduleTime;
@@ -103,7 +99,6 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         newTimeText = (TextView) v.findViewById(R.id.new_list_time_text);
         newTimeLayout = (LinearLayout) v.findViewById(R.id.new_time_list_layout);
 
-        doneLayout = (LinearLayout) v.findViewById(R.id.done_switch_layout);
         doneSwitch = (SwitchCompat) v.findViewById(R.id.done_switch);
 
         scheduledSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -287,10 +282,14 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         timeText.setText(text);
         long newTime = sharedPrefs.getLong(Constants.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
         newTimeText.setText(getNewTimeText((int)newTime));
-
         soundCheckBox.setChecked(sharedPrefs.getBoolean(Constants.SOUND_PREF, true));
-
-        newSwitch.setChecked(SyncUtils.isSyncEnabled(getContext()));
+        if (SyncUtils.isSyncEnabled(getContext())){
+            newSwitch.setChecked(sharedPrefs.getBoolean(Constants.NEW_NOTIFY_PREF, false));
+            doneSwitch.setChecked(sharedPrefs.getBoolean(Constants.DONE_NOTIFY_PREF, false));
+        } else {
+            newSwitch.setChecked(false);
+            doneSwitch.setChecked(false);
+        }
         updateListText();
     }
 
@@ -305,9 +304,6 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
     private void changeScheduledStatus() {
         SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SHARED_PREFS,Context.MODE_PRIVATE).edit();
         if (scheduledSwitch.isChecked()){
-            if (newSwitch.isChecked()){
-                switchType = 2;
-            } else switchType = 1;
             editor.putBoolean(Constants.SCHEDULED_NOTIFY_PREF, true);
             AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
             anim.setDuration(250);
@@ -317,9 +313,6 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             scheduledListLayout.setFocusable(true);
             changeSoundStatus();
         } else {
-            if (!newSwitch.isChecked()){
-                switchType = 0;
-            } else switchType = 1;
             editor.putBoolean(Constants.SCHEDULED_NOTIFY_PREF, false);
             AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
             anim.setDuration(250);
@@ -339,14 +332,15 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
         } else{
             editor.putBoolean(Constants.DONE_NOTIFY_PREF, false);
         }
+        changeSoundStatus();
         editor.apply();
     }
 
     private void changeNewStatus() {
+        SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+        editor.putBoolean(Constants.NEW_NOTIFY_PREF, newSwitch.isChecked());
+        editor.apply();
         if (newSwitch.isChecked()){
-            if (scheduledSwitch.isChecked()){
-                switchType = 2;
-            } else switchType = 1;
             AlphaAnimation anim = new AlphaAnimation(0.3f,1.0f);
             anim.setDuration(250);
             anim.setFillAfter(true);
@@ -357,12 +351,8 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             newTimeLayout.setClickable(true);
             newTimeLayout.setFocusable(true);
             changeSoundStatus();
-            SyncUtils.toogleSync(getContext(), newSwitch.isChecked(), newNotificationInterval);
-            //callback.registerNewGamesAlarm();
+            SyncUtils.toogleSync(getContext(), true, newNotificationInterval);
         } else {
-            if (!scheduledSwitch.isChecked()){
-                switchType = 0;
-            } else switchType = 1;
             AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
             anim.setDuration(250);
             anim.setFillAfter(true);
@@ -373,13 +363,12 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             newTimeLayout.setClickable(false);
             newTimeLayout.setFocusable(false);
             changeSoundStatus();
-            SyncUtils.toogleSync(getContext(), newSwitch.isChecked(), newNotificationInterval);
-            //callback.deleteNewGamesAlarm();
+            SyncUtils.toogleSync(getContext(), true, SyncUtils.SECS_IN_ONE_DAY);
         }
     }
 
     private void changeSoundStatus(){
-        if (switchType == 0){
+        if (!newSwitch.isChecked() && !scheduledSwitch.isChecked() && !doneSwitch.isChecked()){
             AlphaAnimation anim = new AlphaAnimation(1.0f,0.3f);
             anim.setDuration(250);
             anim.setFillAfter(true);
@@ -387,7 +376,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
             soundLayout.setClickable(false);
             soundLayout.setFocusable(false);
             soundCheckBox.setEnabled(false);
-        } else if (switchType == 1) {
+        } else if (newSwitch.isChecked() || scheduledSwitch.isChecked() || doneSwitch.isChecked()){
             if (!soundCheckBox.isEnabled()){
                 AlphaAnimation anim = new AlphaAnimation(0.3f, 1.0f);
                 anim.setDuration(250);
@@ -460,8 +449,10 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
                 SharedPreferences.Editor editor = sharedPrefs.edit();
                 editor.putLong(Constants.NEW_NOTIFY_TIME_PREF, value);
                 editor.apply();
+                if (!newSwitch.isChecked()){ value = SyncUtils.SECS_IN_ONE_DAY; }
                 newNotificationInterval = value;
-                SyncUtils.toogleSync(getContext(), newSwitch.isChecked(), value);
+                SyncUtils.toogleSync(getContext(), true, value);
+                Log.w(TAG, "syncAdapter interval changed to " + value + " secs");
                 newTimeText.setText(getNewTimeText(value));
                 break;
         }

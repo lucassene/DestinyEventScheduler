@@ -32,6 +32,7 @@ public class MemberAdapter extends BaseAdapter {
 
     public void setMemberList(List<MemberModel> memberList){
         this.memberList = memberList;
+        notifyDataSetChanged();
     }
 
     public void toggleMemberCheck(int position){

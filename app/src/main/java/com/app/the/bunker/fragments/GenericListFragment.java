@@ -9,6 +9,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -23,15 +24,18 @@ import com.app.the.bunker.adapters.MemberAdapter;
 import com.app.the.bunker.data.EventTable;
 import com.app.the.bunker.data.EventTypeTable;
 import com.app.the.bunker.data.MemberTable;
+import com.app.the.bunker.interfaces.SwipeListener;
 import com.app.the.bunker.interfaces.ToActivityListener;
 import com.app.the.bunker.models.MemberModel;
 import com.app.the.bunker.provider.DataProvider;
+import com.app.the.bunker.views.CustomSwipeLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenericListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class GenericListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, SwipeListener{
 
+    @SuppressWarnings("unused")
     private static final String TAG = "GenericListFragment";
 
     private static final int LOADER_TYPE = 10;
@@ -45,9 +49,10 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
 
     private ToActivityListener callback;
     private TextView titleView;
-    private CustomCursorAdapter adapter;
     private MemberAdapter memberAdapter;
     private ArrayList<String> entryList;
+    private ArrayList<String> membershipList;
+    private CustomSwipeLayout swipeLayout;
 
     @Override
     public void onAttach(Context context) {
@@ -67,6 +72,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.generic_list_layout, container, false);
         titleView = (TextView) v.findViewById(R.id.title);
+        swipeLayout = (CustomSwipeLayout) v.findViewById(R.id.swipe_layout);
         return v;
     }
 
@@ -86,6 +92,21 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
             }
         }
         fillData(title, tableName);
+
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                switch (tableName){
+                    case MemberTable.TABLE_NAME:
+                        callback.updateClan(membershipList);
+                        break;
+                    case EventTable.TABLE_NAME:
+                    case EventTypeTable.TABLE_NAME:
+                        callback.updateEvents();
+                        break;
+                }
+            }
+        });
     }
 
     @Override
@@ -95,31 +116,26 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
     }
 
     private void fillData(String title, String tableName) {
-
-        String[] from;
-        int[] to;
-
         titleView.setText(title);
         switch (tableName){
             case EventTypeTable.TABLE_NAME:
-                from = new String[] {EventTypeTable.COLUMN_EN, EventTypeTable.COLUMN_PT, EventTypeTable.COLUMN_ES, EventTypeTable.COLUMN_ICON};
-                to = new int[] {R.id.primary_text, R.id.icon};
-                getLoaderManager().initLoader(LOADER_TYPE, null, this);
-                adapter = new CustomCursorAdapter(getContext(), R.layout.event_list_item_layout, null, from, to, 0, LOADER_TYPE);
-                setListAdapter(adapter);
+                initLoader(LOADER_TYPE);
                 break;
             case EventTable.TABLE_NAME:
-                from = new String[] {EventTable.COLUMN_EN, EventTable.COLUMN_PT, EventTable.COLUMN_ES, EventTable.COLUMN_ICON};
-                to = new int[] {R.id.primary_text, R.id.icon};
-                getLoaderManager().initLoader(LOADER_EVENT, null, this);
-                adapter = new CustomCursorAdapter(getContext(), R.layout.event_list_item_layout, null, from, to, 0, LOADER_EVENT);
-                setListAdapter(adapter);
+                initLoader(LOADER_EVENT);
                 break;
             case MemberTable.TABLE_NAME:
                 callback.setToolbarTitle(getString(R.string.no_member));
-                getLoaderManager().initLoader(LOADER_MEMBERS, null, this);
+                initLoader(LOADER_MEMBERS);
                 break;
         }
+    }
+
+    private void initLoader(int type){
+        if (getLoaderManager().getLoader(type) != null){
+            getLoaderManager().destroyLoader(type);
+        }
+        getLoaderManager().restartLoader(type, null, this);
     }
 
     @Override
@@ -227,19 +243,35 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (adapter != null) { adapter.swapCursor(data); }
+        String[] from;
+        int[] to;
+        CustomCursorAdapter adapter;
         if (data != null && data.moveToFirst()){
             switch (loader.getId()){
+                case LOADER_TYPE:
+                    from = new String[] {EventTypeTable.COLUMN_EN, EventTypeTable.COLUMN_PT, EventTypeTable.COLUMN_ES, EventTypeTable.COLUMN_ICON};
+                    to = new int[] {R.id.primary_text, R.id.icon};
+                    adapter = new CustomCursorAdapter(getContext(), R.layout.event_list_item_layout, null, from, to, 0, LOADER_TYPE);
+                    adapter.swapCursor(data);
+                    setListAdapter(adapter);
+                    break;
                 case LOADER_EVENT:
                     data.moveToFirst();
                     gameType = data.getInt(data.getColumnIndexOrThrow(EventTable.COLUMN_TYPE));
+                    from = new String[] {EventTable.COLUMN_EN, EventTable.COLUMN_PT, EventTable.COLUMN_ES, EventTable.COLUMN_ICON};
+                    to = new int[] {R.id.primary_text, R.id.icon};
+                    adapter = new CustomCursorAdapter(getContext(), R.layout.event_list_item_layout, null, from, to, 0, LOADER_EVENT);
+                    adapter.swapCursor(data);
+                    setListAdapter(adapter);
                     break;
                 case LOADER_MEMBERS:
                     data.moveToFirst();
                     List<MemberModel> memberList = new ArrayList<>();
+                    membershipList = new ArrayList<>();
                     for (int i=0;i<data.getCount();i++){
                         MemberModel currentMember = new MemberModel();
                         currentMember.setMembershipId(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP)));
+                        membershipList.add(currentMember.getMembershipId());
                         if (!currentMember.getMembershipId().equals(callback.getBungieId())){
                             currentMember.setName(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_NAME)));
                             currentMember.setIconPath(data.getString(data.getColumnIndexOrThrow(MemberTable.COLUMN_ICON)));
@@ -262,7 +294,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
                     if (memberAdapter == null){
                         memberAdapter = new MemberAdapter(getActivity(), memberList);
                         setListAdapter(memberAdapter);
-                    } else memberAdapter.setMemberList(memberList);
+                    } else { memberAdapter.setMemberList(memberList); }
                     updateTitle();
                     break;
             }
@@ -271,8 +303,11 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {    }
 
+    @Override
+    public void toggleSwipeProgress(boolean b) {
+        if (swipeLayout != null) swipeLayout.setRefreshing(b);
+        fillData(title, tableName);
     }
-
 }

@@ -45,40 +45,36 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TimeZone;
 
+import static com.app.the.bunker.Constants.AUTH_HEADER;
+import static com.app.the.bunker.Constants.CLAN_HEADER;
+import static com.app.the.bunker.Constants.DELETE_METHOD;
+import static com.app.the.bunker.Constants.ENTRIES_ENDPOINT;
+import static com.app.the.bunker.Constants.EVALUATION_ENDPOINT;
+import static com.app.the.bunker.Constants.EVENTS_ENDPOINT;
+import static com.app.the.bunker.Constants.EXCEPTION_ENDPOINT;
+import static com.app.the.bunker.Constants.GAME_ENDPOINT;
+import static com.app.the.bunker.Constants.GET_METHOD;
+import static com.app.the.bunker.Constants.HISTORY_ENDPOINT;
+import static com.app.the.bunker.Constants.INITIAL_PARAM;
+import static com.app.the.bunker.Constants.JOINED_PARAM;
+import static com.app.the.bunker.Constants.JOIN_ENDPOINT;
+import static com.app.the.bunker.Constants.LEAVE_ENDPOINT;
+import static com.app.the.bunker.Constants.LOGIN_ENDPOINT;
+import static com.app.the.bunker.Constants.MEMBERLIST_ENDPOINT;
+import static com.app.the.bunker.Constants.MEMBER_ENDPOINT;
+import static com.app.the.bunker.Constants.MEMBER_HEADER;
+import static com.app.the.bunker.Constants.NOTICE_ENDPOINT;
+import static com.app.the.bunker.Constants.PLATFORM_HEADER;
+import static com.app.the.bunker.Constants.POST_METHOD;
+import static com.app.the.bunker.Constants.PROFILE_ENDPOINT;
+import static com.app.the.bunker.Constants.SERVER_BASE_URL;
+import static com.app.the.bunker.Constants.STATUS_PARAM;
+import static com.app.the.bunker.Constants.TIMEZONE_HEADER;
+import static com.app.the.bunker.Constants.VALIDATE_ENDPOINT;
+
 public class ServerService extends IntentService {
 
     private static final String TAG = "ServerService";
-
-    //private static final String SERVER_BASE_URL = "https://destiny-scheduler.herokuapp.com/api/";
-    private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/api/";
-    private static final String GAME_ENDPOINT = "game";
-    private static final String ENTRIES_ENDPOINT = "/entries";
-    private static final String JOIN_ENDPOINT = "/join";
-    private static final String LEAVE_ENDPOINT = "/leave";
-    private static final String VALIDATE_ENDPOINT = "/validate";
-    private static final String EVALUATION_ENDPOINT = "/evaluations/";
-    private static final String HISTORY_ENDPOINT = "/history";
-    private static final String MEMBER_ENDPOINT = "/member/";
-    private static final String PROFILE_ENDPOINT = "/profile";
-    private static final String EXCEPTION_ENDPOINT = "log-app";
-    private static final String MEMBERLIST_ENDPOINT = "member/list";
-    private static final String NOTICE_ENDPOINT = "notice";
-    private static final String EVENTS_ENDPOINT = "events";
-    private static final String LOGIN_URL = "https://destiny-scheduler.herokuapp.com/login";
-
-    private static final String STATUS_PARAM = "status=";
-    private static final String JOINED_PARAM = "joined=";
-    private static final String INITIAL_PARAM = "?initialId=";
-
-    private static final String MEMBER_HEADER = "membership";
-    private static final String PLATFORM_HEADER = "platform";
-    private static final String CLAN_HEADER = "clanId";
-    private static final String TIMEZONE_HEADER = "zoneid";
-    private static final String AUTH_HEADER = "Authorization";
-
-    private static final String GET_METHOD = "GET";
-    private static final String POST_METHOD = "POST";
-    private static final String DELETE_METHOD = "DELETE";
 
     public static final String REQUEST_TAG = "request";
     public static final String ERROR_TAG = "error";
@@ -257,7 +253,7 @@ public class ServerService extends IntentService {
                 }
                 break;
             case TYPE_NEW_GAMES:
-                url = SERVER_BASE_URL + GAME_ENDPOINT + "?" + STATUS_PARAM + "0&" + JOINED_PARAM + "false";
+                url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + "0" + JOINED_PARAM + "false";
                 error = requestServer(receiver, type, url, null);
                 if (error != NO_ERROR) {
                     sendError(receiver, error);
@@ -359,28 +355,28 @@ public class ServerService extends IntentService {
     private void sendStatus(ResultReceiver receiver, int statusRunning) {
         Bundle bundle = new Bundle();
         bundle.putInt(REQUEST_TAG, type);
-        receiver.send(statusRunning, bundle);
+        if (receiver != null) receiver.send(statusRunning, bundle);
     }
 
     private void sendNotice(ResultReceiver receiver, NoticeModel notice) {
         Bundle bundle = new Bundle();
         bundle.putInt(REQUEST_TAG, type);
         bundle.putSerializable(NOTICE_TAG, notice);
-        receiver.send(STATUS_FINISHED, bundle);
+        if (receiver != null) receiver.send(STATUS_FINISHED, bundle);
     }
 
     private void sendMemberData(ResultReceiver receiver, MemberModel member) {
         Bundle bundle = new Bundle();
         bundle.putInt(REQUEST_TAG, type);
         bundle.putSerializable(PROFILE_TAG, member);
-        receiver.send(STATUS_FINISHED, bundle);
+        if (receiver != null) receiver.send(STATUS_FINISHED, bundle);
     }
 
     private void sendIdWithType(ResultReceiver receiver, int gameId, int type) {
         Bundle bundle = new Bundle();
         bundle.putInt(INT_TAG, gameId);
         bundle.putInt(REQUEST_TAG, type);
-        receiver.send(STATUS_FINISHED, bundle);
+        if (receiver != null) receiver.send(STATUS_FINISHED, bundle);
     }
 
     private void sendEntryData(ResultReceiver receiver, ArrayList<MemberModel> memberList) {
@@ -388,21 +384,21 @@ public class ServerService extends IntentService {
         bundle.putInt(REQUEST_TAG, type);
         bundle.putInt(GAMEID_TAG, gameId);
         bundle.putSerializable(ENTRY_TAG, memberList);
-        receiver.send(STATUS_FINISHED, bundle);
+        if (receiver != null) receiver.send(STATUS_FINISHED, bundle);
     }
 
     private void sendGameData(ResultReceiver receiver, ArrayList<GameModel> gameList) {
         Bundle bundle = new Bundle();
         bundle.putInt(REQUEST_TAG, type);
         bundle.putSerializable(GAME_TAG, gameList);
-        receiver.send(STATUS_FINISHED, bundle);
+        if (receiver != null) receiver.send(STATUS_FINISHED, bundle);
     }
 
     private void sendIntData(ResultReceiver receiver, int data) {
         Bundle bundle = new Bundle();
         bundle.putInt(INT_TAG, data);
         bundle.putInt(REQUEST_TAG, type);
-        receiver.send(STATUS_FINISHED, bundle);
+        if (receiver != null) receiver.send(STATUS_FINISHED, bundle);
     }
 
     private void sendError(ResultReceiver receiver, int error) {
@@ -410,7 +406,7 @@ public class ServerService extends IntentService {
         Bundle bundle = new Bundle();
         bundle.clear();
         bundle.putInt(ERROR_TAG, error);
-        receiver.send(STATUS_ERROR, bundle);
+        if (receiver != null) receiver.send(STATUS_ERROR, bundle);
     }
 
     private int requestServer(ResultReceiver receiver, int type, String url, Bundle bundle) {
@@ -420,7 +416,7 @@ public class ServerService extends IntentService {
             if (NetworkUtils.checkConnection(getApplicationContext())){
                 URL myURL;
                 if (type == TYPE_LOGIN) {
-                    myURL = new URL(LOGIN_URL);
+                    myURL = new URL(SERVER_BASE_URL + LOGIN_ENDPOINT);
                 } else myURL = new URL(url);
                 HttpURLConnection urlConnection = (HttpURLConnection) myURL.openConnection();
                 switch (type){
@@ -571,7 +567,7 @@ public class ServerService extends IntentService {
                                 loginBundle.putInt(REQUEST_TAG, type);
                                 loginBundle.putString(URL_TAG, url);
                                 loginBundle.putBundle(BUNDLE_TAG, bundle);
-                                requestServer(receiver, TYPE_LOGIN, LOGIN_URL, loginBundle);
+                                requestServer(receiver, TYPE_LOGIN, SERVER_BASE_URL + LOGIN_ENDPOINT, loginBundle);
                                 break;
                         }
                     }
@@ -1078,8 +1074,11 @@ public class ServerService extends IntentService {
         GameModel game = (GameModel) bundle.getSerializable(GAME_TAG);
         JSONObject json = new JSONObject();
         if (game != null){
+            JSONObject jCreator = new JSONObject();
+            jCreator.put("membership", memberId);
             JSONObject jEvent = new JSONObject();
             jEvent.put("id", game.getEventId());
+            json.put("creator", jCreator);
             json.put("event",jEvent);
             json.put("time", game.getTime());
             json.put("light", game.getMinLight());

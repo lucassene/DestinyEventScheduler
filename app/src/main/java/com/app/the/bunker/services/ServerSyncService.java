@@ -24,6 +24,7 @@ import com.app.the.bunker.R;
 import com.app.the.bunker.activities.DrawerActivity;
 import com.app.the.bunker.data.EventTypeTable;
 import com.app.the.bunker.data.LoggedUserTable;
+import com.app.the.bunker.data.MemberTable;
 import com.app.the.bunker.models.GameModel;
 import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.utils.CipherUtils;
@@ -45,23 +46,22 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import static com.app.the.bunker.Constants.AUTH_HEADER;
+import static com.app.the.bunker.Constants.CLAN_HEADER;
+import static com.app.the.bunker.Constants.DONE_ENDPOINT;
+import static com.app.the.bunker.Constants.GAME_ENDPOINT;
+import static com.app.the.bunker.Constants.GET_METHOD;
+import static com.app.the.bunker.Constants.JOINED_PARAM;
+import static com.app.the.bunker.Constants.LOGIN_ENDPOINT;
+import static com.app.the.bunker.Constants.MEMBER_HEADER;
+import static com.app.the.bunker.Constants.PLATFORM_HEADER;
+import static com.app.the.bunker.Constants.SERVER_BASE_URL;
+import static com.app.the.bunker.Constants.STATUS_PARAM;
+import static com.app.the.bunker.Constants.TIMEZONE_HEADER;
+
 public class ServerSyncService extends IntentService {
 
     private static final String TAG = "ServerSyncService";
-
-    //private static final String SERVER_BASE_URL = "https://destiny-scheduler.herokuapp.com/";
-    private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/";
-    private static final String GAME_ENDPOINT = "api/game";
-    private static final String DONE_ENDPOINT = "/done";
-    private static final String LOGIN_ENDPOINT = "login";
-    private static final String STATUS_PARAM = "?status=0";
-    private static final String JOINED_PARAM = "&joined=";
-    private static final String MEMBER_HEADER = "membership";
-    private static final String CLAN_HEADER = "clanId";
-    private static final String PLATFORM_HEADER = "platform";
-    private static final String TIMEZONE_HEADER = "zoneid";
-    private static final String AUTH_HEADER = "Authorization";
-    private static final String GET_METHOD = "GET";
 
     private String memberId;
     private int platformId;
@@ -105,21 +105,25 @@ public class ServerSyncService extends IntentService {
                     memberId = cursor.getString(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_MEMBERSHIP));
                     platformId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
                     clanId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_CLAN));
-                    String url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + JOINED_PARAM + "false";
-                    requestServer(ServerService.TYPE_NEW_GAMES, url);
 
                     SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
-                    if (prefs.getBoolean(Constants.DONE_NOTIFY_PREF, false)){
-                        String lastNotification = prefs.getString(Constants.LAST_DONE_PREF, "23-04-2100T10:42");
-                        Calendar lastCal = DateUtils.stringToDate(lastNotification);
-                        lastCal.add(Calendar.DAY_OF_MONTH,1);
-                        Calendar now = Calendar.getInstance();
-                        if (now.getTimeInMillis() > lastCal.getTimeInMillis()){
-                            url = SERVER_BASE_URL + GAME_ENDPOINT + DONE_ENDPOINT;
-                            requestServer(ServerService.TYPE_DONE, url);
-                            if (hasNewGames || hasDoneGames) { makeNotification(); }
-                        } else Log.w(TAG, "User already notified this day.");
-                    } else Log.w(TAG, "doneNotify is false");
+
+                    boolean isNewNotifyAllowed = prefs.getBoolean(Constants.NEW_NOTIFY_PREF, true);
+                    if (isNewNotifyAllowed){
+                        String url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + "0" + JOINED_PARAM + "false";
+                        requestServer(ServerService.TYPE_NEW_GAMES, url);
+                    }
+
+                    String lastNotification = prefs.getString(Constants.LAST_DAILY_PREF, "23-04-2100T10:42");
+                    Calendar lastCal = DateUtils.stringToDate(lastNotification);
+                    lastCal.add(Calendar.DAY_OF_MONTH,1);
+                    Calendar now = Calendar.getInstance();
+
+                    if (now.getTimeInMillis() > lastCal.getTimeInMillis()) {
+                        if (prefs.getBoolean(Constants.DONE_NOTIFY_PREF, true)) getDoneGames();
+                        getNewEvents();
+                        getNewMembers();
+                    } else Log.w(TAG, "Checks already happened today.");
                 }
             } finally {
                 if (cursor != null) cursor.close();
@@ -128,10 +132,48 @@ public class ServerSyncService extends IntentService {
 
         sharedPrefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         if (sharedPrefs.getBoolean(Constants.SCHEDULED_NOTIFY_PREF, false)) {
-            String url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + JOINED_PARAM + "true";
+            String url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + "0" + JOINED_PARAM + "true";
             requestServer(ServerService.TYPE_SYNC_SCHEDULED, url);
         }
 
+    }
+
+    private void getNewMembers() {
+        Cursor cursor = null;
+        try{
+            cursor = getContentResolver().query(DataProvider.MEMBER_URI, new String[] {MemberTable.COLUMN_MEMBERSHIP}, null, null, null);
+            if (cursor != null && cursor.moveToFirst()){
+                ArrayList<String> mList = new ArrayList<>();
+                for (int i=0;i<cursor.getCount();i++){
+                    mList.add(cursor.getString(cursor.getColumnIndexOrThrow(MemberTable.COLUMN_MEMBERSHIP)));
+                    cursor.moveToNext();
+                }
+                Intent intent = new Intent(Intent.ACTION_SYNC, null, this, BungieService.class);
+                intent.putExtra(BungieService.REQUEST_EXTRA, BungieService.TYPE_UPDATE_CLAN);
+                intent.putExtra("memberList", mList);
+                intent.putExtra("clanId", String.valueOf(clanId));
+                intent.putExtra("platformId", platformId);
+                intent.putExtra("userMembership", memberId);
+                startService(intent);
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+    }
+
+    private void getNewEvents() {
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ServerService.class);
+        intent.putExtra(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_EVENTS);
+        intent.putExtra(ServerService.MEMBER_TAG, memberId);
+        intent.putExtra(ServerService.PLATFORM_TAG, platformId);
+        intent.putExtra(ServerService.CLAN_TAG, String.valueOf(clanId));
+        startService(intent);
+    }
+
+    private void getDoneGames() {
+        String url = SERVER_BASE_URL + GAME_ENDPOINT + DONE_ENDPOINT;
+        requestServer(ServerService.TYPE_DONE, url);
+        if (hasNewGames || hasDoneGames) { makeNotification(); }
     }
 
     private int[] getIdArray() {
@@ -217,7 +259,7 @@ public class ServerSyncService extends IntentService {
                                 Calendar now = Calendar.getInstance();
                                 String date = DateUtils.calendarToString(now);
                                 SharedPreferences.Editor edit = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                                edit.putString(Constants.LAST_DONE_PREF, date);
+                                edit.putString(Constants.LAST_DAILY_PREF, date);
                                 edit.apply();
                                 Log.w(TAG, "Done games found.");
                             } else{

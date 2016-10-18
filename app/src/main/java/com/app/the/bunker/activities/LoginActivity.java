@@ -139,7 +139,7 @@ public class LoginActivity extends AppCompatActivity implements RequestResultRec
     protected void onResume() {
         super.onResume();
 
-        if (getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).getBoolean(PrepareActivity.PREPARE_PREF,false) || isBungieServiceRunning()){
+        if (getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).getBoolean(PrepareActivity.PREPARE_PREF,false) && isBungieServiceRunning()){
             Intent intent = new Intent(this, PrepareActivity.class);
             intent.putExtra(PrepareActivity.TYPE, PrepareActivity.TYPE_LOGIN);
             startActivity(intent);

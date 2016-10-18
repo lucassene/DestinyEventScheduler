@@ -48,26 +48,24 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
+import static com.app.the.bunker.Constants.AUTH_HEADER;
+import static com.app.the.bunker.Constants.CLAN_ENDPOINT;
+import static com.app.the.bunker.Constants.CLAN_HEADER;
+import static com.app.the.bunker.Constants.EVENTS_ENDPOINT;
+import static com.app.the.bunker.Constants.INITIAL_PARAM;
+import static com.app.the.bunker.Constants.LOGIN_ENDPOINT;
+import static com.app.the.bunker.Constants.MEMBERLIST_ENDPOINT;
+import static com.app.the.bunker.Constants.MEMBERS_ENDPOINT;
+import static com.app.the.bunker.Constants.MEMBER_HEADER;
+import static com.app.the.bunker.Constants.PLATFORM_HEADER;
+import static com.app.the.bunker.Constants.SERVER_BASE_URL;
 import static com.app.the.bunker.services.ServerService.ERROR_JSON;
+import static com.app.the.bunker.services.ServerService.RECEIVER_TAG;
 
 public class BungieService extends IntentService {
 
     private static final String BASE_URL = "https://www.bungie.net/Platform/";
     private static final String BASE_IMAGE_URL = "http://www.bungie.net";
-
-    //private static final String SERVER_BASE_URL = "https://destiny-scheduler.herokuapp.com/";
-    private static final String SERVER_BASE_URL = "https://destiny-event-scheduler.herokuapp.com/";
-    private static final String API_SERVER_ENDPOINT = "api/";
-    private static final String LOGIN_ENDPOINT = "login";
-    private static final String CLAN_ENDPOINT = "clan";
-    private static final String MEMBERS_ENDPOINT = "members";
-    private static final String MEMBERLIST_ENDPOINT = "member/list";
-    private static final String EVENTS_ENDPOINT = "events";
-    private static final String INITIAL_PARAM = "?initialId=";
-
-    private static final String SERVER_MEMBER_HEADER = "membership";
-    private static final String SERVER_PLATFORM_HEADER = "platform";
-    private static final String AUTH_HEADER = "Authorization";
 
     private static final String USER_PREFIX = "User/";
     private static final String GROUP_PREFIX = "Group/";
@@ -119,8 +117,6 @@ public class BungieService extends IntentService {
     public static final int ERROR_AUTH = 180;
     public static final int ERROR_SERVER = 190;
 
-    private static final String DEFAULT_ICON = "/img/profile/avatars/Destiny26.jpg";
-
     private int error = 0;
 
     private String displayName = "";
@@ -164,11 +160,14 @@ public class BungieService extends IntentService {
         membersModelList = new ArrayList<>();
         iconsList = new ArrayList<>();
 
-        final ResultReceiver receiver = intent.getParcelableExtra(RECEIVER_EXTRA);
+        ResultReceiver receiver;
+        if (intent.hasExtra(RECEIVER_TAG)){
+            receiver = intent.getParcelableExtra(RECEIVER_TAG);
+        } else receiver = null;
 
         switch (request) {
             case TYPE_LOGIN:
-                receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+                if (receiver != null) receiver.send(STATUS_RUNNING, Bundle.EMPTY);
                 error = getBungieAccount(receiver);
                 Log.w(TAG, "getBungieAccount error: " + error);
                 if (error != NO_ERROR){
@@ -193,7 +192,7 @@ public class BungieService extends IntentService {
                             }
                             insertLoggedUser();
                             getNewEvents(receiver);
-                            receiver.send(STATUS_FINISHED, Bundle.EMPTY);
+                            if (receiver != null) receiver.send(STATUS_FINISHED, Bundle.EMPTY);
                         }
                     }
                 }
@@ -202,16 +201,16 @@ public class BungieService extends IntentService {
             case TYPE_RELOGIN:
                 cookie = intent.getStringExtra(COOKIE_EXTRA);
                 xcsrf = intent.getStringExtra(XCSRF_EXTRA);
-                receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+                if (receiver != null) receiver.send(STATUS_RUNNING, Bundle.EMPTY);
                 error = getBungieAccount(receiver);
                 if (error != NO_ERROR){
                     sendError(receiver);
                 } else {
-                    receiver.send(STATUS_FINISHED, Bundle.EMPTY);
+                    if (receiver != null) receiver.send(STATUS_FINISHED, Bundle.EMPTY);
                 }
                 break;
             case TYPE_UPDATE_CLAN:
-                receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+                if (receiver != null) receiver.send(STATUS_RUNNING, Bundle.EMPTY);
                 clanId = intent.getStringExtra("clanId");
                 actualMemberList = intent.getStringArrayListExtra("memberList");
                 membershipId = intent.getStringExtra("userMembership");
@@ -224,7 +223,7 @@ public class BungieService extends IntentService {
                     if (error != NO_ERROR){
                         sendError(receiver);
                     } else {
-                        receiver.send(STATUS_FINISHED, Bundle.EMPTY);
+                        if (receiver != null) receiver.send(STATUS_FINISHED, Bundle.EMPTY);
                     }
                 }
                 break;
@@ -265,7 +264,7 @@ public class BungieService extends IntentService {
 
         String myURL = BASE_URL + GROUP_PREFIX + clanId + "/";
         Log.w(TAG, myURL);
-        receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+        if (receiver != null) receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 
         try {
 
@@ -386,7 +385,7 @@ public class BungieService extends IntentService {
         Log.w(TAG,"Algum problema ocorreu, avisando o usuário");
         bundle.clear();
         bundle.putInt(ERROR_TAG, error);
-        receiver.send(STATUS_ERROR, bundle);
+        if (receiver != null) receiver.send(STATUS_ERROR, bundle);
     }
 
     private int getBungieAccount(ResultReceiver receiver){
@@ -533,9 +532,9 @@ public class BungieService extends IntentService {
     }
 
     private HttpURLConnection getDefaultHeaders(HttpURLConnection urlConnection, String method) throws Exception {
-        urlConnection.setRequestProperty(SERVER_MEMBER_HEADER, membershipId);
-        urlConnection.setRequestProperty(CLAN_EXTRA, clanId);
-        urlConnection.setRequestProperty(SERVER_PLATFORM_HEADER, String.valueOf(platformId));
+        urlConnection.setRequestProperty(MEMBER_HEADER, membershipId);
+        urlConnection.setRequestProperty(CLAN_HEADER, clanId);
+        urlConnection.setRequestProperty(PLATFORM_HEADER, String.valueOf(platformId));
         urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
         String authKey = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).getString(Constants.KEY_PREF,"");
         try{
@@ -580,7 +579,7 @@ public class BungieService extends IntentService {
                     bundle.putString("clanId", clanId);
                     bundle.putString("authKey", encryptedKey);
 
-                    receiver.send(STATUS_LOGIN, bundle);
+                    if (receiver != null) receiver.send(STATUS_LOGIN, bundle);
                     return NO_ERROR;
                 } else {
                     Log.w(TAG, "Response Code do JSON diferente de 200 (" + statusCode + " - Server Login)");
@@ -599,8 +598,8 @@ public class BungieService extends IntentService {
 
     private int getMembersOfClan(ResultReceiver receiver){
 
-        String myURL = SERVER_BASE_URL + API_SERVER_ENDPOINT + CLAN_ENDPOINT + "/" + clanId + "/" + MEMBERS_ENDPOINT;
-        receiver.send(STATUS_FRIENDS, Bundle.EMPTY);
+        String myURL = SERVER_BASE_URL + CLAN_ENDPOINT + "/" + clanId + "/" + MEMBERS_ENDPOINT;
+        if (receiver != null) receiver.send(STATUS_FRIENDS, Bundle.EMPTY);
 
         try{
 
@@ -634,7 +633,7 @@ public class BungieService extends IntentService {
                             error = parseNewMembers(receiver, memberList);
                         } else error = parseMembersOfClan(receiver, memberList);
                         if (error == NO_ERROR){
-                            receiver.send(STATUS_PARTY, Bundle.EMPTY);
+                            if (receiver != null) receiver.send(STATUS_PARTY, Bundle.EMPTY);
                             return NO_ERROR;
                         } else return error;
                     } else {
@@ -674,7 +673,7 @@ public class BungieService extends IntentService {
         sharedEditor.putInt(Constants.TYPE_PREF, getDBTypesCount());
         sharedEditor.apply();
 
-        String myURL = SERVER_BASE_URL + API_SERVER_ENDPOINT + EVENTS_ENDPOINT + INITIAL_PARAM + getDBEventsCount();
+        String myURL = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + getDBEventsCount();
         Log.w(TAG, "New Events URL: " + myURL);
         receiver.send(STATUS_EVENTS, Bundle.EMPTY);
 
@@ -793,7 +792,7 @@ public class BungieService extends IntentService {
 
     private int parseMembersOfClan(ResultReceiver receiver, ArrayList<String> memberList) {
 
-        String myURL = SERVER_BASE_URL + API_SERVER_ENDPOINT + MEMBERLIST_ENDPOINT;
+        String myURL = SERVER_BASE_URL + MEMBERLIST_ENDPOINT;
 
         try {
             if (NetworkUtils.checkConnection(getApplicationContext())){

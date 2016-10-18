@@ -395,7 +395,7 @@ public class DetailEventFragment extends ListFragment implements FromDialogListe
     }
 
     private void checkIfEventIsFull(){
-        if (entryList.size() >= 12 && !game.isJoined()){
+        if (entryList.size() >= MAX_GUARDIANS && !game.isJoined()){
             joinButton.setEnabled(false);
             joinButton.setText(R.string.event_full);
         } else{

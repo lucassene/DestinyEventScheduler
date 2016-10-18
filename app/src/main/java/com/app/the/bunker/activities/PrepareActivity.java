@@ -20,6 +20,7 @@ import com.app.the.bunker.interfaces.FromDialogListener;
 import com.app.the.bunker.models.MultiChoiceItemModel;
 import com.app.the.bunker.services.BungieService;
 import com.app.the.bunker.services.RequestResultReceiver;
+import com.app.the.bunker.utils.DateUtils;
 import com.app.the.bunker.utils.SyncUtils;
 
 import java.util.Calendar;
@@ -306,11 +307,14 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
         sharedEditor.putBoolean(Constants.SOUND_PREF, true);
         sharedEditor.putBoolean(Constants.SCHEDULED_NOTIFY_PREF, true);
         sharedEditor.putInt(Constants.SCHEDULED_TIME_PREF, 0);
+        sharedEditor.putBoolean(Constants.NEW_NOTIFY_PREF, true);
         sharedEditor.putLong(Constants.NEW_NOTIFY_TIME_PREF, SyncUtils.DEFAULT_INTERVAL);
         sharedEditor.putString(Constants.MEMBER_PREF, membershipId);
         sharedEditor.putInt(Constants.PLATFORM_PREF, platformId);
         sharedEditor.putString(Constants.CLAN_PREF, clanId);
         sharedEditor.putString(Constants.USERNAME_PREF, userName);
+        Calendar now = Calendar.getInstance();
+        sharedEditor.putString(Constants.LAST_DAILY_PREF, DateUtils.calendarToString(now));
         sharedEditor.apply();
 
         SyncUtils.toogleSync(this, true, SyncUtils.DEFAULT_INTERVAL);

@@ -45,4 +45,5 @@ public interface ToActivityListener {
     MemberModel getMemberProfile();
     void callAndroidIntent(int type, String text);
     void updateClan(ArrayList<String> idList);
+    void updateEvents();
 }

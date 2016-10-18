@@ -139,19 +139,13 @@ public class ScheduledListFragment extends ListFragment implements UserDataListe
     }
 
     @Override
-    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId) {
-
-    }
+    public void onEntriesLoaded(List<MemberModel> entryList, boolean isUpdateNeeded, int gameId) {    }
 
     @Override
-    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {
-
-    }
+    public void onMemberLoaded(MemberModel member, boolean isUpdateNeeded) {    }
 
     @Override
-    public void onMembersUpdated() {
-
-    }
+    public void onMembersUpdated() {    }
 
     public void refreshList() {
         if (NetworkUtils.checkConnection(getContext())){

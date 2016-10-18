@@ -104,7 +104,6 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/support_annotations_23_4_0.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/support_v4_23_4_0.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/support_vector_drawable_23_4_0.xml" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/app/src/main/res/menu/add_menu.xml" afterPath="$PROJECT_DIR$/app/src/main/res/menu/done_menu.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.14.1/taskArtifacts/cache.properties.lock" afterPath="$PROJECT_DIR$/.gradle/2.14.1/taskArtifacts/cache.properties.lock" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.14.1/taskArtifacts/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/2.14.1/taskArtifacts/fileHashes.bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.14.1/taskArtifacts/fileSnapshots.bin" afterPath="$PROJECT_DIR$/.gradle/2.14.1/taskArtifacts/fileSnapshots.bin" />
@@ -113,23 +112,27 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.14.1/tasks/_app_compileDebugJavaWithJavac/localClassSetAnalysis/localClassSetAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/2.14.1/tasks/_app_compileDebugJavaWithJavac/localClassSetAnalysis/localClassSetAnalysis.bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.14.1/tasks/_app_compileDebugJavaWithJavac/localClassSetAnalysis/localClassSetAnalysis.lock" afterPath="$PROJECT_DIR$/.gradle/2.14.1/tasks/_app_compileDebugJavaWithJavac/localClassSetAnalysis/localClassSetAnalysis.lock" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.14.1/tasks/_app_compileDebugJavaWithJavac/localJarClasspathSnapshot/localJarClasspathSnapshot.lock" afterPath="$PROJECT_DIR$/.gradle/2.14.1/tasks/_app_compileDebugJavaWithJavac/localJarClasspathSnapshot/localJarClasspathSnapshot.lock" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/generated/mockable-android-23.jar" afterPath="$PROJECT_DIR$/build/generated/mockable-android-23.jar" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/Constants.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/Constants.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/DrawerActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/DrawerActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/GameAdapter.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/GameAdapter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/LoginActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/LoginActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/PrepareActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/PrepareActivity.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/MemberAdapter.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/MemberAdapter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/data/EventTable.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/data/EventTable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/dialogs/SimpleInputDialog.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/dialogs/SimpleInputDialog.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/DetailEventFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/DetailEventFragment.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/GenericListFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/GenericListFragment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MainSettingsFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MainSettingsFragment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MyClanFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MyClanFragment.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/NewEventFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/NewEventFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/interfaces/FromActivityListener.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/interfaces/FromActivityListener.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/ScheduledListFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/ScheduledListFragment.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/interfaces/ToActivityListener.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/interfaces/ToActivityListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/models/GameModel.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/models/GameModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/CreateNotificationService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/CreateNotificationService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/BungieService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/BungieService.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/ServerService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/ServerService.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/ServerSyncService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/ServerSyncService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/new_event_layout.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/new_event_layout.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/values-es/strings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values-es/strings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/values-pt-rBR/strings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values-pt-rBR/strings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/utils/SyncUtils.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/utils/SyncUtils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/generic_list_layout.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/generic_list_layout.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/intermediates/dex-cache/cache.xml" afterPath="$PROJECT_DIR$/build/intermediates/dex-cache/cache.xml" />
     </list>
@@ -270,7 +273,7 @@
     <favorites_list name="DestinyEventScheduler" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -1944,10 +1947,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/dialogs/MultiChoiceDialog.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/menu/share_menu.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MyClanFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/dialogs/MyAlertDialog.java" />
         <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/utils/Constants.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/xml/authenticator.xml" />
@@ -1960,40 +1959,44 @@
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/SyncAdapter.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/BunkerAuthenticator.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/utils/SyncUtils.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/xml/sync_adapter.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/NewGameNotificationService.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/AlarmService.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/about_settings_layout.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/AboutSettingsFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/PrepareActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/LoginActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/BungieService.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/Constants.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MainSettingsFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/settings_layout.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/new_event_layout.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/dialogs/SimpleInputDialog.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/values-v14/styles.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/styles.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/views/ToolbarActionMode.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/ActionModeCallback.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/menu/add_menu.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/member_list_item_layout.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/interfaces/ToActivityListener.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/interfaces/FromActivityListener.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/values-es/strings.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/values-pt-rBR/strings.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/MemberAdapter.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/GenericListFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/models/GameModel.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/GameAdapter.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/CreateNotificationService.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/utils/SyncUtils.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/LoginActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/BungieService.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/PrepareActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/ServerSyncService.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/DetailEventFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/DrawerActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MainSettingsFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/dialogs/SimpleInputDialog.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/NewEventFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/generic_list_layout.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/ScheduledListFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/interfaces/ToActivityListener.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/MemberAdapter.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MyClanFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/GenericListFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/DetailEventFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/data/EventTable.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/DrawerActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/Constants.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/ServerService.java" />
       </list>
     </option>
@@ -2029,17 +2032,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope">
-        <subPane subId="Project Files">
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
-      <pane id="PackagesPane" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -2170,6 +2163,16 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
       <pane id="AndroidView">
         <subPane>
           <PATH>
@@ -2180,7 +2183,7 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -2200,15 +2203,13 @@
     <property name="AnalyzeApkAction.lastApkPath" value="$PROJECT_DIR$/app/build/outputs/apk/app-debug.apk" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler" />
+    <key name="MoveMembersDialog.RECENTS_KEY">
+      <recent name="com.app.the.bunker.utils.SyncUtils" />
+      <recent name="com.app.the.bunker.Constants" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.app.the.bunker" />
       <recent name="com" />
-    </key>
-    <key name="MoveMembersDialog.RECENTS_KEY">
-      <recent name="com.app.the.bunker.Constants" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\src\main\res" />
@@ -2216,6 +2217,9 @@
       <recent name="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\src\main\res\drawable-xxhdpi" />
       <recent name="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\src\main\res\drawable-xhdpi" />
       <recent name="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\src\main\res\drawable-mdpi" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler" />
     </key>
   </component>
   <component name="RunManager" selected="Android App.app">
@@ -2646,12 +2650,13 @@
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32904884" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.4974293" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.4974293" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24935733" sideWeight="0.7562674" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24935733" sideWeight="0.7562674" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32969153" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24935733" sideWeight="0.17688023" order="3" side_tool="true" content_ui="tabs" />
@@ -2661,37 +2666,36 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39972144" sideWeight="0.49485862" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24935733" sideWeight="0.21866295" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24935733" sideWeight="0.24373259" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4303621" sideWeight="0.5109255" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37604457" sideWeight="0.48907456" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3259053" sideWeight="0.50899744" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4303621" sideWeight="0.48393315" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32969153" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39972144" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3286908" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3259053" sideWeight="0.49357328" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.4974293" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3259053" sideWeight="0.49100256" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39972144" sideWeight="0.49485862" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32904884" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.4974293" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.4974293" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24935733" sideWeight="0.781337" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24935733" sideWeight="0.7562674" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32969153" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -2719,208 +2723,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/about_settings_layout.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="431">
-          <caret line="174" column="44" selection-start-line="174" selection-start-column="44" selection-end-line="174" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/settings_layout.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="209" column="0" selection-start-line="209" selection-start-column="0" selection-end-line="227" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/dialogs/SimpleInputDialog.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="93" column="33" selection-start-line="93" selection-start-column="33" selection-end-line="93" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/ic_add.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/menu/home_menu.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="19" selection-start-line="7" selection-start-column="19" selection-end-line="7" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/generic_list_layout.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="43" selection-start-line="8" selection-start-column="43" selection-end-line="8" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/AppData/Local/Android/sdk/extras/android/m2repository/com/android/support/support-v4/23.4.0/support-v4-23.4.0-sources.jar!/android/support/v4/app/Fragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="534" column="24" selection-start-line="534" selection-start-column="24" selection-end-line="534" selection-end-column="24" />
-          <folding>
-            <element signature="e#18919#18920#0" expanded="false" />
-            <element signature="e#18946#18947#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="36" column="42" selection-start-line="36" selection-start-column="42" selection-end-line="36" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-manifest">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/values-v14/styles.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="64" selection-start-line="9" selection-start-column="64" selection-end-line="9" selection-end-column="64" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/views/ToolbarActionMode.java" />
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/styles.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/AppData/Local/Android/sdk/extras/android/m2repository/com/android/support/appcompat-v7/23.4.0/appcompat-v7-23.4.0-sources.jar!/android/support/v7/view/SupportActionModeWrapper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="127">
-          <caret line="154" column="0" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/ActionModeCallback.java" />
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/ic_done.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MyClanFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="174" column="62" selection-start-line="174" selection-start-column="62" selection-end-line="174" selection-end-column="62" />
-          <folding>
-            <element signature="e#6531#6558#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/CustomCursorAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1156">
-          <caret line="85" column="72" selection-start-line="85" selection-start-column="72" selection-end-line="85" selection-end-column="72" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/member_list_item_layout.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="39" selection-start-line="8" selection-start-column="39" selection-end-line="8" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/ValidateListFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="557">
-          <caret line="101" column="31" selection-start-line="101" selection-start-column="31" selection-end-line="101" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/ValidationAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="99" column="70" selection-start-line="99" selection-start-column="70" selection-end-line="99" selection-end-column="70" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/DetailValidationFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="621">
-          <caret line="419" column="32" selection-start-line="419" selection-start-column="32" selection-end-line="419" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/menu/done_menu.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="9" selection-start-line="3" selection-start-column="9" selection-end-line="3" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/interfaces/ToActivityListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="17" column="26" selection-start-line="17" selection-start-column="26" selection-end-line="17" selection-end-column="26" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/interfaces/FromActivityListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/new_event_layout.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="258" column="29" selection-start-line="258" selection-start-column="29" selection-end-line="258" selection-end-column="29" />
-          <folding>
-            <element signature="e#10445#10474#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/values-es/strings.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="555">
@@ -2945,36 +2747,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/MemberAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="59">
-          <caret line="48" column="0" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/GenericListFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="28" selection-start-line="18" selection-start-column="28" selection-end-line="18" selection-end-column="28" />
-          <folding>
-            <element signature="e#4508#4537#0" expanded="true" />
-            <element signature="e#6281#6310#0" expanded="true" />
-            <element signature="e#6390#6416#0" expanded="true" />
-            <element signature="e#6467#6495#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/models/MemberModel.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="656">
           <caret line="75" column="5" selection-start-line="75" selection-start-column="5" selection-end-line="75" selection-end-column="5" />
           <folding>
-            <element signature="e#1630#1631#0" expanded="true" />
-            <element signature="e#1665#1666#0" expanded="true" />
+            <element signature="e#1630#1631#0" expanded="false" />
+            <element signature="e#1665#1666#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -2984,24 +2763,16 @@
         <state relative-caret-position="391">
           <caret line="26" column="24" selection-start-line="26" selection-start-column="24" selection-end-line="26" selection-end-column="24" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#3710#3711#0" expanded="true" />
-            <element signature="e#3742#3743#0" expanded="true" />
-            <element signature="e#3808#3809#0" expanded="true" />
-            <element signature="e#3850#3851#0" expanded="true" />
-            <element signature="e#3882#3883#0" expanded="true" />
-            <element signature="e#3913#3914#0" expanded="true" />
-            <element signature="e#3958#3959#0" expanded="true" />
-            <element signature="e#3998#3999#0" expanded="true" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#3710#3711#0" expanded="false" />
+            <element signature="e#3742#3743#0" expanded="false" />
+            <element signature="e#3808#3809#0" expanded="false" />
+            <element signature="e#3850#3851#0" expanded="false" />
+            <element signature="e#3882#3883#0" expanded="false" />
+            <element signature="e#3913#3914#0" expanded="false" />
+            <element signature="e#3958#3959#0" expanded="false" />
+            <element signature="e#3998#3999#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/ScheduledListFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="27" column="13" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3018,8 +2789,8 @@
         <state relative-caret-position="255">
           <caret line="190" column="61" selection-start-line="190" selection-start-column="61" selection-end-line="190" selection-end-column="61" />
           <folding>
-            <element signature="e#0#58450#0" expanded="true" />
-            <element signature="imports" expanded="true" />
+            <element signature="e#0#58450#0" expanded="false" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -3036,7 +2807,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3060,42 +2830,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
           <caret line="27" column="50" selection-start-line="27" selection-start-column="50" selection-end-line="27" selection-end-column="50" />
-          <folding>
-            <element signature="e#698#699#0" expanded="false" />
-            <element signature="e#755#756#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/Constants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="34" column="68" selection-start-line="34" selection-start-column="68" selection-end-line="34" selection-end-column="68" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/data/EventTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-250">
-          <caret line="86" column="335" selection-start-line="86" selection-start-column="335" selection-end-line="86" selection-end-column="335" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/ServerSyncService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="232" column="83" selection-start-line="232" selection-start-column="83" selection-end-line="232" selection-end-column="83" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/CreateNotificationService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="884">
-          <caret line="74" column="30" selection-start-line="74" selection-start-column="30" selection-end-line="74" selection-end-column="30" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3120,48 +2854,291 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/DetailEventFragment.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/CreateNotificationService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="382" column="38" selection-start-line="382" selection-start-column="38" selection-end-line="382" selection-end-column="38" />
-          <folding>
-            <element signature="e#15707#15726#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="884">
+          <caret line="74" column="30" selection-start-line="74" selection-start-column="30" selection-end-line="74" selection-end-column="30" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/DrawerActivity.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/DownloadService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="1213" column="30" selection-start-line="1213" selection-start-column="30" selection-end-line="1213" selection-end-column="30" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="85">
+          <caret line="19" column="13" selection-start-line="19" selection-start-column="13" selection-end-line="19" selection-end-column="13" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/NewEventFragment.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/NotificationService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="490" column="43" selection-start-line="490" selection-start-column="43" selection-end-line="490" selection-end-column="43" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="68">
+          <caret line="33" column="13" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/UpdateNotificationsService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="31" column="0" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/LocalService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="21" column="49" selection-start-line="21" selection-start-column="49" selection-end-line="21" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/utils/SyncUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="16" column="52" selection-start-line="16" selection-start-column="52" selection-end-line="16" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/settings_layout.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="483">
+          <caret line="231" column="12" selection-start-line="231" selection-start-column="12" selection-end-line="231" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/LoginActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8">
+          <caret line="138" column="31" selection-start-line="138" selection-start-column="31" selection-end-line="138" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/PrepareActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="319" column="17" selection-start-line="319" selection-start-column="17" selection-end-line="319" selection-end-column="17" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/BungieService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="537">
-          <caret line="930" column="8" selection-start-line="930" selection-start-column="8" selection-end-line="930" selection-end-column="50" />
+        <state relative-caret-position="3502">
+          <caret line="266" column="0" selection-start-line="266" selection-start-column="0" selection-end-line="266" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/WebActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MainSettingsFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="384">
+          <caret line="452" column="48" selection-start-line="452" selection-start-column="48" selection-end-line="452" selection-end-column="48" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/dialogs/SimpleInputDialog.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="316">
+          <caret line="93" column="39" selection-start-line="93" selection-start-column="39" selection-end-line="93" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/NewEventFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="147">
+          <caret line="487" column="66" selection-start-line="487" selection-start-column="66" selection-end-line="487" selection-end-column="66" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/generic_list_layout.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="731">
+          <caret line="43" column="60" selection-start-line="43" selection-start-column="60" selection-end-line="43" selection-end-column="60" />
+          <folding>
+            <element signature="e#1065#1088#0" expanded="true" />
+            <element signature="e#1124#1147#0" expanded="true" />
+            <element signature="e#1515#1540#0" expanded="true" />
+            <element signature="e#1667#1690#0" expanded="true" />
+            <element signature="e#1726#1749#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/interfaces/ToActivityListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="571">
+          <caret line="47" column="24" selection-start-line="47" selection-start-column="24" selection-end-line="47" selection-end-column="24" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/scheduled_list_layout.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="278">
+          <caret line="19" column="45" selection-start-line="19" selection-start-column="45" selection-end-line="19" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/MemberAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="263">
+          <caret line="34" column="31" selection-start-line="34" selection-start-column="31" selection-end-line="34" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/ScheduledListFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="42" column="18" selection-start-line="42" selection-start-column="18" selection-end-line="42" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/MyClanFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-225">
+          <caret line="263" column="56" selection-start-line="263" selection-start-column="56" selection-end-line="263" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/GenericListFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="646">
+          <caret line="38" column="60" selection-start-line="38" selection-start-column="60" selection-end-line="38" selection-end-column="60" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1381#1408#0" expanded="true" />
+            <element signature="e#4538#4567#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/ServerSyncService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="332">
+          <caret line="125" column="20" selection-start-line="125" selection-start-column="20" selection-end-line="125" selection-end-column="20" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/fragments/DetailEventFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="538">
+          <caret line="334" column="42" selection-start-line="334" selection-start-column="42" selection-end-line="334" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/adapters/DetailEventAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="33" column="34" selection-start-line="33" selection-start-column="34" selection-end-line="33" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/ic_control.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/ic_control.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-hdpi/ic_control.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-mdpi/ic_inferno6v6.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-mdpi/ic_inferno_elim.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/ic_inferno_sup.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/ic_inferno_elim.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-mdpi/ic_control.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/data/EventTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="138" column="330" selection-start-line="138" selection-start-column="330" selection-end-line="138" selection-end-column="330" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/activities/DrawerActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="1194" column="53" selection-start-line="1194" selection-start-column="53" selection-end-line="1194" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/Constants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/app/the/bunker/services/ServerService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="1173" column="50" selection-start-line="1173" selection-start-column="50" selection-end-line="1173" selection-end-column="50" />
+        <state relative-caret-position="434">
+          <caret line="949" column="30" selection-start-line="949" selection-start-column="30" selection-end-line="949" selection-end-column="30" />
           <folding />
         </state>
       </provider>

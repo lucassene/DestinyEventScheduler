@@ -246,29 +246,6 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         SharedPreferences.Editor sharedEditor = sharedPrefs.edit();
         sharedEditor.putBoolean(PrepareActivity.MSG_SHOWED_PREF, true);
         sharedEditor.apply();
-
-        String[] members = {
-                "4611686018449763730",
-                "4611686018450253378",
-                "4611686018442220415",
-                "4611686018432074920",
-                "4611686018433014309",
-                "4611686018432713903",
-                "4611686018439224227",
-                "4611686018456783207",
-                "4611686018428867206"
-        };
-
-/*        for (String member : members) {
-            CipherUtils utils = new CipherUtils();
-            try {
-                String key = utils.encrypt(member);
-                Log.w(TAG, "membership: " + member + " , key: " + key);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }*/
-
     }
 
     private void getLoggedUserData() {
@@ -304,9 +281,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_HISTORY_GAMES);
                         runServerService(bundle);
                     } else if (getOpenedFragment() instanceof NewEventFragment) {
-                        bundle.clear();
-                        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_EVENTS);
-                        runServerService(bundle);
+                        updateEvents();
                     } else if (getOpenedFragment() instanceof SearchFragment) {
                         bundle.clear();
                         bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_GAMES);
@@ -350,6 +325,13 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             intent.putExtra("userMembership", bungieId);
             startService(intent);
         }
+    }
+
+    @Override
+    public void updateEvents() {
+        Bundle bundle = new Bundle();
+        bundle.putInt(ServerService.REQUEST_TAG, ServerService.TYPE_NEW_EVENTS);
+        runServerService(bundle);
     }
 
     private void refreshLists() {
@@ -1390,6 +1372,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 if (openedFragment instanceof MyClanFragment) {
                     MyClanFragment frag = (MyClanFragment) openedFragment;
                     frag.refreshData();
+                } else if (getOpenedFragment() instanceof GenericListFragment){
+                    SwipeListener frag = (SwipeListener) getOpenedFragment();
+                    frag.toggleSwipeProgress(false);
                 }
                 onDataLoaded();
                 break;
@@ -1648,6 +1633,9 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         if (getOpenedFragment() instanceof NewEventFragment){
                             NewEventFragment frag = (NewEventFragment) getOpenedFragment();
                             frag.onServerResponse(0);
+                        } else if (getOpenedFragment() instanceof GenericListFragment){
+                            SwipeListener frag = (SwipeListener) getOpenedFragment();
+                            frag.toggleSwipeProgress(false);
                         }
                         break;
                 }

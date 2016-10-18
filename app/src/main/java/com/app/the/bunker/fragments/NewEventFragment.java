@@ -294,7 +294,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                 bundle.putString("title", getResources().getString(R.string.spaces_available));
                 bundle.putString("yes", getResources().getString(R.string.save));
                 bundle.putString("no", getResources().getString(R.string.cancel));
-                int n = maxGuardians - reservedSpaces;
+                int n = maxGuardians - (reservedSpaces+1);
                 bundle.putInt("max", n);
                 bundle.putInt("min", 0);
                 bundle.putInt("type", FromDialogListener.GUARDIAN_TYPE);
@@ -476,13 +476,17 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
     public void onPositiveClick(String input, int type) {
         switch (type){
             case FromDialogListener.LIGHT_TYPE:
-                lightText.setText(input);
-                int min = Integer.parseInt(input) - minLight;
-                lightBar.setProgress(min);
+                if (!input.equals("")){
+                    lightText.setText(input);
+                    int min = Integer.parseInt(input) - minLight;
+                    lightBar.setProgress(min);
+                }
                 break;
             case FromDialogListener.GUARDIAN_TYPE:
-                spaceText.setText(input);
-                spaceBar.setProgress(Integer.parseInt(input));
+                if (!input.equals("")){
+                    spaceText.setText(input);
+                    spaceBar.setProgress(Integer.parseInt(input));
+                }
                 break;
         }
     }

@@ -13,14 +13,38 @@
         android:textSize="@dimen/secondaryTextSize"
         android:gravity="center_vertical"/>
 
-    <ListView
-        android:id="@android:id/list"
+    <com.app.the.bunker.views.CustomSwipeLayout
+        android:id="@+id/swipe_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingRight="@dimen/global_padding"
-        android:paddingEnd="@dimen/global_padding"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="8dp"
-        android:scrollbarStyle="outsideOverlay"/>
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true">
+
+            <ListView
+                android:id="@android:id/list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingRight="@dimen/global_padding"
+                android:paddingEnd="@dimen/global_padding"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="8dp"
+                android:scrollbarStyle="outsideOverlay"/>
+
+            <TextView
+                android:id="@android:id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/nothing_to_show"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingRight="@dimen/global_padding"
+                android:paddingEnd="@dimen/global_padding"/>
+
+        </FrameLayout>
+
+    </com.app.the.bunker.views.CustomSwipeLayout>
 
 </LinearLayout>
