@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="versionCode">3</integer>
+    <integer name="versionCode">4</integer>
     <string name="AUTHORITY" translatable="false">com.app.the.bunker.provider</string>
     <string name="psn" translatable="false">PSN</string>
     <string name="live" translatable="false">LIVE</string>
@@ -346,7 +346,7 @@
     <string name="update_needed">WARNING</string>
     <string name="update_later">UPDATE LATER</string>
     <string name="no_event_msg">Can\'t create this event. Please update this app.</string>
-    <string name="version_code" translatable="false">1.03</string>
+    <string name="version_code" translatable="false">1.1.0</string>
     <string name="creating_button_msg">CREATING EVENT</string>
     <string name="updating_database">Updating database</string>
     <string name="joining_msg_button">JOINING</string>
@@ -389,7 +389,7 @@
     <string name="invite_msg">Help us and invite your friends to The Bunker</string>
     <string name="finished_events">Finished events</string>
     <string name="finished_events_text">Notifies events to validate or evaluate</string>
-    <string name="spaces">Spaces</string>
+    <string name="spaces">Slots</string>
     <string name="reserved">Reserved</string>
     <string name="no_members_selected">No member selected</string>
     <string name="spaces_available">Available</string>
@@ -401,7 +401,10 @@
     <string name="member">" MEMBER"</string>
     <string name="members_">" MEMBERS"</string>
     <string name="event_full">EVENT FULL</string>
-    <string name="nothing_to_show">Nothing to show</string>
+    <string name="nothing_to_show">No item found</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="policy_msg">Know how we use your data</string>
+    <string name="time_out_msg">Connection timeout. Please try again later.</string>
 
 
 </resources>

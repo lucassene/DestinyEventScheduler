@@ -60,18 +60,23 @@ public class NotificationService extends IntentService {
 
     private void getNotificationInfo(int notificationId) {
         if (notificationId != 0){
-            Cursor cursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, NotificationTable.COLUMN_ID + "=" + notificationId, null,NotificationTable.COLUMN_TIME + " ASC");
-            if (cursor != null && cursor.moveToFirst()){
-                Log.w(TAG, "Notificação encontrada, abrindo...");
-                String title = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_EVENT));
-                String iconId = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ICON));
-                String typeName = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TYPE));
-                Calendar gameTime = DateUtils.stringToDate(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME_TIME)));
-                String notifyTime = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TIME));
-                cursor.close();
-                makeNotification(title, iconId, typeName, gameTime, notifyTime, notificationId);
+            Cursor cursor = null;
+            try{
+                cursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, NotificationTable.COLUMN_ID + "=" + notificationId, null,NotificationTable.COLUMN_TIME + " ASC");
+                if (cursor != null && cursor.moveToFirst()){
+                    Log.w(TAG, "Notificação encontrada, abrindo...");
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_EVENT));
+                    String iconId = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ICON));
+                    String typeName = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TYPE));
+                    Calendar gameTime = DateUtils.stringToDate(cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_GAME_TIME)));
+                    String notifyTime = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TIME));
+                    cursor.close();
+                    makeNotification(title, iconId, typeName, gameTime, notifyTime, notificationId);
 
-            } else Log.w(TAG, "Nenhuma Notificação foi encontrada.");
+                } else Log.w(TAG, "Nenhuma Notificação foi encontrada.");
+            } finally {
+                if (cursor != null) cursor.close();
+            }
         }
     }
 

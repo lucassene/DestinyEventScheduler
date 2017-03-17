@@ -88,6 +88,7 @@ public class ServerSyncService extends IntentService {
         selectedIds = new ArrayList<>();
 
         int typeIds[] = getIdArray();
+
         if (typeIds != null) {
             for (int typeId : typeIds) {
                 boolean b = sharedPrefs.getBoolean(String.valueOf(typeId), false);
@@ -106,23 +107,26 @@ public class ServerSyncService extends IntentService {
                     platformId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_PLATFORM));
                     clanId = cursor.getInt(cursor.getColumnIndexOrThrow(LoggedUserTable.COLUMN_CLAN));
 
-                    SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
-
-                    boolean isNewNotifyAllowed = prefs.getBoolean(Constants.NEW_NOTIFY_PREF, true);
-                    if (isNewNotifyAllowed){
+                    boolean isNewNotifyAllowed = sharedPrefs.getBoolean(Constants.NEW_NOTIFY_PREF, true);
+                    if (isNewNotifyAllowed) {
                         String url = SERVER_BASE_URL + GAME_ENDPOINT + STATUS_PARAM + "0" + JOINED_PARAM + "false";
                         requestServer(ServerService.TYPE_NEW_GAMES, url);
                     }
 
-                    String lastNotification = prefs.getString(Constants.LAST_DAILY_PREF, "23-04-2100T10:42");
+                    String lastNotification = sharedPrefs.getString(Constants.LAST_DAILY_PREF, "23-04-2100T10:42");
                     Calendar lastCal = DateUtils.stringToDate(lastNotification);
-                    lastCal.add(Calendar.DAY_OF_MONTH,1);
+                    lastCal.add(Calendar.DAY_OF_MONTH, 1);
                     Calendar now = Calendar.getInstance();
 
                     if (now.getTimeInMillis() > lastCal.getTimeInMillis()) {
-                        if (prefs.getBoolean(Constants.DONE_NOTIFY_PREF, true)) getDoneGames();
-                        getNewEvents();
-                        getNewMembers();
+                    String date = DateUtils.calendarToString(now);
+                    SharedPreferences.Editor edit = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
+                    edit.putString(Constants.LAST_DAILY_PREF, date);
+                    edit.apply();
+                    if (sharedPrefs.getBoolean(Constants.DONE_NOTIFY_PREF, true))
+                        getDoneGames();
+                    getNewEvents();
+                    getNewMembers();
                     } else Log.w(TAG, "Checks already happened today.");
                 }
             } finally {
@@ -210,6 +214,10 @@ public class ServerSyncService extends IntentService {
 
     @Override
     public void onDestroy() {
+        //DBHelper database = DBHelper.getInstance(getApplicationContext());
+        //SQLiteDatabase db = database.getWritableDatabase();
+        //database.close();
+        //db.close();
         super.onDestroy();
         Log.w(TAG, "ServerSyncService destroyed");
     }
@@ -219,6 +227,8 @@ public class ServerSyncService extends IntentService {
             if (NetworkUtils.checkConnection(this)){
                 URL myURL = new URL(url);
                 HttpURLConnection urlConnection = (HttpURLConnection) myURL.openConnection();
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setReadTimeout(10000);
                 urlConnection.setRequestProperty(MEMBER_HEADER, memberId);
                 urlConnection.setRequestProperty(PLATFORM_HEADER, String.valueOf(platformId));
                 urlConnection.setRequestProperty(CLAN_HEADER, String.valueOf(clanId));
@@ -256,11 +266,6 @@ public class ServerSyncService extends IntentService {
                             parseGames(resp);
                             if (gameList.size()>0){
                                 hasDoneGames = true;
-                                Calendar now = Calendar.getInstance();
-                                String date = DateUtils.calendarToString(now);
-                                SharedPreferences.Editor edit = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).edit();
-                                edit.putString(Constants.LAST_DAILY_PREF, date);
-                                edit.apply();
                                 Log.w(TAG, "Done games found.");
                             } else{
                                 Log.w(TAG, "No done games found.");

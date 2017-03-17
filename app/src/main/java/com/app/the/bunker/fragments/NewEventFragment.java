@@ -413,7 +413,7 @@ public class NewEventFragment extends Fragment implements LoaderManager.LoaderCa
                         EventTable.ALL_COLUMNS,
                         EventTable.COLUMN_TYPE + "=?",
                         selectionArgs,
-                        StringUtils.getLanguageString(getContext())
+                        StringUtils.getLanguageString()
                 );
             default:
                 return null;

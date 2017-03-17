@@ -350,5 +350,9 @@
     <string name="spaces_available">Disponíveis</string>
     <string name="spaces">Vagas</string>
     <string name="event_full">EVENTO CHEIO</string>
+    <string name="nothing_to_show">Nenhum item encontrado</string>
+    <string name="policy_msg">Saiba como usamos seus dados</string>
+    <string name="privacy_policy">Política de Privacidade</string>
+    <string name="time_out_msg">Tempo de conexão expirou. Por favor, tente novamente mais tarde.</string>
 
 </resources>

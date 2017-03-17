@@ -156,6 +156,9 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
                         errorCode = BungieService.ERROR_INCORRECT_REQUEST;
                         Log.w(TAG, "Incorrect request to BungieService");
                         break;
+                    case BungieService.ERROR_TIMEOUT:
+                        errorCode = BungieService.ERROR_TIMEOUT;
+                        break;
                 }
                 showAlertDialog();
                 progressBar.setVisibility(View.GONE);
@@ -269,6 +272,11 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
                 dialog.setArguments(bundle);
                 dialog.show(getSupportFragmentManager(),"alert");
                 break;
+            case BungieService.ERROR_TIMEOUT:
+                bundle.putString("title", getString(R.string.error));
+                bundle.putString("msg", getString(R.string.time_out_msg));
+                bundle.putString("posButton", getString(R.string.got_it));
+                break;
             case BungieService.NO_ERROR:
                 SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
                 boolean showed = prefs.getBoolean(MSG_SHOWED_PREF, false);
@@ -313,6 +321,7 @@ public class PrepareActivity extends AccountAuthenticatorActivity implements Req
         sharedEditor.putInt(Constants.PLATFORM_PREF, platformId);
         sharedEditor.putString(Constants.CLAN_PREF, clanId);
         sharedEditor.putString(Constants.USERNAME_PREF, userName);
+        sharedEditor.putBoolean(Constants.DONE_NOTIFY_PREF, true);
         Calendar now = Calendar.getInstance();
         sharedEditor.putString(Constants.LAST_DAILY_PREF, DateUtils.calendarToString(now));
         sharedEditor.apply();

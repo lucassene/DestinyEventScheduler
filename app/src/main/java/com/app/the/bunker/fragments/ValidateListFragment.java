@@ -128,7 +128,7 @@ public class ValidateListFragment extends ListFragment implements UserDataListen
                 gameAdapter.notifyDataSetChanged();
             } else Log.w(TAG, "listView null");
         }
-        swipeLayout.setRefreshing(false);
+        if (swipeLayout != null) swipeLayout.setRefreshing(false);
     }
 
     private int getStartPos(List<GameModel> gameList, int gameStatus) {

@@ -8,6 +8,7 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.app.the.bunker.activities.LoginActivity;
 import com.app.the.bunker.activities.PrepareActivity;
@@ -54,7 +55,7 @@ public class BunkerAuthenticator extends AbstractAccountAuthenticator {
             bundle.putString(AccountManager.KEY_AUTHTOKEN, token);
             return bundle;
         }
-
+        Log.w("BunkerAuthenticator", "peekAuthToken returned an empty String.");
         Intent intent = new Intent(mContext, PrepareActivity.class);
         intent.putExtra(PrepareActivity.TYPE, PrepareActivity.TYPE_RENEW_TOKEN);
         intent.putExtra(Constants.ARG_ACCOUNT_TYPE, account.type);

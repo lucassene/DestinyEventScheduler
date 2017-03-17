@@ -77,9 +77,10 @@ public class DataProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         Log.w("Database","Content Provider onCreated called succesfully.");
-        database = new DBHelper(getContext());
+        database = DBHelper.getInstance(getContext());
         return true;
     }
+
 
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {

@@ -377,9 +377,13 @@
     <string name="one_member_selected">Un miembro seleccionado</string>
     <string name="reserved">Reservados</string>
     <string name="select_members">Seleccionar a los miembros</string>
-    <string name="spaces">Espacios</string>
+    <string name="spaces">Plazas</string>
     <string name="spaces_available">Disponibles</string>
     <string name="event_full">EVENTO LLENO</string>
+    <string name="nothing_to_show">Artículos no encontrados</string>
+    <string name="policy_msg">Conoce cómo utilizamos sus datos</string>
+    <string name="privacy_policy">Política de Privacidad</string>
+    <string name="time_out_msg">El tiempo de conexión expiro. Por favor, inténtelo de nuevo más tarde.</string>
 
 
 </resources>

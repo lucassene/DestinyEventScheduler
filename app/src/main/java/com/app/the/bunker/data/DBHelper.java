@@ -9,8 +9,9 @@ public class DBHelper extends SQLiteOpenHelper{
 
     private static final String DB_NAME = "destinydb";
     private static final int DB_VERSION = 1;
+    private static DBHelper mInstance = null;
 
-    public DBHelper(Context context){
+    private  DBHelper(Context context){
         super(context, DB_NAME, null, DB_VERSION);
     }
 
@@ -45,5 +46,18 @@ public class DBHelper extends SQLiteOpenHelper{
             db.execSQL("PRAGMA foreign_keys=ON;");
         }
         Log.w("Database","Database opened succesfully");
+    }
+
+    @Override
+    public synchronized void close() {
+        super.close();
+        Log.w("Database","Database closed succesfully");
+    }
+
+    public static DBHelper getInstance(Context context){
+        if (mInstance == null){
+            mInstance = new DBHelper(context.getApplicationContext());
+        }
+        return mInstance;
     }
 }

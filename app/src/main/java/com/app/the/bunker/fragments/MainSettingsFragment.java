@@ -523,7 +523,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
                 EventTypeTable.ALL_COLUMNS,
                 null,
                 null,
-                StringUtils.getLanguageString(getContext()) + " ASC"
+                StringUtils.getLanguageString() + " ASC"
         );
     }
 
@@ -536,7 +536,7 @@ public class MainSettingsFragment extends Fragment implements FromDialogListener
                 MultiChoiceItemModel item = new MultiChoiceItemModel();
                 int id = data.getInt(data.getColumnIndexOrThrow(EventTypeTable.COLUMN_ID));
                 item.setId(id);
-                item.setText(data.getString(data.getColumnIndexOrThrow(StringUtils.getLanguageString(getContext()))));
+                item.setText(data.getString(data.getColumnIndexOrThrow(StringUtils.getLanguageString())));
                 item.setChecked(prefs.getBoolean(String.valueOf(id),false));
                 typeList.add(item);
                 data.moveToNext();

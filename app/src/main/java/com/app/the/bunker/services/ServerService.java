@@ -133,6 +133,7 @@ public class ServerService extends IntentService {
     public static final int ERROR_INCORRECT_GAMEID = 80;
     public static final int ERROR_NO_EVENT = 90;
     public static final int ERROR_INSERT = 100;
+    public static final int ERROR_TIMEOUT = 110;
 
     public static final String RUNNING_SERVICE = "serverRunning";
 
@@ -341,11 +342,11 @@ public class ServerService extends IntentService {
                 } else sendNotice(receiver, notice);
                 break;
             case TYPE_NEW_EVENTS:
-                url = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + getDBEventsCount();
-                error = requestServer(receiver, type, url, null);
-                if (error != NO_ERROR){
-                    sendError(receiver, error);
-                } else sendStatus(receiver, STATUS_FINISHED);
+                    url = SERVER_BASE_URL + EVENTS_ENDPOINT + INITIAL_PARAM + getDBEventsCount();
+                    error = requestServer(receiver, type, url, null);
+                    if (error != NO_ERROR){
+                        sendError(receiver, error);
+                    } else sendStatus(receiver, STATUS_FINISHED);
                 break;
         }
         this.stopSelf();
@@ -409,6 +410,8 @@ public class ServerService extends IntentService {
         if (receiver != null) receiver.send(STATUS_ERROR, bundle);
     }
 
+    private String auth;
+
     private int requestServer(ResultReceiver receiver, int type, String url, Bundle bundle) {
         Log.w(TAG, "URL: " + url);
         if (receiver != null) { sendStatus(receiver, STATUS_RUNNING); }
@@ -419,6 +422,8 @@ public class ServerService extends IntentService {
                     myURL = new URL(SERVER_BASE_URL + LOGIN_ENDPOINT);
                 } else myURL = new URL(url);
                 HttpURLConnection urlConnection = (HttpURLConnection) myURL.openConnection();
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setReadTimeout(10000);
                 switch (type){
                     case TYPE_CREATE_GAME:
                         urlConnection = createGameRequest(urlConnection, bundle);
@@ -528,7 +533,6 @@ public class ServerService extends IntentService {
                                     return error;
                                 case TYPE_LOGIN:
                                     String authKey = urlConnection.getHeaderField(AUTH_HEADER);
-                                    //Log.w(TAG, "authKey: " + authKey);
                                     CipherUtils cipher = new CipherUtils();
                                     SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
                                     SharedPreferences.Editor editor = prefs.edit();
@@ -538,6 +542,7 @@ public class ServerService extends IntentService {
                                     String userName = prefs.getString(Constants.USERNAME_PREF, "");
                                     AccountManager manager = AccountManager.get(this);
                                     Account acc = new Account(userName, Constants.ACC_TYPE);
+                                    manager.invalidateAuthToken(Constants.ACC_TYPE, auth);
                                     manager.setAuthToken(acc, Constants.ACC_TYPE, encrypted);
                                     error = requestServer(receiver, bundle.getInt(REQUEST_TAG),bundle.getString(URL_TAG),bundle.getBundle(BUNDLE_TAG));
                                     return error;
@@ -578,6 +583,10 @@ public class ServerService extends IntentService {
                 Log.w(TAG, "No internet connection found");
                 return ERROR_NO_CONNECTION;
             }
+        } catch (java.net.SocketTimeoutException e){
+            e.printStackTrace();
+            Log.w(TAG, "Time out");
+            return ERROR_TIMEOUT;
         } catch (Exception e){
             e.printStackTrace();
             Log.w(TAG, "Error in HTTP request");
@@ -736,7 +745,7 @@ public class ServerService extends IntentService {
                     member.setTitle(getString(R.string.default_title));
                 } else {
                     JSONObject jTitle = jMember.getJSONObject("memberTitle");
-                    member.setTitle(jTitle.getString(StringUtils.getLanguageString(this)));
+                    member.setTitle(jTitle.getString(StringUtils.getLanguageString()));
                 }
                 member.setInsert(true);
                 memberList.add(member);
@@ -771,7 +780,7 @@ public class ServerService extends IntentService {
                 JSONObject jType = jTypes.getJSONObject(i);
                 EventTypeModel type = new EventTypeModel();
                 type.setTypeId(jType.getInt("eventTypeId"));
-                type.setTypeName(jType.getString(StringUtils.getLanguageString(this)));
+                type.setTypeName(jType.getString(StringUtils.getLanguageString()));
                 type.setTimesPlayed(jType.getInt("timesPlayed"));
                 typeList.add(type);
             }
@@ -780,7 +789,7 @@ public class ServerService extends IntentService {
                 member.setTitle(getString(R.string.default_title));
             } else {
                 JSONObject jTitle = jMember.getJSONObject("memberTitle");
-                member.setTitle(jTitle.getString(StringUtils.getLanguageString(this)));
+                member.setTitle(jTitle.getString(StringUtils.getLanguageString()));
             }
 
             EventModel event = new EventModel();
@@ -792,11 +801,11 @@ public class ServerService extends IntentService {
                 event.setTimesPlayed(jFavorite.getInt("timesPlayed"));
                 JSONObject jEvent = jFavorite.getJSONObject("event");
                 event.setEventId(jEvent.getInt("id"));
-                event.setEventName(jEvent.getString(StringUtils.getLanguageString(this)));
+                event.setEventName(jEvent.getString(StringUtils.getLanguageString()));
                 event.setEventIcon(jEvent.getString("icon"));
                 JSONObject jFavType = jEvent.getJSONObject("eventType");
                 favType.setTypeId(jFavType.getInt("id"));
-                favType.setTypeName(jFavType.getString(StringUtils.getLanguageString(this)));
+                favType.setTypeName(jFavType.getString(StringUtils.getLanguageString()));
                 favType.setTypeIcon(jFavType.getString("icon"));
                 event.setEventType(favType);
             }
@@ -827,7 +836,7 @@ public class ServerService extends IntentService {
                     member.setTitle(getString(R.string.default_title));
                 } else {
                     JSONObject jTitle = jEntry.getJSONObject("memberTitle");
-                    member.setTitle(jTitle.getString(StringUtils.getLanguageString(this)));
+                    member.setTitle(jTitle.getString(StringUtils.getLanguageString()));
                 }
                 memberList.add(member);
             }
@@ -862,7 +871,7 @@ public class ServerService extends IntentService {
                     member.setTitle(getString(R.string.default_title));
                 } else {
                     JSONObject jTitle = jMember.getJSONObject("memberTitle");
-                    member.setTitle(jTitle.getString(StringUtils.getLanguageString(this)));
+                    member.setTitle(jTitle.getString(StringUtils.getLanguageString()));
                 }
                 memberList.add(member);
             }
@@ -891,12 +900,12 @@ public class ServerService extends IntentService {
                 JSONObject jEvent = jGame.getJSONObject("event");
                 game.setEventId(jEvent.getInt("id"));
                 if (game.getEventId() > maxEvent){hasNewEvents = true;}
-                game.setEventName(jEvent.getString(StringUtils.getLanguageString(this)));
+                game.setEventName(jEvent.getString(StringUtils.getLanguageString()));
                 game.setEventIcon(jEvent.getString("icon"));
                 game.setMaxGuardians(jEvent.getInt("maxGuardians"));
                 JSONObject jType = jEvent.getJSONObject("eventType");
                 game.setTypeId(jType.getInt("id"));
-                game.setTypeName(jType.getString(StringUtils.getLanguageString(this)));
+                game.setTypeName(jType.getString(StringUtils.getLanguageString()));
                 game.setTypeIcon(jType.getString("icon"));
                 game.setTime(jGame.getString("time"));
                 game.setMinLight(jGame.getInt("light"));
@@ -1138,7 +1147,7 @@ public class ServerService extends IntentService {
         CipherUtils cUtils = new CipherUtils();
         try{
             pass = cUtils.encrypt(memberId);
-            Log.w(TAG, "password: " + pass);
+            //Log.w(TAG, "password: " + pass);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

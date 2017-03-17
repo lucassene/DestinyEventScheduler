@@ -263,7 +263,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
         Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
+                if (drawerLayout != null) drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.menu_refresh:
                 if (NetworkUtils.checkConnection(this)) {
@@ -430,11 +430,11 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
             selectedDrawerItem = 1;
             fm.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             updateViewPager();
-            drawerLayout.closeDrawers();
+            if (drawerLayout != null) drawerLayout.closeDrawers();
             if (child != null) child.playSoundEffect(SoundEffectConstants.CLICK);
             return true;
         }
-        drawerLayout.closeDrawers();
+        if (drawerLayout != null) drawerLayout.closeDrawers();
         return false;
     }
 
@@ -952,7 +952,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     public boolean openNewEventFragment(View child) {
         if (openedFragment instanceof NewEventFragment) {
-            drawerLayout.closeDrawers();
+            if (drawerLayout != null) drawerLayout.closeDrawers();
             return false;
         }
         selectedDrawerItem = 2;
@@ -963,7 +963,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     public boolean openSearchEventFragment(View child) {
         if (openedFragment instanceof SearchFragment) {
-            drawerLayout.closeDrawers();
+            if (drawerLayout != null) drawerLayout.closeDrawers();
             return false;
         }
         selectedDrawerItem = 3;
@@ -974,7 +974,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private boolean openMyEventsFragment(View child) {
         if (openedFragment instanceof MyEventsFragment) {
-            drawerLayout.closeDrawers();
+            if (drawerLayout != null) drawerLayout.closeDrawers();
             return false;
         }
         selectedDrawerItem = 4;
@@ -985,7 +985,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     public boolean openHistoryFragment(View child) {
         if (openedFragment instanceof HistoryListFragment) {
-            drawerLayout.closeDrawers();
+            if (drawerLayout != null) drawerLayout.closeDrawers();
             return false;
         }
         selectedDrawerItem = 5;
@@ -996,7 +996,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     public boolean openMyClanFragment(View child) {
         if (openedFragment instanceof MyClanFragment) {
-            drawerLayout.closeDrawers();
+            if (drawerLayout != null) drawerLayout.closeDrawers();
             return false;
         }
         selectedDrawerItem = 7;
@@ -1013,9 +1013,12 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
     public boolean openMyProfileFragment(View child) {
         if (memberProfile != null) {
             if (openedFragment instanceof MyNewProfileFragment && memberProfile.getMembershipId().equals(bungieId)) {
-                drawerLayout.closeDrawers();
+                if (drawerLayout != null) drawerLayout.closeDrawers();
                 return false;
             }
+        } else if (getOpenedFragment() instanceof MyNewProfileFragment){
+            if (drawerLayout != null) drawerLayout.closeDrawers();
+            return false;
         }
         selectedDrawerItem = 8;
         MyNewProfileFragment fragment = new MyNewProfileFragment();
@@ -1028,7 +1031,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     public boolean openConfigFragment(View child) {
         if (openedFragment instanceof MainSettingsFragment) {
-            drawerLayout.closeDrawers();
+            if (drawerLayout != null) drawerLayout.closeDrawers();
             return false;
         }
         selectedDrawerItem = 10;
@@ -1039,7 +1042,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private boolean openAboutFragment(View child) {
         if (openedFragment instanceof AboutSettingsFragment) {
-            drawerLayout.closeDrawers();
+            if (drawerLayout != null) drawerLayout.closeDrawers();
             return false;
         }
         selectedDrawerItem = 11;
@@ -1050,7 +1053,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     private boolean openDBViewerFragment(View child) {
         if (openedFragment instanceof DBViewerFragment) {
-            drawerLayout.closeDrawers();
+            if (drawerLayout != null) drawerLayout.closeDrawers();
             return false;
         }
 
@@ -1267,7 +1270,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                 super.onDrawerClosed(drawerView);
             }
         };
-        drawerLayout.addDrawerListener(drawerToggle);
+        if (drawerLayout != null) drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
     }
@@ -1316,7 +1319,7 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
 
     @Override
     public void onLogoff() {
-        DBHelper database = new DBHelper(getApplicationContext());
+        DBHelper database = DBHelper.getInstance(getApplicationContext());
         SQLiteDatabase db = database.getWritableDatabase();
         database.onUpgrade(db, 0, 0);
         db.close();
@@ -1448,6 +1451,14 @@ public class DrawerActivity extends AppCompatActivity implements ToActivityListe
                         dialog.putString("msg", getString(R.string.no_event_msg));
                         dialog.putString("posButton", getString(R.string.got_it));
                         showAlertDialog(dialog);
+                        break;
+                    case ServerService.ERROR_TIMEOUT:
+                        Bundle dialogB = new Bundle();
+                        dialogB.putInt("type", MyAlertDialog.ALERT_DIALOG);
+                        bundle.putString("title", getString(R.string.error));
+                        bundle.putString("msg", getString(R.string.time_out_msg));
+                        bundle.putString("posButton", getString(R.string.got_it));
+                        showAlertDialog(dialogB);
                         break;
                     default:
                         progress.setVisibility(View.GONE);

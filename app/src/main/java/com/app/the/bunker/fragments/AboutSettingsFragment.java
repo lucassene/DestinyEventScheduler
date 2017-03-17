@@ -24,6 +24,7 @@ public class AboutSettingsFragment extends Fragment {
     LinearLayout helpLayout;
     LinearLayout patreonLayout;
     LinearLayout inviteLayout;
+    LinearLayout policyLayout;
     TextView versionTxt;
 
     @Override
@@ -39,6 +40,7 @@ public class AboutSettingsFragment extends Fragment {
         helpLayout = (LinearLayout) v.findViewById(R.id.help_layout);
         patreonLayout = (LinearLayout) v.findViewById(R.id.patreon_layout);
         inviteLayout = (LinearLayout) v.findViewById(R.id.share_layout);
+        policyLayout = (LinearLayout) v.findViewById(R.id.policy_layout);
         versionTxt = (TextView) v.findViewById(R.id.versionTxt);
         versionTxt.setText(BuildConfig.VERSION_NAME);
 
@@ -67,6 +69,13 @@ public class AboutSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 callback.callAndroidIntent(DrawerActivity.TYPE_SHARE_INTENT, "");
+            }
+        });
+
+        policyLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.callAndroidIntent(DrawerActivity.TYPE_BROWSER_INTENT, "https://thebunkerapp.wordpress.com/privacy-policy/");
             }
         });
 

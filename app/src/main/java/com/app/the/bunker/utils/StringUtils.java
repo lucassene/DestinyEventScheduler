@@ -1,6 +1,5 @@
 package com.app.the.bunker.utils;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.text.TextUtils;
 
@@ -24,8 +23,8 @@ public class StringUtils {
         } else return String.valueOf(number);
     }
 
-    public static String getLanguageString(Context context) {
-        context.getResources();
+    public static String getLanguageString() {
+        //context.getResources();
         String lang = Resources.getSystem().getConfiguration().locale.getLanguage();
         switch (lang) {
             case "pt":

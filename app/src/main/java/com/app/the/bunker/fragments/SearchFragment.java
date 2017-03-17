@@ -1,7 +1,6 @@
 package com.app.the.bunker.fragments;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -34,6 +33,7 @@ import com.app.the.bunker.models.MemberModel;
 import com.app.the.bunker.provider.DataProvider;
 import com.app.the.bunker.services.ServerService;
 import com.app.the.bunker.utils.NetworkUtils;
+import com.app.the.bunker.utils.StringUtils;
 import com.app.the.bunker.views.CustomSwipeLayout;
 
 import java.util.ArrayList;
@@ -279,8 +279,7 @@ public class SearchFragment extends Fragment implements AdapterView.OnItemSelect
     }
 
     private String getNameColumn() {
-        String lang = Resources.getSystem().getConfiguration().locale.getLanguage();
-        switch (lang) {
+        switch (StringUtils.getLanguageString()) {
             case "pt":
                 return EventTypeTable.COLUMN_PT;
             case "es":

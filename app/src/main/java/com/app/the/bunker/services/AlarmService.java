@@ -24,19 +24,23 @@ public class AlarmService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Cursor cursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, null, null, NotificationTable.COLUMN_TIME + " ASC");
-        if (cursor != null && cursor.moveToFirst()){
+        Cursor cursor = null;
+        try {
+            cursor = getContentResolver().query(DataProvider.NOTIFICATION_URI, NotificationTable.ALL_COLUMNS, null, null, NotificationTable.COLUMN_TIME + " ASC");
+            if (cursor != null && cursor.moveToFirst()){
 
-            for (int i=0; i<cursor.getCount(); i++){
-                Integer notifyId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
-                String notifyTime = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TIME));
+                for (int i=0; i<cursor.getCount(); i++){
+                    Integer notifyId = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_ID));
+                    String notifyTime = cursor.getString(cursor.getColumnIndexOrThrow(NotificationTable.COLUMN_TIME));
 
-                registerAlarm(notifyId, notifyTime);
+                    registerAlarm(notifyId, notifyTime);
 
-                cursor.moveToNext();
+                    cursor.moveToNext();
+                }
+                cursor.close();
             }
-
-            cursor.close();
+        } finally {
+            if (cursor != null) cursor.close();
         }
     }
 

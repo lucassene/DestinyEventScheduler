@@ -1,7 +1,6 @@
 package com.app.the.bunker.fragments;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,6 +27,7 @@ import com.app.the.bunker.interfaces.SwipeListener;
 import com.app.the.bunker.interfaces.ToActivityListener;
 import com.app.the.bunker.models.MemberModel;
 import com.app.the.bunker.provider.DataProvider;
+import com.app.the.bunker.utils.StringUtils;
 import com.app.the.bunker.views.CustomSwipeLayout;
 
 import java.util.ArrayList;
@@ -213,7 +213,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
                         projection,
                         null,
                         null,
-                        Resources.getSystem().getConfiguration().locale.getLanguage() + " ASC");
+                        StringUtils.getLanguageString() + " ASC");
                 break;
             case LOADER_EVENT:
                 projection = EventTable.ALL_COLUMNS;
@@ -224,7 +224,7 @@ public class GenericListFragment extends ListFragment implements LoaderManager.L
                         projection,
                         EventTable.COLUMN_TYPE + "=?",
                         selectionArgs,
-                        Resources.getSystem().getConfiguration().locale.getLanguage() + " ASC");
+                        StringUtils.getLanguageString() + " ASC");
                 break;
             case LOADER_MEMBERS:
                 cursorLoader = new CursorLoader(getActivity(),

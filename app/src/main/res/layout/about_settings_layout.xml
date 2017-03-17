@@ -206,6 +206,33 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/policy_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listItemHeight"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="8dp"
+            android:paddingLeft="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/privacy_policy"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/policy_msg"
+                android:textSize="13sp"
+                android:alpha="0.75"/>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/help_layout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/listItemHeight"

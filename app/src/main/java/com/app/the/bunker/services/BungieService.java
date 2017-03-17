@@ -96,7 +96,6 @@ public class BungieService extends IntentService {
     public static final String XCSRF_EXTRA = "x-csrf";
     public static final String PLATFORM_EXTRA = "platform";
     public static final String MEMBERSHIP_EXTRA = "membershipId";
-    public static final String CLAN_EXTRA = "clanId";
 
     private static final String KEY_HEADER = "x-api-key";
     private static final String COOKIE_HEADER = "cookie";
@@ -116,6 +115,7 @@ public class BungieService extends IntentService {
     public static final int ERROR_CLAN_MEMBER = 170;
     public static final int ERROR_AUTH = 180;
     public static final int ERROR_SERVER = 190;
+    public static final int ERROR_TIMEOUT = 200;
 
     private int error = 0;
 
@@ -272,6 +272,8 @@ public class BungieService extends IntentService {
 
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setReadTimeout(10000);
 
                 urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
                 urlConnection.setRequestMethod(GET_METHOD);
@@ -353,7 +355,11 @@ public class BungieService extends IntentService {
                 Log.w(TAG, "Sem conexão com a internet");
                 return ERROR_NO_CONNECTION;
             }
-        } catch (Exception e){
+        } catch (java.net.SocketTimeoutException e){
+            e.printStackTrace();
+            Log.w(TAG, "Time out! (getCurrentBungieAccount)");
+            return ERROR_TIMEOUT;
+        } catch(Exception e){
             Log.w(TAG, "Problema no HTTP Request (getCurrentBungieAccount)");
             e.printStackTrace();
             return ERROR_HTTP_REQUEST;
@@ -399,6 +405,8 @@ public class BungieService extends IntentService {
 
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setReadTimeout(10000);
                 urlConnection.setRequestProperty(KEY_HEADER, BuildConfig.API_KEY);
                 urlConnection.setRequestProperty(XCSRF_HEADER, xcsrf);
                 urlConnection.setRequestProperty(COOKIE_HEADER, cookie);
@@ -420,6 +428,10 @@ public class BungieService extends IntentService {
                 return ERROR_NO_CONNECTION;
             }
 
+        } catch (java.net.SocketTimeoutException e){
+            e.printStackTrace();
+            Log.w(TAG, "Time out! (getCurrentBungieAccount)");
+            return ERROR_TIMEOUT;
         } catch (Exception e) {
             Log.w(TAG, "Problema no HTTP Request (getCurrentBungieAccount)");
             e.printStackTrace();
@@ -560,6 +572,8 @@ public class BungieService extends IntentService {
 
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setReadTimeout(10000);
                 urlConnection = createLoginRequest(urlConnection);
                 int statusCode;
                 if (urlConnection != null){
@@ -589,6 +603,10 @@ public class BungieService extends IntentService {
                 Log.w(TAG, "Sem conexão com a internet");
                 return ERROR_NO_CONNECTION;
             }
+        } catch (java.net.SocketTimeoutException e ){
+            Log.w(TAG, "Time out! (Server Login)");
+            e.printStackTrace();
+            return ERROR_TIMEOUT;
         } catch (Exception e) {
             Log.w(TAG, "Problema no HTTP Request (Server Login)");
             e.printStackTrace();
@@ -607,6 +625,8 @@ public class BungieService extends IntentService {
 
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setReadTimeout(10000);
                 urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
                 int statusCode;
                 if (urlConnection != null) {
@@ -659,6 +679,11 @@ public class BungieService extends IntentService {
                 return ERROR_NO_CONNECTION;
             }
 
+        } catch (java.net.SocketTimeoutException e ){
+            Log.w(TAG, "Time out! (getMembersOfClan");
+            e.printStackTrace();
+            error = ERROR_TIMEOUT;
+            return ERROR_TIMEOUT;
         } catch (Exception e) {
             Log.w(TAG, "Problema no HTTP Request (getMembersOfClan)");
             e.printStackTrace();
@@ -680,6 +705,8 @@ public class BungieService extends IntentService {
         try{
             URL url = new URL(myURL);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setConnectTimeout(5000);
+            urlConnection.setReadTimeout(10000);
             urlConnection = getDefaultHeaders(urlConnection, GET_METHOD);
 
             int statusCode;
@@ -799,6 +826,8 @@ public class BungieService extends IntentService {
 
                 URL url = new URL(myURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setReadTimeout(10000);
                 urlConnection = getDefaultHeaders(urlConnection, POST_METHOD);
                 if (urlConnection == null) return ERROR_AUTH;
                 urlConnection.setDoOutput(true);
@@ -862,6 +891,11 @@ public class BungieService extends IntentService {
                 error = ERROR_NO_CONNECTION;
                 return ERROR_NO_CONNECTION;
             }
+        } catch (java.net.SocketTimeoutException e){
+            Log.w(TAG, "Time out! (getMembersOfClan)");
+            e.printStackTrace();
+            error = ERROR_TIMEOUT;
+            return ERROR_TIMEOUT;
         } catch (Exception e) {
                     Log.w(TAG, "Problema no HTTP Request (getMembersOfClan)");
                     e.printStackTrace();

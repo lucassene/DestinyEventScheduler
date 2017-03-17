@@ -91,7 +91,7 @@ public class LoginActivity extends AppCompatActivity implements RequestResultRec
 
     private void prepareDatabase(){
         CookiesUtils.clearCookies();
-        DBHelper database = new DBHelper(getApplicationContext());
+        DBHelper database = DBHelper.getInstance(getApplicationContext());
         SQLiteDatabase db = database.getWritableDatabase();
         database.onUpgrade(db, 0, 0);
         db.close();
@@ -359,6 +359,11 @@ public class LoginActivity extends AppCompatActivity implements RequestResultRec
                 bundle.putString("msg", getString(R.string.credentials_expired));
                 bundle.putString("posButton",getString(R.string.got_it));
                 break;
+            case BungieService.ERROR_TIMEOUT:
+                bundle.putString("title", getString(R.string.error));
+                bundle.putString("msg", getString(R.string.time_out_msg));
+                bundle.putString("posButton", getString(R.string.got_it));
+                break;
         }
         dialog.setArguments(bundle);
         dialog.show(getSupportFragmentManager(),"alert");
@@ -369,7 +374,7 @@ public class LoginActivity extends AppCompatActivity implements RequestResultRec
         switch (errorCode){
             case BungieService.ERROR_NO_CLAN:
                 CookiesUtils.clearCookies();
-                DBHelper database = new DBHelper(getApplicationContext());
+                DBHelper database = DBHelper.getInstance(getApplicationContext());
                 SQLiteDatabase db = database.getWritableDatabase();
                 database.onUpgrade(db, 0, 0);
                 showButtons = true;
