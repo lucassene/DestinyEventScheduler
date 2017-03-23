@@ -2,49 +2,40 @@
 <items version="2" >
 
     <item
-        is-multidex="true"
-        jar="C:\Users\Escritorio\.android\build-cache\661341ef66cf4a085cfd610ca86cd354ea5b68b3\output\jars\classes.jar"
-        jumboMode="true"
+        is-multidex="false"
+        jar="C:\Users\Escritorio\.android\build-cache\c62abd97da24f6332b9df25f1b6ef6c6615cd72a\output\jars\classes.jar"
+        jumboMode="false"
         optimize="true"
         revision="25.0.0"
-        sha1="de4db3785756bfb0915a9f59a9b3f2fea7407be4">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_2e0a2e769123c5777ac11eb1b9d69ad1862d66b5\classes.dex" />
+        sha1="3dee4ce5844d39d843d503fb8fe04e51e5bfffac">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_54026a9ef4f53dbc3ade102ebbc211d9f4692d77.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="C:\Users\Escritorio\.android\build-cache\219e246c35661b18af1e83f007406921ce49823c\output\jars\classes.jar"
-        jumboMode="true"
+        is-multidex="false"
+        jar="C:\Users\Escritorio\.android\build-cache\dc36cd6deae1a3c08e00e1e9376439a9d86093fc\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="8a36d229011e75f0caef408e1adf0d3fd4d94e02">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_507b317aa3a39bfbe46edbaf5f2269696eaea2dd.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Escritorio\.android\build-cache\d652d1afe8f594b8a34b5094d0c20a9b06396117\output\jars\classes.jar"
+        jumboMode="false"
         optimize="true"
         revision="25.0.0"
         sha1="ec75036c3c52e451d0cde50a5aedaf5fd32354a0">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_fa056c6e086ffd67e2595117769eaf510294ed1f\classes.dex" />
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_04bbd5b88b74ec2fcd1492a1e9c6fb6af2ee3f6e.jar" />
     </item>
     <item
-        is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-appindexing\9.4.0\jars\classes.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="C:\Users\Escritorio\.android\build-cache\30b011e78a36db012bfb57f210066c103e7f419c\output\jars\libs\internal_impl-23.4.0.jar"
+        jumboMode="true"
         optimize="true"
-        revision="23.0.3"
-        sha1="c10df7344e31161852c20bb8143fc37319aa10ec">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.google.android.gms-play-services-appindexing-9.4.0_da18ef3190a5790516d72b96496381e12b86b0c8.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.3"
-        sha1="c2c594cace5d83a3227b2b6e658ecbfd586d3ed9">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.android.support-support-vector-drawable-23.4.0_2c40ed158fdec59a50f8d1b55d3233ee673005c9.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\design\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.3"
-        sha1="5326d9a850d491714fef8cbfaa9ea3416f0bf0d2">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.android.support-design-23.4.0_9f30a2310e5a7611ae4ed281761dc8b0bc98d978.jar" />
+        revision="25.0.0"
+        sha1="ea3c07504d2c8f4b13aa17c45c1b68ed9c1c3674">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-23.4.0_c05f8319e09fe7be5e566454a77df972463fe25f\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -66,6 +57,60 @@
     </item>
     <item
         is-multidex="true"
+        jar="C:\Users\Escritorio\.android\build-cache\127be8c5537027c3f3f89bdbed76298645e7816e\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="de4db3785756bfb0915a9f59a9b3f2fea7407be4">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_72014f6ddec0804719c5d5016e95c5e97ad9c562\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Escritorio\.android\build-cache\c78b4517f22fdaa56c619e630d90889cc3cde3fb\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="548f06de403a9409f00554b3ee12a9fdea0e236c">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_69c1cade0a3b52a24ebd7f37ef5369adc5420691\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Escritorio\.android\build-cache\127be8c5537027c3f3f89bdbed76298645e7816e\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="de4db3785756bfb0915a9f59a9b3f2fea7407be4">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_72014f6ddec0804719c5d5016e95c5e97ad9c562.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Escritorio\.android\build-cache\1c8e5de196ac1625c4d6e2f8a1c8cd706c0a6b48\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="c10df7344e31161852c20bb8143fc37319aa10ec">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_a28c3d0286d127f260e659fe95b613c2f559a0f5.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Escritorio\.android\build-cache\d652d1afe8f594b8a34b5094d0c20a9b06396117\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="ec75036c3c52e451d0cde50a5aedaf5fd32354a0">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_04bbd5b88b74ec2fcd1492a1e9c6fb6af2ee3f6e\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Escritorio\.android\build-cache\30b011e78a36db012bfb57f210066c103e7f419c\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="67bd36ee9340ec7c254108936ad16b24bed160cc">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_ad1e8f8180ef4e3cc0cab4d1a64cad150441d7c4.jar" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\Escritorio\.android\build-cache\9afd8e8e34a5219149af2dc84b9450523eba436f\output\jars\classes.jar"
         jumboMode="true"
         optimize="true"
@@ -75,12 +120,12 @@
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.4.0\jars\classes.jar"
+        jar="C:\Users\Escritorio\.android\build-cache\c78b4517f22fdaa56c619e630d90889cc3cde3fb\output\jars\classes.jar"
         jumboMode="false"
         optimize="true"
-        revision="23.0.3"
-        sha1="67bd36ee9340ec7c254108936ad16b24bed160cc">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.android.support-support-v4-23.4.0_0665aa66f7d3d49f4add5134c0bfd289c8de104b.jar" />
+        revision="25.0.0"
+        sha1="548f06de403a9409f00554b3ee12a9fdea0e236c">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_69c1cade0a3b52a24ebd7f37ef5369adc5420691.jar" />
     </item>
     <item
         is-multidex="true"
@@ -92,31 +137,13 @@
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_8f8e3140ffa0a537a42df9e9b51e1ba83edc6257\classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.3"
-        sha1="de4db3785756bfb0915a9f59a9b3f2fea7407be4">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.android.support-animated-vector-drawable-23.4.0_b1a977a2b9e4af62997fbe150493e03cbb33725a.jar" />
-    </item>
-    <item
         is-multidex="true"
-        jar="C:\Users\Escritorio\.android\build-cache\28434a48149cd441a47d2f916dd45dccc7585f34\output\jars\classes.jar"
+        jar="C:\Users\Escritorio\.android\build-cache\30b011e78a36db012bfb57f210066c103e7f419c\output\jars\classes.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="5326d9a850d491714fef8cbfaa9ea3416f0bf0d2">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_8b1e398d20fd2dff92e9b8c801aaef428021d1f4\classes.dex" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.3"
-        sha1="ec75036c3c52e451d0cde50a5aedaf5fd32354a0">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.android.support-recyclerview-v7-23.4.0_1e9c29063cb59e855e1db0b35ae17306fe6e70be.jar" />
+        sha1="67bd36ee9340ec7c254108936ad16b24bed160cc">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_ad1e8f8180ef4e3cc0cab4d1a64cad150441d7c4\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -129,30 +156,12 @@
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\Escritorio\.android\build-cache\e8297eb2e2b5c283095948f49cb241f590b42f15\output\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.0"
-        sha1="67bd36ee9340ec7c254108936ad16b24bed160cc">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_f69c767b190e51e21a4064dd5500ff0697597093\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.0"
         sha1="a1fb92e8bb9c62b3087d310bd612ce0284ce5e55">
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_528c79f81cd48a8de8f9cfb90d233d6ed022fc30\classes.dex" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-tasks\9.4.0\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.3"
-        sha1="8a36d229011e75f0caef408e1adf0d3fd4d94e02">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.google.android.gms-play-services-tasks-9.4.0_60b66e186f82585a8a8799f8808c238e1d4f387b.jar" />
     </item>
     <item
         is-multidex="true"
@@ -164,22 +173,13 @@
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_54126c6053d65203335a186f30dc14743b3c8572\classes.dex" />
     </item>
     <item
-        is-multidex="true"
-        jar="C:\Users\Escritorio\.android\build-cache\e8297eb2e2b5c283095948f49cb241f590b42f15\output\jars\libs\internal_impl-23.4.0.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.0"
-        sha1="ea3c07504d2c8f4b13aa17c45c1b68ed9c1c3674">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-23.4.0_efc41a478e0bdcfbc8300a0bbb833f612672cd15\classes.dex" />
-    </item>
-    <item
         is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-base\9.4.0\jars\classes.jar"
+        jar="C:\Users\Escritorio\.android\build-cache\f797b4c6ecce524954633cbb09545a55b7f02b04\output\jars\classes.jar"
         jumboMode="false"
         optimize="true"
-        revision="23.0.3"
-        sha1="3dee4ce5844d39d843d503fb8fe04e51e5bfffac">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.google.android.gms-play-services-base-9.4.0_0cb0e7ff707a469f63260676892f9c02d21d15a5.jar" />
+        revision="25.0.0"
+        sha1="18b5697c65c4fe5b7381613b8b8ae9ac52e26fa7">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_54126c6053d65203335a186f30dc14743b3c8572.jar" />
     </item>
     <item
         is-multidex="true"
@@ -189,6 +189,33 @@
         revision="23.0.3"
         sha1="f474798fde03291398b1a016118b9809a79550b7">
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\MPAndroidChart-v2.2.3_05df6a7436db3cb51008a5aec91c37f639dfd03a\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Escritorio\.android\build-cache\f8ed4bf722d8898367e89c14d3883ce2eb0230e9\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="c2c594cace5d83a3227b2b6e658ecbfd586d3ed9">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_09d7bf2cdc7a19761b150333c89c9d1c4fd3f8d4\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Escritorio\.android\build-cache\f8ed4bf722d8898367e89c14d3883ce2eb0230e9\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="c2c594cace5d83a3227b2b6e658ecbfd586d3ed9">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_09d7bf2cdc7a19761b150333c89c9d1c4fd3f8d4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Escritorio\.android\build-cache\9afd8e8e34a5219149af2dc84b9450523eba436f\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="618485fef3ebe12127f7622abbc9b5b39057b5c2">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_1d482aa9b724151399575fc671d2ccd41bd30000.jar" />
     </item>
     <item
         is-multidex="false"
@@ -219,48 +246,48 @@
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.firebase\firebase-common\9.4.0\jars\classes.jar"
+        jar="C:\Users\Escritorio\.gradle\caches\modules-2\files-2.1\com.github.PhilJay\MPAndroidChart\v2.2.3\f474798fde03291398b1a016118b9809a79550b7\MPAndroidChart-v2.2.3.jar"
         jumboMode="false"
-        optimize="true"
-        revision="23.0.3"
-        sha1="18b5697c65c4fe5b7381613b8b8ae9ac52e26fa7">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.google.firebase-firebase-common-9.4.0_8e77f022b6d1d6997ea5ce8e0bc6d36898553cb5.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-basement\9.4.0\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.3"
-        sha1="618485fef3ebe12127f7622abbc9b5b39057b5c2">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.google.android.gms-play-services-basement-9.4.0_b722b817efb4a0bcc0a1fd61017f076480fcb84e.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Escritorio\.android\build-cache\9fb12f67cb4081e6fba114501df0f2e23ae6cc9a\output\jars\classes.jar"
-        jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="548f06de403a9409f00554b3ee12a9fdea0e236c">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_07ae100a0a32328224d8d0f9848ab21c83a9467d\classes.dex" />
+        sha1="f474798fde03291398b1a016118b9809a79550b7">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\MPAndroidChart-v2.2.3_05df6a7436db3cb51008a5aec91c37f639dfd03a.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.4.0\jars\libs\internal_impl-23.4.0.jar"
+        jar="C:\Users\Escritorio\.android\build-cache\30b011e78a36db012bfb57f210066c103e7f419c\output\jars\libs\internal_impl-23.4.0.jar"
         jumboMode="false"
         optimize="true"
-        revision="23.0.3"
+        revision="25.0.0"
         sha1="ea3c07504d2c8f4b13aa17c45c1b68ed9c1c3674">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\internal_impl-23.4.0_94a457fc6cbdc396c341398e528483828a832573.jar" />
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\internal_impl-23.4.0_c05f8319e09fe7be5e566454a77df972463fe25f.jar" />
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\Escritorio\.android\build-cache\5f720d1f8382d9a7dd431331f6b09fa1691866de\output\jars\classes.jar"
+        jar="C:\Users\Escritorio\.android\build-cache\5ffe92b10a20a9ee4d528f960aa2a0c385d4a45e\output\jars\classes.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="c2c594cace5d83a3227b2b6e658ecbfd586d3ed9">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_1cee4bdc2406fc62e87530a2d3d36b62fa6a4cae\classes.dex" />
+        sha1="5326d9a850d491714fef8cbfaa9ea3416f0bf0d2">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_02e049fe2aae9877dd643e2f819c220083f4deca\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Escritorio\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.4.0\support-annotations-23.4.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="ffbe55fdb2bb456b1485831706a9eac3300bb6b8">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\support-annotations-23.4.0_a160ab4c4b4965d75da70792fd181401ebd307d6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Escritorio\.android\build-cache\5ffe92b10a20a9ee4d528f960aa2a0c385d4a45e\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="5326d9a850d491714fef8cbfaa9ea3416f0bf0d2">
+        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\classes_02e049fe2aae9877dd643e2f819c220083f4deca.jar" />
     </item>
     <item
         is-multidex="true"
@@ -270,15 +297,6 @@
         revision="25.0.0"
         sha1="ffbe55fdb2bb456b1485831706a9eac3300bb6b8">
         <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-23.4.0_a160ab4c4b4965d75da70792fd181401ebd307d6\classes.dex" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.4.0\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.3"
-        sha1="548f06de403a9409f00554b3ee12a9fdea0e236c">
-        <dex dex="C:\Users\Escritorio\Documents\Lucas\Android\DestinyEventScheduler\app\build\intermediates\pre-dexed\release\com.android.support-appcompat-v7-23.4.0_041b890f512302eb4072f743d647098eb315527f.jar" />
     </item>
     <item
         is-multidex="true"

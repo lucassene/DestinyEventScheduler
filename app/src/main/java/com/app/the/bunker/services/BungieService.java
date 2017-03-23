@@ -60,6 +60,7 @@ import static com.app.the.bunker.Constants.MEMBER_HEADER;
 import static com.app.the.bunker.Constants.PLATFORM_HEADER;
 import static com.app.the.bunker.Constants.SERVER_BASE_URL;
 import static com.app.the.bunker.services.ServerService.ERROR_JSON;
+import static com.app.the.bunker.services.ServerService.ERROR_NULL_RESPONSE;
 import static com.app.the.bunker.services.ServerService.RECEIVER_TAG;
 
 public class BungieService extends IntentService {
@@ -287,7 +288,7 @@ public class BungieService extends IntentService {
 
                     //Log.w(TAG, "getGroup response: " + response );
 
-                    if (response != null){
+                    if (response != null) {
                         try {
                             JSONObject jO = new JSONObject(response);
                             Log.w(TAG, "getGroup response: " + jO.toString());
@@ -303,42 +304,42 @@ public class BungieService extends IntentService {
 
                             Cursor cursor = null;
                             try {
-                                cursor = getContentResolver().query(DataProvider.CLAN_URI,ClanTable.ALL_COLUMNS,null, null, null);
-                                if (cursor != null && cursor.moveToFirst()){
+                                cursor = getContentResolver().query(DataProvider.CLAN_URI, ClanTable.ALL_COLUMNS, null, null, null);
+                                if (cursor != null && cursor.moveToFirst()) {
                                     String actualName = cursor.getString(cursor.getColumnIndexOrThrow(ClanTable.COLUMN_NAME));
                                     String actualMotto = cursor.getString(cursor.getColumnIndexOrThrow(ClanTable.COLUMN_DESC));
                                     String actualBanner = cursor.getString(cursor.getColumnIndexOrThrow(ClanTable.COLUMN_BACKGROUND));
                                     String actualIcon = cursor.getString(cursor.getColumnIndexOrThrow(ClanTable.COLUMN_ID));
 
                                     ContentValues values = new ContentValues();
-                                    if (!clanName.equals(actualName)){
+                                    if (!clanName.equals(actualName)) {
                                         values.put(ClanTable.COLUMN_NAME, clanName);
                                     }
-                                    if (!clanBanner.equals(actualBanner)){
-                                        String imageName = clanBanner.substring(clanBanner.lastIndexOf("/")+1, clanBanner.length());
+                                    if (!clanBanner.equals(actualBanner)) {
+                                        String imageName = clanBanner.substring(clanBanner.lastIndexOf("/") + 1, clanBanner.length());
                                         values.put(ClanTable.COLUMN_BACKGROUND, imageName);
                                         ImageUtils.downloadImage(getApplicationContext(), BASE_IMAGE_URL + clanBanner);
                                     }
-                                    if (!clanIcon.equals(actualIcon)){
-                                        String imageName = clanIcon.substring(clanIcon.lastIndexOf("/")+1, clanIcon.length());
+                                    if (!clanIcon.equals(actualIcon)) {
+                                        String imageName = clanIcon.substring(clanIcon.lastIndexOf("/") + 1, clanIcon.length());
                                         values.put(ClanTable.COLUMN_ICON, imageName);
                                         ImageUtils.downloadImage(getApplicationContext(), BASE_IMAGE_URL + clanIcon);
                                     }
-                                    if (!motto.equals(actualMotto)){
+                                    if (!motto.equals(actualMotto)) {
                                         values.put(ClanTable.COLUMN_DESC, motto);
                                     }
-                                    getContentResolver().update(DataProvider.CLAN_URI,values,ClanTable.COLUMN_BUNGIE_ID + "=" + clanId,null);
+                                    getContentResolver().update(DataProvider.CLAN_URI, values, ClanTable.COLUMN_BUNGIE_ID + "=" + clanId, null);
                                     values.clear();
                                     return NO_ERROR;
                                 }
-                            } catch (Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             } finally {
                                 if (cursor != null) cursor.close();
                             }
 
                             return 0;
-                        } catch (JSONException jE){
+                        } catch (JSONException jE) {
                             Log.w(TAG, "Erro no JSON de GetGroup");
                             jE.printStackTrace();
                             return ERROR_RESPONSE_CODE;
@@ -355,6 +356,10 @@ public class BungieService extends IntentService {
                 Log.w(TAG, "Sem conexão com a internet");
                 return ERROR_NO_CONNECTION;
             }
+        } catch (StackOverflowError e){
+            e.printStackTrace();
+            Log.w(TAG,"StackOverflowError");
+            return ERROR_HTTP_REQUEST;
         } catch (java.net.SocketTimeoutException e){
             e.printStackTrace();
             Log.w(TAG, "Time out! (getCurrentBungieAccount)");
@@ -417,7 +422,9 @@ public class BungieService extends IntentService {
                 if (statusCode == 200) {
                     InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     getCurrentBungieAccountResponse = convertInputStreamToString(inputStream);
-                    return NO_ERROR;
+                    if (getCurrentBungieAccountResponse != null){
+                        return NO_ERROR;
+                    } return ERROR_NULL_RESPONSE;
                 } else {
                     Log.w(TAG, "Response Code do JSON diferente de 200 (GetCurrentBungieAccount");
                     return ERROR_RESPONSE_CODE;
@@ -427,7 +434,10 @@ public class BungieService extends IntentService {
                 Log.w(TAG, "Sem conexão com a internet");
                 return ERROR_NO_CONNECTION;
             }
-
+        } catch (StackOverflowError e){
+            e.printStackTrace();
+            Log.w(TAG,"StackOverflowError");
+            return ERROR_HTTP_REQUEST;
         } catch (java.net.SocketTimeoutException e){
             e.printStackTrace();
             Log.w(TAG, "Time out! (getCurrentBungieAccount)");
@@ -567,7 +577,6 @@ public class BungieService extends IntentService {
         Log.w(TAG, "Login initiaded. Getting authorization...");
 
         try {
-
             if (NetworkUtils.checkConnection(getApplicationContext())){
 
                 URL url = new URL(myURL);
@@ -603,6 +612,10 @@ public class BungieService extends IntentService {
                 Log.w(TAG, "Sem conexão com a internet");
                 return ERROR_NO_CONNECTION;
             }
+        } catch (StackOverflowError e){
+            e.printStackTrace();
+            Log.w(TAG,"StackOverflowError");
+            return ERROR_HTTP_REQUEST;
         } catch (java.net.SocketTimeoutException e ){
             Log.w(TAG, "Time out! (Server Login)");
             e.printStackTrace();
@@ -620,7 +633,6 @@ public class BungieService extends IntentService {
         if (receiver != null) receiver.send(STATUS_FRIENDS, Bundle.EMPTY);
 
         try{
-
             if (NetworkUtils.checkConnection(getApplicationContext())){
 
                 URL url = new URL(myURL);
@@ -678,7 +690,11 @@ public class BungieService extends IntentService {
                 error = ERROR_NO_CONNECTION;
                 return ERROR_NO_CONNECTION;
             }
-
+        } catch (StackOverflowError e){
+            e.printStackTrace();
+            Log.w(TAG,"StackOverflowError");
+            error = ERROR_HTTP_REQUEST;
+            return ERROR_HTTP_REQUEST;
         } catch (java.net.SocketTimeoutException e ){
             Log.w(TAG, "Time out! (getMembersOfClan");
             e.printStackTrace();
@@ -717,7 +733,6 @@ public class BungieService extends IntentService {
             if (statusCode == 200) {
                 InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                 String response = convertInputStreamToString(inputStream);
-
                 if (response != null) {
                     parseNewEvents(response);
                 }
@@ -727,6 +742,9 @@ public class BungieService extends IntentService {
                     if (err != NO_ERROR) getNewEvents(receiver);
                 }
             }
+        } catch (StackOverflowError e){
+            e.printStackTrace();
+            Log.w(TAG,"StackOverflowError");
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -891,6 +909,11 @@ public class BungieService extends IntentService {
                 error = ERROR_NO_CONNECTION;
                 return ERROR_NO_CONNECTION;
             }
+        } catch (StackOverflowError e){
+            e.printStackTrace();
+            Log.w(TAG,"StackOverflowError");
+            error = ERROR_HTTP_REQUEST;
+            return ERROR_HTTP_REQUEST;
         } catch (java.net.SocketTimeoutException e){
             Log.w(TAG, "Time out! (getMembersOfClan)");
             e.printStackTrace();
@@ -952,18 +975,24 @@ public class BungieService extends IntentService {
 
     private String convertInputStreamToString(InputStream inputStream) throws IOException {
 
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        String line;
-        String result = "";
+        try{
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            String line;
+            String result = "";
 
-        while ((line = bufferedReader.readLine()) != null) {
-            result += line;
+            while ((line = bufferedReader.readLine()) != null) {
+                result += line;
+            }
+
+            inputStream.close();
+            result = Html.fromHtml(result).toString();
+
+            return result;
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.w(TAG,"Error converting InputStream to String");
+            return null;
         }
-
-        inputStream.close();
-        result = Html.fromHtml(result).toString();
-
-        return result;
     }
 
     private void insertClanMember(MemberModel member) {

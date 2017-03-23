@@ -81,7 +81,6 @@ public class DataProvider extends ContentProvider {
         return true;
     }
 
-
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 

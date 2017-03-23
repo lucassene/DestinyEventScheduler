@@ -416,7 +416,7 @@ public class ServerService extends IntentService {
         Log.w(TAG, "URL: " + url);
         if (receiver != null) { sendStatus(receiver, STATUS_RUNNING); }
         try {
-            if (NetworkUtils.checkConnection(getApplicationContext())){
+            if (NetworkUtils.checkConnection(getApplicationContext())) {
                 URL myURL;
                 if (type == TYPE_LOGIN) {
                     myURL = new URL(SERVER_BASE_URL + LOGIN_ENDPOINT);
@@ -424,7 +424,7 @@ public class ServerService extends IntentService {
                 HttpURLConnection urlConnection = (HttpURLConnection) myURL.openConnection();
                 urlConnection.setConnectTimeout(5000);
                 urlConnection.setReadTimeout(10000);
-                switch (type){
+                switch (type) {
                     case TYPE_CREATE_GAME:
                         urlConnection = createGameRequest(urlConnection, bundle);
                         break;
@@ -469,7 +469,7 @@ public class ServerService extends IntentService {
                 }
 
                 int statusCode;
-                if (urlConnection != null){
+                if (urlConnection != null) {
                     statusCode = urlConnection.getResponseCode();
                 } else return ERROR_JSON;
 
@@ -477,9 +477,9 @@ public class ServerService extends IntentService {
                     int error = NO_ERROR;
                     InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     String response = convertInputStreamToString(inputStream);
-                    if (response != null){
+                    if (response != null) {
                         try {
-                            switch (type){
+                            switch (type) {
                                 case TYPE_CREATE_GAME:
                                     gameId = Integer.parseInt(response);
                                     return NO_ERROR;
@@ -488,7 +488,7 @@ public class ServerService extends IntentService {
                                 case TYPE_JOINED_GAMES:
                                 case TYPE_HISTORY_GAMES:
                                     error = parseGames(receiver, response);
-                                    if (error != NO_ERROR){
+                                    if (error != NO_ERROR) {
                                         return error;
                                     } else return NO_ERROR;
                                 case TYPE_GAME_ENTRIES:
@@ -505,7 +505,7 @@ public class ServerService extends IntentService {
                                     String mUrl = SERVER_BASE_URL + MEMBERLIST_ENDPOINT;
                                     int err = requestServer(receiver, TYPE_CLAN_MEMBERS, mUrl, bundle);
                                     Log.w(TAG, "MemberList error: " + err);
-                                    if (err == NO_ERROR){
+                                    if (err == NO_ERROR) {
                                         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, LocalService.class);
                                         intent.putExtra(LocalService.RECEIVER_HEADER, receiver);
                                         intent.putExtra(LocalService.REQUEST_HEADER, LocalService.TYPE_UPDATE_MEMBERS);
@@ -524,7 +524,7 @@ public class ServerService extends IntentService {
                                     error = parseMembers(response);
                                     return error;
                                 case TYPE_NOTICE:
-                                    if (!StringUtils.isEmptyOrWhiteSpaces(response)){
+                                    if (!StringUtils.isEmptyOrWhiteSpaces(response)) {
                                         error = parseNotice(response);
                                         return error;
                                     } else return NO_ERROR;
@@ -544,12 +544,12 @@ public class ServerService extends IntentService {
                                     Account acc = new Account(userName, Constants.ACC_TYPE);
                                     manager.invalidateAuthToken(Constants.ACC_TYPE, auth);
                                     manager.setAuthToken(acc, Constants.ACC_TYPE, encrypted);
-                                    error = requestServer(receiver, bundle.getInt(REQUEST_TAG),bundle.getString(URL_TAG),bundle.getBundle(BUNDLE_TAG));
+                                    error = requestServer(receiver, bundle.getInt(REQUEST_TAG), bundle.getString(URL_TAG), bundle.getBundle(BUNDLE_TAG));
                                     return error;
                                 default:
                                     return NO_ERROR;
                             }
-                        } catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                             return ERROR_INCORRECT_RESPONSE;
                         }
@@ -560,10 +560,10 @@ public class ServerService extends IntentService {
                 } else {
                     String s = convertInputStreamToString(urlConnection.getErrorStream());
                     Log.w(TAG, "error: " + s);
-                    if (statusCode == 500 || statusCode == 403){
+                    if (statusCode == 500 || statusCode == 403) {
                         if (hasTriedOnce) return ERROR_RESPONSE_CODE;
                         hasTriedOnce = true;
-                        switch (type){
+                        switch (type) {
                             case TYPE_CREATE_GAME:
                                 return ERROR_NO_EVENT;
                             default:
@@ -583,6 +583,10 @@ public class ServerService extends IntentService {
                 Log.w(TAG, "No internet connection found");
                 return ERROR_NO_CONNECTION;
             }
+        } catch (StackOverflowError e){
+            e.printStackTrace();
+            Log.w(TAG,"StackOverflowError");
+            return ERROR_HTTP_REQUEST;
         } catch (java.net.SocketTimeoutException e){
             e.printStackTrace();
             Log.w(TAG, "Time out");
@@ -1172,15 +1176,21 @@ public class ServerService extends IntentService {
     }
 
     private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null) {
-            result += line;
+        try{
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            String result = "";
+            while ((line = bufferedReader.readLine()) != null) {
+                result += line;
+            }
+            inputStream.close();
+            result = Html.fromHtml(result).toString();
+            return result;
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.w(TAG,"Error converting InputStream to String");
+            return null;
         }
-        inputStream.close();
-        result = Html.fromHtml(result).toString();
-        return result;
     }
 
     private class TypeComparator implements java.util.Comparator<EventTypeModel> {

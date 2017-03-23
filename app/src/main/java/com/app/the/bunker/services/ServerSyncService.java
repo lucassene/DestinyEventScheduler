@@ -183,15 +183,19 @@ public class ServerSyncService extends IntentService {
     private int[] getIdArray() {
         Cursor cursor = null;
         ArrayList<Integer> list = new ArrayList<>();
-        try{
-            cursor = getContentResolver().query(DataProvider.EVENT_TYPE_URI, EventTypeTable.ALL_COLUMNS,null,null,null);
-            if (cursor != null && cursor.moveToFirst()){
-                for (int i=0;i<cursor.getCount();i++){
+        try {
+            cursor = getContentResolver().query(DataProvider.EVENT_TYPE_URI, EventTypeTable.ALL_COLUMNS, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                for (int i = 0; i < cursor.getCount(); i++) {
                     list.add(cursor.getInt(cursor.getColumnIndexOrThrow(EventTypeTable.COLUMN_ID)));
                     cursor.moveToNext();
                 }
             }
             return convertList(list);
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.w(TAG, "Error with getIdArray()");
+            return null;
         } finally {
             if (cursor != null) cursor.close();
         }
@@ -223,8 +227,8 @@ public class ServerSyncService extends IntentService {
     }
 
     private void requestServer(int type, String url) {
-        try{
-            if (NetworkUtils.checkConnection(this)){
+        try {
+            if (NetworkUtils.checkConnection(this)) {
                 URL myURL = new URL(url);
                 HttpURLConnection urlConnection = (HttpURLConnection) myURL.openConnection();
                 urlConnection.setConnectTimeout(5000);
@@ -233,24 +237,26 @@ public class ServerSyncService extends IntentService {
                 urlConnection.setRequestProperty(PLATFORM_HEADER, String.valueOf(platformId));
                 urlConnection.setRequestProperty(CLAN_HEADER, String.valueOf(clanId));
                 urlConnection.setRequestProperty(TIMEZONE_HEADER, TimeZone.getDefault().getID());
-                String authKey = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).getString(Constants.KEY_PREF,"");
-                try{
-                    if (!authKey.isEmpty()){
+                String authKey = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE).getString(Constants.KEY_PREF, "");
+                try {
+                    if (!authKey.isEmpty()) {
                         CipherUtils cipher = new CipherUtils();
                         urlConnection.setRequestProperty(AUTH_HEADER, cipher.decrypt(authKey));
                     } else urlConnection.setRequestProperty(AUTH_HEADER, authKey);
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 urlConnection.setRequestMethod(GET_METHOD);
                 int statusCode = urlConnection.getResponseCode();
-                if (statusCode == 200){
-                    switch (type){
+                if (statusCode == 200) {
+                    switch (type) {
                         case ServerService.TYPE_NEW_GAMES:
                             InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                             String response = convertInputStreamToString(inputStream);
-                            parseGames(response);
-                            hasNewGames = checkifHasSelectedGames();
+                            if (response != null) {
+                                parseGames(response);
+                                hasNewGames = checkifHasSelectedGames();
+                            }
                             break;
                         case ServerService.TYPE_LOGIN:
                             authKey = urlConnection.getHeaderField(AUTH_HEADER);
@@ -263,31 +269,35 @@ public class ServerSyncService extends IntentService {
                         case ServerService.TYPE_DONE:
                             InputStream iStream = new BufferedInputStream(urlConnection.getInputStream());
                             String resp = convertInputStreamToString(iStream);
-                            parseGames(resp);
-                            if (gameList.size()>0){
-                                hasDoneGames = true;
-                                Log.w(TAG, "Done games found.");
-                            } else{
-                                Log.w(TAG, "No done games found.");
-                                hasDoneGames = false;
+                            if (resp != null) {
+                                parseGames(resp);
+                                if (gameList.size() > 0) {
+                                    hasDoneGames = true;
+                                    Log.w(TAG, "Done games found.");
+                                } else {
+                                    Log.w(TAG, "No done games found.");
+                                    hasDoneGames = false;
+                                }
                             }
                             break;
                         case ServerService.TYPE_SYNC_SCHEDULED:
                             InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
                             String r = convertInputStreamToString(stream);
-                            parseGames(r);
-                            if (gameList.size()>0){
-                                Log.w(TAG, "calling CreateNotificationService...");
-                                Intent intent = new Intent(Intent.ACTION_SYNC, null, this, CreateNotificationService.class);
-                                intent.putExtra(CreateNotificationService.GAME_HEADER, gameList);
-                                startService(intent);
-                            } else Log.w(TAG, "No schedule events found.");
+                            if (r != null) {
+                                parseGames(r);
+                                if (gameList.size() > 0) {
+                                    Log.w(TAG, "calling CreateNotificationService...");
+                                    Intent intent = new Intent(Intent.ACTION_SYNC, null, this, CreateNotificationService.class);
+                                    intent.putExtra(CreateNotificationService.GAME_HEADER, gameList);
+                                    startService(intent);
+                                } else Log.w(TAG, "No schedule events found.");
+                            }
                             break;
                     }
                 } else {
                     Log.w(TAG, "Status code different than 200.");
-                    if (statusCode == 500 || statusCode == 403){
-                        if (!hasTriedOnce){
+                    if (statusCode == 500 || statusCode == 403) {
+                        if (!hasTriedOnce) {
                             priorUrl = url;
                             String lUrl = SERVER_BASE_URL + LOGIN_ENDPOINT;
                             requestServer(ServerService.TYPE_LOGIN, lUrl);
@@ -295,8 +305,15 @@ public class ServerSyncService extends IntentService {
                         }
                     }
                 }
-
-            } else { Log.w(TAG, "No internet connection."); }
+            } else {
+                Log.w(TAG, "No internet connection.");
+            }
+        } catch (StackOverflowError e){
+            e.printStackTrace();
+            Log.w(TAG,"StackOverflowError");
+        } catch (java.net.SocketTimeoutException e) {
+            e.printStackTrace();
+            Log.w(TAG, "Time out");
         } catch (Exception e){
             e.printStackTrace();
             Log.w(TAG, "Error in HTTP Request");
@@ -459,13 +476,19 @@ public class ServerSyncService extends IntentService {
     }
 
     private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null) {
-            result += line;
+        try{
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            String result = "";
+            while ((line = bufferedReader.readLine()) != null) {
+                result += line;
+            }
+            inputStream.close();
+            return result;
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.w(TAG, "Error converting InputStream to String");
+            return null;
         }
-        inputStream.close();
-        return result;
     }
 }
