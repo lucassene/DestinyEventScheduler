@@ -24,6 +24,9 @@ The app is not available anymore.
 - The first version was released in September 2016 and the last version (v1.1.2) was removed from play store in November 2017. 
 - During this period the app was downloaded 539 times with an average rate of 4.3 stars.
 
+## License
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
 ## Meta
 
 ### Front-End
