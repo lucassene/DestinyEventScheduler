@@ -30,7 +30,7 @@ The app is not available anymore.
 ## Meta
 
 ### Front-End
-Lucas Sene Grandchamp – lsgrandchamp@gmail.com
+Lucas Sene Grandchamp
 
 [https://github.com/lucassene](https://github.com/lucassene)
 
